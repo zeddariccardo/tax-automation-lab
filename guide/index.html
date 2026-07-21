@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Automazione dei processi fiscali e contabili | Tax Automation Lab</title>
+<meta name="description" content="Un metodo operativo per scegliere i processi, trasformare le regole professionali in software e verificare il risultato.">
+<link rel="canonical" href="https://taxautomationlab.com/guide/">
+<meta name="robots" content="index,follow">
+<style>
+:root{--bg:#0E1624;--panel:#141d2e;--text:#F7F7F5;--muted:#C8CDD3;--line:rgba(247,247,245,.16);--accent:#145368;--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:radial-gradient(circle at 100% 0,rgba(89,20,125,.34),transparent 38%),linear-gradient(155deg,#291638,#123545);background-attachment:fixed;color:var(--text);font:15px/1.65 var(--sans);min-height:100vh}
+.wrap{width:min(920px,calc(100% - 32px));margin:auto}.top{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-weight:750;letter-spacing:.08em;text-transform:uppercase;font-size:12px;text-decoration:none}.nav{display:flex;flex-wrap:wrap;gap:12px}.nav a,.back{color:var(--muted);text-decoration:none}.nav a:hover,.back:hover{color:#fff}
+.hero{padding:52px 0 28px}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}h1,h2{font-family:var(--serif);font-weight:300}h1{font-size:clamp(42px,8vw,72px);line-height:1;margin:12px 0 18px}h2{font-size:30px;line-height:1.1;margin:34px 0 12px}p,li{color:#E1E5E8}.lead{font-size:18px;max-width:760px}.panel{background:linear-gradient(150deg,rgba(15,25,34,.94),rgba(27,29,38,.9));border:1px solid var(--line);border-radius:12px;padding:24px;margin:18px 0}.callout{border-left:4px solid var(--accent)}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-weight:650}.button.secondary{background:transparent;color:#fff;border:1px solid var(--line)}.footer{border-top:1px solid var(--line);margin-top:48px;padding:24px 0 42px;color:var(--muted);font-size:11px}.guide-section{scroll-margin-top:20px}.guide-section pre{white-space:pre-wrap;font:inherit;color:#E1E5E8;margin:0}.toc{columns:2;column-gap:30px}.toc a{display:block;color:#E1E5E8;text-decoration:none;margin:7px 0}.toc a:hover{color:#fff}@media(max-width:640px){.top{align-items:flex-start;flex-direction:column}.toc{columns:1}.panel{padding:19px}}
+</style>
+</head><body>
+<div class="wrap">
+<header class="top"><a class="brand" href="/">Tax Automation Lab</a>
+<nav class="nav"><a href="/guide/">Guida</a><a href="/privacy/">Privacy</a><a href="/security/">Sicurezza</a><a href="/terms/">Termini</a><a href="/licenses/">Licenze</a></nav></header>
+<main><section class="hero"><span class="eyebrow">Guida operativa · edizione 2026</span><h1>Automazione dei processi fiscali e contabili</h1><p class="lead">Un metodo operativo per scegliere i processi, trasformare le regole professionali in software e verificare il risultato.</p></section>
+<section class="panel callout">
+<strong>Edizione web</strong>
+<p>Questa pagina rende la guida consultabile senza scaricare file dal dominio. Il PDF completo è distribuito tramite GitHub Releases.</p>
+<div class="actions">
+<a class="button" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer">Scarica il PDF da GitHub ↗</a>
+<a class="button secondary" href="/">Torna al Lab</a>
+</div>
+</section>
+<section class="panel"><span class="eyebrow">Indice</span><div class="toc"><a href="#s1">01 · G u i d a o p e r at i va · e d i z i o n e 2 0 2 6</a>
+<a href="#s2">02 · Indice</a>
+<a href="#s3">03 · I · S c e lta d e l p r o c e s s o</a>
+<a href="#s4">04 · I I · S c e lta d e g l i s t r u m e n t i</a>
+<a href="#s5">05 · III · Uso dell&#x27;intelligenza artificiale</a>
+<a href="#s6">06 · IV · Verifica</a>
+<a href="#s7">07 · V · C h i c c h e p r at i c h e</a>
+<a href="#s8">08 · Parte s e c o n d a</a>
+<a href="#s9">09 · VI · Il problema</a>
+<a href="#s10">10 · VII · Input</a>
+<a href="#s11">11 · VIII · Brainstorm e memoria</a>
+<a href="#s12">12 · IX · Progetto di sviluppo</a>
+<a href="#s13">13 · X · Sviluppo</a>
+<a href="#s14">14 · XI · Follow-up e test</a>
+<a href="#s15">15 · X I I · L o g i c a c o n ta b i l e</a>
+<a href="#s16">16 · XIII · Rettifiche</a>
+<a href="#s17">17 · XIV · Audit</a>
+<a href="#s18">18 · XV · Rilascio</a>
+<a href="#s19">19 · XVI · La professione</a>
+<a href="#s20">20 · XVII · Chiusura</a></div></section>
+<section class="panel guide-section" id="s1"><span class="eyebrow">Sezione 01</span><h2>G u i d a o p e r at i va · e d i z i o n e 2 0 2 6</h2><pre>Automazione
+
+dei processi fiscali
+
+e contabili
+
+Un metodo operativo per scegliere i processi, usare gli strumenti di intelligenza artificiale, trasformare le
+
+regole professionali in software e verificare il risultato. Il metodo viene applicato alla riclassificazione di un
+
+bilancio infrannuale dal reporting IAS/IFRS agli schemi civilistici italiani.
+
+Riccardo Zedda, dottore commercialista</pre></section>
+<section class="panel guide-section" id="s2"><span class="eyebrow">Sezione 02</span><h2>Indice</h2><pre>Contenuti
+
+I Capire cosa automatizzare 03 IX Progetto di sviluppo 12
+
+II Scegliere gli strumenti 04 X Prima versione 13
+
+III Usare l&#x27;intelligenza artificiale 05 XI Follow-up e test 14
+
+IV Verificare il risultato 06 XII Logica contabile 15
+
+V Chicche pratiche 07 XIII Rettifiche IAS/IFRS e OIC 16
+
+VI Il problema da risolvere 09 XIV Audit indipendente 17
+
+VII Input e condizioni 10 XV Rilascio 18
+
+VIII Brainstorm e memoria 11 XVI La professione 19
+
+Riccardo Zedda II</pre></section>
+<section class="panel guide-section" id="s3"><span class="eyebrow">Sezione 03</span><h2>I · S c e lta d e l p r o c e s s o</h2><pre>Partire dal processo, non dallo strumento
+
+Scelgo un&#x27;attività che conosco bene e che ripeto. Gli input devono essere abbastanza stabili, le regole spiegabili e il risultato controllabile. Non parto dal processo più
+
+complesso. Parto da quello in cui posso confrontare il tool con un working paper già affidabile.
+
+01 Ricorre. La eseguo ogni mese, trimestre o anno e assorbe tempo ogni volta.
+
+02 I dati sono leggibili. I file hanno una struttura riconoscibile oppure posso normalizzarli.
+
+03 Le regole si possono scrivere. So spiegare cosa fare nei casi ordinari e nelle principali eccezioni.
+
+04 Il risultato si può verificare. Dispongo di quadrature, controlli o output storici con cui confrontarlo.
+
+Se almeno tre risposte sono positive, vale la pena costruire un primo prototipo. Se una regola vive solo nella testa di chi esegue il processo, prima va scritta.</pre></section>
+<section class="panel guide-section" id="s4"><span class="eyebrow">Sezione 04</span><h2>I I · S c e lta d e g l i s t r u m e n t i</h2><pre>Assegnare un ruolo a ogni ambiente
+
+Non serve conoscere tutti i modelli. Serve sapere quale lavoro affidare a ciascuno. Questa è la combinazione che uso io perché mi trovo bene, ma può essere sostituita.
+
+Terrei comunque separate progettazione, sviluppo e controllo.
+
+01 Capire e progettare — ChatGPT. Metto ordine nel processo, preparo il brief, chiarisco le regole e costruisco i test.
+
+02 Scrivere il codice — Claude. Sviluppo l&#x27;applicativo a partire da specifiche già approvate e lavoro per versioni piccole.
+
+03 Leggere molti documenti — Gemini o Perplexity. Esamino corpus ampi e individuo i passaggi da verificare sulle fonti ufficiali.
+
+04 Conservare la memoria — Obsidian. Tengo insieme fonti, mapping, decisioni, test, assunzioni e versioni del progetto.
+
+05 Verificare la sostanza — banche dati professionali. Controllo norme, prassi e principi contabili. Il modello non sostituisce la fonte.</pre></section>
+<section class="panel guide-section" id="s5"><span class="eyebrow">Sezione 05</span><h2>III · Uso dell&#x27;intelligenza artificiale</h2><pre>Aprire la chat e insegnare il processo
+
+Non inizierei chiedendo di scrivere il codice. Aprirei una chat nuova e
+
+Un&#x27;istruzione che si può copiare
+
+trasferirei il processo un pezzo alla volta. Il modello deve capire cosa
+
+voglio ottenere, come sono fatti i dati e dove deve fermarsi. «Voglio costruire un applicativo che produca questo risultato. Questi sono gli input e vanno letti in
+
+questo modo. Queste sono le regole e le eccezioni. Se manca un dato, fermati. L&#x27;output deve superare
+
+01 Scrivi l&#x27;obiettivo. Una frase concreta: voglio ottenere questo questi controlli. Non scrivere ancora codice. Restituisci prima il brief e indicami cosa non è chiaro.»
+
+file partendo da questi dati.
+
+02 Carica input reali. Usa almeno un file ordinario e uno con
+
+un&#x27;anomalia già conosciuta.
+
+03 Insegna come leggerli. Spiega colonne, segni, codici, totali,
+
+righe da ignorare e dati mancanti.
+
+04 Spiega le regole. Scrivi se accade X fai Y. Se manca Z fermati e
+
+chiedi. Non lasciare decisioni implicite.
+
+05 Definisci output e controlli. Indica formato, campi, quadrature,
+
+messaggi di errore e livello di dettaglio.
+
+06 Fatti restituire il brief. Prima del codice chiedi una sintesi
+
+completa e correggi ciò che il modello ha capito male.</pre></section>
+<section class="panel guide-section" id="s6"><span class="eyebrow">Sezione 06</span><h2>IV · Verifica</h2><pre>Provare il risultato prima di usarlo
+
+Un applicativo non è corretto perché si apre o perché produce un numero. Prima dello sviluppo preparo i casi di prova e il risultato atteso. Dopo lo sviluppo provo a farlo
+
+sbagliare.
+
+01 Caso ordinario. Un file pulito con risultato già verificato a mano.
+
+02 Caso limite. Un segno invertito, un conto nuovo, un saldo zero o una fattispecie rara.
+
+03 Input errato. Colonne mancanti, formato sbagliato o dati incoerenti. Il tool deve fermarsi.
+
+04 Risultato atteso. Numeri, classificazioni e quadrature preparati prima di vedere il prototipo.
+
+Eseguo tutti i casi e registro PASS o FAIL. Controllo le fonti normative, apro le voci e arrivo ai conti sottostanti. Una quadratura aritmetica non dimostra che la
+
+classificazione sia corretta.
+
+Infine apro una chat nuova. Le fornisco codice, brief e matrice di test, ma non la storia dello sviluppo. Le chiedo di cercare errori, assunzioni non supportate e casi non
+
+gestiti. La stessa chat che ha costruito il tool non dovrebbe certificarlo.
+
+Istruzione di audit
+
+«Per ogni controllo restituisci PASS o FAIL, motivazione, evidenza e correzione. Non cercare di confermare il risultato. Cerca il modo in cui potrebbe essere sbagliato.»</pre></section>
+<section class="panel guide-section" id="s7"><span class="eyebrow">Sezione 07</span><h2>V · C h i c c h e p r at i c h e</h2><pre>Piccoli accorgimenti che evitano molti errori
+
+01 02 03 04
+
+Il canarino del contesto Il test dello scoiattolo Il passaggio di consegne Sintesi, non copia
+
+Chiedi al modello di iniziare ogni risposta Chiedi cosa dicono i file sugli scoiattoli. La Prima di cambiare chat, fatti preparare una Nel passaggio di consegne non copiare interi
+
+con il tuo nome. Se smette, il contesto risposta corretta è che non ne parlano. Se pagina con obiettivo, decisioni prese, errori documenti. Scrivi cosa è stato deciso, perché
+
+potrebbe essersi deteriorato. È un allarme, inventa, non sta usando bene le fonti. già trovati, file utili e prossimo passo. e dove si trova la fonte.
+
+non una prova.
+
+05 06 07 08
+
+Una produce, una controlla I controlli vengono prima Registro delle assunzioni Prova a smentirlo
+
+Una chat costruisce. Una seconda chat, senza Definisci i criteri PASS o FAIL prima del Tieni visibili le ipotesi usate dal tool. Ogni Non chiedere solo se funziona. Chiedi quale
+
+la storia del lavoro, cerca errori e codice. Dopo rischieresti di adattare il assunzione non verificata deve restare input lo farebbe fallire e quale caso
+
+contraddizioni. controllo al risultato. aperta. contraddice la regola.</pre></section>
+<section class="panel guide-section" id="s8"><span class="eyebrow">Sezione 08</span><h2>Parte s e c o n d a</h2><pre>Un caso completo:
+
+riclassifica del bilancio
+
+secondo la IV Direttiva
+
+Dalla lettura dei principi al rilascio validato. Un applicativo che riceve in ingresso i report gestionali di un gruppo
+
+redatti in logica IAS/IFRS e restituisce i prospetti civilistici di cui agli articoli 2424, 2425 e 2435-bis del codice civile,
+
+gestendo le rettifiche book-to-book in partita doppia.
+
+Il percorso seguito è sempre lo stesso: prima chiarisco il processo in chat, poi affido a Obsidian ciò che deve restare, poi apro un
+
+progetto Claude con quelle stesse fonti, e da lì procedo per versioni e follow-up fino al rilascio.</pre></section>
+<section class="panel guide-section" id="s9"><span class="eyebrow">Sezione 09</span><h2>VI · Il problema</h2><pre>Un bilancino OIC serve anche durante l&#x27;anno
+
+Nel gruppo molte società tengono la contabilità quotidiana e il reporting secondo logiche
+
+S i t u a z i o n e at t u a l e
+
+IAS/IFRS. Il bilancio annuale viene poi predisposto secondo il codice civile e gli OIC.
+
+Trial balance e report IAS/IFRS disponibili. Raccordo OIC già usato in sede annuale.
+
+Durante l&#x27;anno può però servire un bilancino civilistico. Un caso concreto è l&#x27;istruttoria
+
+Il lavoro infrannuale è ancora manuale.
+
+per un rimborso IVA, quando l&#x27;autorità chiede una situazione infrannuale leggibile
+
+secondo criteri italiani.
+
+Ricostruire ogni volta il prospetto a mano significa ripetere mappature, controlli sui Obiettivo
+
+segni, verifiche delle rettifiche e quadrature. Il problema non è tecnico. È un processo Caricare i file standard e ottenere un bilancino OIC navigabile, riconciliato,
+
+professionale già noto che viene rieseguito molte volte. documentato e pronto per la review.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s10"><span class="eyebrow">Sezione 10</span><h2>VII · Input</h2><pre>Gli input esistono già e sono abbastanza stabili
+
+Prima di aprire una chat verifico cosa possiedo davvero. In questo caso non parto da zero. Il lavoro annuale ha già prodotto gran parte della conoscenza necessaria.
+
+Trial balance I l p r o c e s s o pa s s a i l t e s t
+
+File Excel standard con codice conto, descrizione, saldo e periodo. Ricorre, i dati sono leggibili, le regole possono essere scritte e il risultato si
+
+confronta con un bilancio già predisposto.
+
+Balance Sheet e P&amp;L
+
+Report gestionali omogenei fra le società del gruppo.
+
+O u t p u t at t e s o
+
+Stato Patrimoniale e Conto Economico OIC, drill-down fino ai conti, elenco dei
+
+Mapping annuale conti non mappati, rettifiche book-to-book, quadrature ed esportazione del working
+
+paper.
+
+Associazione fra conto IFRS e voce o classe civilistica OIC già utilizzata in sede di
+
+bilancio d&#x27;esercizio.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s11"><span class="eyebrow">Sezione 11</span><h2>VIII · Brainstorm e memoria</h2><pre>Prima chiarisco il processo, poi lo affido alla memoria del progetto
+
+01 · Apro una chat nuova (ChatGPT o Gemini, per corpus più ampi) e descrivo il problema in termini
+
+ChatGPT Riclassifica IV Direttiva — brief di progetto
+
+professionali. Non chiedo ancora codice: voglio capire quali regole mancano e trasformare il lavoro annuale in un
+
+brief utilizzabile. R PROMPT
+
++ Nuova chat
+
+a Spiego perché serve il bilancino e quale risultato voglio ottenere. Devo predisporre uno strumento che, ricevendo in ingresso
+
+PROGETTI i report gestionali del gruppo redatti secondo principi
+
+b Carico un file ordinario, un file con anomalie e il mapping già usato. IAS/IFRS, restituisca lo Stato Patrimoniale e il Conto
+
+IV Direttiva — brief
+
+Economico riclassificati secondo lo schema civilistico
+
+c Insegno come leggere colonne, segni, totali, codici e righe da scartare. Bridge IAS/IFRS → OIC
+
+italiano (artt. 2424, 2425, 2435-bis c.c.). Non redigere
+
+codice: struttura input, regole di transito e output.
+
+d Chiedo domande, casi limite e una prima struttura di input, regole, output e controlli. CHAT
+
+AI CHATGPT
+
+Perimetro schema
+
+Il brief può essere articolato come segue.
+
+abbreviato
+
+Istruzione utile
+
+Riconciliazione utile netto Input
+
+Non scrivere codice. Prima ricostruisci il processo, indicami le informazioni mancanti e restituisci un brief che io possa
+
+Trial balance IAS/IFRS, mapping annuale già in uso, note
+
+correggere. sulle differenze di rappresentazione.
+
+S a lv o i n O b s i d i a n — f i l e M a r k d o w n s e pa r at i
+
+02 · Trasferisco su Obsidian ciò che deve restare del brief: non l&#x27;intera chat, solo le decisioni. Ogni blocco diventa brief.md mapping-conti.md differenze-IAS-OIC.md casi-test.md
+
+un file Markdown separato, così nel passo successivo posso allegare a Claude solo le fonti pertinenti.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s12"><span class="eyebrow">Sezione 12</span><h2>IX · Progetto di sviluppo</h2><pre>In Claude trasferisco lo stesso materiale, già ordinato
+
+03 · Apro un progetto dedicato e carico, come fonti, gli stessi file Markdown organizzati nel passo
+
+Claude Riclassifica IV Direttiva — sviluppo
+
+precedente in Obsidian: brief, mapping dei conti, differenze IAS/IFRS e OIC, casi di test. Non ricopio la
+
+PROGETTO
+
+chat di ChatGPT: passo le decisioni già filtrate. R PROMPT
+
+Riclassifica IV Direttiva
+
+Ho sempre voluto sviluppare uno strumento di questo tipo,
+
+Nella pratica, avere fonti già ordinate aiuta il modello a fare più domande prima del codice, invece di FONTI
+
+ma non sono uno sviluppatore. Conosco il processo fiscale
+
+e ti fornirò tutta la documentazione. Aiutami a progettare e
+
+scrivere subito sulla base di ipotesi implicite. 🗎 brief.md sviluppare il tool spiegandomi anche le scelte tecniche.
+
+🗎 mapping-conti.md AI CLAUDE
+
+Istruzioni permanenti Ho letto brief.md e mapping-conti.md. Prima di scrivere
+
+🗎 differenze-IAS-OIC.md
+
+codice, tre domande sui casi limite: come tratto un conto
+
+Leggi sempre le fonti prima di proporre modifiche. Non inventare regole mancanti. Mantieni un 🗎 casi-test.md reversibile a saldo zero? La mappa annuale copre già le
+
+changelog. Non alterare funzioni già testate senza segnalarlo. 🗎 changelog.md
+
+società in sviluppo? Dove si ferma il tool se un conto non è
+
+mappato?
+
+CHAT RECENTI
+
+Prossimo passo proposto
+
+Correzione segno SP2 V1 — solo caricamento Excel e lettura colonne. Nessuna
+
+Come mi presento logica di mapping ancora.
+
+Rettifica leasing IFRS 16
+
+Non sono uno sviluppatore. Guidami nelle scelte, fammi domande quando una regola non è chiara e
+
+proponi una modifica alla volta. Prima di scrivere spiegami cosa cambierai e come potrò verificarlo.
+
+L e f o n t i c a r i c at e s o n o l e s t e s s e d i O b s i d i a n
+
+brief.md mapping-conti.md differenze-IAS-OIC.md casi-test.md
+
+changelog.md
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s13"><span class="eyebrow">Sezione 13</span><h2>X · Sviluppo</h2><pre>La prima versione deve fare poco ma funzionare
+
+Chiedo un tool che giri in locale e lavoro per blocchi. Ogni versione Riclassifica IV Direttiva · V3 Esporta Excel Esporta PDF
+
+aggiunge una funzione verificabile senza riscrivere ciò che è già stabile.
+
+Stato Patrimoniale Conto Economico Conti non mappati · 0 Verifiche
+
+V1 Caricamento del file Excel e lettura corretta delle colonne.
+
+ATTIVO
+
+V2 Applicazione del mapping ed elenco dei conti non mappati. B.I Immobilizzazioni immateriali 961.173
+
+B.II Immobilizzazioni materiali 20.158
+
+V3 Stato Patrimoniale, Conto Economico e drill-down conto per
+
+B.III Immobilizzazioni finanziarie 138.895.237
+
+conto.
+
+C.II Crediti 49.205.585
+
+V4 Rettifiche, verifiche, esportazione Excel e PDF. C.IV Disponibilità liquide 1.288.598
+
+Totale attivo 191.391.833
+
+La regola
+
+Non chiedo subito il prodotto finale. Una prima versione semplice
+
+rende più facile capire se il modello ha letto bene i dati e se la
+
+struttura del progetto è solida.
+
+Prima interfaccia navigabile: mapping, conti e quadrature visibili fin da V3.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s14"><span class="eyebrow">Sezione 14</span><h2>XI · Follow-up e test</h2><pre>Ogni follow-up parte da un errore osservabile
+
+Controllo pulsanti, schede, navigazione e messaggi prima di entrare nei numeri. Il tool deve reggere anche prima di essere corretto. Ogni correzione approvata entra nel
+
+changelog.md del progetto, così la versione successiva parte da uno stato noto.
+
+01 Caricamento. Un file standard e uno con colonne o righe anomale. 04 Elaborazione. Mapping, conti non mappati e rettifiche.
+
+02 Navigazione. Pulsanti, schede, drill-down, ritorno alla vista precedente. 05 Output. Quadrature, Excel, PDF e riconciliazione del risultato.
+
+03 Lettura input. Codici, descrizioni, segni, periodo, valuta e righe da ignorare. 06 Errori. Il tool si ferma quando manca un dato e non prova a indovinare.
+
+Il follow-up che funziona
+
+Con questo file ottengo questo risultato. Mi aspetto invece questo comportamento. Individua la causa, correggi senza toccare le funzioni già testate, restituisci il file completo e indicami
+
+cosa provare.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s15"><span class="eyebrow">Sezione 15</span><h2>X I I · L o g i c a c o n ta b i l e</h2><pre>Il mapping non basta da solo
+
+Il mapping annuale indica la destinazione OIC del conto. Il tool deve però conoscere anche la natura del saldo e le fattispecie che possono cambiare rappresentazione da un
+
+periodo all&#x27;altro.
+
+01 Voce OIC. La mappa collega il codice conto alla famiglia o alla voce civilistica.
+
+I VA e p o s t e t r i b u t a r i e
+
+02 Segno. Per conti reversibili il saldo consuntivo determina attivo, passivo, costo o IVA a credito o a debito, imposte correnti, ritenute e rapporti di consolidato possono
+
+ricavo. invertirsi fra un periodo e l&#x27;altro. La classificazione segue il saldo e la regola
+
+03 Eccezione. Un conto nuovo o ambiguo resta non mappato. Il sistema non decide documentata.
+
+da solo.
+
+Conto corrente infragruppo
+
+Principio di arresto
+
+La mappa identifica la famiglia civilistica. Il segno effettivo decide se il saldo è un
+
+Quando il dato non consente una decisione univoca, il tool espone il problema e
+
+credito o un debito verso il gruppo.
+
+chiede una scelta. Non trasforma un dubbio professionale in una regola nascosta.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s16"><span class="eyebrow">Sezione 16</span><h2>XIII · Rettifiche</h2><pre>Le differenze IAS/IFRS entrano come scritture book-to-book
+
+Alcune differenze non si risolvono spostando un saldo. Richiedono una scrittura Dare e Avere applicata al solo prospetto civilistico, senza modificare la contabilità gestionale originaria.
+
+Leasing — IFRS 16 e OIC 12. Storno del diritto d&#x27;uso e della passività, ricostruzione dei canoni.
+
+Rettifica IAS/IFRS → OIC
+
+Costi di sviluppo — IAS 38 e OIC 24. Verifica dei requisiti di capitalizzazione e ammortamento.
+
+Crediti e derivati — IFRS 9 e OIC 15/20/32. Raccordo fra ECL, costo ammortizzato e classificazione.
+
+Capitalizzazione dei lavori interni — transito per natura e compensazione via A.4
+
+TFR — IAS 19 e OIC 31. Eliminazione della valutazione attuariale, ricostruzione del debito civilistico.
+
+Voce IV Direttiva Dare Avere
+
+Avviamento — IFRS 3, IAS 36 e OIC 24. Raccordo fra impairment e ammortamento sistematico OIC.
+
+B.6 — materie prime 30.000,00 0,00
+
+Lavori interni — IAS/IFRS e OIC 12. Costi per natura in B.6/B.7 con contropartita A.4.
+
+B.7 — servizi 70.000,00 0,00
+
+A.4 — incrementi immob. 0,00 100.000,00
+
+✓ Dare = Avere, la rettifica quadra
+
+La rettifica può essere salvata solo quando Dare e Avere coincidono.
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s17"><span class="eyebrow">Sezione 17</span><h2>XIV · Audit</h2><pre>Quando il tool mi soddisfa, provo a smentirlo
+
+Congelo la versione e apro un ambiente nuovo. Uso un modello potente e, quando possibile, diverso da
+
+Istruzione di audit
+
+quello impiegato nello sviluppo. Non gli racconto come siamo arrivati al risultato. Gli consegno codice,
+
+brief, mapping, fonti, file di prova e matrice dei test. Non cercare conferme. Cerca il modo in cui il prodotto può
+
+sbagliare. Per ogni controllo restituisci PASS o FAIL, evidenza,
+
+L&#x27;audit del modello non chiude il lavoro. Riproduco i difetti segnalati e testo di nuovo i casi critici. Un PASS non
+
+impatto e correzione proposta.
+
+sostituisce la mia review.
+
+Aree della rubric
+
+Normativa Quadratura Mapping
+
+Casi limite Tracciabilità Regressioni
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s18"><span class="eyebrow">Sezione 18</span><h2>XV · Rilascio</h2><pre>Il tool entra in uso solo dopo l&#x27;ultima review
+
+A questo punto il flusso è semplice e ripetibile. Carico i file, applico il mapping, risolvo i conti non mappati, inserisco le rettifiche necessarie, verifico le quadrature e
+
+genero il working paper.
+
+Audit chiuso Test completi Review dei conti
+
+Nessun FAIL o rilievo aperto. Casi ordinari, limiti e input errati superati. Apro le voci e verifico i conti sottostanti.
+
+Assunzioni visibili Versione datata Manuale breve
+
+Ogni scelta professionale è documentata. File, mapping e changelog sono ricostruibili. Un collega può usare e controllare il tool.
+
+Carica Excel → Applica mapping → Risolvi eccezioni →
+
+Inserisci rettifiche → Verifica → Esporta
+
+P roblema I nput B rainstorm P rogetto S viluppo T est L ogica R ettifiche A udit R ilascio</pre></section>
+<section class="panel guide-section" id="s19"><span class="eyebrow">Sezione 19</span><h2>XVI · La professione</h2><pre>Dove si sposta il valore
+
+Il metodo descritto qui non è rivoluzionario. È utile perché può essere replicato. Una volta imparato a preparare contesto, regole, test e rilascio, lo stesso approccio può
+
+essere applicato a una LIPE, a un modello 770, a una riconciliazione IVA, a un controllo di coerenza o a un altro adempimento ricorrente.
+
+Questo cambia il valore economico di alcune prestazioni. Quando un&#x27;attività può essere documentata, testata e automatizzata in tempi brevi, la parte puramente compilativa
+
+perde valore. Il cliente percepisce il risultato e non le ore necessarie a produrlo.
+
+Il valore si sposta sulla progettazione del processo, sulla lettura delle eccezioni e sull&#x27;assunzione di responsabilità. Sono competenze che la professione possiede già, ma che
+
+spesso rimangono nascoste dietro molte ore di lavoro manuale.
+
+Per me l&#x27;opportunità è usare meno tempo per ricostruire dati e più tempo per giudicarli. La responsabilità professionale non viene trasferita al modello. Rimane in capo a
+
+chi usa lo strumento, lo valida e decide di affidarsi al risultato.</pre></section>
+<section class="panel guide-section" id="s20"><span class="eyebrow">Sezione 20</span><h2>XVII · Chiusura</h2><pre>Il primo progetto deve essere utile
+
+Il primo applicativo che ho sviluppato con questo metodo non era destinato a un cliente. Serviva a gestire un&#x27;attività che mi occupava circa due giornate ogni trimestre.
+
+La prima versione richiese pochi giorni. La validazione richiese più tempo. Dovetti costruire casi di prova, correggere il modo in cui avevo descritto alcune regole e
+
+ripartire più di una volta. È stata la parte più utile, perché mi ha obbligato a rendere esplicito un processo che fino a quel momento eseguivo quasi in automatico.
+
+Da allora quelle due giornate vengono usate diversamente. Non sono diminuite le responsabilità. È diminuita la parte ripetitiva che le nascondeva.
+
+Il consiglio con cui chiudo è molto semplice. Partire da un processo conosciuto bene, con dati reali e un risultato facile da verificare. Il primo obiettivo non deve essere
+
+costruire qualcosa di impressionante. Deve essere costruire qualcosa che si possa usare, controllare e spiegare a un collega.
+
+Riccardo Zedda
+
+Dottore commercialista</pre></section>
+<section class="panel callout"><strong>Licenza</strong><p>© 2026 Riccardo Zedda. Guida distribuita con licenza CC BY-NC-ND 4.0.</p></section>
+</main>
+<footer class="footer">© 2026 Riccardo Zedda · Tax Automation Lab<br>
+Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.</footer>
+</div></body></html>

@@ -1,0 +1,10 @@
+/* TEAM */
+Owner: Riccardo Zedda
+Contact: contact@taxautomationlab.com
+Security: security@taxautomationlab.com
+
+/* SITE */
+Name: Tax Automation Lab
+Language: Italian / English
+Analytics: none
+Hosting: GitHub Pages with Cloudflare

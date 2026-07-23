@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://taxautomationlab.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://taxautomationlab.com/resources/guida-automazione-processi-fiscali.pdf</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://taxautomationlab.com/tools/financial-statement/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://taxautomationlab.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://taxautomationlab.com/security/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://taxautomationlab.com/terms/</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://taxautomationlab.com/licenses/</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://taxautomationlab.com/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/tools/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/tools/financial-statement/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/tools/tfa-client-file/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/tools/lipe/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/resources/guida-automazione-processi-fiscali.pdf</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/approfondimenti/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/approfondimenti/tfa-client-file/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/approfondimenti/automazione-lipe/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/approfondimenti/automazione-processi-fiscali-ai/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/privacy/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/security/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/terms/</loc><lastmod>2026-07-23</lastmod></url>
+  <url><loc>https://taxautomationlab.com/licenses/</loc><lastmod>2026-07-23</lastmod></url>
 </urlset>

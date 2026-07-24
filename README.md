@@ -56,3 +56,5 @@ Le pagine informative sono disponibili in italiano, inglese e spagnolo:
 - Español: https://taxautomationlab.com/es/
 
 Le interfacce operative dei tre tool restano in italiano.
+
+Le versioni inglese e spagnola utilizzano la stessa struttura, lo stesso template e gli stessi controlli della versione italiana; cambiano esclusivamente testi, metadati SEO e destinazioni linguistiche.

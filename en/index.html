@@ -1,26 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#0E1624" name="theme-color"/>
+<meta content="Tax Automation Lab" name="application-name"/>
 <title>Tax Automation Lab | AI automation for tax and accounting</title>
 <meta content="Free tools, practical cases and operational guides for automating tax, accounting and financial reporting processes with artificial intelligence." name="description"/>
 <meta content="index,follow,max-image-preview:large" name="robots"/>
 <meta content="Riccardo Zedda" name="author"/>
-<link href="https://taxautomationlab.com/en/" rel="canonical"/>
-<link href="https://taxautomationlab.com/" hreflang="it" rel="alternate"/>
-<link href="https://taxautomationlab.com/en/" hreflang="en" rel="alternate"/>
-<link href="https://taxautomationlab.com/es/" hreflang="es" rel="alternate"/>
-<link href="https://taxautomationlab.com/" hreflang="x-default" rel="alternate"/>
+
 <link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/assets/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/assets/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="/site.webmanifest" rel="manifest"/>
+<meta content="#0E1624" name="msapplication-TileColor"/>
+<meta content="/browserconfig.xml" name="msapplication-config"/>
 <meta content="website" property="og:type"/>
 <meta content="en_US" property="og:locale"/>
+<meta content="en_US" property="og:locale:alternate"/>
+<meta content="es_ES" property="og:locale:alternate"/>
 <meta content="Tax Automation Lab" property="og:site_name"/>
 <meta content="Tax Automation Lab | AI automation for tax and accounting" property="og:title"/>
 <meta content="Free tools, practical cases and operational guides for automating tax, accounting and financial reporting processes with artificial intelligence." property="og:description"/>
 <meta content="https://taxautomationlab.com/en/" property="og:url"/>
 <meta content="https://taxautomationlab.com/assets/social-preview.png" property="og:image"/>
+<meta content="https://taxautomationlab.com/assets/social-preview.png" property="og:image:secure_url"/>
+<meta content="image/png" property="og:image:type"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="Tax Automation Lab — strumenti AI per fiscalità, contabilità e bilancio" property="og:image:alt"/>
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="Tax Automation Lab | AI automation for tax and accounting" name="twitter:title"/>
 <meta content="Free tools, practical cases and operational guides for automating tax, accounting and financial reporting processes with artificial intelligence." name="twitter:description"/>
@@ -28,71 +38,665 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "url": "https://taxautomationlab.com/en/", "name": "Tax Automation Lab", "headline": "Tax Automation Lab | AI automation for tax and accounting", "description": "Free tools, practical cases and operational guides for automating tax, accounting and financial reporting processes with artificial intelligence.", "inLanguage": "en-US", "publisher": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}}, {"@type": "ItemList", "name": "Three tools available", "itemListElement": [{"@type": "ListItem", "position": 1, "item": {"@type": "SoftwareApplication", "name": "Fourth Directive Reclassification", "url": "https://taxautomationlab.com/en/tools/financial-statement/"}}, {"@type": "ListItem", "position": 2, "item": {"@type": "SoftwareApplication", "name": "TFA Client File", "url": "https://taxautomationlab.com/en/tools/tfa-client-file/"}}, {"@type": "ListItem", "position": 3, "item": {"@type": "SoftwareApplication", "name": "LIPE Generator", "url": "https://taxautomationlab.com/en/tools/lipe/"}}]}]}</script>
 <style>
 :root{
-  --bg:#0E1624;--surface:rgba(15,25,34,.94);--surface2:rgba(31,28,39,.92);
-  --text:#F7F7F5;--muted:#C8CDD3;--soft:#A5ACB8;--line:rgba(247,247,245,.16);
-  --petrol:#145368;--rust:#734C34;--mauve:#725D6A;
+  --bg:#0E1624;--bg-2:#141d2e;--panel:#301546;--panel-2:#441662;
+  --text:#F7F7F5;--muted:#A5ACB8;--soft:#8a93a1;--line:rgba(247,247,245,.12);
+  --primary:#59147D;--secondary:#441662;--tertiary:#145368;--green:#5fb59a;--amber:#c89b6a;
   --serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;
   --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  --max:1120px
+  --max:1120px;--radius:12px;--shadow:0 30px 80px rgba(6,4,14,.5),inset 0 1px rgba(247,247,245,.06);
 }
-*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}
-body{margin:0;min-width:320px;min-height:100vh;color:var(--text);font:15px/1.68 var(--sans);
-background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.48),transparent 62%),
-radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.58),transparent 66%),
-radial-gradient(85% 80% at 30% 70%,rgba(32,128,158,.48),transparent 70%),
-linear-gradient(155deg,#4a2168 0%,#33245a 44%,#123545 100%);background-attachment:fixed}
-a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
-.topbar{position:sticky;top:10px;z-index:20;padding-top:10px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(17,25,34,.90);backdrop-filter:blur(22px);box-shadow:0 18px 50px rgba(0,0,0,.24)}
-.brand{text-decoration:none;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
-.nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav-links a{text-decoration:none;color:var(--muted);font-size:11px}.nav-links a:hover{color:#fff}
-.lang{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:999px}.lang a{display:inline-flex;align-items:center;justify-content:center;min-width:39px;height:33px;padding:0 7px;border-radius:999px;text-decoration:none;color:var(--soft);font-size:9px;font-weight:750}.lang a.active{background:#F7F7F5;color:#141014}
-.hero{padding:78px 0 34px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-h1,h2,h3{font-family:var(--serif);font-weight:300}h1{max-width:980px;margin:15px 0 20px;font-size:clamp(43px,7.5vw,78px);line-height:.98;letter-spacing:-.04em}h2{font-size:clamp(29px,4vw,44px);line-height:1.07;margin:0 0 13px}h3{font-size:27px;line-height:1.1;margin:0 0 11px}
-.lead{max-width:860px;margin:0;color:#E1E5E8;font-size:clamp(17px,2vw,20px)}
-.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 17px;border:1px solid transparent;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-size:11px;font-weight:700}.button.secondary{background:rgba(247,247,245,.05);border-color:rgba(247,247,245,.22);color:#fff}
-.section{padding:30px 0}.section-head{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:18px}.section-head p{max-width:520px;color:#DDE2E6}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card,.panel,.toc{background:linear-gradient(150deg,var(--surface),var(--surface2));border:1px solid var(--line);border-radius:11px;box-shadow:0 24px 70px rgba(3,12,18,.28)}
-.card{display:flex;flex-direction:column;min-height:290px;padding:22px;border-top:3px solid var(--petrol)}.card:nth-child(2){border-top-color:var(--mauve)}.card:nth-child(3){border-top-color:var(--rust)}.card:nth-child(4){border-top-color:#A5ACB8}.card p{color:#E1E5E8}.card .actions{margin-top:auto}
-.label{display:block;margin-bottom:9px;font-size:9px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.facts{display:grid;gap:7px;margin:15px 0}.facts div{padding-bottom:7px;border-bottom:1px solid rgba(247,247,245,.1);color:#DDE2E6;font-size:11px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}.content{display:grid;gap:16px}.panel{padding:27px}.panel p,.panel li{color:#E1E5E8}.panel:nth-child(3n+1){border-left:4px solid var(--petrol)}.panel:nth-child(3n+2){border-left:4px solid var(--mauve)}.panel:nth-child(3n){border-left:4px solid var(--rust)}
-.toc{position:sticky;top:92px;padding:19px}.toc strong{display:block;margin-bottom:10px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.toc a{display:block;padding:7px 0;border-bottom:1px solid rgba(247,247,245,.08);text-decoration:none;color:#D9DDE1;font-size:12px}
-.notice{padding:15px 17px;border:1px solid rgba(247,247,245,.18);border-left:4px solid var(--rust);border-radius:9px;background:rgba(14,22,36,.48);color:#DDE2E6}
-.footer{margin-top:55px;padding:26px 0 40px;border-top:1px solid var(--line);color:var(--soft);font-size:11px}.footer-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer a{text-decoration:none}.footer-note{max-width:880px;margin-top:11px}
-@media(max-width:900px){.grid,.grid.two{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.toc{position:static;order:-1}.section-head{display:block}}
-@media(max-width:680px){.nav-links{display:none}.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:150px}.lang a{min-width:34px;padding:0 5px}}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}body.intro-open{overflow:hidden}
+a{color:inherit}button{font:inherit}.shell{width:min(var(--max),calc(100% - 40px));margin-inline:auto}
+
+/* INTRO */
+.intro{position:fixed;inset:0;z-index:1000;overflow:hidden;background:#050507;display:grid;place-items:center;transition:opacity .65s ease,transform .65s cubic-bezier(.4,0,.2,1),visibility .65s}
+.intro.is-leaving{opacity:0;transform:scale(1.025);visibility:hidden;pointer-events:none}
+#tubes-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.intro::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,rgba(4,4,8,.08),rgba(4,4,8,.4) 45%,rgba(4,4,8,.88) 100%);pointer-events:none}
+.intro::after{content:"";position:absolute;inset:0;opacity:.075;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+.intro-inner{position:relative;z-index:2;width:min(880px,calc(100% - 40px));text-align:center;display:flex;flex-direction:column;align-items:center}
+.intro-kicker{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.72);margin:0 0 20px}.intro-title{font-family:var(--serif);font-size:clamp(56px,10vw,118px);font-weight:300;line-height:.86;letter-spacing:-.055em;margin:0;text-shadow:0 10px 50px rgba(0,0,0,.65)}.intro-title em{font-weight:300;font-style:italic;color:#d8d8ff}.intro-copy{max-width:640px;margin:26px auto 0;font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.78)}
+.start-btn{margin-top:32px;min-width:154px;min-height:52px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(12,12,18,.38);backdrop-filter:blur(18px);color:white;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 1px rgba(255,255,255,.15),0 18px 50px rgba(0,0,0,.32);transition:transform .15s ease,background .15s ease,border-color .15s ease}.start-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.65)}.start-btn:focus-visible{outline:3px solid rgba(255,255,255,.35);outline-offset:4px}.intro-note{position:absolute;z-index:2;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.48);white-space:nowrap}
+
+/* APP */
+.app{min-height:100vh;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .55s ease .15s,transform .55s ease .15s,visibility .55s;background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.62),rgba(120,80,52,.22) 42%,transparent 62%),radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.85),rgba(96,26,140,.34) 46%,transparent 66%),radial-gradient(80% 75% at 80% 55%,rgba(120,48,175,.55),transparent 60%),radial-gradient(85% 80% at 30% 66%,rgba(32,128,158,.6),rgba(22,96,120,.28) 45%,transparent 70%),radial-gradient(95% 80% at 0% 96%,rgba(30,120,150,.68),transparent 64%),linear-gradient(155deg,#4a2168 0%,#3d1a5c 20%,#33245a 44%,#1a4d63 78%,#123545 100%);background-attachment:fixed;background-size:cover}.app.is-visible{opacity:1;visibility:visible;transform:none}
+.app::before{content:"";position:fixed;inset:0;z-index:-3;background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.62),rgba(120,80,52,.22) 42%,transparent 62%),radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.85),rgba(96,26,140,.34) 46%,transparent 66%),radial-gradient(80% 75% at 80% 55%,rgba(120,48,175,.55),transparent 60%),radial-gradient(85% 80% at 30% 66%,rgba(32,128,158,.6),rgba(22,96,120,.28) 45%,transparent 70%),radial-gradient(95% 80% at 0% 96%,rgba(30,120,150,.68),transparent 64%),linear-gradient(155deg,#4a2168 0%,#3d1a5c 20%,#33245a 44%,#1a4d63 78%,#123545 100%)}
+.app-waves{position:fixed;inset:0;z-index:-2;width:100%;height:100%;pointer-events:none;opacity:.92;mix-blend-mode:normal;filter:blur(2px) saturate(108%)}.app-waves svg{width:100%;height:100%;display:block}.app::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,black,transparent 75%)}
+.site-header{position:sticky;top:12px;z-index:60;padding-bottom:10px;background:transparent}.nav{padding-inline:0}.nav-frame{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(180deg,rgba(48,21,70,.55),rgba(14,22,36,.72));backdrop-filter:blur(24px);box-shadow:0 18px 50px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06)}.brand{display:flex;align-items:center;gap:12px;border:0;background:none;color:inherit;padding:0;cursor:pointer;min-width:0}.brand-logo{display:block;width:43px;height:48px;object-fit:contain;filter:drop-shadow(0 8px 20px rgba(89,20,125,.35));flex:0 0 auto}.brand-copy{display:grid;line-height:1.08;text-align:left;min-width:0}.brand-copy strong{font-size:11px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand-copy span{font-size:10px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.desktop-nav{justify-self:center;display:flex;align-items:center;gap:6px;padding:6px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04)}.nav-link{border:0;background:transparent;color:#c8c8cf;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s ease,color .15s ease}.nav-link:hover,.nav-link.active{background:rgba(255,255,255,.09);color:white}.nav-actions{display:flex;align-items:center;gap:8px}.header-action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,.14);cursor:pointer;transition:transform .15s ease,background .15s ease,border-color .15s ease}.header-action:hover{transform:translateY(-1px)}.header-action.secondary{background:rgba(255,255,255,.04);color:#f2f2f6}.header-action.secondary:hover{background:rgba(255,255,255,.08)}.header-action.primary{background:#F7F7F5;color:#141014;border-color:transparent;box-shadow:0 12px 28px rgba(0,0,0,.32)}
+.lang-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid rgba(247,247,245,.14);border-radius:999px;background:rgba(14,22,36,.35);backdrop-filter:blur(14px);box-shadow:inset 0 1px rgba(247,247,245,.06)}
+.lang-option{min-width:39px;height:34px;padding:0 8px;border:0;border-radius:999px;background:transparent;color:#A5ACB8;font-size:9px;font-weight:750;letter-spacing:.09em;cursor:pointer;transition:background .15s ease,color .15s ease,transform .15s ease}
+.lang-option:hover{color:#F7F7F5}.lang-option.active{background:#F7F7F5;color:#141014;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+.intro-lang-switch{position:absolute;z-index:4;top:max(20px,env(safe-area-inset-top));right:max(20px,env(safe-area-inset-right));background:rgba(5,5,7,.38);border-color:rgba(255,255,255,.24)}
+.intro-lang-switch .lang-option{color:rgba(255,255,255,.66)}.intro-lang-switch .lang-option.active{color:#141014;background:#fff}
+
+main{min-height:calc(100vh - 68px)}.page{display:none;padding:54px 0 82px;animation:page-in .22s ease}.page.active{display:block}@keyframes page-in{from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+.eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d4d4da}.eyebrow::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--primary),var(--tertiary))}.display{font-family:var(--serif);font-size:clamp(46px,7vw,76px);font-weight:300;line-height:.96;letter-spacing:-.04em;margin:0;max-width:920px}.display em{font-weight:300;color:#cfcfff}.lead{max-width:790px;margin:22px 0 0;font-size:clamp(17px,2vw,20px);line-height:1.5;color:#dbdbe0}.hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:0 18px;border:1px solid transparent;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-size:12px;font-weight:650;box-shadow:0 12px 30px rgba(0,0,0,.35);cursor:pointer;transition:transform .15s ease,filter .15s ease}.button:hover{transform:translateY(-1px);filter:brightness(1.08)}.button.secondary{background:rgba(247,247,245,.045);border-color:rgba(247,247,245,.20);color:var(--text);box-shadow:none}.surface{background:linear-gradient(165deg,rgba(68,22,98,.28),rgba(30,17,44,.44));border:1px solid rgba(247,247,245,.10);box-shadow:var(--shadow);border-radius:var(--radius);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.home-hero{padding:42px 0 38px;text-align:center}.home-hero .display{margin-inline:auto}.home-hero .lead{margin:22px auto 0}.home-hero .hero-actions{justify-content:center}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px}.principle{padding:20px}.principle span,.label{display:block;color:#a9a9b2;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}.principle h2{font-family:var(--serif);font-size:27px;font-weight:300;line-height:1.05;margin:12px 0 8px}.principle p{font-size:13px;color:#cacacf;margin:0}
+.section{margin-top:34px}.release-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px;padding:13px 16px;border:1px solid rgba(89,20,125,.5);border-left:4px solid var(--primary);border-radius:3px;background:linear-gradient(90deg,rgba(89,20,125,.34),rgba(68,22,98,.2) 56%,rgba(20,83,104,.1));box-shadow:inset 0 1px rgba(255,255,255,.07)}.release-banner strong{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#fff}.release-banner span{font-size:11px;color:#d9d8e4}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}.section-head h2{font-family:var(--serif);font-size:clamp(34px,4vw,46px);font-weight:300;line-height:1;margin:0}.section-head p{max-width:440px;color:var(--muted);font-size:13px;margin:0}.featured{display:grid;grid-template-columns:1.08fr .92fr;overflow:hidden}.featured-copy{padding:26px}.featured-copy h3{font-family:var(--serif);font-size:38px;font-weight:300;line-height:1.02;margin:14px 0 12px}.featured-copy>p{color:#d0d0d6;margin:0}.tags{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 21px}.tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);font-size:10px;color:#d4d4da}.featured-data{padding:22px;border-left:1px solid var(--line);background:linear-gradient(155deg,rgba(20,83,104,.28),rgba(68,22,98,.12));display:flex;flex-direction:column;justify-content:center;gap:8px}.data-row{display:grid;grid-template-columns:82px 1fr;gap:13px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}.data-row:last-child{border-bottom:0}.data-row span{font-size:9px;color:#a9a9b2;text-transform:uppercase;letter-spacing:.12em}.data-row strong{font-size:12px;font-weight:550;color:#e9e9ed}.status-live{color:var(--green)!important}
+.value-strip{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.value-card{padding:22px}.value-card h3{font-family:var(--serif);font-size:28px;font-weight:300;margin:10px 0 8px}.value-card p{color:#c9c9cf;font-size:13px;margin:0}.value-card blockquote{margin:0;font-family:var(--serif);font-size:24px;line-height:1.15;color:#eeeef3}
+.page-header{display:grid;grid-template-columns:1fr 350px;gap:34px;align-items:end;padding:6px 0 28px;border-bottom:1px solid var(--line)}.page-header h1,.page-header h2{font-family:var(--serif);font-size:clamp(45px,7vw,70px);font-weight:300;line-height:.98;letter-spacing:-.035em;margin:0}.page-header>p{font-size:13px;color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:22px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.card{padding:22px}.card h2,.card h3{font-family:var(--serif);font-weight:300;line-height:1.05}.card h2{font-size:34px;margin:10px 0}.card h3{font-size:25px;margin:9px 0}.card p{font-size:13px;color:#cbcbcf;margin-bottom:0}.card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.badge{flex:0 0 auto;padding:6px 9px;border-radius:999px;border:1px solid rgba(239,195,106,.25);background:rgba(239,195,106,.08);color:var(--amber);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.badge.live{border-color:rgba(114,212,155,.25);background:rgba(114,212,155,.08);color:var(--green)}.info{display:grid;margin-top:17px;border-top:1px solid var(--line)}.info-row{display:grid;grid-template-columns:82px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.065)}.info-row:last-child{border-bottom:0}.info-row span{font-size:9px;color:#a4a4ad;text-transform:uppercase;letter-spacing:.12em}.info-row strong{font-size:12px;font-weight:550}.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.method-card{padding:21px}.method-card .num{font-size:10px;color:#b7b7c1;letter-spacing:.15em}.method-card h3{font-family:var(--serif);font-weight:300;font-size:26px;line-height:1.04;margin:20px 0 9px}.method-card p{font-size:13px;color:#c9c9ce;margin:0}.method-callout{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:12px}.method-callout>div{padding:24px}.method-callout h2{font-family:var(--serif);font-size:36px;font-weight:300;line-height:1.05;margin:10px 0}.method-callout p{color:#cdccd3;font-size:13px}.compact-list{display:grid;gap:0;margin-top:16px;border-top:1px solid var(--line)}.compact-list div{padding:11px 0;border-bottom:1px solid rgba(255,255,255,.065);display:flex;gap:12px;font-size:12px}.compact-list b{min-width:74px;color:#e4e4e9}.compact-list span{color:#bdbdc5}
+.profile{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:22px}.profile>article,.profile>aside{padding:24px}.profile h2{font-family:var(--serif);font-size:38px;font-weight:300;line-height:1;margin:10px 0}.profile p{color:#ccccd2;font-size:13px}.timeline{display:grid;margin-top:18px;border-top:1px solid var(--line)}.timeline-row{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.065)}.timeline-row time{font-size:10px;color:#a8a8b0}.timeline-row strong{font-size:12px}.timeline-row p{font-size:12px;margin:4px 0 0;color:#aaaab3}.qualification{margin-top:18px;padding:14px 16px;border-left:2px solid var(--primary);background:rgba(89,20,125,.14);font-size:12px;color:#d5d5dc}.credentials{display:grid;gap:10px;margin-top:16px}.credential{padding:13px 14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:6px}.credential strong{display:block;font-size:12px}.credential span{display:block;margin-top:4px;font-size:11px;color:#aaaab3}.contact{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px}.contact h3{font-family:var(--serif);font-size:28px;font-weight:300;margin:7px 0}.contact p{font-size:12px;color:#bdbdc5;margin:0}.footer{border-top:1px solid var(--line);padding:22px 0 30px;color:#898993;font-size:10px}.footer-row{display:flex;justify-content:space-between;gap:14px}
+/* CONTACT CTA */
+.ask-cta{position:fixed;right:24px;bottom:24px;z-index:90;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}.ask-trigger{display:inline-flex;align-items:center;gap:9px;min-height:46px;padding:0 17px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(48,21,70,.7);backdrop-filter:blur(18px);color:#fff;box-shadow:0 18px 45px rgba(9,10,18,.26),inset 0 1px rgba(255,255,255,.12);font-size:12px;font-weight:650;cursor:pointer;transition:transform .15s ease,background .15s ease,border-color .15s ease}.ask-trigger:hover{transform:translateY(-2px);background:rgba(68,22,98,.85);border-color:rgba(247,247,245,.38)}.ask-trigger svg{width:17px;height:17px;stroke-width:1.8}.ask-trigger,.ask-panel{pointer-events:auto}.ask-panel{width:min(370px,calc(100vw - 28px));padding:20px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:linear-gradient(180deg,rgba(48,21,70,.9),rgba(20,15,32,.96));backdrop-filter:blur(22px);box-shadow:0 26px 70px rgba(7,8,15,.38),inset 0 1px rgba(255,255,255,.09);transform-origin:bottom right;transition:opacity .18s ease,transform .18s ease,visibility .18s}.ask-panel[hidden]{display:none}.ask-panel:not([hidden]){opacity:1;visibility:visible;transform:none}.ask-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.ask-panel h2{font-family:var(--serif);font-size:30px;font-weight:300;line-height:1.03;margin:8px 0 10px}.ask-panel p{margin:0;color:#d0d1d8;font-size:13px}.ask-close{width:32px;height:32px;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(255,255,255,.13);border-radius:50%;background:rgba(255,255,255,.04);color:#fff;cursor:pointer}.ask-close:hover{background:rgba(255,255,255,.10)}.ask-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:17px}.ask-actions a{min-height:42px;padding:0 12px}.ask-note{margin-top:12px!important;color:#aeb0bb!important;font-size:10px!important}.app:not(.is-visible) .ask-cta{display:none}
+.mobile-nav{display:none}
+@media(max-width:880px){.ask-cta{right:14px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 82px)}.ask-trigger{min-height:43px;padding:0 14px}.desktop-nav{display:none}.nav-actions{margin-left:auto}.nav-actions .header-action.secondary{display:none}.brand-logo{width:38px;height:42px}.brand-copy strong{font-size:10px}.brand-copy span{display:none}.page{padding-top:36px}.principles{grid-template-columns:1fr}.featured,.method-callout,.profile{grid-template-columns:1fr}.featured-data{border-left:0;border-top:1px solid var(--line)}.page-header{grid-template-columns:1fr;gap:16px}.page-header>p{max-width:680px}.method-grid{grid-template-columns:1fr 1fr}.span-8,.span-7,.span-6,.span-5,.span-4{grid-column:span 12}.value-strip{grid-template-columns:1fr}.footer{padding-bottom:94px}.mobile-nav{display:grid;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:70;grid-template-columns:repeat(4,1fr);padding:7px;background:rgba(20,15,32,.9);border:1px solid rgba(247,247,245,.13);border-radius:10px;backdrop-filter:blur(20px);box-shadow:0 18px 50px rgba(0,0,0,.4)}.mobile-nav button{border:0;background:transparent;color:#9797a1;border-radius:6px;padding:8px 3px 7px;font-size:9px;cursor:pointer}.mobile-nav button.active{background:rgba(255,255,255,.08);color:white}.mobile-nav svg{display:block;width:17px;height:17px;margin:0 auto 3px;stroke-width:1.7}}
+@media(max-width:580px){.nav-actions .header-action.primary{display:none}.lang-option{min-width:35px;padding:0 6px}.ask-panel{padding:18px}.ask-panel h2{font-size:27px}.ask-actions{grid-template-columns:1fr}.shell{width:min(var(--max),calc(100% - 28px))}.nav{height:62px}.brand-copy span{display:none}.page{padding:28px 0 86px}.home-hero{padding-top:8px}.display{font-size:clamp(42px,13vw,58px);line-height:.98}.lead{font-size:16px;margin-top:18px}.hero-actions>.button{flex:1 1 auto}.principles{margin-top:24px}.principle{padding:18px}.principle h2{font-size:25px}.section{margin-top:28px}.release-banner{align-items:flex-start;flex-direction:column;gap:4px}.section-head{display:block}.section-head p{margin-top:10px}.featured-copy,.featured-data,.card,.profile>article,.profile>aside,.method-callout>div{padding:18px}.featured-copy h3{font-size:32px}.data-row{grid-template-columns:74px 1fr}.page-header h1,.page-header h2{font-size:44px}.grid{margin-top:16px}.method-grid{grid-template-columns:1fr}.method-card h3{font-size:24px}.contact{align-items:flex-start;flex-direction:column}.contact .button{width:100%}.footer-row{display:grid}.intro-title{font-size:clamp(54px,18vw,78px)}.intro-copy{font-size:15px;max-width:330px}.intro-note{font-size:8px}.start-btn{min-width:140px;min-height:50px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.intro-note{display:none}}
+
+
+
+/* v11 — superfici prevalentemente neutre; colori usati come segnali */
+:root{
+  --surface-neutral-a:rgba(15,25,34,.88);
+  --surface-neutral-b:rgba(27,29,38,.84);
+  --surface-neutral-c:rgba(20,31,40,.82);
+  --petrol:#145368;
+  --petrol-dark:#0C3341;
+  --rust:#734C34;
+  --mauve:#725D6A;
+  --warm-white:#F7F7F5;
+  --cool-gray:#A5ACB8;
+  --text:#F7F7F5;
+  --muted:#C8CDD3;
+  --soft:#A5ACB8;
+  --line:rgba(247,247,245,.16);
+  --primary:#145368;
+  --secondary:#725D6A;
+  --tertiary:#734C34;
+  --shadow:0 26px 72px rgba(3,12,18,.38),inset 0 1px rgba(247,247,245,.055);
+}
+
+/* Base neutra: lo sfondo rimane il vero elemento cromatico della pagina. */
+.surface{
+  position:relative;
+  background:linear-gradient(150deg,var(--surface-neutral-a),var(--surface-neutral-b));
+  border-color:rgba(247,247,245,.16);
+  box-shadow:var(--shadow);
+}
+
+/* Le tre card iniziali condividono la stessa superficie; cambia solo il segnale cromatico. */
+.principle{overflow:hidden}
+.principle::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:3px;opacity:.92;
+}
+.principle:nth-child(1)::before{background:linear-gradient(90deg,#145368,#287892)}
+.principle:nth-child(2)::before{background:linear-gradient(90deg,#734C34,#A17659)}
+.principle:nth-child(3)::before{background:linear-gradient(90deg,#725D6A,#9A8190)}
+
+/* Tool: corpo neutro, petrolio solo dove comunica dati e operatività. */
+.featured{background:linear-gradient(145deg,rgba(15,25,34,.94),rgba(27,29,38,.89))}
+.featured-data{
+  background:linear-gradient(155deg,rgba(20,83,104,.48),rgba(12,51,65,.36));
+  border-left-color:rgba(247,247,245,.16);
+}
+.value-card:first-child{border-top:3px solid rgba(115,76,52,.92)}
+.value-card:last-child{border-top:3px solid rgba(114,93,106,.92)}
+
+/* Pagina strumenti: card sobrie, identificate dal bordo e non dal riempimento. */
+[data-page="tools"] .card:nth-child(1){border-left:4px solid #145368}
+[data-page="tools"] .card:nth-child(2){border-left:4px solid #734C34}
+
+/* Metodo: un'unica famiglia di superfici, quattro accenti leggibili. */
+.method-card{background:linear-gradient(150deg,rgba(15,25,34,.90),rgba(27,29,38,.86))}
+.method-card:nth-child(1){border-top:3px solid #145368}
+.method-card:nth-child(2){border-top:3px solid #734C34}
+.method-card:nth-child(3){border-top:3px solid #725D6A}
+.method-card:nth-child(4){border-top:3px solid #A5ACB8}
+.method-callout>.surface:first-child{border-left:4px solid #145368}
+.method-callout>.surface:last-child{border-left:4px solid #725D6A}
+
+/* Profilo: neutro editoriale; il colore separa le funzioni senza tingere l'intero blocco. */
+.profile>article{border-top:3px solid #145368}
+.profile>aside{border-top:3px solid #725D6A}
+.contact{border-left:4px solid #734C34}
+
+/* Release e stati: il ruggine resta riservato a novità e scadenze. */
+.release-banner{
+  border-color:rgba(115,76,52,.82);
+  border-left-color:#734C34;
+  background:linear-gradient(90deg,rgba(115,76,52,.64),rgba(40,34,36,.72) 58%,rgba(20,83,104,.22));
+}
+.qualification{border-left-color:#734C34;background:rgba(115,76,52,.22);color:#F0EFED}
+.credential{background:rgba(247,247,245,.035);border-color:rgba(247,247,245,.13)}
+.badge{border-color:rgba(115,76,52,.54);background:rgba(115,76,52,.20);color:#F0D7C6}
+.badge.live{border-color:rgba(95,181,154,.44);background:rgba(20,83,104,.28);color:#BCE8DA}
+
+/* Header e CTA tornano neutri; petrolio e malva restano negli stati attivi. */
+.nav-frame{
+  background:linear-gradient(180deg,rgba(19,29,39,.80),rgba(17,23,32,.88));
+  border-color:rgba(247,247,245,.16);
+}
+.desktop-nav{background:rgba(247,247,245,.035);border-color:rgba(247,247,245,.11)}
+.nav-link:hover,.nav-link.active{background:rgba(114,93,106,.34)}
+.ask-trigger{background:rgba(18,31,40,.90);border-color:rgba(247,247,245,.22)}
+.ask-trigger:hover{background:rgba(20,83,104,.72)}
+.ask-panel{background:linear-gradient(180deg,rgba(17,29,38,.97),rgba(25,24,31,.98));border-color:rgba(247,247,245,.19)}
+.mobile-nav{background:rgba(16,27,36,.94)!important;border-color:rgba(247,247,245,.15)!important}
+.mobile-nav button.active{background:rgba(114,93,106,.36)!important}
+
+/* Contrasto tipografico più netto senza usare bianco puro ovunque. */
+.display,.page-header h1,.page-header h2,.section-head h2,.principle h2,.featured-copy h3,.value-card h3,
+.card h2,.card h3,.method-card h3,.method-callout h2,.profile h2,.contact h3,.ask-panel h2{
+  color:#F7F7F5;
+}
+.lead,.section-head p,.page-header>p,.principle p,.featured-copy>p,.value-card p,.card p,
+.method-card p,.method-callout p,.profile p,.contact p,.ask-panel p{color:#E1E5E8}
+.principle span,.label,.data-row span,.info-row span,.timeline-row time,.credential span,.compact-list span{color:#B8C0C9}
+.data-row strong,.info-row strong,.compact-list b,.timeline-row strong,.credential strong{color:#F7F7F5}
+.value-card blockquote{color:#F7F7F5}
+.footer{color:#A5ACB8}
+
+
+/* v12 — nuovo monogramma e ritratto Profilo */
+.brand-logo{width:42px;height:47px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(115,76,52,.22));}
+.profile-intro{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:22px;align-items:start;}
+.profile-intro-copy{min-width:0;}
+.profile-portrait{position:relative;align-self:start;justify-self:end;width:132px;height:154px;overflow:hidden;margin-right:18px;border:1px solid rgba(247,247,245,.24);border-radius:4px;background:#F7F7F5;box-shadow:0 18px 38px rgba(5,12,18,.25);}
+.profile-portrait::before{content:none;}
+.profile-portrait::after{content:none;}
+.profile-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:none;mix-blend-mode:normal;}
+
+.profile-social{display:inline-flex;align-items:center;gap:8px;margin-top:13px;color:#F7F7F5;text-decoration:none;font-size:11px;font-weight:650;letter-spacing:.04em}
+.profile-social svg{width:17px;height:17px;fill:currentColor}
+.profile-social span{border-bottom:1px solid rgba(247,247,245,.38);padding-bottom:2px}
+.profile-social:hover span{border-bottom-color:#F7F7F5}
+@media(max-width:580px){.profile-intro{grid-template-columns:minmax(0,1fr) 88px;gap:14px}.profile-portrait{width:88px;height:112px;margin-right:8px}.profile-portrait img{width:100%;height:100%;object-fit:cover;object-position:center 28%}.brand-logo{width:36px;height:40px}}
+
+/* v2.1 — interazioni mobile e popup introduttivo */
+button,a,.button,.header-action,.nav-link,.mobile-nav button{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.button,.header-action,.nav-link,.mobile-nav button{
+  position:relative;
+  z-index:2;
+  pointer-events:auto;
+}
+.welcome-modal{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  background:rgba(5,8,13,.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  transition:opacity .2s ease,visibility .2s ease;
+}
+.welcome-modal[hidden]{
+  display:grid;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.welcome-card{
+  width:min(610px,100%);
+  padding:30px;
+  border:1px solid rgba(247,247,245,.18);
+  border-radius:14px;
+  background:linear-gradient(155deg,rgba(15,25,34,.98),rgba(31,28,39,.98));
+  box-shadow:0 30px 90px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.06);
+}
+.welcome-card h2{
+  margin:10px 0 14px;
+  font-family:var(--serif);
+  font-size:clamp(34px,6vw,48px);
+  font-weight:300;
+  line-height:1.02;
+}
+.welcome-card p{
+  margin:0;
+  color:#E1E5E8;
+  font-size:15px;
+  line-height:1.65;
+}
+.welcome-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:23px;
+}
+.welcome-actions .button{
+  min-width:160px;
+}
+@media(max-width:580px){
+  .welcome-modal{padding:14px}
+  .welcome-card{padding:23px 20px}
+  .welcome-card p{font-size:14px}
+  .welcome-actions{display:grid;grid-template-columns:1fr}
+  .welcome-actions .button{width:100%}
+}
+
+
+/* v2.2 — audit mobile, accessibilità e performance */
+.welcome-modal[hidden]{display:none!important}
+body.modal-open{overflow:hidden}
+@media(max-width:880px){
+  .app{background-attachment:scroll}
+  .button,.header-action,.ask-trigger,.ask-close{min-height:44px}
+  .lang-option{min-width:44px;min-height:44px}
+  .mobile-nav button{min-height:48px}
+  .welcome-modal{padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+}
+
+
+/* v2.4 — homepage sintetica e obiettivi del Lab */
+.lab-goals-wrap{display:flex;justify-content:center;margin-top:28px}
+.lab-goals{width:min(860px,100%);padding:20px 22px;border-top:3px solid #145368}
+.lab-goals>span{display:block;color:#B8C0C9;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.lab-goals ul{display:grid;gap:9px;margin:14px 0 0;padding:0;list-style:none}
+.lab-goals li{position:relative;padding-left:18px;color:#E1E5E8;font-size:13px}
+.lab-goals li::before{content:"";position:absolute;left:0;top:.68em;width:7px;height:7px;border-radius:50%;background:#145368;box-shadow:0 0 0 4px rgba(20,83,104,.18)}
+@media(max-width:580px){.lab-goals-wrap{margin-top:22px}.lab-goals{padding:18px}.lab-goals li{font-size:12px}}
+
+
+/* v5 — approfondimenti e terza lingua */
+.insights-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
+.insight-card{display:flex;flex-direction:column;min-height:250px;padding:22px;border-top:3px solid #725D6A}
+.insight-card:nth-child(2){border-top-color:#145368}
+.insight-card:nth-child(3){border-top-color:#734C34}
+.insight-card .label{display:block;margin-bottom:10px}
+.insight-card h3{font-family:var(--serif);font-size:27px;font-weight:300;line-height:1.08;margin:0 0 12px;color:#F7F7F5}
+.insight-card p{font-size:13px;color:#E1E5E8;margin:0 0 18px}
+.insight-card .button{margin-top:auto;align-self:flex-start}
+.footer a{white-space:nowrap}
+@media(max-width:880px){.insights-grid{grid-template-columns:1fr}}
+@media(max-width:580px){.lang-option{min-width:32px;padding:0 5px}.insight-card{min-height:0;padding:18px}}
+
+
+/* v6 — three-tool catalogue */
+.tool-suite-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.tool-suite-card{display:flex;flex-direction:column;min-height:300px;padding:22px;border-top:3px solid #145368}
+.tool-suite-card:nth-child(2){border-top-color:#725D6A}.tool-suite-card:nth-child(3){border-top-color:#734C34}
+.tool-suite-card h3{font-family:var(--serif);font-size:28px;font-weight:300;line-height:1.08;margin:0 0 11px;color:#F7F7F5}
+.tool-suite-card p{font-size:13px;color:#E1E5E8;margin:0 0 15px}
+.tool-suite-meta{display:grid;gap:7px;margin:5px 0 18px}
+.tool-suite-meta div{display:flex;justify-content:space-between;gap:12px;padding-bottom:7px;border-bottom:1px solid rgba(247,247,245,.1);font-size:10.5px}
+.tool-suite-meta span{color:#A5ACB8}.tool-suite-meta strong{text-align:right;color:#F7F7F5}
+.tool-suite-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.insights-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:940px){.tool-suite-grid{grid-template-columns:1fr}.tool-suite-card{min-height:0}}
+@media(max-width:720px){.insights-grid{grid-template-columns:1fr}}
+
 </style>
-<style id="tal-v634-touch-targets">.button{min-height:44px!important}.lang a,.lang button{min-width:44px!important;min-height:44px!important;height:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}</style>
-</head><body><header class="topbar"><div class="wrap nav">
-<a class="brand" href="/en/">Tax Automation Lab</a>
-<nav aria-label="Main navigation" class="nav-links"><a href="/en/">Home</a><a href="/en/tools/">Tools</a><a href="/en/insights/">Insights</a><a download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Guide (Italian PDF)</a></nav>
-<div aria-label="Language selection" class="lang"><a href="/?skipIntro=1" hreflang="it">ITA</a><a aria-current="page" class="active" href="/en/" hreflang="en">ENG</a><a href="/es/" hreflang="es">ESP</a></div>
-</div></header>
-<main class="wrap">
-<section class="hero"><span class="eyebrow">Tax &amp; Accounting · Automation Lab</span><h1>Tax and accounting processes, transformed into verifiable technology</h1><p class="lead">You do not need to be a developer to automate professional work. You need to understand the process, write the rules, define the controls and verify the result.</p>
-<div class="actions"><a class="button" href="/en/tools/">Tools →</a><a class="button secondary" href="/en/insights/">Insights →</a></div></section>
-<section class="section"><div class="section-head"><div><span class="label">Tools</span><h2>Three tools available</h2></div><p>Single-file browser applications that process data locally and can also be downloaded from GitHub.</p></div><div class="grid"><article class="card"><span class="label">Financial statements · v1.1.1</span><h3>Fourth Directive Reclassification</h3>
-<p>Reclassifies IAS/IFRS trial balances into Italian statutory Balance Sheet and Income Statement formats, with mapping, book-to-book adjustments, reconciliations and Excel/PDF export.</p><div class="actions"><a class="button" href="/en/tools/financial-statement/">View tool →</a></div></article><article class="card"><span class="label">Tax for Audit · v1.5.3</span><h3>TFA Client File</h3>
-<p>Organises the permanent tax profile, annual file, Information Request List, tax calculation, tax returns, open points, conclusions and exports.</p><div class="actions"><a class="button" href="/en/tools/tfa-client-file/">View tool →</a></div></article><article class="card"><span class="label">VAT · v3.2.3</span><h3>LIPE Generator</h3>
-<p>Manages client VAT-code mapping, period imports, VP fields, reconciliations, the official-style PDF, Excel working paper and IVP18 XML.</p><div class="actions"><a class="button" href="/en/tools/lipe/">View tool →</a></div></article></div></section>
-<section class="section"><div class="section-head"><div><span class="label">Method</span><h2>From professional rules to verifiable software</h2></div><p>Development comes last. First come scope, data, exceptions, expected results and independent review.</p></div>
-<div class="panel"><div class="grid two">
-<div><h3>1. Select and document</h3><p>Choose a recurring process with stable inputs, explainable rules and an output that can be independently checked.</p></div>
-<div><h3>2. Build and challenge</h3><p>Develop in small releases, define PASS/FAIL criteria in advance and separate production from review.</p></div>
-</div><div class="actions"><a class="button secondary" href="/en/insights/ai-tax-process-automation/">Read the full method →</a></div></div></section>
-<section class="section"><div class="section-head"><div><span class="label">Insights</span><h2>Practical cases and method</h2></div><p>Long-form pages built on real processes, explicit rules and controls already developed within the Lab.</p></div><div class="grid two"><article class="card"><span class="label">Financial statements</span><h3>IAS/IFRS to Italian statutory formats</h3>
-<p>Inputs, mapping, book-to-book adjustments, reconciliations and professional responsibility.</p><div class="actions"><a class="button secondary" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read →</a></div></article><article class="card"><span class="label">Tax for Audit</span><h3>A reusable annual tax file</h3>
-<p>Permanent profile, annual working paper, IRL, open points, conclusions and controlled roll-forward.</p><div class="actions"><a class="button secondary" href="/en/insights/tfa-client-file/">Read →</a></div></article><article class="card"><span class="label">VAT</span><h3>LIPE automation and controls</h3>
-<p>VAT ledgers, tax codes, VP-field mapping, reconciliations, PDF and XML.</p><div class="actions"><a class="button secondary" href="/en/insights/lipe-automation/">Read →</a></div></article><article class="card"><span class="label">Method</span><h3>From the tax process to the tool</h3>
-<p>How to define scope, rules, exceptions, tests, releases and independent review.</p><div class="actions"><a class="button secondary" href="/en/insights/ai-tax-process-automation/">Read →</a></div></article></div></section>
-<section class="section"><div class="panel"><span class="label">Riccardo Zedda</span><h2>Tax expertise applied to practical technology</h2><p>I am Riccardo Zedda, an Italian tax professional and Head of Tax Italy. Tax Automation Lab is my independent portfolio of open tools, operating methods and practical experiments.</p></div></section>
-</main><footer class="footer"><div class="wrap">
-<div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span>
-<a href="/en/privacy/">Privacy</a> ·
-<a href="/en/security/">Security</a> ·
-<a href="/en/terms/">Terms</a> ·
-<a href="/en/licenses/">Licences</a>
-</span></div>
-<p class="footer-note">Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. Published content, opinions and tools do not represent third parties.</p>
-</div></footer></body></html>
+
+
+
+
+<style id="tal-v634-touch-targets">.lang-option{min-width:44px!important;min-height:44px!important;height:44px!important}.button,.header-action,.nav-link{min-height:44px}</style>
+<link href="https://taxautomationlab.com/en/" rel="canonical"/><link href="https://taxautomationlab.com/" hreflang="it" rel="alternate"/><link href="https://taxautomationlab.com/en/" hreflang="en" rel="alternate"/><link href="https://taxautomationlab.com/es/" hreflang="es" rel="alternate"/><link href="https://taxautomationlab.com/" hreflang="x-default" rel="alternate"/></head>
+<body class="intro-open">
+<section aria-labelledby="intro-title" class="intro" id="intro">
+<canvas aria-hidden="true" id="tubes-canvas"></canvas>
+<div aria-label="Selezione lingua" class="lang-switch intro-lang-switch" role="group">
+<button aria-pressed="false" class="lang-option" data-lang="it" type="button">ITA</button>
+<button aria-pressed="true" class="lang-option active" data-lang="en" type="button">ENG</button>
+<button aria-pressed="false" class="lang-option" data-lang="es" type="button">ESP</button>
+</div>
+<div class="intro-inner">
+<p class="intro-kicker">Dr. Riccardo Zedda</p>
+<p class="intro-title" id="intro-title">Tax &amp; Accounting <em>Automation Lab</em></p>
+<p class="intro-copy">Tools for automating recurring tax and accounting processes.</p>
+<button class="start-btn" id="start-button" type="button">Start</button>
+</div>
+</section>
+<section aria-describedby="welcome-copy" aria-labelledby="welcome-title" aria-modal="true" class="welcome-modal" hidden="" id="welcome-modal" role="dialog">
+<div class="welcome-card" tabindex="-1">
+<span class="label">Welcome</span>
+<h2 id="welcome-title">Hi, I’m Riccardo</h2>
+<p id="welcome-copy">I created Tax Automation Lab to collect and share, whenever time allows, the open-source projects, tools and guides I develop by applying artificial intelligence to tax and accounting. It is not a commercial showcase, but a personal portfolio of projects and ideas. Feel free to explore; I will periodically publish new tools and practical cases. And if you have an idea, a process to automate, or simply want to compare notes, get in touch!</p>
+<div class="welcome-actions">
+<button class="button" id="welcome-enter" type="button">Enter the Lab</button>
+<button class="button secondary" id="welcome-contact" type="button">Get in touch</button>
+</div>
+</div>
+</section>
+<div aria-hidden="true" class="app" id="app">
+<div aria-hidden="true" class="app-waves"><svg preserveaspectratio="none" viewbox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg"><defs><lineargradient id="wPetrol" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2a9cbe"></stop><stop offset="1" stop-color="#0f6a86"></stop></lineargradient><lineargradient id="wPlum" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#7a2bb0"></stop><stop offset="1" stop-color="#4e1b78"></stop></lineargradient><lineargradient id="wAme" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#a24fd6"></stop><stop offset="1" stop-color="#5c1f8e"></stop></lineargradient><lineargradient id="wRust" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#b8804f"></stop><stop offset="1" stop-color="#5c1f8e"></stop></lineargradient></defs><path d="M0,300 C160,278 300,362 430,338 C560,314 640,262 720,296 L720,540 C560,580 380,536 220,556 C120,568 40,556 0,562 Z" fill="url(#wRust)" opacity="0.42"></path><path d="M0,360 C300,318 520,432 820,388 C1080,350 1280,300 1440,342 L1440,640 C1200,684 1000,576 720,616 C440,656 220,572 0,612 Z" fill="url(#wAme)" opacity="0.56"></path><path d="M0,520 C240,470 430,604 720,560 C1020,516 1200,428 1440,470 L1440,900 L0,900 Z" fill="url(#wPetrol)" opacity="0.72"></path><path d="M0,610 C260,566 450,690 760,646 C1040,612 1260,540 1440,592 L1440,900 L0,900 Z" fill="url(#wPlum)" opacity="0.62"></path></svg></div>
+<header class="site-header">
+<div class="shell nav">
+<div class="nav-frame">
+<button aria-label="Torna alla schermata iniziale" class="brand" id="show-intro" type="button">
+<img alt="Logo Riccardo Zedda" class="brand-logo" src="data:image/png;base64,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"/>
+<span class="brand-copy"><strong>Tax &amp; Accounting - Automation Lab</strong></span>
+</button>
+<nav aria-label="Navigazione principale" class="desktop-nav">
+<button class="nav-link active" data-route="home" type="button">Home</button>
+<button class="nav-link" data-route="tools" type="button">Tools</button>
+<button class="nav-link" data-route="method" type="button">Method</button>
+<button class="nav-link" data-route="about" type="button">About me</button>
+</nav>
+<div class="nav-actions">
+<div aria-label="Selezione lingua" class="lang-switch" role="group">
+<button aria-pressed="false" class="lang-option" data-lang="it" type="button">ITA</button>
+<button aria-pressed="true" class="lang-option active" data-lang="en" type="button">ENG</button>
+<button aria-pressed="false" class="lang-option" data-lang="es" type="button">ESP</button>
+</div>
+<a class="header-action secondary" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Guide ↓</a>
+<button class="header-action primary" id="header-contact" type="button">Contact</button>
+</div>
+</div>
+</div>
+</header>
+<main>
+<section aria-labelledby="home-title" class="page active" data-page="home">
+<div class="shell">
+<div class="home-hero">
+<h1 class="display" id="home-title" tabindex="-1">Tax and accounting processes, transformed into <em>automated technology tools</em></h1>
+<p class="lead">You do not need to be a developer to automate professional work. You need to understand the process, write the rules, define the controls and verify the result.</p>
+<div class="hero-actions">
+<button class="button" data-route="tools" type="button">Open the tools</button>
+<a class="button secondary" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the guide (IT) ↓</a>
+</div>
+</div>
+<div class="lab-goals-wrap">
+<article class="lab-goals surface">
+<span>Lab objectives</span>
+<ul>
+<li>Share tools that can be used by firms and professionals.</li>
+<li>Share ideas and suggestions and develop new automations.</li>
+<li>Gather feedback and connect with professionals and businesses.</li>
+</ul>
+</article>
+</div>
+<section class="section">
+<div class="release-banner"><strong>3 TOOLS AVAILABLE</strong><span>Financial statements, Tax for Audit and LIPE: free local applications available from GitHub</span></div>
+<div class="section-head"><div><h2>The Tax Automation Lab operational suite</h2></div><p>Each tool turns a documented professional process into a faster, controllable and reusable workflow.</p></div>
+<div class="tool-suite-grid">
+<article class="tool-suite-card surface">
+<span class="label">Financial statements · v1.1.1</span><h3>Fourth Directive Reclassification</h3>
+<p>From IAS/IFRS trial balances to Italian statutory Balance Sheet and Income Statement formats, with mapping, adjustments, reconciliations and an annual archive.</p>
+<div class="tool-suite-meta"><div><span>Output</span><strong>Balance Sheet, Income Statement, Excel and PDF</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div>
+<div class="tool-suite-actions"><a class="button" href="/en/tools/financial-statement/">Open →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+</article>
+<article class="tool-suite-card surface">
+<span class="label">Tax for Audit · v1.5.3</span><h3>TFA Client File</h3>
+<p>Permanent tax profile, annual file, tax calculation, tax returns, IRL, open points, conclusions and export.</p>
+<div class="tool-suite-meta"><div><span>Output</span><strong>Excel, PDF, JSON and HTML</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div>
+<div class="tool-suite-actions"><a class="button" href="/en/tools/tfa-client-file/">Open →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+</article>
+<article class="tool-suite-card surface">
+<span class="label">VAT · v3.2.3</span><h3>LIPE Generator</h3>
+<p>Permanent VAT-code mapping, amount import, VP framework, reconciliations, PDF form, working paper and IVP18 XML.</p>
+<div class="tool-suite-meta"><div><span>Output</span><strong>VP, PDF, Excel and XML</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div>
+<div class="tool-suite-actions"><a class="button" href="/en/tools/lipe/">Open →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+</article>
+</div>
+</section>
+<section aria-labelledby="insights-home-title" class="section">
+<div class="section-head">
+<div><span class="label">Insights</span><h2 id="insights-home-title">Practical cases and method</h2></div>
+<p>Four pages built on real processes, explicit rules, controls and materials already developed in the Lab.</p>
+</div>
+<div class="insights-grid">
+<article class="insight-card surface"><span class="label">Financial statements</span><h3>IAS/IFRS → Fourth Directive reclassification</h3><p>Inputs, mapping, book-to-book adjustments, reconciliations and outputs of the statutory reclassification tool.</p><a class="button secondary" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read the case →</a></article>
+<article class="insight-card surface"><span class="label">Tax for Audit</span><h3>A reusable and verifiable annual tax file</h3><p>Permanent profile, current year, information request list, open points, conclusions and controlled roll-forward.</p><a class="button secondary" href="/en/insights/tfa-client-file/">Read the case →</a></article>
+<article class="insight-card surface"><span class="label">VAT · tool available</span><h3>LIPE automation and controls</h3><p>From VAT ledgers and tax codes to VP-field mapping, reconciliations and validation of the result.</p><a class="button secondary" href="/en/insights/lipe-automation/">Read the case →</a></article>
+<article class="insight-card surface"><span class="label">Method</span><h3>From the tax process to the tool</h3><p>How to select an activity, write rules and exceptions, build tests and organise an independent review.</p><a class="button secondary" href="/en/insights/ai-tax-process-automation/">Read the method →</a></article>
+</div>
+</section>
+</div>
+</section>
+<section aria-labelledby="tools-title" class="page" data-page="tools">
+<div class="shell">
+<header class="page-header"><div><p class="eyebrow">Tools</p><h2 id="tools-title">Three tools available</h2></div><p>Single-file applications usable online or downloadable from GitHub. Data are processed locally in the browser.</p></header>
+<div class="tool-suite-grid">
+<article class="tool-suite-card surface"><span class="label">Financial statements · v1.1.1</span><h3>Fourth Directive Reclassification</h3><p>Reclassifies IAS/IFRS reports into Italian statutory formats, preserving account detail, reversals, adjustments and reconciliations.</p><div class="tool-suite-meta"><div><span>Input</span><strong>Excel, mapping and adjustments</strong></div><div><span>Output</span><strong>Balance Sheet, Income Statement, Excel and PDF</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div><div class="tool-suite-actions"><a class="button" href="/en/tools/financial-statement/">Open the tool (IT) →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub download ↗</a></div></article>
+<article class="tool-suite-card surface"><span class="label">Tax for Audit · v1.5.3</span><h3>TFA Client File</h3><p>Organises the client's tax profile and annual file: tax calculation, tax returns, IRL, open points and conclusions.</p><div class="tool-suite-meta"><div><span>Input</span><strong>Client data and working papers</strong></div><div><span>Output</span><strong>Excel, PDF, JSON and HTML</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div><div class="tool-suite-actions"><a class="button" href="/en/tools/tfa-client-file/">Open the tool (IT) →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub download ↗</a></div></article>
+<article class="tool-suite-card surface"><span class="label">VAT · v3.2.3</span><h3>LIPE Generator</h3><p>Configures VAT-code mapping, imports amounts and reconstructs the VP framework with controls, official-style PDF, working paper and IVP18 XML.</p><div class="tool-suite-meta"><div><span>Input</span><strong>VAT-code mapping and Excel amounts</strong></div><div><span>Output</span><strong>VP, PDF, Excel and XML</strong></div><div><span>Status</span><strong class="status-live">Available</strong></div></div><div class="tool-suite-actions"><a class="button" href="/en/tools/lipe/">Open the tool (IT) →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">GitHub download ↗</a></div></article>
+</div>
+</div>
+</section>
+<section aria-labelledby="method-title" class="page" data-page="method">
+<div class="shell">
+<header class="page-header"><div><p class="eyebrow">Method</p><h2 id="method-title">From professional rules to verifiable software</h2></div><p>Development is the final step. The process, data, exceptions and tests come first.</p></header>
+<div class="method-grid">
+<article class="method-card surface"><span class="num">1 · Choose the right process to automate</span><h3>A recurring, verifiable process</h3><p>Start from an activity you know well, with readable inputs, explainable rules and a result you can already verify.</p></article>
+<article class="method-card surface"><span class="num">2 · Write</span><h3>Teach the process to the machine</h3><p>Teach the machine how to read the inputs, apply rules and exceptions, perform controls and generate the correct output.</p></article>
+<article class="method-card surface"><span class="num">3 · Build</span><h3>One function at a time</h3><p>Small releases, real data and a changelog before adding complexity.</p></article>
+<article class="method-card surface"><span class="num">4 · Challenge</span><h3>Testing and independent review</h3><p>Ordinary case, edge case, invalid input and independent review.</p></article>
+</div>
+<div class="method-callout">
+<div class="surface"><span class="label">Where value shifts</span><h2>Value shifts from preparation to process design, exception management and responsibility for the result</h2><p>When an activity can be documented and automated, value does not lie in the hours spent producing the output. It lies in governing the process and deciding whether the result is reliable.</p><a class="button" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the full guide (IT) ↓</a></div>
+<div class="surface"><span class="label">Operating framework</span><div class="compact-list"><div><b>Input</b><span>Real files and known anomalies</span></div><div><b>Brief</b><span>Rules, exceptions and output</span></div><div><b>Test</b><span>PASS/FAIL criteria defined in advance</span></div><div><b>Release</b><span>Manual, changelog and limitations</span></div></div></div>
+</div>
+</div>
+</section>
+<section aria-labelledby="about-title" class="page" data-page="about">
+<div class="shell">
+<header class="page-header"><div><p class="eyebrow">About me</p><h2 id="about-title">Tax and technology applied to real work</h2></div><p>This lab grows out of my direct work in tax compliance, reporting, transactions and tax controls.</p></header>
+<div class="profile">
+<article class="surface"><div class="profile-intro"><div class="profile-intro-copy"><span class="label">Riccardo Zedda</span><h2>Tax Manager</h2><p>I am currently Tax Manager and Head of the Italian tax function at Verdalia Bioenergy, an international group operating in the biomethane sector. I cover tax strategy, compliance, M&amp;A, reporting, audits and the development of tax-technology solutions.</p><a aria-label="Profilo LinkedIn di Riccardo Zedda" class="profile-social" href="https://it.linkedin.com/in/riccardo-zedda-4a47961b8" rel="noopener" target="_blank"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5.2 3.6A2.2 2.2 0 1 1 5.2 8a2.2 2.2 0 0 1 0-4.4ZM3.3 9.5h3.8V21H3.3V9.5Zm6.1 0H13v1.6h.1c.5-.9 1.7-2 3.6-2 3.9 0 4.6 2.6 4.6 5.9v6h-3.8v-5.3c0-1.3 0-3-1.9-3-1.9 0-2.2 1.4-2.2 2.9V21H9.4V9.5Z"></path></svg><span>LinkedIn</span></a></div><figure aria-label="Ritratto professionale di Riccardo Zedda" class="profile-portrait"><img alt="Ritratto professionale di Riccardo Zedda" src="data:image/jpeg;base64,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"/></figure></div>
+<div class="timeline"><div class="timeline-row"><time>2025 — present</time><div><strong>Tax Manager</strong><p>I manage the group’s Italian tax matters and coordinate tax and accounting process-automation projects.</p></div></div><div class="timeline-row"><time>2023 — 2025</time><div><strong>PwC Italy · Tax</strong><p>At PwC, I worked on corporate income tax, VAT, withholding taxes, transactions and support for tax audits.</p></div></div><div class="timeline-row"><time>2023</time><div><strong>KPMG Italy · M&amp;A Tax</strong><p>I worked in M&amp;A Tax, focusing on the tax analysis of corporate transactions.</p></div></div></div>
+<div class="qualification"><strong>Professional qualification.</strong> I am qualified to practise as an Italian Dottore Commercialista. I currently do not practise independently and I am not registered with the professional body, as I work as an employee.</div>
+</article>
+<aside class="surface"><span class="label">Education</span><div class="credentials"><div class="credential"><strong>Bocconi University</strong><span>MSc in Economics and Legislation for Business</span></div><div class="credential"><strong>University of Cagliari</strong><span>Economics and Business Management · 110/110 cum laude</span></div><div class="credential"><strong>Areas</strong><span>Tax compliance, M&amp;A, reporting, AI tax automation, NetSuite</span></div><div class="credential"><strong>Languages</strong><span>Italian, English and Spanish</span></div></div></aside>
+</div>
+<div class="contact surface"><div><span class="label">Contact</span><h3>Feedback and practical use cases</h3><p>Do you have an idea, a process to simplify or feedback on one of the tools? Get in touch: I will be glad to hear from you and discuss the case.</p></div><a class="button" href="mailto:contact@taxautomationlab.com?subject=Tax%20Automation%20Lab%20%E2%80%94%20Contatto%20dal%20sito">Email Riccardo ↗</a></div>
+</div>
+</section>
+</main>
+<div class="ask-cta" id="ask-cta">
+<section aria-labelledby="ask-title" class="ask-panel" hidden="" id="ask-panel">
+<div class="ask-head">
+<div><span class="label">Contact</span><h2 id="ask-title">Do you have a process to automate?</h2></div>
+<button aria-label="Chiudi il pannello contatti" class="ask-close" id="ask-close" type="button">×</button>
+</div>
+<p>Tell me about the process, the available inputs and the result you want to achieve.</p>
+<div class="ask-actions">
+<a class="button" href="mailto:contact@taxautomationlab.com?subject=Tax%20Automation%20Lab%20%E2%80%94%20Confronto%20su%20un%20processo">Email me ↗</a>
+<a class="button secondary" href="https://it.linkedin.com/in/riccardo-zedda-4a47961b8" rel="noopener" target="_blank">LinkedIn ↗</a>
+</div>
+<p class="ask-note">No forms and no data collected by this website.</p>
+</section>
+<button aria-controls="ask-panel" aria-expanded="false" class="ask-trigger" id="ask-trigger" type="button">
+<svg aria-hidden="true" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path><path d="M8 9h8M8 13h5"></path></svg>
+    Contact
+  </button>
+</div>
+<nav aria-label="Navigazione mobile" class="mobile-nav">
+<button aria-label="Home" class="active" data-route="home" type="button"><svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V21H3zM9 21v-6h6v6"></path></svg>Home</button>
+<button aria-label="Strumenti" data-route="tools" type="button"><svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg>Tools</button>
+<button aria-label="Metodo" data-route="method" type="button"><svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 4h12M6 12h12M6 20h12M3 4h.01M3 12h.01M3 20h.01"></path></svg>Method</button>
+<button aria-label="Chi sono" data-route="about" type="button"><svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>About me</button>
+</nav>
+<footer class="footer">
+<div class="shell footer-row">
+<span>© <span id="year"></span> Riccardo Zedda · Tax Automation Lab</span>
+<span><a href="/en/insights/">Insights</a> · <a href="/en/privacy/">Privacy</a> · <a href="/en/security/">Security</a> · <a href="/en/terms/">Terms</a> · <a href="/en/licenses/">Licences</a></span>
+</div>
+<div class="shell" style="margin-top:10px;color:#A5ACB8;font-size:10px">Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. Published content, opinions and tools do not represent third parties.</div>
+</footer>
+</div>
+<script>
+(function(){
+  const body=document.body, intro=document.getElementById('intro'), app=document.getElementById('app'), start=document.getElementById('start-button'), showIntro=document.getElementById('show-intro');
+  let tubesApp=null, fallbackStop=null;
+
+  function randomColors(count){return Array.from({length:count},()=>"#"+Math.floor(Math.random()*16777215).toString(16).padStart(6,"0"));}
+
+  function initFallback(canvas){
+    const ctx=canvas.getContext('2d'); if(!ctx) return ()=>{};
+    let raf=0,w=0,h=0,t=0; const pointer={x:.5,y:.5,tx:.5,ty:.5};
+    const palettes=[["#f967fb","#53bcff","#6958d5"],["#6366f1","#a855f7","#c968f7"],["#2ee7a7","#6f7cff","#ff5ba6"]]; let palette=palettes[1];
+    function size(){const d=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;canvas.width=w*d;canvas.height=h*d;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(d,0,0,d,0,0)}
+    function pos(e){const p=e.touches?e.touches[0]:e; if(!p)return;pointer.tx=p.clientX/w;pointer.ty=p.clientY/h}
+    function draw(){t+=.008;pointer.x+=(pointer.tx-pointer.x)*.035;pointer.y+=(pointer.ty-pointer.y)*.035;ctx.clearRect(0,0,w,h);ctx.fillStyle='#050507';ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation='lighter';for(let k=0;k<5;k++){const phase=t+k*1.1,amp=48+k*18,base=(k+1)*h/6;ctx.beginPath();for(let x=-100;x<=w+100;x+=8){const y=base+Math.sin(x*.006+phase)*amp+Math.cos(x*.003-phase*.7)*28+(pointer.y-.5)*80+(pointer.x-.5)*(x-w/2)*.08;if(x===-100)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.lineWidth=10-k*.8;ctx.strokeStyle=palette[k%palette.length]+'33';ctx.shadowBlur=28;ctx.shadowColor=palette[k%palette.length];ctx.stroke();ctx.lineWidth=2.1;ctx.strokeStyle=palette[k%palette.length];ctx.shadowBlur=15;ctx.stroke()}ctx.globalCompositeOperation='source-over';raf=requestAnimationFrame(draw)}
+    window.addEventListener('resize',size);window.addEventListener('pointermove',pos,{passive:true});window.addEventListener('touchmove',pos,{passive:true});
+    intro.addEventListener('click',e=>{if(e.target.closest('button'))return;palette=palettes[Math.floor(Math.random()*palettes.length)]});size();draw();
+    return ()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',size);window.removeEventListener('pointermove',pos);window.removeEventListener('touchmove',pos)};
+  }
+
+  async function initTubes(){
+    const canvas=document.getElementById('tubes-canvas');
+    try{
+      const module=await Promise.race([import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('WebGL module timeout')),2800))]);
+      const TubesCursor=module.default;
+      tubesApp=TubesCursor(canvas,{tubes:{colors:["#f967fb","#53bcff","#6958d5"],lights:{intensity:200,colors:["#83f36e","#fe8a2e","#ff008a","#60aed5"]}}});
+      intro.addEventListener('click',e=>{if(e.target.closest('button')||!tubesApp)return;tubesApp.tubes.setColors(randomColors(3));tubesApp.tubes.setLightsColors(randomColors(4));});
+    }catch(err){console.warn('Tubes WebGL non disponibile: uso fallback canvas.',err);fallbackStop=initFallback(canvas);}
+  }
+
+  const welcomeModal=document.getElementById('welcome-modal'),welcomeCard=welcomeModal.querySelector('.welcome-card'),welcomeEnter=document.getElementById('welcome-enter'),welcomeContact=document.getElementById('welcome-contact');
+  function openWelcome(){welcomeModal.hidden=false;body.classList.add('modal-open');requestAnimationFrame(()=>welcomeEnter.focus());}
+  function closeWelcome(focusTarget=document.getElementById('home-title')){welcomeModal.hidden=true;body.classList.remove('modal-open');if(focusTarget)focusTarget.focus({preventScroll:true});}
+  function rememberIntroSeen(){try{sessionStorage.setItem('tal-intro-seen','1')}catch(e){}}
+  function enter(){
+    rememberIntroSeen();
+    intro.classList.add('is-leaving');app.classList.add('is-visible');app.setAttribute('aria-hidden','false');body.classList.remove('intro-open');
+    setTimeout(()=>{intro.hidden=true;openWelcome();},680);
+  }
+  function enterDirect(){
+    rememberIntroSeen();
+    intro.hidden=true;intro.classList.add('is-leaving');app.classList.add('is-visible');app.setAttribute('aria-hidden','false');body.classList.remove('intro-open','modal-open');
+    welcomeModal.hidden=true;
+  }
+  function reopen(){closeWelcome(null);if(!tubesApp&&!fallbackStop)initTubes();intro.hidden=false;requestAnimationFrame(()=>intro.classList.remove('is-leaving'));app.classList.remove('is-visible');app.setAttribute('aria-hidden','true');body.classList.add('intro-open');start.focus({preventScroll:true});}
+  start.addEventListener('click',enter);showIntro.addEventListener('click',reopen);
+
+  const askTrigger=document.getElementById('ask-trigger'),askPanel=document.getElementById('ask-panel'),askClose=document.getElementById('ask-close'),headerContact=document.getElementById('header-contact');
+  function setAsk(open){askPanel.hidden=!open;askTrigger.setAttribute('aria-expanded',String(open));}
+  askTrigger.addEventListener('click',e=>{e.stopPropagation();setAsk(askPanel.hidden);});
+  askClose.addEventListener('click',e=>{e.stopPropagation();setAsk(false);});
+  headerContact&&headerContact.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setAsk(true);});
+  welcomeEnter.addEventListener('click',()=>closeWelcome());
+  welcomeContact.addEventListener('click',e=>{e.preventDefault();closeWelcome(null);setAsk(true);askTrigger.focus({preventScroll:true});});
+  welcomeModal.addEventListener('click',e=>{if(e.target===welcomeModal)closeWelcome();});
+  welcomeModal.addEventListener('keydown',e=>{
+    if(e.key!=='Tab')return;
+    const focusable=[...welcomeModal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&!el.hidden);
+    if(!focusable.length)return;
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWelcome();setAsk(false);}});
+  document.addEventListener('click',e=>{if(!e.target.closest('#ask-cta')&&!e.target.closest('#header-contact')&&!e.target.closest('#welcome-contact'))setAsk(false);});
+
+
+  
+  const translations={
+    en:{"Dott. Riccardo Zedda":"Dr. Riccardo Zedda","Strumenti per automatizzare processi fiscali e contabili ricorrenti.":"Tools for automating recurring tax and accounting processes.","Strumenti":"Tools","Metodo":"Method","Chi sono":"About me","Guida ↓":"Guide ↓","Contatti":"Contact","Processi fiscali e contabili, trasformati in":"Tax and accounting processes, transformed into","strumenti tecnologici automatizzati":"automated technology tools","Non serve essere sviluppatori per automatizzare un'attività professionale. Serve conoscere il lavoro, scrivere le regole, definire i controlli e verificare il risultato.":"You do not need to be a developer to automate professional work. You need to understand the process, write the rules, define the controls and verify the result.","Apri gli strumenti":"Open the tools","Scarica la guida ↓":"Download the guide (IT) ↓","01 · Automazione":"01 · Automation","Lettura e riconciliazione dei dati":"Data reading and reconciliation","I dati vengono letti, normalizzati e riconciliati in base a regole dichiarate dal professionista.":"Data are read, normalised and reconciled according to rules defined by the professional.","02 · Controllo":"02 · Control","Tracciabilità del risultato":"Traceability of the result","Assunzioni, eccezioni, conti non mappati e quadrature restano visibili e verificabili.":"Assumptions, exceptions, unmapped accounts and reconciliations remain visible and reviewable.","03 · Valore":"03 · Value","Ruolo del professionista":"The professional’s role","La parte compilativa si riduce. Restano al professionista la valutazione e la responsabilità del risultato.":"Manual preparation is reduced. Assessment and responsibility for the result remain with the professional.","PRIMO RILASCIO":"FIRST RELEASE","Il primo strumento pubblicato e scaricabile gratuitamente":"The first published tool, available as a free download","Riclassifica IV Direttiva":"Fourth Directive Reclassification","Da reporting IAS/IFRS a Stato Patrimoniale e Conto Economico civilistici.":"From IAS/IFRS reporting to Italian statutory Balance Sheet and Income Statement.","Tool disponibile":"Tool available","Insegna tu alla macchina come leggere i tuoi dati: carica trial balance e mapping. Il tool applica la riclassifica, gestisce rettifiche book-to-book, segnala i conti non mappati e produce working paper Excel e PDF.":"Teach the application how to read your data: upload the trial balance and mapping. The tool performs the reclassification, manages book-to-book adjustments, flags unmapped accounts and produces Excel and PDF working papers.","Elaborazione locale":"Local processing","Apri il tool →":"Open the tool (IT) →","Input":"Input","Output":"Output","Controlli":"Controls","Trial balance, balance sheet e mapping conti":"Trial balance, balance sheet and account mapping","SP, CE, dettaglio conti, Excel e PDF":"Balance Sheet, Income Statement, account detail, Excel and PDF","Quadrature, non mappati, storni e rettifiche":"Reconciliations, unmapped accounts, reversals and adjustments","Stato":"Status","Disponibile":"Available","Il punto":"Key point","Ruolo dell'intelligenza artificiale":"The role of artificial intelligence","L'intelligenza artificiale riduce i tempi di sviluppo, non la responsabilità sul risultato. Ogni tool viene rilasciato solo dopo test su casi reali e una verifica della logica condotta separatamente da chi lo ha sviluppato.":"Artificial intelligence reduces development time, not responsibility for the result. Each tool is released only after testing on real cases and an independent review of its logic.","Dalla guida":"From the guide","“Usare meno tempo per ricostruire dati e più tempo per analizzarli.”":"“Spend less time reconstructing data and more time analysing them.”","Strumenti disponibili e prossimi rilasci":"Available tools and upcoming releases","Ogni progetto parte da input reali, regole scritte e controlli definiti; solo successivamente si passa alla scrittura del codice e allo sviluppo dell’applicativo.":"Each project starts from real inputs, written rules and defined controls; only then does coding and application development begin.","Bilancio":"Financial statements","Riclassifica report IAS/IFRS negli schemi civilistici italiani, mantenendo il dettaglio per conto.":"Reclassifies IAS/IFRS reports into Italian statutory formats while preserving account-level detail.","Excel standard, mapping e rettifiche":"Standard Excel files, mapping and adjustments","SP, CE, working paper, PDF":"Balance Sheet, Income Statement, working paper and PDF","Verifiche":"Checks","Quadrature, non mappati, partita doppia":"Reconciliations, unmapped accounts and double-entry controls","Caso completo ↗":"Full case study (IT) ↗","IVA":"VAT","Generatore LIPE":"LIPE Generator","Release date 8 agosto 2026":"Release date: 8 August 2026","Dai registri IVA mensili alla comunicazione trimestrale, con mapping dei codici e riconciliazione dei campi VP.":"From monthly VAT ledgers to the quarterly filing, including tax-code mapping and reconciliation of VP fields.","Registri PDF/Excel e tax code":"PDF/Excel ledgers and tax codes","VP1–VP14, controlli e tracciato":"VP1–VP14, controls and filing format","Dalla regola professionale al software verificabile":"From professional rules to verifiable software","Lo sviluppo è l'ultima parte. Prima vengono processo, dati, eccezioni e test.":"Development is the final step. The process, data, exceptions and tests come first.","1 · Scegliere il giusto processo da automatizzare":"1 · Choose the right process to automate","Un processo ricorrente e verificabile":"A recurring, verifiable process","Parti da un’attività che conosci bene, con input leggibili, regole spiegabili e un risultato che puoi già controllare.":"Start from an activity you know well, with readable inputs, explainable rules and a result you can already verify.","2 · Scrivere":"2 · Write","Insegnare il processo alla macchina":"Teach the process to the machine","Insegna alla macchina come leggere gli input, applicare regole ed eccezioni, eseguire i controlli e generare l’output corretto.":"Teach the machine how to read the inputs, apply rules and exceptions, perform controls and generate the correct output.","3 · Costruire":"3 · Build","Una funzione alla volta":"One function at a time","Versioni piccole, dati reali e changelog prima di aggiungere complessità.":"Small releases, real data and a changelog before adding complexity.","04 · Smentire":"4 · Challenge","Test e audit indipendente":"Testing and independent review","Caso ordinario, caso limite, input errato e revisione indipendente.":"Ordinary case, edge case, invalid input and independent review.","Dove si sposta il valore":"Where value shifts","Il valore si sposta dalla compilazione alla progettazione del processo, alla gestione delle eccezioni e alla responsabilità sul risultato":"Value shifts from preparation to process design, exception management and responsibility for the result","Quando un'attività può essere documentata e automatizzata, il valore non è nelle ore impiegate per produrre l'output. È nella capacità di governare il processo e decidere se il risultato è affidabile.":"When an activity can be documented and automated, value does not lie in the hours spent producing the output. It lies in governing the process and deciding whether the result is reliable.","Scarica la guida completa ↓":"Download the full guide (IT) ↓","Schema operativo":"Operating framework","File reali e anomalie note":"Real files and known anomalies","Regole, eccezioni e output":"Rules, exceptions and output","PASS/FAIL definiti prima":"PASS/FAIL criteria defined in advance","Manuale, changelog e limiti":"Manual, changelog and limitations","Fiscalità e tecnologia applicate al lavoro reale":"Tax and technology applied to real work","Questo laboratorio nasce dal lavoro che svolgo nella gestione di compliance, reporting, operazioni straordinarie e controlli fiscali.":"This lab grows out of my direct work in tax compliance, reporting, transactions and tax controls.","Attualmente sono Tax Manager e responsabile della funzione fiscale italiana di Verdalia Bioenergy, gruppo internazionale attivo nel settore del biometano. Mi occupo di strategia fiscale, compliance, M&A, reporting, verifiche e sviluppo di soluzioni di tax technology.":"I am currently Tax Manager and Head of the Italian tax function at Verdalia Bioenergy, an international group operating in the biomethane sector. I cover tax strategy, compliance, M&A, reporting, audits and the development of tax-technology solutions.","2025 — oggi":"2025 — present","Gestisco la fiscalità italiana del gruppo e coordino progetti di automazione dei processi fiscali e contabili.":"I manage the group’s Italian tax matters and coordinate tax and accounting process-automation projects.","Ho lavorato in PwC occupandomi di imposte dirette, IVA, ritenute, operazioni straordinarie e supporto agli audit.":"At PwC, I worked on corporate income tax, VAT, withholding taxes, transactions and support for tax audits.","Ho svolto un’esperienza in M&A Tax dedicata all’analisi fiscale delle operazioni straordinarie.":"I worked in M&A Tax, focusing on the tax analysis of corporate transactions.","Qualifica.":"Professional qualification.","Ho conseguito l’abilitazione all’esercizio della professione di dottore commercialista. Attualmente non esercito la libera professione e non sono iscritto all’Albo, in quanto lavoro come dipendente.":"I am qualified to practise as an Italian Dottore Commercialista. I currently do not practise independently and I am not registered with the professional body, as I work as an employee.","Formazione":"Education","Università di Cagliari":"University of Cagliari","Economia e gestione aziendale · 110/110 e lode":"Economics and Business Management · 110/110 cum laude","Ambiti":"Areas","Lingue":"Languages","Italiano, inglese e spagnolo":"Italian, English and Spanish","Feedback e casi d’uso concreti":"Feedback and practical use cases","Hai un’idea, un processo da semplificare o vuoi confrontarti su uno dei tool? Scrivimi: sarò felice di ascoltarti e approfondire insieme il caso.":"Do you have an idea, a process to simplify or feedback on one of the tools? Get in touch: I will be glad to hear from you and discuss the case.","Scrivi a Riccardo ↗":"Email Riccardo ↗","Hai un processo da automatizzare?":"Do you have a process to automate?","Raccontami il processo, gli input disponibili e il risultato che vuoi ottenere.":"Tell me about the process, the available inputs and the result you want to achieve.","Scrivimi via email ↗":"Email me ↗","Nessun modulo e nessun dato raccolto dal sito.":"No forms and no data collected by this website.","Strumenti informativi · verifica professionale necessaria":"Informational tools · professional review required","Benvenuto":"Welcome","Ciao, sono Riccardo":"Hi, I’m Riccardo","Ho creato Tax Automation Lab per raccogliere e condividere, quando il tempo me lo permette, i progetti open source, i tool e le guide che sviluppo applicando l’intelligenza artificiale alla fiscalità e alla contabilità. Non è una vetrina commerciale ma un portfolio personale di progetti e idee. Naviga liberamente; pubblicherò periodicamente nuovi strumenti e casi pratici. E se hai un’idea, un processo da automatizzare o semplicemente vuoi confrontarti, scrivimi!":"I created Tax Automation Lab to collect and share, whenever time allows, the open-source projects, tools and guides I develop by applying artificial intelligence to tax and accounting. It is not a commercial showcase, but a personal portfolio of projects and ideas. Feel free to explore; I will periodically publish new tools and practical cases. And if you have an idea, a process to automate, or simply want to compare notes, get in touch!","Entra nel Lab":"Enter the Lab","Scrivimi":"Get in touch","Rilascio":"Release","Scarica il tool ↓":"Download the tool (IT) ↓","Obiettivi del Lab":"Lab objectives","Condividere strumenti utilizzabili da studi e professionisti.":"Share tools that can be used by firms and professionals.","Condividere idee e suggerimenti e sviluppare nuovi automatismi.":"Share ideas and suggestions and develop new automations.","Raccogliere feedback ed entrare in contatto con professionisti e imprese.":"Gather feedback and connect with professionals and businesses.","Scarica da GitHub ↗":"Download from GitHub ↗","Download GitHub ↗":"GitHub download ↗","Privacy":"Privacy","Sicurezza":"Security","Termini":"Terms","Licenze":"Licences","Home":"Home","Start":"Start","Tax & Accounting - Automation Lab":"Tax & Accounting - Automation Lab","Approfondimenti":"Insights","Casi pratici e metodo":"Practical cases and method","Dalla regola professionale al processo verificabile: tre approfondimenti costruiti su casi reali e materiali già pubblicati nel Lab.":"From professional rules to a verifiable process: three insights built on real cases and materials already published by the Lab.","Riclassificazione IAS/IFRS → IV Direttiva":"IAS/IFRS → Fourth Directive reclassification","Input, mapping, rettifiche book-to-book, quadrature e output del tool di riclassificazione civilistica.":"Inputs, mapping, book-to-book adjustments, reconciliations and outputs of the statutory reclassification tool.","Leggi il caso →":"Read the case →","Dal processo fiscale al tool":"From the tax process to the tool","Come scegliere un’attività, scrivere regole ed eccezioni, costruire i test e organizzare un audit indipendente.":"How to select an activity, write rules and exceptions, build tests and organise an independent review.","Leggi il metodo →":"Read the method →","IVA · caso in sviluppo":"VAT · case in development","Automazione e controllo LIPE":"LIPE automation and controls","Dai registri IVA e dai tax code al mapping dei campi VP, alle riconciliazioni e alla validazione del risultato.":"From VAT ledgers and tax codes to VP-field mapping, reconciliations and validation of the result.","3 STRUMENTI DISPONIBILI":"3 TOOLS AVAILABLE","Bilancio, Tax for Audit e LIPE: applicazioni gratuite, locali e scaricabili da GitHub":"Financial statements, Tax for Audit and LIPE: free local applications available from GitHub","La suite operativa del Tax Automation Lab":"The Tax Automation Lab operational suite","Ogni strumento trasforma un processo professionale documentato in un flusso più rapido, controllabile e riutilizzabile.":"Each tool turns a documented professional process into a faster, controllable and reusable workflow.","Bilancio · v1.1.1":"Financial statements · v1.1.1","Tax for Audit · v1.5.3":"Tax for Audit · v1.5.3","IVA · v3.2.3":"VAT · v3.2.3","Da trial balance IAS/IFRS a Stato Patrimoniale e Conto Economico civilistici, con mapping, rettifiche, quadrature e archivio annuale.":"From IAS/IFRS trial balances to Italian statutory Balance Sheet and Income Statement formats, with mapping, adjustments, reconciliations and an annual archive.","Profilo fiscale permanente, fascicolo annuale, calcolo imposte, dichiarativi, IRL, open points, conclusioni ed export.":"Permanent tax profile, annual file, tax calculation, tax returns, IRL, open points, conclusions and export.","Codiciario IVA permanente, import degli importi, quadro VP, riconciliazioni, modello PDF, working paper e XML IVP18.":"Permanent VAT-code mapping, amount import, VP framework, reconciliations, PDF form, working paper and IVP18 XML.","SP, CE, Excel e PDF":"Balance Sheet, Income Statement, Excel and PDF","Excel, PDF, JSON e HTML":"Excel, PDF, JSON and HTML","VP, PDF, Excel e XML":"VP, PDF, Excel and XML","Apri →":"Open →","GitHub ↗":"GitHub ↗","Quattro pagine costruite su processi reali, regole esplicite, controlli e materiali già sviluppati nel Lab.":"Four pages built on real processes, explicit rules, controls and materials already developed in the Lab.","Un fascicolo fiscale annuale, riutilizzabile e verificabile":"A reusable and verifiable annual tax file","Profilo permanente, anno corrente, information request list, open points, conclusioni e riporto controllato.":"Permanent profile, current year, information request list, open points, conclusions and controlled roll-forward.","IVA · tool disponibile":"VAT · tool available","Tre strumenti disponibili":"Three tools available","Applicazioni monofile utilizzabili online o scaricabili da GitHub. I dati vengono elaborati localmente nel browser.":"Single-file applications usable online or downloadable from GitHub. Data are processed locally in the browser.","Riclassifica report IAS/IFRS negli schemi civilistici italiani, mantenendo dettaglio per conto, storni, rettifiche e quadrature.":"Reclassifies IAS/IFRS reports into Italian statutory formats, preserving account detail, reversals, adjustments and reconciliations.","Organizza il profilo fiscale del cliente e il fascicolo annuale: calcolo imposte, dichiarativi, IRL, open points e conclusioni.":"Organises the client's tax profile and annual file: tax calculation, tax returns, IRL, open points and conclusions.","Configura il codiciario IVA, importa gli importi e ricostruisci il quadro VP con controlli, PDF ministeriale, working paper e XML IVP18.":"Configures VAT-code mapping, imports amounts and reconstructs the VP framework with controls, official-style PDF, working paper and IVP18 XML.","Excel, mapping e rettifiche":"Excel, mapping and adjustments","Dati cliente e working paper":"Client data and working papers","Codiciario e importi Excel":"VAT-code mapping and Excel amounts"},
+    es:{"Dott. Riccardo Zedda":"Dr. Riccardo Zedda","Strumenti per automatizzare processi fiscali e contabili ricorrenti.":"Herramientas para automatizar procesos fiscales y contables recurrentes.","Strumenti":"Herramientas","Metodo":"Método","Chi sono":"Sobre mí","Home":"Inicio","Start":"Entrar","Guida ↓":"Guía (IT) ↓","Contatti":"Contacto","Benvenuto":"Bienvenido","Ciao, sono Riccardo":"Hola, soy Riccardo","Ho creato Tax Automation Lab per raccogliere e condividere, quando il tempo me lo permette, i progetti open source, i tool e le guide che sviluppo applicando l’intelligenza artificiale alla fiscalità e alla contabilità. Non è una vetrina commerciale ma un portfolio personale di progetti e idee. Naviga liberamente; pubblicherò periodicamente nuovi strumenti e casi pratici. E se hai un’idea, un processo da automatizzare o semplicemente vuoi confrontarti, scrivimi!":"He creado Tax Automation Lab para reunir y compartir, cuando el tiempo me lo permite, los proyectos open source, las herramientas y las guías que desarrollo aplicando la inteligencia artificial a la fiscalidad y la contabilidad. No es un escaparate comercial, sino un portfolio personal de proyectos e ideas. Navega libremente; publicaré periódicamente nuevas herramientas y casos prácticos. Y si tienes una idea, un proceso que automatizar o simplemente quieres intercambiar opiniones, escríbeme.","Entra nel Lab":"Entrar en el Lab","Scrivimi":"Escríbeme","Tax & Accounting - Automation Lab":"Tax & Accounting - Automation Lab","Processi fiscali e contabili, trasformati in":"Procesos fiscales y contables transformados en","strumenti tecnologici automatizzati":"herramientas tecnológicas automatizadas","Non serve essere sviluppatori per automatizzare un'attività professionale. Serve conoscere il lavoro, scrivere le regole, definire i controlli e verificare il risultato.":"No hace falta ser desarrollador para automatizar una actividad profesional. Hay que conocer el trabajo, escribir las reglas, definir los controles y verificar el resultado.","Apri gli strumenti":"Abrir las herramientas","Scarica la guida ↓":"Descargar la guía (IT) ↓","Obiettivi del Lab":"Objetivos del Lab","Condividere strumenti utilizzabili da studi e professionisti.":"Compartir herramientas utilizables por despachos y profesionales.","Condividere idee e suggerimenti e sviluppare nuovi automatismi.":"Compartir ideas y sugerencias y desarrollar nuevas automatizaciones.","Raccogliere feedback ed entrare in contatto con professionisti e imprese.":"Recoger opiniones y conectar con profesionales y empresas.","PRIMO RILASCIO":"PRIMER LANZAMIENTO","Il primo strumento pubblicato e scaricabile gratuitamente":"La primera herramienta publicada y descargable gratuitamente","Riclassifica IV Direttiva":"Reclasificación IV Directiva","Da reporting IAS/IFRS a Stato Patrimoniale e Conto Economico civilistici.":"Del reporting IAS/IFRS al balance y a la cuenta de resultados conforme a los esquemas italianos.","Tool disponibile":"Herramienta disponible","Insegna tu alla macchina come leggere i tuoi dati: carica trial balance e mapping. Il tool applica la riclassifica, gestisce rettifiche book-to-book, segnala i conti non mappati e produce working paper Excel e PDF.":"Indica a la aplicación cómo leer tus datos: carga el trial balance y el mapping. La herramienta aplica la reclasificación, gestiona ajustes book-to-book, señala las cuentas no mapeadas y produce working papers en Excel y PDF.","Elaborazione locale":"Procesamiento local","Apri il tool →":"Abrir la herramienta (IT) →","Scarica da GitHub ↗":"Descargar desde GitHub ↗","Input":"Input","Output":"Output","Controlli":"Controles","Trial balance, balance sheet e mapping conti":"Trial balance, balance sheet y mapping de cuentas","SP, CE, dettaglio conti, Excel e PDF":"Balance, cuenta de resultados, detalle de cuentas, Excel y PDF","Quadrature, non mappati, storni e rettifiche":"Cuadres, cuentas no mapeadas, reclasificaciones y ajustes","Stato":"Estado","Disponibile":"Disponible","Strumenti disponibili e prossimi rilasci":"Herramientas disponibles y próximos lanzamientos","Ogni progetto parte da input reali, regole scritte e controlli definiti; solo successivamente si passa alla scrittura del codice e allo sviluppo dell’applicativo.":"Cada proyecto parte de datos reales, reglas escritas y controles definidos; solo después se pasa al código y al desarrollo de la aplicación.","Bilancio":"Estados financieros","Riclassifica report IAS/IFRS negli schemi civilistici italiani, mantenendo il dettaglio per conto.":"Reclasifica reportes IAS/IFRS en los esquemas estatutarios italianos manteniendo el detalle por cuenta.","Excel standard, mapping e rettifiche":"Excel estándar, mapping y ajustes","SP, CE, working paper, PDF":"Balance, cuenta de resultados, working paper y PDF","Verifiche":"Comprobaciones","Quadrature, non mappati, partita doppia":"Cuadres, cuentas no mapeadas y controles de partida doble","Download GitHub ↗":"Descarga GitHub ↗","IVA":"IVA","Generatore LIPE":"Generador LIPE","Release date 8 agosto 2026":"Fecha de lanzamiento: 8 de agosto de 2026","Dai registri IVA mensili alla comunicazione trimestrale, con mapping dei codici e riconciliazione dei campi VP.":"De los libros de IVA mensuales a la comunicación trimestral, con mapping de códigos y conciliación de los campos VP.","Registri PDF/Excel e tax code":"Libros PDF/Excel y tax codes","VP1–VP14, controlli e tracciato":"VP1–VP14, controles y formato de envío","Dalla regola professionale al software verificabile":"De la regla profesional al software verificable","Lo sviluppo è l'ultima parte. Prima vengono processo, dati, eccezioni e test.":"El desarrollo es la última parte. Primero vienen el proceso, los datos, las excepciones y las pruebas.","1 · Scegliere il giusto processo da automatizzare":"1 · Elegir el proceso adecuado para automatizar","Un processo ricorrente e verificabile":"Un proceso recurrente y verificable","Parti da un’attività che conosci bene, con input leggibili, regole spiegabili e un risultato che puoi già controllare.":"Empieza por una actividad que conozcas bien, con datos legibles, reglas explicables y un resultado que ya puedas comprobar.","2 · Scrivere":"2 · Escribir","Insegnare il processo alla macchina":"Enseñar el proceso a la máquina","Insegna alla macchina come leggere gli input, applicare regole ed eccezioni, eseguire i controlli e generare l’output corretto.":"Enseña a la máquina a leer los datos, aplicar reglas y excepciones, ejecutar controles y generar el resultado correcto.","3 · Costruire":"3 · Construir","Una funzione alla volta":"Una función cada vez","Versioni piccole, dati reali e changelog prima di aggiungere complessità.":"Versiones pequeñas, datos reales y changelog antes de añadir complejidad.","04 · Smentire":"4 · Cuestionar","Test e audit indipendente":"Pruebas y revisión independiente","Caso ordinario, caso limite, input errato e revisione indipendente.":"Caso ordinario, caso límite, dato erróneo y revisión independiente.","Dove si sposta il valore":"Dónde se desplaza el valor","Il valore si sposta dalla compilazione alla progettazione del processo, alla gestione delle eccezioni e alla responsabilità sul risultato":"El valor se desplaza de la preparación al diseño del proceso, a la gestión de excepciones y a la responsabilidad sobre el resultado","Quando un'attività può essere documentata e automatizzata, il valore non è nelle ore impiegate per produrre l'output. È nella capacità di governare il processo e decidere se il risultato è affidabile.":"Cuando una actividad puede documentarse y automatizarse, el valor no está en las horas dedicadas a producir el resultado. Está en la capacidad de gobernar el proceso y decidir si el resultado es fiable.","Scarica la guida completa ↓":"Descargar la guía completa (IT) ↓","Schema operativo":"Esquema operativo","File reali e anomalie note":"Archivos reales y anomalías conocidas","Brief":"Brief","Regole, eccezioni e output":"Reglas, excepciones y resultados","Test":"Pruebas","PASS/FAIL definiti prima":"Criterios PASS/FAIL definidos previamente","Rilascio":"Lanzamiento","Manuale, changelog e limiti":"Manual, changelog y limitaciones","Fiscalità e tecnologia applicate al lavoro reale":"Fiscalidad y tecnología aplicadas al trabajo real","Questo laboratorio nasce dal lavoro che svolgo nella gestione di compliance, reporting, operazioni straordinarie e controlli fiscali.":"Este laboratorio nace de mi trabajo en compliance, reporting, operaciones extraordinarias y controles fiscales.","Attualmente sono Tax Manager e responsabile della funzione fiscale italiana di Verdalia Bioenergy, gruppo internazionale attivo nel settore del biometano. Mi occupo di strategia fiscale, compliance, M&A, reporting, verifiche e sviluppo di soluzioni di tax technology.":"Actualmente soy Tax Manager y responsable de la función fiscal italiana de Verdalia Bioenergy, grupo internacional activo en el sector del biometano. Me ocupo de estrategia fiscal, compliance, M&A, reporting, revisiones y desarrollo de soluciones de tax technology.","2025 — oggi":"2025 — actualidad","Gestisco la fiscalità italiana del gruppo e coordino progetti di automazione dei processi fiscali e contabili.":"Gestiono la fiscalidad italiana del grupo y coordino proyectos de automatización de procesos fiscales y contables.","Ho lavorato in PwC occupandomi di imposte dirette, IVA, ritenute, operazioni straordinarie e supporto agli audit.":"Trabajé en PwC en impuestos directos, IVA, retenciones, operaciones extraordinarias y apoyo a auditorías.","Ho svolto un’esperienza in M&A Tax dedicata all’analisi fiscale delle operazioni straordinarie.":"Trabajé en M&A Tax, centrado en el análisis fiscal de operaciones extraordinarias.","Qualifica.":"Habilitación profesional.","Ho conseguito l’abilitazione all’esercizio della professione di dottore commercialista. Attualmente non esercito la libera professione e non sono iscritto all’Albo, in quanto lavoro come dipendente.":"Obtuve la habilitación italiana de Dottore Commercialista. Actualmente no ejerzo por cuenta propia ni estoy inscrito en el registro profesional, ya que trabajo como empleado.","Formazione":"Formación","Università di Cagliari":"Universidad de Cagliari","Economia e gestione aziendale · 110/110 e lode":"Economía y gestión empresarial · 110/110 con matrícula de honor","Ambiti":"Áreas","Lingue":"Idiomas","Italiano, inglese e spagnolo":"Italiano, inglés y español","Feedback e casi d’uso concreti":"Feedback y casos de uso concretos","Hai un’idea, un processo da semplificare o vuoi confrontarti su uno dei tool? Scrivimi: sarò felice di ascoltarti e approfondire insieme il caso.":"¿Tienes una idea, un proceso que simplificar o quieres comentar una de las herramientas? Escríbeme: estaré encantado de escucharte y analizar juntos el caso.","Scrivi a Riccardo ↗":"Escribir a Riccardo ↗","Hai un processo da automatizzare?":"¿Tienes un proceso que automatizar?","Raccontami il processo, gli input disponibili e il risultato che vuoi ottenere.":"Cuéntame el proceso, los datos disponibles y el resultado que quieres obtener.","Scrivimi via email ↗":"Escríbeme por email ↗","Nessun modulo e nessun dato raccolto dal sito.":"Sin formularios y sin recopilación de datos en el sitio.","Privacy":"Privacidad","Sicurezza":"Seguridad","Termini":"Términos","Licenze":"Licencias","Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.":"Tax Automation Lab es un proyecto personal e independiente, no aprobado ni patrocinado por terceros. Los contenidos, opiniones y herramientas publicados no representan a terceros.","Approfondimenti":"Análisis","Casi pratici e metodo":"Casos prácticos y método","Dalla regola professionale al processo verificabile: tre approfondimenti costruiti su casi reali e materiali già pubblicati nel Lab.":"De la regla profesional al proceso verificable: tres análisis construidos sobre casos reales y materiales ya publicados en el Lab.","Riclassificazione IAS/IFRS → IV Direttiva":"Reclasificación IAS/IFRS → IV Directiva","Input, mapping, rettifiche book-to-book, quadrature e output del tool di riclassificazione civilistica.":"Datos, mapping, ajustes book-to-book, cuadres y resultados de la herramienta de reclasificación estatutaria.","Leggi il caso →":"Leer el caso →","Dal processo fiscale al tool":"Del proceso fiscal a la herramienta","Come scegliere un’attività, scrivere regole ed eccezioni, costruire i test e organizzare un audit indipendente.":"Cómo elegir una actividad, escribir reglas y excepciones, construir las pruebas y organizar una revisión independiente.","Leggi il metodo →":"Leer el método →","IVA · caso in sviluppo":"IVA · caso en desarrollo","Automazione e controllo LIPE":"Automatización y control LIPE","Dai registri IVA e dai tax code al mapping dei campi VP, alle riconciliazioni e alla validazione del risultato.":"De los libros de IVA y los tax codes al mapping de los campos VP, las conciliaciones y la validación del resultado.","3 STRUMENTI DISPONIBILI":"3 HERRAMIENTAS DISPONIBLES","Bilancio, Tax for Audit e LIPE: applicazioni gratuite, locali e scaricabili da GitHub":"Estados financieros, Tax for Audit y LIPE: aplicaciones gratuitas, locales y descargables desde GitHub","La suite operativa del Tax Automation Lab":"La suite operativa de Tax Automation Lab","Ogni strumento trasforma un processo professionale documentato in un flusso più rapido, controllabile e riutilizzabile.":"Cada herramienta transforma un proceso profesional documentado en un flujo más rápido, controlable y reutilizable.","Bilancio · v1.1.1":"Estados financieros · v1.1.1","Tax for Audit · v1.5.3":"Tax for Audit · v1.5.3","IVA · v3.2.3":"IVA · v3.2.3","Da trial balance IAS/IFRS a Stato Patrimoniale e Conto Economico civilistici, con mapping, rettifiche, quadrature e archivio annuale.":"De trial balances IAS/IFRS al balance y a la cuenta de resultados estatutarios italianos, con mapping, ajustes, cuadres y archivo anual.","Profilo fiscale permanente, fascicolo annuale, calcolo imposte, dichiarativi, IRL, open points, conclusioni ed export.":"Perfil fiscal permanente, expediente anual, cálculo de impuestos, declaraciones, IRL, open points, conclusiones y exportación.","Codiciario IVA permanente, import degli importi, quadro VP, riconciliazioni, modello PDF, working paper e XML IVP18.":"Mapping permanente de códigos de IVA, importación de importes, cuadro VP, conciliaciones, modelo PDF, working paper y XML IVP18.","SP, CE, Excel e PDF":"Balance, cuenta de resultados, Excel y PDF","Excel, PDF, JSON e HTML":"Excel, PDF, JSON y HTML","VP, PDF, Excel e XML":"VP, PDF, Excel y XML","Apri →":"Abrir →","GitHub ↗":"GitHub ↗","Quattro pagine costruite su processi reali, regole esplicite, controlli e materiali già sviluppati nel Lab.":"Cuatro páginas construidas sobre procesos reales, reglas explícitas, controles y materiales ya desarrollados en el Lab.","Un fascicolo fiscale annuale, riutilizzabile e verificabile":"Un expediente fiscal anual, reutilizable y verificable","Profilo permanente, anno corrente, information request list, open points, conclusioni e riporto controllato.":"Perfil permanente, ejercicio corriente, information request list, open points, conclusiones y traslado controlado.","IVA · tool disponibile":"IVA · herramienta disponible","Tre strumenti disponibili":"Tres herramientas disponibles","Applicazioni monofile utilizzabili online o scaricabili da GitHub. I dati vengono elaborati localmente nel browser.":"Aplicaciones de archivo único utilizables online o descargables desde GitHub. Los datos se procesan localmente en el navegador.","Riclassifica report IAS/IFRS negli schemi civilistici italiani, mantenendo dettaglio per conto, storni, rettifiche e quadrature.":"Reclasifica reportes IAS/IFRS en los esquemas estatutarios italianos, manteniendo detalle por cuenta, reclasificaciones, ajustes y cuadres.","Organizza il profilo fiscale del cliente e il fascicolo annuale: calcolo imposte, dichiarativi, IRL, open points e conclusioni.":"Organiza el perfil fiscal del cliente y el expediente anual: cálculo de impuestos, declaraciones, IRL, open points y conclusiones.","Configura il codiciario IVA, importa gli importi e ricostruisci il quadro VP con controlli, PDF ministeriale, working paper e XML IVP18.":"Configura el mapping de códigos de IVA, importa los importes y reconstruye el cuadro VP con controles, PDF de formato oficial, working paper y XML IVP18.","Excel, mapping e rettifiche":"Excel, mapping y ajustes","Dati cliente e working paper":"Datos del cliente y working papers","Codiciario e importi Excel":"Mapping de IVA e importes Excel"}
+  };
+  let currentLang='en';
+  const langButtons=[...document.querySelectorAll('[data-lang]')];
+  const languageAria={it:'Selezione lingua',en:'Language selection',es:'Selección de idioma'};
+  const ariaTranslations={
+    it:{'Torna alla schermata iniziale':'Torna alla schermata iniziale','Navigazione principale':'Navigazione principale','Navigazione mobile':'Navigazione mobile','Chiudi il pannello contatti':'Chiudi il pannello contatti','Strumenti':'Strumenti','Metodo':'Metodo','Chi sono':'Chi sono','Home':'Home'},
+    en:{'Torna alla schermata iniziale':'Return to the landing page','Navigazione principale':'Main navigation','Navigazione mobile':'Mobile navigation','Chiudi il pannello contatti':'Close contact panel','Strumenti':'Tools','Metodo':'Method','Chi sono':'About me','Home':'Home'},
+    es:{'Torna alla schermata iniziale':'Volver a la portada','Navigazione principale':'Navegación principal','Navigazione mobile':'Navegación móvil','Chiudi il pannello contatti':'Cerrar el panel de contacto','Strumenti':'Herramientas','Metodo':'Método','Chi sono':'Sobre mí','Home':'Inicio'}
+  };
+
+  const translatableNodes=[];
+  (function captureItalianText(){
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(node){
+      if(!node.parentElement||node.parentElement.closest('script,style'))return NodeFilter.FILTER_REJECT;
+      return node.nodeValue.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+    }});
+    while(walker.nextNode()){
+      const node=walker.currentNode;
+      translatableNodes.push({node,raw:node.nodeValue,base:node.nodeValue.trim()});
+    }
+  })();
+
+  function translateTextNodes(targetLang){
+    translatableNodes.forEach(item=>{
+      const leading=item.raw.match(/^\s*/)[0],trailing=item.raw.match(/\s*$/)[0];
+      const value=targetLang==='it'?item.base:(translations[targetLang]?.[item.base]||item.base);
+      item.node.nodeValue=leading+value+trailing;
+    });
+  }
+
+  const seoCopy={
+    it:{homeTitle:'Tax Automation Lab | Automazione AI per fiscalità e contabilità',description:'Tool e guide pratiche per automatizzare attività fiscali e contabili con l’intelligenza artificiale. Progetti open, casi pratici e soluzioni gratuite.',ogDescription:'Strumenti AI per automatizzare fiscalità, contabilità e bilancio. Tool gratuiti, casi pratici e guide operative.',locale:'it_IT',image:'https://taxautomationlab.com/assets/social-preview.png'},
+    en:{homeTitle:'Tax Automation Lab | AI Automation for Tax and Accounting',description:'Practical tools and guides for automating tax and accounting activities with artificial intelligence. Open projects, practical cases and free solutions.',ogDescription:'AI tools for automating tax, accounting and financial reporting. Free tools, practical cases and operational guides.',locale:'en_US',image:'https://taxautomationlab.com/assets/social-preview-en.png'},
+    es:{homeTitle:'Tax Automation Lab | Automatización con IA para fiscalidad y contabilidad',description:'Herramientas y guías prácticas para automatizar actividades fiscales y contables con inteligencia artificial. Proyectos abiertos, casos prácticos y soluciones gratuitas.',ogDescription:'Herramientas de IA para automatizar fiscalidad, contabilidad y reporting financiero. Herramientas gratuitas, casos prácticos y guías operativas.',locale:'es_ES',image:'https://taxautomationlab.com/assets/social-preview.png'}
+  };
+
+  function setMeta(selector,attribute,value){const el=document.querySelector(selector);if(el)el.setAttribute(attribute,value);}
+  function updateLanguageMeta(){
+    const seo=seoCopy[currentLang];
+    document.documentElement.lang=currentLang;
+    setMeta('meta[name="description"]','content',seo.description);
+    setMeta('meta[property="og:locale"]','content',seo.locale);
+    setMeta('meta[property="og:title"]','content',seo.homeTitle);
+    setMeta('meta[property="og:description"]','content',seo.ogDescription);
+    setMeta('meta[property="og:image"]','content',seo.image);
+    setMeta('meta[property="og:image:secure_url"]','content',seo.image);
+    setMeta('meta[name="twitter:title"]','content',seo.homeTitle);
+    setMeta('meta[name="twitter:description"]','content',seo.ogDescription);
+    setMeta('meta[name="twitter:image"]','content',seo.image);
+    document.querySelectorAll('.lang-switch').forEach(el=>el.setAttribute('aria-label',languageAria[currentLang]));
+    document.querySelectorAll('[aria-label]').forEach(el=>{
+      const value=el.getAttribute('aria-label');
+      const source=Object.keys(ariaTranslations.it).find(k=>Object.values(ariaTranslations).some(map=>map[k]===value));
+      if(source&&ariaTranslations[currentLang][source])el.setAttribute('aria-label',ariaTranslations[currentLang][source]);
+    });
+    const subjects={
+      it:['Contatto dal sito','Confronto su un processo'],
+      en:['Contact from website','Discussion about a process'],
+      es:['Contacto desde el sitio','Consulta sobre un proceso']
+    };
+    const mailContact=document.querySelector('a[href^="mailto:"][href*="contact@taxautomationlab.com"]');
+    if(mailContact)mailContact.href='mailto:contact@taxautomationlab.com?subject='+encodeURIComponent('Tax Automation Lab — '+subjects[currentLang][0]);
+    const allMail=[...document.querySelectorAll('a[href^="mailto:contact@taxautomationlab.com"]')];
+    if(allMail[1])allMail[1].href='mailto:contact@taxautomationlab.com?subject='+encodeURIComponent('Tax Automation Lab — '+subjects[currentLang][1]);
+  }
+
+  function updatePageTitle(name){
+    const titles={
+      it:{home:seoCopy.it.homeTitle,tools:'Strumenti | Tax Automation Lab',method:'Metodo | Tax Automation Lab',about:'Chi sono | Tax Automation Lab'},
+      en:{home:seoCopy.en.homeTitle,tools:'Tools | Tax Automation Lab',method:'Method | Tax Automation Lab',about:'About me | Tax Automation Lab'},
+      es:{home:seoCopy.es.homeTitle,tools:'Herramientas | Tax Automation Lab',method:'Método | Tax Automation Lab',about:'Sobre mí | Tax Automation Lab'}
+    };
+    document.title=titles[currentLang][name]||titles[currentLang].home;
+  }
+
+  function setLanguage(lang,persist=true){
+    if(!['it','en','es'].includes(lang))lang='it';
+    translateTextNodes(lang);
+    currentLang=lang;
+    langButtons.forEach(btn=>{const active=btn.dataset.lang===currentLang;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
+    updateLanguageMeta();
+    updatePageTitle(location.hash.slice(1)||'home');
+    if(persist){try{localStorage.setItem('tal-language',currentLang)}catch(e){}}
+  }
+  langButtons.forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();setLanguage(btn.dataset.lang);}));
+
+  const pages=[...document.querySelectorAll('[data-page]')]; const controls=[...document.querySelectorAll('[data-route]')]; const valid=new Set(pages.map(p=>p.dataset.page));
+  function route(name,push=true){if(!valid.has(name))name='home';pages.forEach(p=>p.classList.toggle('active',p.dataset.page===name));controls.forEach(c=>c.classList.toggle('active',c.dataset.route===name));if(push&&location.hash!=='#'+name)history.pushState(null,'','#'+name);window.scrollTo({top:0,behavior:'auto'});updatePageTitle(name)}
+  document.addEventListener('click',e=>{
+    const control=e.target.closest('[data-route]');
+    if(!control)return;
+    e.preventDefault();
+    route(control.dataset.route);
+  },true);
+  window.addEventListener('popstate',()=>route(location.hash.slice(1)||'home',false));window.addEventListener('hashchange',()=>route(location.hash.slice(1)||'home',false));document.getElementById('year').textContent=new Date().getFullYear();setLanguage('en',false);route(location.hash.slice(1)||'home',false);
+  const params=new URLSearchParams(location.search);
+  let introSeen=false;try{introSeen=sessionStorage.getItem('tal-intro-seen')==='1'}catch(e){}
+  const skipIntro=params.get('skipIntro')==='1'||params.get('preview')==='app'||introSeen;
+  if(skipIntro){
+    enterDirect();
+    if(params.get('skipIntro')==='1'){history.replaceState(null,'',location.pathname+location.hash);}
+  }else{
+    initTubes();
+  }
+})();
+</script>
+<script id="tal-language-routes">
+document.addEventListener("click",function(event){
+  const trigger=event.target.closest("[data-lang]");
+  if(!trigger)return;
+  const lang=trigger.getAttribute("data-lang");
+  const routes={"it":"/?skipIntro=1","en":"/en/","es":"/es/"};
+  if(routes[lang]){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.location.href=routes[lang];
+  }
+},true);
+</script>
+</body></html>

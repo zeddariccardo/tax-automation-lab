@@ -1,4 +1,3 @@
-html
 <html lang="es"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>Casos prácticos y método | Tax Automation Lab</title><meta content="Análisis operativos sobre reclasificación IAS/IFRS, Tax for Audit, automatización LIPE y diseño de procesos fiscales." name="description"/>
@@ -7,7 +6,7 @@ html
 :root{--bg:#0E1624;--surface-a:rgba(15,25,34,.94);--surface-b:rgba(31,28,39,.92);--text:#F7F7F5;--muted:#C8CDD3;--soft:#A5ACB8;--line:rgba(247,247,245,.16);--petrol:#145368;--rust:#734C34;--mauve:#725D6A;--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;--max:1080px}
 *{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-width:320px;min-height:100vh;color:var(--text);font:15px/1.68 var(--sans);background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.50),transparent 62%),radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.62),transparent 66%),radial-gradient(85% 80% at 30% 70%,rgba(32,128,158,.52),transparent 70%),linear-gradient(155deg,#4a2168 0%,#33245a 44%,#123545 100%);background-attachment:fixed}
 a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
-.topbar{position:sticky;top:10px;z-index:20;padding-top:10px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(17,25,34,.88);backdrop-filter:blur(22px);box-shadow:0 18px 50px rgba(0,0,0,.24)}.brand{text-decoration:none;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav-links a{text-decoration:none;color:var(--muted);font-size:11px}.nav-links a:hover{color:#fff}.lang{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px}.lang button{min-width:39px;height:33px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--soft);font-size:9px;font-weight:750;cursor:pointer}.lang button.active{background:#F7F7F5;color:#141014}
+.topbar{position:sticky;top:10px;z-index:20;padding-top:10px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(17,25,34,.88);backdrop-filter:blur(22px);box-shadow:0 18px 50px rgba(0,0,0,.24)}.brand{text-decoration:none;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav-links a{text-decoration:none;color:var(--muted);font-size:11px}.nav-links a:hover{color:#fff}.lang{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px}.lang button,.lang a{min-width:39px;height:33px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--soft);font-size:9px;font-weight:750;cursor:pointer}.lang button,.lang a.active{background:#F7F7F5;color:#141014}
 .hero{padding:78px 0 32px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}h1,h2,h3{font-family:var(--serif);font-weight:300}h1{max-width:950px;margin:15px 0 20px;font-size:clamp(43px,7.5vw,76px);line-height:.98;letter-spacing:-.04em}h2{font-size:clamp(29px,4vw,42px);line-height:1.07;margin:0 0 13px}h3{font-size:25px;line-height:1.1}.lead{max-width:850px;margin:0;color:#E1E5E8;font-size:clamp(17px,2vw,20px)}
 .hero-actions,.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 17px;border:1px solid transparent;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-size:11px;font-weight:700}.button.secondary{background:rgba(247,247,245,.05);border-color:rgba(247,247,245,.22);color:#fff}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}.content{display:grid;gap:16px}.panel,.toc,.card{background:linear-gradient(150deg,var(--surface-a),var(--surface-b));border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 70px rgba(3,12,18,.28)}.panel{padding:27px}.panel p{color:#E1E5E8;margin:10px 0}.panel ul,.panel ol{margin:14px 0 0;padding-left:21px;color:#E1E5E8}.panel li{margin:8px 0}.panel:nth-child(3n+1){border-left:4px solid var(--petrol)}.panel:nth-child(3n+2){border-left:4px solid var(--mauve)}.panel:nth-child(3n){border-left:4px solid var(--rust)}
@@ -16,16 +15,40 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.card{display:flex;flex-direction:column;padding:22px;min-height:260px;border-top:3px solid var(--petrol)}.card:nth-child(2){border-top-color:var(--mauve)}.card:nth-child(3){border-top-color:var(--rust)}.card h2{font-size:30px}.card p{color:#E1E5E8}.card .button{margin-top:auto;align-self:flex-start}
 .footer{margin-top:55px;padding:26px 0 40px;border-top:1px solid var(--line);color:var(--soft);font-size:11px}.footer-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer a{text-decoration:none}.footer-note{max-width:850px;margin-top:11px}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.toc{position:static;order:-1}.cards{grid-template-columns:1fr}.nav-links{display:none}}
-@media(max-width:580px){.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:140px}.lang button{min-width:34px;padding:0 5px}}
+@media(max-width:580px){.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:140px}.lang button,.lang a{min-width:34px;padding:0 5px}}
 </style>
 
 
 
-<style id="tal-v634-touch-targets">.button{min-height:44px!important}.lang a,.lang button{min-width:44px!important;min-height:44px!important;height:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}</style>
-<link href="https://taxautomationlab.com/es/analisis/" rel="canonical"/><link href="https://taxautomationlab.com/approfondimenti/" hreflang="it" rel="alternate"/><link href="https://taxautomationlab.com/en/insights/" hreflang="en" rel="alternate"/><link href="https://taxautomationlab.com/es/analisis/" hreflang="es" rel="alternate"/><link href="https://taxautomationlab.com/approfondimenti/" hreflang="x-default" rel="alternate"/></head><body>
+<style id="tal-v634-touch-targets">.button{min-height:44px!important}.lang a,.lang button,.lang a{min-width:44px!important;min-height:44px!important;height:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}</style>
+<link rel="canonical" href="https://taxautomationlab.com/es/analisis/"><link rel="alternate" hreflang="it" href="https://taxautomationlab.com/approfondimenti/">
+<link rel="alternate" hreflang="en" href="https://taxautomationlab.com/en/insights/">
+<link rel="alternate" hreflang="es" href="https://taxautomationlab.com/es/analisis/">
+<link rel="alternate" hreflang="x-default" href="https://taxautomationlab.com/approfondimenti/">
+<style id="tal-language-link-fallback">[data-lang],[data-tal-lang]{font:inherit;text-decoration:none;cursor:pointer}[data-lang][aria-current="page"],[data-tal-lang][aria-current="page"]{font-weight:800}</style>
+<meta name="author" content="Riccardo Zedda">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Tax Automation Lab">
+<meta property="og:title" content="Casos prácticos y método | Tax Automation Lab">
+<meta property="og:description" content="Análisis operativos sobre reclasificación IAS/IFRS, Tax for Audit, automatización LIPE y diseño de procesos fiscales.">
+<meta property="og:url" content="https://taxautomationlab.com/es/analisis/">
+<meta property="og:image" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tax Automation Lab — herramientas para fiscalidad, contabilidad y estados financieros">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Casos prácticos y método | Tax Automation Lab">
+<meta name="twitter:description" content="Análisis operativos sobre reclasificación IAS/IFRS, Tax for Audit, automatización LIPE y diseño de procesos fiscales.">
+<meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="en_US">
+</head><body>
 <header class="topbar"><div class="wrap nav"><a class="brand" href="/es/?skipIntro=1">Tax Automation Lab</a>
-<nav class="nav-links"><a href="/es/?skipIntro=1">Inicio</a><a href="/es/tools/">Herramientas</a><a href="/es/analisis/">Análisis</a><a download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Guía (PDF en italiano)</a></nav>
-<div class="lang"><button aria-pressed="false" data-lang="it">ITA</button><button aria-pressed="false" data-lang="en">ENG</button><button aria-pressed="true" class="active" data-lang="es">ESP</button></div></div></header>
+<nav class="nav-links"><a href="/es/?skipIntro=1">Inicio</a><a href="/es/tools/">Herramientas</a><a href="/es/analisis/">Análisis</a><a download="Guida_Automazione_Processi_Fiscali_v4.pdf" href="/resources/Guida_Automazione_Processi_Fiscali_v4.pdf">Guía v4 (PDF en italiano)</a></nav>
+<div class="lang"><a data-lang="it" href="/approfondimenti/" hreflang="it">ITA</a><a data-lang="en" href="/en/insights/" hreflang="en">ENG</a><a class="active" data-lang="es" aria-current="page" href="/es/analisis/" hreflang="es">ESP</a></div></div></header>
 <main class="wrap"><section class="hero"><span class="eyebrow" data-i18n="eyebrow">Análisis</span><h1 data-i18n="title">Casos prácticos y método</h1><p class="lead" data-i18n="lead">Páginas construidas sobre procesos reales, reglas explícitas, controles y materiales ya desarrollados en Tax Automation Lab.</p></section>
 <section class="cards">
 <article class="card"><h2 data-i18n="c1t">Reclasificación IAS/IFRS → IV Directiva</h2><p data-i18n="c1p">Cómo transformar trial balances y reportes de gestión en estados estatutarios italianos manteniendo verificables el mapping, los ajustes y los cuadres.</p><a class="button secondary" data-i18n="c1a" href="/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/">Leer el caso →</a></article>

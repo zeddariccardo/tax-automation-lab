@@ -340,4 +340,14 @@
     <loc>https://taxautomationlab.com/resources/guida-automazione-processi-fiscali.pdf</loc>
     <lastmod>2026-07-24</lastmod>
   </url>
+
+  <url>
+    <loc>https://taxautomationlab.com/configura-con-ai/</loc>
+    <changefreq>monthly</changefreq><priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://taxautomationlab.com/configura-con-ai/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://taxautomationlab.com/en/configure-with-ai/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://taxautomationlab.com/es/configura-con-ia/"/>
+  </url>
+  <url><loc>https://taxautomationlab.com/en/configure-with-ai/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://taxautomationlab.com/es/configura-con-ia/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

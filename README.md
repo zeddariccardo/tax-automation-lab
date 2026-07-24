@@ -1,5 +1,7 @@
 # Tax Automation Lab
 
+Pacchetto sito: v6.5.0
+
 Portfolio personale dedicato all’automazione di processi fiscali e contabili.
 
 ## Strumenti disponibili
@@ -17,7 +19,7 @@ I dati inseriti non vengono inviati al sito.
 
 La guida “Automazione dei processi fiscali e contabili” è disponibile in PDF:
 
-https://taxautomationlab.com/resources/guida-automazione-processi-fiscali.pdf
+https://taxautomationlab.com/resources/Guida_Automazione_Processi_Fiscali_v4.pdf
 
 ## Licenze
 
@@ -58,3 +60,18 @@ Le pagine informative sono disponibili in italiano, inglese e spagnolo:
 Le interfacce operative dei tre tool restano in italiano.
 
 Le versioni inglese e spagnola utilizzano la stessa struttura, lo stesso template e gli stessi controlli della versione italiana; cambiano esclusivamente testi, metadati SEO e destinazioni linguistiche.
+
+
+## Onboarding assistito dall’AI
+
+La sezione `/configura-con-ai/` mette a disposizione template compatibili, prompt guidati e istruzioni visive per preparare con un assistente AI:
+
+- il file di importazione del Financial Statement;
+- il codiciario IVA permanente del Generatore LIPE.
+
+Gli importi LIPE del singolo periodo restano separati e vengono caricati direttamente nel tool.
+
+
+## Audit remediation
+
+See `AUDIT-REMEDIATION.md` for the verified findings, corrections applied and deliberately deferred items.

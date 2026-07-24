@@ -9,7 +9,7 @@ Official source: https://github.com/zeddariccardo/tax-automation-lab
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export.">
 <link rel="canonical" href="https://taxautomationlab.com/tools/tfa-client-file/">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -452,8 +452,8 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
 .tal-publication a{color:#F7F7F5;text-decoration:none;font-size:11px;font-weight:700}
 .tal-publication a:hover{text-decoration:underline}
 .tal-publication-lang{display:inline-flex;gap:3px;padding:3px;border:1px solid rgba(247,247,245,.2);border-radius:999px}
-.tal-publication-lang button{min-width:38px;height:31px;border:0;border-radius:999px;background:transparent;color:#A5ACB8;font-size:9px;font-weight:750;cursor:pointer}
-.tal-publication-lang button.active{background:#F7F7F5;color:#0E1624}
+.tal-publication-lang button,.tal-publication-lang a{min-width:38px;height:31px;border:0;border-radius:999px;background:transparent;color:#A5ACB8;font-size:9px;font-weight:750;cursor:pointer}
+.tal-publication-lang button,.tal-publication-lang a.active{background:#F7F7F5;color:#0E1624}
 .tal-publication details{margin-top:10px;border:1px solid rgba(247,247,245,.14);border-radius:9px;background:linear-gradient(135deg,rgba(89,20,125,.22),rgba(20,83,104,.18));overflow:hidden}
 .tal-publication summary{cursor:pointer;padding:11px 14px;font-size:11px;font-weight:700;letter-spacing:.04em}
 .tal-publication-body{padding:4px 14px 15px}
@@ -466,16 +466,32 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
 @media(max-width:820px){.tal-publication-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.tal-publication-facts{grid-template-columns:1fr}.tal-publication{padding:11px 12px}}
 </style>
+<style id="tal-v634-touch-targets">.tal-publication-lang button,.tal-publication-lang a{min-width:44px!important;min-height:44px!important;height:44px!important}.sb-toggle{min-height:44px!important}.primary-tab,.workspace-link{min-height:44px!important}</style>
 <link rel="alternate" hreflang="it" href="https://taxautomationlab.com/tools/tfa-client-file/">
 <link rel="alternate" hreflang="en" href="https://taxautomationlab.com/en/tools/tfa-client-file/">
 <link rel="alternate" hreflang="es" href="https://taxautomationlab.com/es/tools/tfa-client-file/">
 <link rel="alternate" hreflang="x-default" href="https://taxautomationlab.com/tools/tfa-client-file/">
-<style id="tal-v634-touch-targets">.tal-publication-lang button{min-width:44px!important;min-height:44px!important;height:44px!important}.sb-toggle{min-height:44px!important}.primary-tab,.workspace-link{min-height:44px!important}</style>
+<style id="tal-language-link-fallback">[data-lang],[data-tal-lang]{font:inherit;text-decoration:none;cursor:pointer}[data-lang][aria-current="page"],[data-tal-lang][aria-current="page"]{font-weight:800}</style>
+<meta name="author" content="Riccardo Zedda">
+<meta property="og:locale" content="it_IT">
+<meta property="og:image" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tax Automation Lab — strumenti per fiscalità, contabilità e bilancio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TFA Client File: scheda fiscale per Tax for Audit | Tax Automation Lab">
+<meta name="twitter:description" content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export.">
+<meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview.png">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<style id="tal-site-footer-style">.tal-site-footer{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#0E1624;color:#F7F7F5;padding:24px 18px;border-top:1px solid rgba(247,247,245,.18)}.tal-site-footer>div{max-width:1180px;margin:0 auto}.tal-site-footer span{display:block;margin:4px 0}.tal-site-footer a{color:#F7F7F5;text-decoration:underline;text-underline-offset:3px}.tal-site-footer p{max-width:900px;margin:10px 0 0;color:#C8CDD3;line-height:1.55;font-size:13px}.tal-publication-links{flex-wrap:wrap}</style>
 </head>
 <body>
 <header class="top">
   <div class="top-line">
-    <div><div class="kicker">Tax Automation Lab · Working paper</div><h1>Tax Tool - TFA Client File</h1></div>
+    <div><div class="kicker">Tax Automation Lab · Working paper</div><h1>Tax Tool — TFA Client File</h1></div>
     <div class="privacy">100% locale · nessun dato lascia il dispositivo</div>
   </div>
 </header>
@@ -528,16 +544,11 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
 <div class="app-main">
 <section class="tal-publication" aria-label="Informazioni di pubblicazione">
   <div class="tal-publication-top">
-    <div class="tal-publication-links">
-      <a href="/?skipIntro=1">Tax Automation Lab</a>
-      <a href="/tools/">Catalogo strumenti</a>
-      <a href="/licenses/">Licenze</a>
-      <a href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer">Download GitHub ↗</a>
-    </div>
+    <div class="tal-publication-links"><a href="/?skipIntro=1">Home</a><a href="/tools/">Strumenti</a><a href="/approfondimenti/">Approfondimenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/resources/Guida_Automazione_Processi_Fiscali_v4.pdf" download>Guida v4</a><a href="/licenses/">Licenze</a><a href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer">Download GitHub ↗</a></div>
     <div class="tal-publication-lang" aria-label="Selezione lingua">
-      <button type="button" data-tal-lang="it" class="active" aria-pressed="true">ITA</button>
-      <button type="button" data-tal-lang="en" aria-pressed="false">ENG</button>
-      <button type="button" data-tal-lang="es" aria-pressed="false">ESP</button>
+      <a data-tal-lang="it" class="active" aria-current="page" href="/tools/tfa-client-file/" hreflang="it">ITA</a>
+      <a data-tal-lang="en" href="/en/tools/tfa-client-file/" hreflang="en">ENG</a>
+      <a data-tal-lang="es" href="/es/tools/tfa-client-file/" hreflang="es">ESP</a>
     </div>
   </div>
   <details>
@@ -919,7 +930,7 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
 </section>
 </div>
 </main>
-<footer class="foot"><div class="disclaimer">Strumento indipendente di supporto operativo, sviluppato sulla base dell'esperienza professionale dell'autore.﻿​‌​‌​​‌​​‌‌​‌​​‌​‌‌​​​‌‌​‌‌​​​‌‌​‌‌​​​​‌​‌‌‌​​‌​​‌‌​​‌​​​‌‌​‌‌‌‌​​‌​​​​​​‌​‌‌​‌​​‌‌​​‌​‌​‌‌​​‌​​​‌‌​​‌​​​‌‌​​​​‌​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​‌​​​‌‌​​​​‌​‌‌‌‌​​​​​‌​​​​​​‌​​​​​‌​‌‌‌​‌​‌​‌‌‌​‌​​​‌‌​‌‌‌‌​‌‌​‌‌​‌​‌‌​​​​‌​‌‌‌​‌​​​‌‌​‌​​‌​‌‌​‌‌‌‌​‌‌​‌‌‌​​​‌​​​​​​‌​​‌‌​​​‌‌​​​​‌​‌‌​​​‌​​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​‌​​​‌​​​‌‌​​‌​​​​​‌​​‌​​​​​​‌​​​​‌‌​‌‌​‌‌​​​‌‌​‌​​‌​‌‌​​‌​‌​‌‌​‌‌‌​​‌‌‌​‌​​​​‌​​​​​​‌​​​‌‌​​‌‌​‌​​‌​‌‌​‌‌​​​‌‌​​‌​‌​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​​‌‌​​‌​​​‌‌​​​​​​‌‌​​‌​​​‌‌​‌‌​​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​​‌​​‌​‌‌​‌​​​‌​‌‌​‌​‌​‌​‌​​​‌​​​‌‌​​‌​​​​​‌​​‌​‌‌​‌​​‌‌​​‌​​​‌‌​​​​​​‌‌​​‌​​​‌‌​‌‌​​​‌​‌‌​‌​​‌‌​‌‌‌​‌‌​​​‌‌​​‌‌​‌​​​‌‌​​‌​‌​​‌‌‌​​‌​​‌‌​​​‌﻿ Non sostituisce il giudizio professionale, le procedure di audit, le istruzioni dichiarative o l'analisi della normativa applicabile al caso concreto.</div><div class="meta">Elaborazione locale · nessun dato lascia il browser · fascicolo pluriennale · Excel e PDF strutturati · open access</div></footer>
+<footer class="foot"><div class="disclaimer">Strumento indipendente di supporto operativo, sviluppato sulla base dell'esperienza professionale dell'autore. Non sostituisce il giudizio professionale, le procedure di audit, le istruzioni dichiarative o l'analisi della normativa applicabile al caso concreto.</div><div class="meta">Elaborazione locale · nessun dato lascia il browser · fascicolo pluriennale · Excel e PDF strutturati · open access</div></footer><footer class="tal-site-footer" aria-label="Tax Automation Lab legal information"><div><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span><p>Tax Automation Lab è un progetto personale e indipendente. L’elaborazione dei file avviene localmente nel browser; classificazioni, mappature e output devono essere verificati dal professionista.</p></div></footer>
 </div><!-- /.app-main -->
 
 <div class="modal-ov" id="year-modal"><div class="modal"><button class="close-btn" type="button" data-close="year-modal">×</button><h3>Crea un nuovo esercizio</h3><p class="sub">Puoi creare un fascicolo vuoto oppure riportare quello corrente. I dati riportati vengono marcati come “Da riconfermare”.</p>

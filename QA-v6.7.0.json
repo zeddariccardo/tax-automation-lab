@@ -1,0 +1,113 @@
+{
+  "release": "v6.7.0",
+  "date": "2026-07-24",
+  "checks": {
+    "html_files": 48,
+    "duplicate_ids": {},
+    "visible_zero_width_character_files": [],
+    "tfa_pages": {
+      "tools/tfa-client-file/index.html": {
+        "required_ids": {
+          "sidebar": true,
+          "workspace-nav": true,
+          "import-tfa-excel": true,
+          "tfa-import-modal": true,
+          "view-other": true,
+          "sb-save-current": true,
+          "cmd-import-excel": true,
+          "tfa-command-context": true
+        },
+        "version_1_6_0": true,
+        "default_analytic": true,
+        "misc_items_model": true,
+        "unclassified_to_other": true,
+        "template_download_embedded": true,
+        "numeric_parser_handles_decimal_dot": true
+      },
+      "en/tools/tfa-client-file/index.html": {
+        "required_ids": {
+          "sidebar": true,
+          "workspace-nav": true,
+          "import-tfa-excel": true,
+          "tfa-import-modal": true,
+          "view-other": true,
+          "sb-save-current": true,
+          "cmd-import-excel": true,
+          "tfa-command-context": true
+        },
+        "version_1_6_0": true,
+        "default_analytic": true,
+        "misc_items_model": true,
+        "unclassified_to_other": true,
+        "template_download_embedded": true,
+        "numeric_parser_handles_decimal_dot": true
+      },
+      "es/tools/tfa-client-file/index.html": {
+        "required_ids": {
+          "sidebar": true,
+          "workspace-nav": true,
+          "import-tfa-excel": true,
+          "tfa-import-modal": true,
+          "view-other": true,
+          "sb-save-current": true,
+          "cmd-import-excel": true,
+          "tfa-command-context": true
+        },
+        "version_1_6_0": true,
+        "default_analytic": true,
+        "misc_items_model": true,
+        "unclassified_to_other": true,
+        "template_download_embedded": true,
+        "numeric_parser_handles_decimal_dot": true
+      }
+    },
+    "template_exists": true,
+    "screenshot_assets": {
+      "tfa-import-sidebar.png": true,
+      "tfa-import-preview.png": true
+    },
+    "favicon_assets": {
+      "favicon.ico": true,
+      "assets/icons/favicon-32x32.png": true,
+      "assets/icons/favicon-16x16.png": true,
+      "assets/icons/apple-touch-icon.png": true,
+      "site.webmanifest": true
+    },
+    "ai_pages": {
+      "configura-con-ai/index.html": {
+        "tfa_card": true,
+        "template_link": true,
+        "screens": true
+      },
+      "en/configure-with-ai/index.html": {
+        "tfa_card": true,
+        "template_link": true,
+        "screens": true
+      },
+      "es/configura-con-ia/index.html": {
+        "tfa_card": true,
+        "template_link": true,
+        "screens": true
+      }
+    },
+    "missing_internal_assets": [],
+    "non_tfa_tools_unchanged_from_v6_6_0": {
+      "tools/financial-statement/index.html": true,
+      "en/tools/financial-statement/index.html": true,
+      "es/tools/financial-statement/index.html": true,
+      "tools/lipe/index.html": true,
+      "en/tools/lipe/index.html": true,
+      "es/tools/lipe/index.html": true
+    },
+    "template_sheets": [
+      "Istruzioni",
+      "Anagrafica",
+      "Analitica",
+      "Commentary"
+    ],
+    "template_required_sheets": true
+  },
+  "notes": [
+    "Interactive Chromium execution was unavailable in the build environment; validation therefore combines static DOM checks, JavaScript syntax checks, workbook inspection and ZIP integrity tests."
+  ]
+}

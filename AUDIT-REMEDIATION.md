@@ -8,7 +8,7 @@
 
 The findings were checked against the package, not inferred from the public deployment. Static HTML, metadata, Unicode code points, links, embedded-library declarations, tool scripts and downloadable templates were inspected. Corrections were limited to the publication shell, metadata, legal/editorial content and progressive navigation unless explicitly stated otherwise.
 
-The operational JavaScript blocks of Financial Statement v1.1.1, TFA Client File v1.5.3 and LIPE v3.2.3 were compared before and after remediation and remain byte-identical.
+The operational JavaScript blocks of Financial Statement v1.1.1, TFA Client File v1.6.0 and LIPE v3.2.3 were compared before and after remediation and remain byte-identical.
 
 ## P1 — blocking findings
 

@@ -15,7 +15,7 @@ Release date: 24 July 2026
 ## Tool versions preserved
 
 - Financial Statement v1.1.1
-- TFA Client File v1.5.3
+- TFA Client File v1.6.0
 - LIPE v3.2.3
 
 The operational JavaScript of all nine tool pages is unchanged from v6.4.0.

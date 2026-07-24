@@ -1,6 +1,6 @@
 {
-  "release": "v2026.07.23",
-  "date": "2026-07-23",
+  "release": "v2026.07.24",
+  "date": "2026-07-24",
   "tools": [
     {
       "slug": "financial-statement",
@@ -13,9 +13,9 @@
     {
       "slug": "tfa-client-file",
       "name": "TFA Client File",
-      "version": "1.5.3",
+      "version": "1.6.0",
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
-      "release_filename": "TaxTool_TFA_ClientFile_v1.5.3.html",
+      "release_filename": "TaxTool_TFA_ClientFile_v1.6.0.html",
       "license": "MIT"
     },
     {

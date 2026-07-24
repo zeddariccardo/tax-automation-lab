@@ -1,22 +1,19 @@
 {
   "name": "Tax Automation Lab",
-  "short_name": "Tax Automation",
-  "description": "Tool e guide pratiche per automatizzare attività fiscali e contabili con l'intelligenza artificiale.",
+  "short_name": "Tax Automation Lab",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "background_color": "#0E1624",
-  "theme_color": "#0E1624",
-  "lang": "it",
+  "background_color": "#0e1927",
+  "theme_color": "#0e1927",
   "icons": [
     {
-      "src": "/assets/icons/icon-192.png",
-      "sizes": "192x192",
+      "src": "/assets/icons/favicon-32x32.png",
+      "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/icon-512.png",
-      "sizes": "512x512",
+      "src": "/assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     }
   ]

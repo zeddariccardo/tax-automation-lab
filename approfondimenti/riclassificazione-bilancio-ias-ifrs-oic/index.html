@@ -1,18 +1,19 @@
 <!doctype html>
+
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>Come riclassificare un bilancio IAS/IFRS secondo la IV Direttiva</title>
-<meta name="description" content="Caso pratico sulla riclassificazione di trial balance IAS/IFRS negli schemi civilistici italiani, con mapping, rettifiche, quadrature ed export.">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="author" content="Riccardo Zedda">
-<link rel="canonical" href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Come riclassificare un bilancio IAS/IFRS secondo la IV Direttiva">
-<meta property="og:description" content="Caso pratico sulla riclassificazione di trial balance IAS/IFRS negli schemi civilistici italiani, con mapping, rettifiche, quadrature ed export.">
-<meta property="og:url" content="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/">
-<meta property="og:site_name" content="Tax Automation Lab">
+<meta content="Caso pratico sulla riclassificazione di trial balance IAS/IFRS negli schemi civilistici italiani, con mapping, rettifiche, quadrature ed export." name="description"/>
+<meta content="index,follow,max-image-preview:large" name="robots"/>
+<meta content="Riccardo Zedda" name="author"/>
+<link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="Come riclassificare un bilancio IAS/IFRS secondo la IV Direttiva" property="og:title"/>
+<meta content="Caso pratico sulla riclassificazione di trial balance IAS/IFRS negli schemi civilistici italiani, con mapping, rettifiche, quadrature ed export." property="og:description"/>
+<meta content="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" property="og:url"/>
+<meta content="Tax Automation Lab" property="og:site_name"/>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Riclassificazione di un bilancio IAS/IFRS negli schemi civilistici italiani", "description": "Dal trial balance al bilancino civilistico: input, mapping, rettifiche book-to-book, controlli e output verificabili.", "url": "https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/", "inLanguage": "it-IT", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "publisher": {"@type": "Person", "name": "Riccardo Zedda"}, "datePublished": "2026-07-21", "dateModified": "2026-07-21", "isPartOf": {"@type": "WebSite", "name": "Tax Automation Lab", "url": "https://taxautomationlab.com/"}}</script>
 <style>
 :root{--bg:#0E1624;--surface-a:rgba(15,25,34,.94);--surface-b:rgba(31,28,39,.92);--text:#F7F7F5;--muted:#C8CDD3;--soft:#A5ACB8;--line:rgba(247,247,245,.16);--petrol:#145368;--rust:#734C34;--mauve:#725D6A;--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;--max:1080px}
@@ -29,32 +30,35 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.toc{position:static;order:-1}.cards{grid-template-columns:1fr}.nav-links{display:none}}
 @media(max-width:580px){.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:140px}.lang button{min-width:34px;padding:0 5px}}
 </style>
+<link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="it" rel="alternate"/>
+<link href="https://taxautomationlab.com/en/insights/ias-ifrs-to-italian-statutory-financial-statements/" hreflang="en" rel="alternate"/>
+<link href="https://taxautomationlab.com/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/" hreflang="es" rel="alternate"/>
+<link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="x-default" rel="alternate"/>
 </head>
 <body>
 <header class="topbar"><div class="wrap nav">
-  <a class="brand" href="/">Tax Automation Lab</a>
-  <nav class="nav-links" aria-label="Navigazione principale">
-    <a href="/" data-i18n="common_home">Home</a>
-    <a href="/approfondimenti/" data-i18n="common_insights">Approfondimenti</a>
-    <a href="/tools/financial-statement/" data-i18n="common_tool">Apri il tool</a>
-    <a href="/resources/guida-automazione-processi-fiscali.pdf" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" data-i18n="common_guide">Scarica la guida (PDF)</a>
-  </nav>
-  <div class="lang" aria-label="Selezione lingua">
-    <button type="button" data-lang="it" class="active" aria-pressed="true">ITA</button>
-    <button type="button" data-lang="en" aria-pressed="false">ENG</button>
-    <button type="button" data-lang="es" aria-pressed="false">ESP</button>
-  </div>
+<a class="brand" href="/">Tax Automation Lab</a>
+<nav aria-label="Navigazione principale" class="nav-links">
+<a data-i18n="common_home" href="/">Home</a>
+<a data-i18n="common_insights" href="/approfondimenti/">Approfondimenti</a>
+<a data-i18n="common_tool" href="/tools/financial-statement/">Apri il tool</a>
+<a data-i18n="common_guide" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Scarica la guida (PDF)</a>
+</nav>
+<div aria-label="Selezione lingua" class="lang">
+<button aria-pressed="true" class="active" data-lang="it" type="button">ITA</button>
+<button aria-pressed="false" data-lang="en" type="button">ENG</button>
+<button aria-pressed="false" data-lang="es" type="button">ESP</button>
+</div>
 </div></header>
 <main class="wrap">
 <section class="hero">
-  <span class="eyebrow" data-i18n="eyebrow">Caso pratico · Bilancio</span>
-  <h1 data-i18n="h1">Riclassificazione di un bilancio IAS/IFRS negli schemi civilistici italiani</h1>
-  <p class="lead" data-i18n="lead">Dal trial balance al bilancino civilistico: input, mapping, rettifiche book-to-book, controlli e output verificabili.</p>
-  
-  <div class="hero-actions"><a class="button" href="/tools/financial-statement/" data-i18n="cta_1">Apri il tool →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer" data-i18n="cta_2">Scarica da GitHub ↗</a></div>
+<span class="eyebrow" data-i18n="eyebrow">Caso pratico · Bilancio</span>
+<h1 data-i18n="h1">Riclassificazione di un bilancio IAS/IFRS negli schemi civilistici italiani</h1>
+<p class="lead" data-i18n="lead">Dal trial balance al bilancino civilistico: input, mapping, rettifiche book-to-book, controlli e output verificabili.</p>
+<div class="hero-actions"><a class="button" data-i18n="cta_1" href="/tools/financial-statement/">Apri il tool →</a><a class="button secondary" data-i18n="cta_2" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">Scarica da GitHub ↗</a></div>
 </section>
 <div class="layout">
-  <article class="content"><section class="panel" id="section-1">
+<article class="content"><section class="panel" id="section-1">
 <h2 data-i18n="s1_title">Il problema professionale</h2>
 <p data-i18n="s1_p1">In molte organizzazioni la contabilità quotidiana e il reporting sono costruiti secondo logiche IAS/IFRS, mentre il bilancio annuale o un prospetto infrannuale devono essere leggibili secondo gli schemi civilistici italiani. La richiesta può emergere, ad esempio, durante una review, un’istruttoria o la predisposizione di un bilancino intermedio.</p>
 <p data-i18n="s1_p2">Ripetere manualmente il lavoro significa ricostruire ogni volta mapping, segni, riclassificazioni, rettifiche e quadrature. Il processo è adatto all’automazione quando i file sono abbastanza stabili, le regole possono essere scritte e il risultato può essere confrontato con un working paper già affidabile.</p>
@@ -78,21 +82,20 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 <h2 data-i18n="s6_title">Output e responsabilità professionale</h2>
 <p data-i18n="s6_p1">L’output atteso comprende Stato Patrimoniale, Conto Economico, dettaglio per conto, working paper Excel e report PDF. Il tool accelera la ricostruzione, rende visibili gli errori e conserva il percorso logico; non sostituisce la valutazione dei principi contabili applicabili né la validazione finale.</p>
 </section>
-    <div class="actions"><a class="button" href="/tools/financial-statement/" data-i18n="cta_1">Apri il tool →</a><a class="button secondary" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer" data-i18n="cta_2">Scarica da GitHub ↗</a><a class="button secondary" href="/approfondimenti/automazione-processi-fiscali-ai/" data-i18n="cta_3">Consulta il metodo →</a></div>
-  </article>
-  <aside class="toc"><strong data-i18n="common_insights">Approfondimenti</strong><a href="#section-1" data-i18n="s1_title">Il problema professionale</a><a href="#section-2" data-i18n="s2_title">Gli input disponibili</a><a href="#section-3" data-i18n="s3_title">Mapping e tracciabilità</a><a href="#section-4" data-i18n="s4_title">Rettifiche IAS/IFRS–OIC e storni</a><a href="#section-5" data-i18n="s5_title">Controlli prima dell’export</a><a href="#section-6" data-i18n="s6_title">Output e responsabilità professionale</a></aside>
+<div class="actions"><a class="button" data-i18n="cta_1" href="/tools/financial-statement/">Apri il tool →</a><a class="button secondary" data-i18n="cta_2" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">Scarica da GitHub ↗</a><a class="button secondary" data-i18n="cta_3" href="/approfondimenti/automazione-processi-fiscali-ai/">Consulta il metodo →</a></div>
+</article>
+<aside class="toc"><strong data-i18n="common_insights">Approfondimenti</strong><a data-i18n="s1_title" href="#section-1">Il problema professionale</a><a data-i18n="s2_title" href="#section-2">Gli input disponibili</a><a data-i18n="s3_title" href="#section-3">Mapping e tracciabilità</a><a data-i18n="s4_title" href="#section-4">Rettifiche IAS/IFRS–OIC e storni</a><a data-i18n="s5_title" href="#section-5">Controlli prima dell’export</a><a data-i18n="s6_title" href="#section-6">Output e responsabilità professionale</a></aside>
 </div>
 </main>
 <footer class="footer"><div class="wrap">
-  <div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span>
-    <a href="/privacy/" data-i18n="common_privacy">Privacy</a> ·
-    <a href="/security/" data-i18n="common_security">Sicurezza</a> ·
-    <a href="/terms/" data-i18n="common_terms">Termini</a> ·
-    <a href="/licenses/" data-i18n="common_licenses">Licenze</a>
-  </span></div>
-  <p class="footer-note" data-i18n="common_disclaimer">Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.</p>
+<div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span>
+<a data-i18n="common_privacy" href="/privacy/">Privacy</a> ·
+    <a data-i18n="common_security" href="/security/">Sicurezza</a> ·
+    <a data-i18n="common_terms" href="/terms/">Termini</a> ·
+    <a data-i18n="common_licenses" href="/licenses/">Licenze</a>
+</span></div>
+<p class="footer-note" data-i18n="common_disclaimer">Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.</p>
 </div></footer>
-
 <script>
 (function(){
   const translations={"it":{"common_home":"Home","common_insights":"Approfondimenti","common_tool":"Apri il tool","common_guide":"Scarica la guida (PDF)","common_privacy":"Privacy","common_security":"Sicurezza","common_terms":"Termini","common_licenses":"Licenze","common_disclaimer":"Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.","eyebrow":"Caso pratico · Bilancio","h1":"Riclassificazione di un bilancio IAS/IFRS negli schemi civilistici italiani","lead":"Dal trial balance al bilancino civilistico: input, mapping, rettifiche book-to-book, controlli e output verificabili.","s1_title":"Il problema professionale","s1_p1":"In molte organizzazioni la contabilità quotidiana e il reporting sono costruiti secondo logiche IAS/IFRS, mentre il bilancio annuale o un prospetto infrannuale devono essere leggibili secondo gli schemi civilistici italiani. La richiesta può emergere, ad esempio, durante una review, un’istruttoria o la predisposizione di un bilancino intermedio.","s1_p2":"Ripetere manualmente il lavoro significa ricostruire ogni volta mapping, segni, riclassificazioni, rettifiche e quadrature. Il processo è adatto all’automazione quando i file sono abbastanza stabili, le regole possono essere scritte e il risultato può essere confrontato con un working paper già affidabile.","s2_title":"Gli input disponibili","s2_p1":"Il punto di partenza è normalmente già disponibile: trial balance, balance sheet e conto economico gestionali, chart of accounts, mapping utilizzato in sede annuale, periodo corrente e comparativo. Il tool non crea la conoscenza contabile: organizza e applica una conoscenza che il professionista ha già formalizzato.","s2_li1":"Una riga per ogni conto, con codice, descrizione, importo corrente e importo precedente.","s2_li2":"Una voce IV Direttiva già assegnata oppure da completare nell’interfaccia.","s2_li3":"Dati anagrafici e scelta fra schema ordinario e abbreviato.","s3_title":"Mapping e tracciabilità","s3_p1":"Il mapping collega ciascun conto gestionale alla corretta voce dello Stato Patrimoniale o del Conto Economico. Un conto privo di voce, una voce inesistente o un’associazione incompatibile fra sezione patrimoniale ed economica non deve scomparire: deve restare visibile come anomalia da risolvere.","s3_li1":"Drill-down dalla voce civilistica ai conti sottostanti.","s3_li2":"Elenco separato dei conti non mappati.","s3_li3":"Memoria locale del mapping associata alla società.","s4_title":"Rettifiche IAS/IFRS–OIC e storni","s4_p1":"Le differenze fra reporting IAS/IFRS e rappresentazione civilistica non si risolvono sempre con un semplice cambio di voce. Le rettifiche book-to-book devono essere registrate in partita doppia, descritte, attivabili o disattivabili e controllate affinché Dare e Avere coincidano.","s4_p2":"Gli storni e le riclassificazioni devono lasciare una traccia leggibile. L’obiettivo non è produrre soltanto il numero finale, ma permettere alla persona che effettua la review di ricostruire come si è arrivati al risultato.","s5_title":"Controlli prima dell’export","s5_p1":"Un prospetto non è corretto soltanto perché si apre o perché quadra aritmeticamente. Il controllo deve coprire sia la matematica sia la classificazione. Il risultato del Conto Economico deve essere coerente con la voce dell’utile o della perdita nel patrimonio netto, e il periodo precedente deve essere verificato separatamente.","s5_li1":"Quadratura dello Stato Patrimoniale corrente e precedente.","s5_li2":"Coerenza del risultato d’esercizio fra Conto Economico e Patrimonio Netto.","s5_li3":"Segnalazione di mapping mancanti, non validi o incompatibili.","s5_li4":"Blocco degli export quando mancano condizioni essenziali.","s6_title":"Output e responsabilità professionale","s6_p1":"L’output atteso comprende Stato Patrimoniale, Conto Economico, dettaglio per conto, working paper Excel e report PDF. Il tool accelera la ricostruzione, rende visibili gli errori e conserva il percorso logico; non sostituisce la valutazione dei principi contabili applicabili né la validazione finale.","cta_1":"Apri il tool →","cta_2":"Scarica da GitHub ↗","cta_3":"Consulta il metodo →"},"en":{"common_home":"Home","common_insights":"Insights","common_tool":"Open the tool","common_guide":"Download the guide (PDF · IT)","common_privacy":"Privacy","common_security":"Security","common_terms":"Terms","common_licenses":"Licences","common_disclaimer":"Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. The published content, opinions and tools do not represent third parties.","eyebrow":"Practical case · Financial statements","h1":"Reclassifying IAS/IFRS financial statements into Italian statutory formats","lead":"From the trial balance to Italian statutory statements: inputs, mapping, book-to-book adjustments, controls and verifiable outputs.","s1_title":"The professional problem","s1_p1":"In many organisations, day-to-day accounting and reporting follow IAS/IFRS logic, while the annual financial statements or an interim statement must be readable under Italian statutory formats. The need may arise during a review, an administrative procedure or the preparation of an interim set of accounts.","s1_p2":"Repeating the work manually means rebuilding mapping, signs, reclassifications, adjustments and reconciliations every time. The process is suitable for automation when the files are sufficiently stable, the rules can be written and the result can be compared with an already reliable working paper.","s2_title":"Available inputs","s2_p1":"The starting point is usually already available: trial balance, management balance sheet and income statement, chart of accounts, the mapping used for the annual accounts, current period and comparative data. The tool does not create accounting knowledge; it organises and applies knowledge already formalised by the professional.","s2_li1":"One row per account, including code, description, current amount and prior-period amount.","s2_li2":"A Fourth Directive line item already assigned or to be completed in the interface.","s2_li3":"Company information and a choice between ordinary and abbreviated formats.","s3_title":"Mapping and traceability","s3_p1":"Mapping links each management account to the correct Balance Sheet or Income Statement line. An account without a line item, a non-existent line item or an incompatible link between balance-sheet and income-statement sections must not disappear; it must remain visible as an exception to be resolved.","s3_li1":"Drill-down from the statutory line item to underlying accounts.","s3_li2":"A separate list of unmapped accounts.","s3_li3":"Local storage of mapping associated with the company.","s4_title":"IAS/IFRS–OIC adjustments and reversals","s4_p1":"Differences between IAS/IFRS reporting and Italian statutory presentation cannot always be solved by merely changing a line item. Book-to-book adjustments must be recorded as balanced double entries, described, capable of being enabled or disabled and checked so that debits equal credits.","s4_p2":"Reversals and reclassifications must leave a readable trail. The objective is not merely to produce the final number, but to allow the reviewer to reconstruct how the result was obtained.","s5_title":"Controls before export","s5_p1":"A statement is not correct merely because it opens or reconciles arithmetically. Controls must cover both mathematics and classification. The Income Statement result must agree with the profit or loss line in equity, and the prior period must be checked separately.","s5_li1":"Current- and prior-period Balance Sheet reconciliation.","s5_li2":"Consistency of the profit or loss figure between the Income Statement and equity.","s5_li3":"Flagging of missing, invalid or incompatible mapping.","s5_li4":"Blocking exports when essential conditions are not met.","s6_title":"Outputs and professional responsibility","s6_p1":"Expected outputs include the Balance Sheet, Income Statement, account detail, an Excel working paper and a PDF report. The tool speeds up reconstruction, exposes errors and preserves the logical trail; it does not replace the assessment of applicable accounting principles or final validation.","cta_1":"Open the tool (IT) →","cta_2":"Download from GitHub ↗","cta_3":"Read the method →"},"es":{"common_home":"Inicio","common_insights":"Análisis","common_tool":"Abrir la herramienta","common_guide":"Descargar la guía (PDF · IT)","common_privacy":"Privacidad","common_security":"Seguridad","common_terms":"Términos","common_licenses":"Licencias","common_disclaimer":"Tax Automation Lab es un proyecto personal e independiente, no aprobado ni patrocinado por terceros. Los contenidos, opiniones y herramientas publicados no representan a terceros.","eyebrow":"Caso práctico · Estados financieros","h1":"Reclasificación de estados financieros IAS/IFRS en los esquemas estatutarios italianos","lead":"Del trial balance a los estados estatutarios italianos: datos, mapping, ajustes book-to-book, controles y resultados verificables.","s1_title":"El problema profesional","s1_p1":"En muchas organizaciones, la contabilidad diaria y el reporting siguen lógicas IAS/IFRS, mientras que los estados anuales o un estado intermedio deben poder leerse conforme a los esquemas estatutarios italianos. La necesidad puede surgir durante una revisión, un procedimiento administrativo o la preparación de un estado intermedio.","s1_p2":"Repetir el trabajo manualmente implica reconstruir cada vez el mapping, los signos, las reclasificaciones, los ajustes y los cuadres. El proceso es apto para automatizarse cuando los archivos son suficientemente estables, las reglas pueden escribirse y el resultado puede compararse con un working paper ya fiable.","s2_title":"Datos disponibles","s2_p1":"El punto de partida suele estar ya disponible: trial balance, balance y cuenta de resultados de gestión, chart of accounts, mapping utilizado en el cierre anual, período corriente y comparativo. La herramienta no crea conocimiento contable: organiza y aplica el conocimiento que el profesional ya ha formalizado.","s2_li1":"Una línea por cuenta, con código, descripción, importe corriente e importe anterior.","s2_li2":"Una partida IV Directiva ya asignada o pendiente de completar en la interfaz.","s2_li3":"Datos de la sociedad y elección entre formato ordinario y abreviado.","s3_title":"Mapping y trazabilidad","s3_p1":"El mapping vincula cada cuenta de gestión con la partida correcta del balance o de la cuenta de resultados. Una cuenta sin partida, una partida inexistente o una asociación incompatible entre secciones patrimoniales y económicas no debe desaparecer: debe seguir visible como anomalía pendiente de resolver.","s3_li1":"Drill-down desde la partida estatutaria hasta las cuentas subyacentes.","s3_li2":"Lista separada de cuentas no mapeadas.","s3_li3":"Memoria local del mapping asociada a la sociedad.","s4_title":"Ajustes IAS/IFRS–OIC y reclasificaciones","s4_p1":"Las diferencias entre el reporting IAS/IFRS y la presentación estatutaria italiana no siempre se resuelven cambiando simplemente una partida. Los ajustes book-to-book deben registrarse en partida doble, describirse, poder activarse o desactivarse y comprobarse para que el Debe coincida con el Haber.","s4_p2":"Los traspasos y reclasificaciones deben dejar una trazabilidad legible. El objetivo no es producir únicamente el número final, sino permitir que quien revisa reconstruya cómo se llegó al resultado.","s5_title":"Controles antes de exportar","s5_p1":"Un estado no es correcto solo porque se abra o cuadre aritméticamente. El control debe cubrir tanto la matemática como la clasificación. El resultado de la cuenta de resultados debe ser coherente con la partida de beneficio o pérdida en el patrimonio neto, y el período anterior debe verificarse por separado.","s5_li1":"Cuadre del balance corriente y anterior.","s5_li2":"Coherencia del resultado del ejercicio entre la cuenta de resultados y el patrimonio neto.","s5_li3":"Señalización de mappings ausentes, no válidos o incompatibles.","s5_li4":"Bloqueo de exportaciones cuando faltan condiciones esenciales.","s6_title":"Resultados y responsabilidad profesional","s6_p1":"Los resultados esperados incluyen balance, cuenta de resultados, detalle por cuenta, working paper Excel y reporte PDF. La herramienta acelera la reconstrucción, hace visibles los errores y conserva el recorrido lógico; no sustituye la evaluación de los principios contables aplicables ni la validación final.","cta_1":"Abrir la herramienta (IT) →","cta_2":"Descargar desde GitHub ↗","cta_3":"Consultar el método →"}};
@@ -115,5 +118,17 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
   setLang(initial,false);
 })();
 </script>
-
+<script id="tal-language-routes">
+document.addEventListener("click",function(event){
+  const trigger=event.target.closest("[data-lang]");
+  if(!trigger)return;
+  const lang=trigger.getAttribute("data-lang");
+  const routes={"it":"/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/","en":"/en/insights/ias-ifrs-to-italian-statutory-financial-statements/","es":"/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/"};
+  if(routes[lang]){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.location.href=routes[lang];
+  }
+},true);
+</script>
 </body></html>

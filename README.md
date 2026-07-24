@@ -46,3 +46,13 @@ Analytics né cookie pubblicitari.
 Tax Automation Lab è un progetto personale e indipendente, non approvato o
 sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti
 pubblicati non rappresentano terze parti.
+
+## Lingue del sito
+
+Le pagine informative sono disponibili in italiano, inglese e spagnolo:
+
+- Italiano: https://taxautomationlab.com/
+- English: https://taxautomationlab.com/en/
+- Español: https://taxautomationlab.com/es/
+
+Le interfacce operative dei tre tool restano in italiano.

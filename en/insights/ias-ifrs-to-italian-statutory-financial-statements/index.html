@@ -1,0 +1,95 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>IAS/IFRS to Italian statutory statements | Tax Automation Lab</title>
+<meta content="Practical case on reclassifying IAS/IFRS trial balances into Italian statutory formats, including mapping, adjustments, reconciliations and export." name="description"/>
+<meta content="index,follow,max-image-preview:large" name="robots"/>
+<meta content="Riccardo Zedda" name="author"/>
+<link href="https://taxautomationlab.com/en/insights/ias-ifrs-to-italian-statutory-financial-statements/" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="IAS/IFRS to Italian statutory statements | Tax Automation Lab" property="og:title"/>
+<meta content="Caso pratico sulla riclassificazione di trial balance IAS/IFRS negli schemi civilistici italiani, con mapping, rettifiche, quadrature ed export." property="og:description"/>
+<meta content="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" property="og:url"/>
+<meta content="Tax Automation Lab" property="og:site_name"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Reclassifying IAS/IFRS financial statements into Italian statutory formats", "description": "From the trial balance to Italian statutory statements: inputs, mapping, book-to-book adjustments, controls and verifiable outputs.", "url": "https://taxautomationlab.com/en/insights/ias-ifrs-to-italian-statutory-financial-statements/", "inLanguage": "en-US", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "publisher": {"@type": "Person", "name": "Riccardo Zedda"}, "datePublished": "2026-07-21", "dateModified": "2026-07-21", "isPartOf": {"@type": "WebSite", "name": "Tax Automation Lab", "url": "https://taxautomationlab.com/"}}</script>
+<style>
+:root{--bg:#0E1624;--surface-a:rgba(15,25,34,.94);--surface-b:rgba(31,28,39,.92);--text:#F7F7F5;--muted:#C8CDD3;--soft:#A5ACB8;--line:rgba(247,247,245,.16);--petrol:#145368;--rust:#734C34;--mauve:#725D6A;--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;--max:1080px}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-width:320px;min-height:100vh;color:var(--text);font:15px/1.68 var(--sans);background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.50),transparent 62%),radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.62),transparent 66%),radial-gradient(85% 80% at 30% 70%,rgba(32,128,158,.52),transparent 70%),linear-gradient(155deg,#4a2168 0%,#33245a 44%,#123545 100%);background-attachment:fixed}
+a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
+.topbar{position:sticky;top:10px;z-index:20;padding-top:10px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(17,25,34,.88);backdrop-filter:blur(22px);box-shadow:0 18px 50px rgba(0,0,0,.24)}.brand{text-decoration:none;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav-links a{text-decoration:none;color:var(--muted);font-size:11px}.nav-links a:hover{color:#fff}.lang{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px}.lang button{min-width:39px;height:33px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--soft);font-size:9px;font-weight:750;cursor:pointer}.lang button.active{background:#F7F7F5;color:#141014}
+.hero{padding:78px 0 32px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}h1,h2,h3{font-family:var(--serif);font-weight:300}h1{max-width:950px;margin:15px 0 20px;font-size:clamp(43px,7.5vw,76px);line-height:.98;letter-spacing:-.04em}h2{font-size:clamp(29px,4vw,42px);line-height:1.07;margin:0 0 13px}h3{font-size:25px;line-height:1.1}.lead{max-width:850px;margin:0;color:#E1E5E8;font-size:clamp(17px,2vw,20px)}
+.hero-actions,.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 17px;border:1px solid transparent;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-size:11px;font-weight:700}.button.secondary{background:rgba(247,247,245,.05);border-color:rgba(247,247,245,.22);color:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}.content{display:grid;gap:16px}.panel,.toc,.card{background:linear-gradient(150deg,var(--surface-a),var(--surface-b));border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 70px rgba(3,12,18,.28)}.panel{padding:27px}.panel p{color:#E1E5E8;margin:10px 0}.panel ul,.panel ol{margin:14px 0 0;padding-left:21px;color:#E1E5E8}.panel li{margin:8px 0}.panel:nth-child(3n+1){border-left:4px solid var(--petrol)}.panel:nth-child(3n+2){border-left:4px solid var(--mauve)}.panel:nth-child(3n){border-left:4px solid var(--rust)}
+.toc{position:sticky;top:92px;padding:19px}.toc strong{display:block;margin-bottom:10px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.toc a{display:block;padding:7px 0;border-bottom:1px solid rgba(247,247,245,.08);text-decoration:none;color:#D9DDE1;font-size:12px}.toc a:last-child{border-bottom:0}.toc a:hover{color:#fff}
+.status{display:inline-flex;margin:0 0 16px;padding:7px 10px;border:1px solid rgba(115,76,52,.65);border-radius:999px;background:rgba(115,76,52,.22);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.card{display:flex;flex-direction:column;padding:22px;min-height:260px;border-top:3px solid var(--petrol)}.card:nth-child(2){border-top-color:var(--mauve)}.card:nth-child(3){border-top-color:var(--rust)}.card h2{font-size:30px}.card p{color:#E1E5E8}.card .button{margin-top:auto;align-self:flex-start}
+.footer{margin-top:55px;padding:26px 0 40px;border-top:1px solid var(--line);color:var(--soft);font-size:11px}.footer-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer a{text-decoration:none}.footer-note{max-width:850px;margin-top:11px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.toc{position:static;order:-1}.cards{grid-template-columns:1fr}.nav-links{display:none}}
+@media(max-width:580px){.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:140px}.lang button{min-width:34px;padding:0 5px}}
+
+/* tal-static-language-links */
+.lang a{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:32px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:9px;font-weight:750;text-decoration:none}
+.lang a.active{background:#fff;color:#111}
+</style>
+<link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="it" rel="alternate"/><link href="https://taxautomationlab.com/en/insights/ias-ifrs-to-italian-statutory-financial-statements/" hreflang="en" rel="alternate"/><link href="https://taxautomationlab.com/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/" hreflang="es" rel="alternate"/><link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="x-default" rel="alternate"/></head>
+<body>
+<header class="topbar"><div class="wrap nav">
+<a class="brand" href="/en/">Tax Automation Lab</a>
+<nav aria-label="Navigazione principale" class="nav-links">
+<a data-i18n="common_home" href="/en/">Home</a>
+<a data-i18n="common_insights" href="/en/insights/">Insights</a>
+<a data-i18n="common_tool" href="/en/tools/financial-statement/">Open the tool</a>
+<a data-i18n="common_guide" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the guide (PDF · IT)</a>
+</nav>
+<div aria-label="Selezione lingua" class="lang"><a href="/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="it">ITA</a><a aria-current="page" class="active" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/" hreflang="en">ENG</a><a href="/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/" hreflang="es">ESP</a></div>
+</div></header>
+<main class="wrap">
+<section class="hero">
+<span class="eyebrow" data-i18n="eyebrow">Practical case · Financial statements</span>
+<h1 data-i18n="h1">Reclassifying IAS/IFRS financial statements into Italian statutory formats</h1>
+<p class="lead" data-i18n="lead">From the trial balance to Italian statutory statements: inputs, mapping, book-to-book adjustments, controls and verifiable outputs.</p>
+<div class="hero-actions"><a class="button" data-i18n="cta_1" href="/en/tools/financial-statement/">Open the tool (IT) →</a><a class="button secondary" data-i18n="cta_2" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">Download from GitHub ↗</a></div>
+</section>
+<div class="layout">
+<article class="content"><section class="panel" id="section-1">
+<h2 data-i18n="s1_title">The professional problem</h2>
+<p data-i18n="s1_p1">In many organisations, day-to-day accounting and reporting follow IAS/IFRS logic, while the annual financial statements or an interim statement must be readable under Italian statutory formats. The need may arise during a review, an administrative procedure or the preparation of an interim set of accounts.</p>
+<p data-i18n="s1_p2">Repeating the work manually means rebuilding mapping, signs, reclassifications, adjustments and reconciliations every time. The process is suitable for automation when the files are sufficiently stable, the rules can be written and the result can be compared with an already reliable working paper.</p>
+</section><section class="panel" id="section-2">
+<h2 data-i18n="s2_title">Available inputs</h2>
+<p data-i18n="s2_p1">The starting point is usually already available: trial balance, management balance sheet and income statement, chart of accounts, the mapping used for the annual accounts, current period and comparative data. The tool does not create accounting knowledge; it organises and applies knowledge already formalised by the professional.</p>
+<ul><li data-i18n="s2_li1">One row per account, including code, description, current amount and prior-period amount.</li><li data-i18n="s2_li2">A Fourth Directive line item already assigned or to be completed in the interface.</li><li data-i18n="s2_li3">Company information and a choice between ordinary and abbreviated formats.</li></ul>
+</section><section class="panel" id="section-3">
+<h2 data-i18n="s3_title">Mapping and traceability</h2>
+<p data-i18n="s3_p1">Mapping links each management account to the correct Balance Sheet or Income Statement line. An account without a line item, a non-existent line item or an incompatible link between balance-sheet and income-statement sections must not disappear; it must remain visible as an exception to be resolved.</p>
+<ul><li data-i18n="s3_li1">Drill-down from the statutory line item to underlying accounts.</li><li data-i18n="s3_li2">A separate list of unmapped accounts.</li><li data-i18n="s3_li3">Local storage of mapping associated with the company.</li></ul>
+</section><section class="panel" id="section-4">
+<h2 data-i18n="s4_title">IAS/IFRS–OIC adjustments and reversals</h2>
+<p data-i18n="s4_p1">Differences between IAS/IFRS reporting and Italian statutory presentation cannot always be solved by merely changing a line item. Book-to-book adjustments must be recorded as balanced double entries, described, capable of being enabled or disabled and checked so that debits equal credits.</p>
+<p data-i18n="s4_p2">Reversals and reclassifications must leave a readable trail. The objective is not merely to produce the final number, but to allow the reviewer to reconstruct how the result was obtained.</p>
+</section><section class="panel" id="section-5">
+<h2 data-i18n="s5_title">Controls before export</h2>
+<p data-i18n="s5_p1">A statement is not correct merely because it opens or reconciles arithmetically. Controls must cover both mathematics and classification. The Income Statement result must agree with the profit or loss line in equity, and the prior period must be checked separately.</p>
+<ul><li data-i18n="s5_li1">Current- and prior-period Balance Sheet reconciliation.</li><li data-i18n="s5_li2">Consistency of the profit or loss figure between the Income Statement and equity.</li><li data-i18n="s5_li3">Flagging of missing, invalid or incompatible mapping.</li><li data-i18n="s5_li4">Blocking exports when essential conditions are not met.</li></ul>
+</section><section class="panel" id="section-6">
+<h2 data-i18n="s6_title">Outputs and professional responsibility</h2>
+<p data-i18n="s6_p1">Expected outputs include the Balance Sheet, Income Statement, account detail, an Excel working paper and a PDF report. The tool speeds up reconstruction, exposes errors and preserves the logical trail; it does not replace the assessment of applicable accounting principles or final validation.</p>
+</section>
+<div class="actions"><a class="button" data-i18n="cta_1" href="/en/tools/financial-statement/">Open the tool (IT) →</a><a class="button secondary" data-i18n="cta_2" href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">Download from GitHub ↗</a><a class="button secondary" data-i18n="cta_3" href="/en/insights/ai-tax-process-automation/">Read the method →</a></div>
+</article>
+<aside class="toc"><strong data-i18n="common_insights">Insights</strong><a data-i18n="s1_title" href="#section-1">The professional problem</a><a data-i18n="s2_title" href="#section-2">Available inputs</a><a data-i18n="s3_title" href="#section-3">Mapping and traceability</a><a data-i18n="s4_title" href="#section-4">IAS/IFRS–OIC adjustments and reversals</a><a data-i18n="s5_title" href="#section-5">Controls before export</a><a data-i18n="s6_title" href="#section-6">Outputs and professional responsibility</a></aside>
+</div>
+</main>
+<footer class="footer"><div class="wrap">
+<div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span>
+<a data-i18n="common_privacy" href="/en/privacy/">Privacy</a> ·
+    <a data-i18n="common_security" href="/en/security/">Security</a> ·
+    <a data-i18n="common_terms" href="/en/terms/">Terms</a> ·
+    <a data-i18n="common_licenses" href="/en/licenses/">Licences</a>
+</span></div>
+<p class="footer-note" data-i18n="common_disclaimer">Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. The published content, opinions and tools do not represent third parties.</p>
+</div></footer>
+</body></html>

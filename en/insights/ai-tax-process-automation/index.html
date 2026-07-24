@@ -1,0 +1,96 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>How to automate tax and accounting processes with AI</title>
+<meta content="Operational method for selecting a tax process, formalising rules and exceptions, developing in releases, testing and organising an independent review." name="description"/>
+<meta content="index,follow,max-image-preview:large" name="robots"/>
+<meta content="Riccardo Zedda" name="author"/>
+<link href="https://taxautomationlab.com/en/insights/ai-tax-process-automation/" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="How to automate tax and accounting processes with AI" property="og:title"/>
+<meta content="Metodo operativo per scegliere un processo fiscale, formalizzare regole ed eccezioni, sviluppare con agenti AI, testare e organizzare un audit indipendente." property="og:description"/>
+<meta content="https://taxautomationlab.com/approfondimenti/automazione-processi-fiscali-ai/" property="og:url"/>
+<meta content="Tax Automation Lab" property="og:site_name"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "From the tax process to the tool: an operational method", "description": "Select the process, teach rules and exceptions, build tests, develop in small releases and verify the result through a separate review.", "url": "https://taxautomationlab.com/en/insights/ai-tax-process-automation/", "inLanguage": "en-US", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "publisher": {"@type": "Person", "name": "Riccardo Zedda"}, "datePublished": "2026-07-21", "dateModified": "2026-07-21", "isPartOf": {"@type": "WebSite", "name": "Tax Automation Lab", "url": "https://taxautomationlab.com/"}}</script>
+<style>
+:root{--bg:#0E1624;--surface-a:rgba(15,25,34,.94);--surface-b:rgba(31,28,39,.92);--text:#F7F7F5;--muted:#C8CDD3;--soft:#A5ACB8;--line:rgba(247,247,245,.16);--petrol:#145368;--rust:#734C34;--mauve:#725D6A;--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;--max:1080px}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-width:320px;min-height:100vh;color:var(--text);font:15px/1.68 var(--sans);background:radial-gradient(75% 65% at 3% 0%,rgba(168,108,64,.50),transparent 62%),radial-gradient(90% 90% at 100% 6%,rgba(150,54,200,.62),transparent 66%),radial-gradient(85% 80% at 30% 70%,rgba(32,128,158,.52),transparent 70%),linear-gradient(155deg,#4a2168 0%,#33245a 44%,#123545 100%);background-attachment:fixed}
+a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
+.topbar{position:sticky;top:10px;z-index:20;padding-top:10px}.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(17,25,34,.88);backdrop-filter:blur(22px);box-shadow:0 18px 50px rgba(0,0,0,.24)}.brand{text-decoration:none;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav-links a{text-decoration:none;color:var(--muted);font-size:11px}.nav-links a:hover{color:#fff}.lang{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px}.lang button{min-width:39px;height:33px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--soft);font-size:9px;font-weight:750;cursor:pointer}.lang button.active{background:#F7F7F5;color:#141014}
+.hero{padding:78px 0 32px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}h1,h2,h3{font-family:var(--serif);font-weight:300}h1{max-width:950px;margin:15px 0 20px;font-size:clamp(43px,7.5vw,76px);line-height:.98;letter-spacing:-.04em}h2{font-size:clamp(29px,4vw,42px);line-height:1.07;margin:0 0 13px}h3{font-size:25px;line-height:1.1}.lead{max-width:850px;margin:0;color:#E1E5E8;font-size:clamp(17px,2vw,20px)}
+.hero-actions,.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 17px;border:1px solid transparent;border-radius:999px;background:#F7F7F5;color:#141014;text-decoration:none;font-size:11px;font-weight:700}.button.secondary{background:rgba(247,247,245,.05);border-color:rgba(247,247,245,.22);color:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}.content{display:grid;gap:16px}.panel,.toc,.card{background:linear-gradient(150deg,var(--surface-a),var(--surface-b));border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 70px rgba(3,12,18,.28)}.panel{padding:27px}.panel p{color:#E1E5E8;margin:10px 0}.panel ul,.panel ol{margin:14px 0 0;padding-left:21px;color:#E1E5E8}.panel li{margin:8px 0}.panel:nth-child(3n+1){border-left:4px solid var(--petrol)}.panel:nth-child(3n+2){border-left:4px solid var(--mauve)}.panel:nth-child(3n){border-left:4px solid var(--rust)}
+.toc{position:sticky;top:92px;padding:19px}.toc strong{display:block;margin-bottom:10px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.toc a{display:block;padding:7px 0;border-bottom:1px solid rgba(247,247,245,.08);text-decoration:none;color:#D9DDE1;font-size:12px}.toc a:last-child{border-bottom:0}.toc a:hover{color:#fff}
+.status{display:inline-flex;margin:0 0 16px;padding:7px 10px;border:1px solid rgba(115,76,52,.65);border-radius:999px;background:rgba(115,76,52,.22);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.card{display:flex;flex-direction:column;padding:22px;min-height:260px;border-top:3px solid var(--petrol)}.card:nth-child(2){border-top-color:var(--mauve)}.card:nth-child(3){border-top-color:var(--rust)}.card h2{font-size:30px}.card p{color:#E1E5E8}.card .button{margin-top:auto;align-self:flex-start}
+.footer{margin-top:55px;padding:26px 0 40px;border-top:1px solid var(--line);color:var(--soft);font-size:11px}.footer-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer a{text-decoration:none}.footer-note{max-width:850px;margin-top:11px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.toc{position:static;order:-1}.cards{grid-template-columns:1fr}.nav-links{display:none}}
+@media(max-width:580px){.wrap{width:min(var(--max),calc(100% - 26px))}.hero{padding-top:55px}.panel{padding:20px}.nav{align-items:flex-start}.brand{max-width:140px}.lang button{min-width:34px;padding:0 5px}}
+
+/* tal-static-language-links */
+.lang a{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:32px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:9px;font-weight:750;text-decoration:none}
+.lang a.active{background:#fff;color:#111}
+</style>
+<link href="https://taxautomationlab.com/approfondimenti/automazione-processi-fiscali-ai/" hreflang="it" rel="alternate"/><link href="https://taxautomationlab.com/en/insights/ai-tax-process-automation/" hreflang="en" rel="alternate"/><link href="https://taxautomationlab.com/es/analisis/automatizacion-procesos-fiscales-ia/" hreflang="es" rel="alternate"/><link href="https://taxautomationlab.com/approfondimenti/automazione-processi-fiscali-ai/" hreflang="x-default" rel="alternate"/></head>
+<body>
+<header class="topbar"><div class="wrap nav">
+<a class="brand" href="/en/">Tax Automation Lab</a>
+<nav aria-label="Navigazione principale" class="nav-links">
+<a data-i18n="common_home" href="/en/">Home</a>
+<a data-i18n="common_insights" href="/en/insights/">Insights</a>
+<a data-i18n="common_tool" href="/en/tools/financial-statement/">Open the tool</a>
+<a data-i18n="common_guide" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the guide (PDF · IT)</a>
+</nav>
+<div aria-label="Selezione lingua" class="lang"><a href="/approfondimenti/automazione-processi-fiscali-ai/" hreflang="it">ITA</a><a aria-current="page" class="active" href="/en/insights/ai-tax-process-automation/" hreflang="en">ENG</a><a href="/es/analisis/automatizacion-procesos-fiscales-ia/" hreflang="es">ESP</a></div>
+</div></header>
+<main class="wrap">
+<section class="hero">
+<span class="eyebrow" data-i18n="eyebrow">Operational method</span>
+<h1 data-i18n="h1">From the tax process to the tool: an operational method</h1>
+<p class="lead" data-i18n="lead">Select the process, teach rules and exceptions, build tests, develop in small releases and verify the result through a separate review.</p>
+<div class="hero-actions"><a class="button" data-i18n="cta_1" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the full guide (IT) ↓</a><a class="button secondary" data-i18n="cta_2" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read the Fourth Directive case →</a></div>
+</section>
+<div class="layout">
+<article class="content"><section class="panel" id="section-1">
+<h2 data-i18n="s1_title">1. Start from the process, not the tool</h2>
+<p data-i18n="s1_p1">I choose an activity that I know well and repeat. Inputs must be sufficiently stable, rules explainable and the result controllable. I do not start with the most complex process; I start with one that can be compared with an already reliable working paper or historical output.</p>
+<ul><li data-i18n="s1_li1">It recurs monthly, quarterly or annually.</li><li data-i18n="s1_li2">The data have a recognisable structure or can be normalised.</li><li data-i18n="s1_li3">Ordinary rules and the main exceptions can be written down.</li><li data-i18n="s1_li4">There are reconciliations or historical results against which the output can be verified.</li></ul>
+</section><section class="panel" id="section-2">
+<h2 data-i18n="s2_title">2. Assign a role to each environment</h2>
+<p data-i18n="s2_p1">There is no need to know every model. What matters is separating design, development, memory and control. One environment can help structure the process and brief; another can write the code; a knowledge base preserves sources, mapping, decisions and tests; a fresh chat performs the review.</p>
+</section><section class="panel" id="section-3">
+<h2 data-i18n="s3_title">3. Teach the process before asking for code</h2>
+<p data-i18n="s3_p1">The first request should not be “write the program”. I first describe the objective, provide real inputs, explain columns, signs and rows to ignore, write rules and exceptions and define outputs and controls. I then ask the model to return a complete brief and identify what remains unclear.</p>
+<ul><li data-i18n="s3_li1">If an essential datum is missing, the tool must stop and report it.</li><li data-i18n="s3_li2">Professional decisions must not remain implicit in the prompt.</li><li data-i18n="s3_li3">The brief is approved before development begins.</li></ul>
+</section><section class="panel" id="section-4">
+<h2 data-i18n="s4_title">4. Define tests before the prototype</h2>
+<p data-i18n="s4_p1">An application is not correct merely because it produces a number. Before development, I prepare cases and expected results. After development, I deliberately try to make it fail. PASS or FAIL criteria are defined in advance so that they are not adapted to the result obtained.</p>
+<ul><li data-i18n="s4_li1">Ordinary case with a manually verified result.</li><li data-i18n="s4_li2">Edge case with reversed signs, new accounts or zero balances.</li><li data-i18n="s4_li3">Invalid input: missing columns, wrong format or inconsistent data.</li><li data-i18n="s4_li4">Comparison with the expected result prepared before the prototype.</li></ul>
+</section><section class="panel" id="section-5">
+<h2 data-i18n="s5_title">5. Develop in small releases</h2>
+<p data-i18n="s5_p1">The first version should do a limited number of things and make them verifiable. One function at a time, real data and a changelog. Complexity is added only when the previous version is stable and regression tests continue to pass.</p>
+</section><section class="panel" id="section-6">
+<h2 data-i18n="s6_title">6. Separate production from review</h2>
+<p data-i18n="s6_p1">The same chat that built the tool should not certify it. I open a new conversation and provide the code, brief and testing matrix, but not the development history. I ask it to search for errors, unsupported assumptions and unhandled cases, returning PASS or FAIL, rationale, evidence and correction for each control.</p>
+</section><section class="panel" id="section-7">
+<h2 data-i18n="s7_title">7. Release with limitations, manual and memory</h2>
+<p data-i18n="s7_p1">Release does not coincide with the end of coding. It requires a user manual, a changelog, a description of accepted inputs, the controls performed, open assumptions and the tool's limitations. The professional must understand not only how to use it, but also when not to use it.</p>
+</section>
+<div class="actions"><a class="button" data-i18n="cta_1" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Download the full guide (IT) ↓</a><a class="button secondary" data-i18n="cta_2" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read the Fourth Directive case →</a><a class="button secondary" data-i18n="cta_3" href="/en/insights/lipe-automation/">Read the LIPE case →</a></div>
+</article>
+<aside class="toc"><strong data-i18n="common_insights">Insights</strong><a data-i18n="s1_title" href="#section-1">1. Start from the process, not the tool</a><a data-i18n="s2_title" href="#section-2">2. Assign a role to each environment</a><a data-i18n="s3_title" href="#section-3">3. Teach the process before asking for code</a><a data-i18n="s4_title" href="#section-4">4. Define tests before the prototype</a><a data-i18n="s5_title" href="#section-5">5. Develop in small releases</a><a data-i18n="s6_title" href="#section-6">6. Separate production from review</a><a data-i18n="s7_title" href="#section-7">7. Release with limitations, manual and memory</a></aside>
+</div>
+</main>
+<footer class="footer"><div class="wrap">
+<div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span>
+<a data-i18n="common_privacy" href="/en/privacy/">Privacy</a> ·
+    <a data-i18n="common_security" href="/en/security/">Security</a> ·
+    <a data-i18n="common_terms" href="/en/terms/">Terms</a> ·
+    <a data-i18n="common_licenses" href="/en/licenses/">Licences</a>
+</span></div>
+<p class="footer-note" data-i18n="common_disclaimer">Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. The published content, opinions and tools do not represent third parties.</p>
+</div></footer>
+</body></html>

@@ -395,6 +395,7 @@ body.modal-open{overflow:hidden}
 <link href="https://taxautomationlab.com/en/" hreflang="en" rel="alternate"/>
 <link href="https://taxautomationlab.com/es/" hreflang="es" rel="alternate"/>
 <link href="https://taxautomationlab.com/" hreflang="x-default" rel="alternate"/>
+<style id="tal-v634-touch-targets">.lang-option{min-width:44px!important;min-height:44px!important;height:44px!important}.button,.header-action,.nav-link{min-height:44px}</style>
 </head>
 <body class="intro-open">
 <section aria-labelledby="intro-title" class="intro" id="intro">
@@ -613,11 +614,18 @@ Tax Automation Lab è un progetto personale e indipendente, non approvato o spon
   const welcomeModal=document.getElementById('welcome-modal'),welcomeCard=welcomeModal.querySelector('.welcome-card'),welcomeEnter=document.getElementById('welcome-enter'),welcomeContact=document.getElementById('welcome-contact');
   function openWelcome(){welcomeModal.hidden=false;body.classList.add('modal-open');requestAnimationFrame(()=>welcomeEnter.focus());}
   function closeWelcome(focusTarget=document.getElementById('home-title')){welcomeModal.hidden=true;body.classList.remove('modal-open');if(focusTarget)focusTarget.focus({preventScroll:true});}
+  function rememberIntroSeen(){try{sessionStorage.setItem('tal-intro-seen','1')}catch(e){}}
   function enter(){
+    rememberIntroSeen();
     intro.classList.add('is-leaving');app.classList.add('is-visible');app.setAttribute('aria-hidden','false');body.classList.remove('intro-open');
     setTimeout(()=>{intro.hidden=true;openWelcome();},680);
   }
-  function reopen(){closeWelcome(null);intro.hidden=false;requestAnimationFrame(()=>intro.classList.remove('is-leaving'));app.classList.remove('is-visible');app.setAttribute('aria-hidden','true');body.classList.add('intro-open');start.focus({preventScroll:true});}
+  function enterDirect(){
+    rememberIntroSeen();
+    intro.hidden=true;intro.classList.add('is-leaving');app.classList.add('is-visible');app.setAttribute('aria-hidden','false');body.classList.remove('intro-open','modal-open');
+    welcomeModal.hidden=true;
+  }
+  function reopen(){closeWelcome(null);if(!tubesApp&&!fallbackStop)initTubes();intro.hidden=false;requestAnimationFrame(()=>intro.classList.remove('is-leaving'));app.classList.remove('is-visible');app.setAttribute('aria-hidden','true');body.classList.add('intro-open');start.focus({preventScroll:true});}
   start.addEventListener('click',enter);showIntro.addEventListener('click',reopen);
 
   const askTrigger=document.getElementById('ask-trigger'),askPanel=document.getElementById('ask-panel'),askClose=document.getElementById('ask-close'),headerContact=document.getElementById('header-contact');
@@ -738,7 +746,16 @@ Tax Automation Lab è un progetto personale e indipendente, non approvato o spon
     e.preventDefault();
     route(control.dataset.route);
   },true);
-  window.addEventListener('popstate',()=>route(location.hash.slice(1)||'home',false));window.addEventListener('hashchange',()=>route(location.hash.slice(1)||'home',false));document.getElementById('year').textContent=new Date().getFullYear();let savedLanguage='it';try{savedLanguage=localStorage.getItem('tal-language')||'it'}catch(e){}setLanguage(savedLanguage,false);route(location.hash.slice(1)||'home',false);initTubes();if(new URLSearchParams(location.search).get('preview')==='app'){enter();}
+  window.addEventListener('popstate',()=>route(location.hash.slice(1)||'home',false));window.addEventListener('hashchange',()=>route(location.hash.slice(1)||'home',false));document.getElementById('year').textContent=new Date().getFullYear();setLanguage('it',false);route(location.hash.slice(1)||'home',false);
+  const params=new URLSearchParams(location.search);
+  let introSeen=false;try{introSeen=sessionStorage.getItem('tal-intro-seen')==='1'}catch(e){}
+  const skipIntro=params.get('skipIntro')==='1'||params.get('preview')==='app'||introSeen;
+  if(skipIntro){
+    enterDirect();
+    if(params.get('skipIntro')==='1'){history.replaceState(null,'',location.pathname+location.hash);}
+  }else{
+    initTubes();
+  }
 })();
 </script>
 <script id="tal-language-routes">
@@ -746,7 +763,7 @@ document.addEventListener("click",function(event){
   const trigger=event.target.closest("[data-lang]");
   if(!trigger)return;
   const lang=trigger.getAttribute("data-lang");
-  const routes={"it":"/","en":"/en/","es":"/es/"};
+  const routes={"it":"/?skipIntro=1","en":"/en/","es":"/es/"};
   if(routes[lang]){
     event.preventDefault();
     event.stopImmediatePropagation();

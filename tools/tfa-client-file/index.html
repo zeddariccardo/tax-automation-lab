@@ -1,5 +1,3 @@
-<!doctype html>
-
 <!-- build: tfa-client-file/1.5.3 channel:stable fp:52 5a 2d 54 46 41 2d 32 30 32 36 2d 37 63 34 65 39 31 -->
 <!--
 TaxTool TFA Client File
@@ -7,19 +5,19 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://github.com/zeddariccardo/tax-automation-lab
 -->
-
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export." name="description"/>
-<link href="https://taxautomationlab.com/tools/tfa-client-file/" rel="canonical"/>
-<meta content="index,follow,max-image-preview:large" name="robots"/>
-<meta content="website" property="og:type"/>
-<meta content="TFA Client File: scheda fiscale per Tax for Audit | Tax Automation Lab" property="og:title"/>
-<meta content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export." property="og:description"/>
-<meta content="https://taxautomationlab.com/tools/tfa-client-file/" property="og:url"/>
-<meta content="Tax Automation Lab" property="og:site_name"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export.">
+<link rel="canonical" href="https://taxautomationlab.com/tools/tfa-client-file/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TFA Client File: scheda fiscale per Tax for Audit | Tax Automation Lab">
+<meta property="og:description" content="Scheda fiscale cliente per attività di Tax for Audit: profilo permanente, calcolo imposte, dichiarativi, information request list, open points, conclusioni, archivio annuale ed export.">
+<meta property="og:url" content="https://taxautomationlab.com/tools/tfa-client-file/">
+<meta property="og:site_name" content="Tax Automation Lab">
 <title>TFA Client File: scheda fiscale per Tax for Audit | Tax Automation Lab</title>
 <style>
 :root{
@@ -446,6 +444,7 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
   ]
 }
 </script>
+
 <style id="tal-publication-layer">
 .tal-publication{position:relative;z-index:52;padding:12px clamp(16px,3vw,34px);background:#0E1624;color:#F7F7F5;border-bottom:1px solid rgba(247,247,245,.14);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif}
 .tal-publication-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -467,443 +466,483 @@ h2.bt{font-weight:600;letter-spacing:-.02em}
 @media(max-width:820px){.tal-publication-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.tal-publication-facts{grid-template-columns:1fr}.tal-publication{padding:11px 12px}}
 </style>
-<link href="https://taxautomationlab.com/tools/tfa-client-file/" hreflang="it" rel="alternate"/>
-<link href="https://taxautomationlab.com/en/tools/tfa-client-file/" hreflang="en" rel="alternate"/>
-<link href="https://taxautomationlab.com/es/tools/tfa-client-file/" hreflang="es" rel="alternate"/>
-<link href="https://taxautomationlab.com/tools/tfa-client-file/" hreflang="x-default" rel="alternate"/>
+<link rel="alternate" hreflang="it" href="https://taxautomationlab.com/tools/tfa-client-file/">
+<link rel="alternate" hreflang="en" href="https://taxautomationlab.com/en/tools/tfa-client-file/">
+<link rel="alternate" hreflang="es" href="https://taxautomationlab.com/es/tools/tfa-client-file/">
+<link rel="alternate" hreflang="x-default" href="https://taxautomationlab.com/tools/tfa-client-file/">
+<style id="tal-v634-touch-targets">.tal-publication-lang button{min-width:44px!important;min-height:44px!important;height:44px!important}.sb-toggle{min-height:44px!important}.primary-tab,.workspace-link{min-height:44px!important}</style>
 </head>
 <body>
 <header class="top">
-<div class="top-line">
-<div><div class="kicker">Tax Automation Lab · Working paper</div><h1>Tax Tool - TFA Client File</h1></div>
-<div class="privacy">100% locale · nessun dato lascia il dispositivo</div>
-</div>
+  <div class="top-line">
+    <div><div class="kicker">Tax Automation Lab · Working paper</div><h1>Tax Tool - TFA Client File</h1></div>
+    <div class="privacy">100% locale · nessun dato lascia il dispositivo</div>
+  </div>
 </header>
-<button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
-<nav aria-label="Navigazione principale" class="appbar" id="sidebar">
-<div class="sb-brand">
-<span class="sb-logo">TFA</span>
-<span class="sb-brandtext"><b>TFA Client File</b><small>Tax for Audit · working paper</small></span>
-</div>
-<div class="sb-context" id="context-label"><b>Cliente senza denominazione</b> · fascicolo corrente</div>
-<div class="sb-modewrap">
-<span class="sb-cap">Modalità di lavoro</span>
-<div aria-label="Modalità di lavoro" class="primary-nav" id="primary-nav">
-<button class="primary-tab active" data-primary-mode="commentary" type="button">Commentary</button>
-<button class="primary-tab" data-primary-mode="schematic" type="button">Analitica</button>
-</div>
-</div>
-<div class="workspace-nav" id="workspace-nav">
-<span class="sb-cap sb-groupcap">Lavoro</span>
-<button class="workspace-link ws-dash" data-view="dashboard" type="button"><span class="ws-ic">◧</span>Dashboard</button>
-<button class="workspace-link ws-irl" data-view="irl" type="button"><span class="ws-ic">☷</span>IRL <span class="ws-count" id="sb-irl-pending"></span></button>
-<div class="workspace-group" data-workspace-group="commentary">
-<button class="workspace-link active" data-commentary-section="summary" type="button"><span class="ws-ic">▤</span>Sintesi e cliente</button>
-<button class="workspace-link" data-commentary-section="tax" type="button"><span class="ws-ic">∑</span>Calcolo imposte</button>
-<button class="workspace-link" data-commentary-section="returns" type="button"><span class="ws-ic">▦</span>Dichiarativi</button>
-<button class="workspace-link" data-commentary-section="open" type="button"><span class="ws-ic">◔</span>Open points &amp; conclusioni</button>
-</div>
-<div class="workspace-group" data-workspace-group="schematic">
-<button class="workspace-link active" data-view="profile" type="button"><span class="ws-ic">▤</span>Anagrafica</button>
-<button class="workspace-link" data-view="tax" type="button"><span class="ws-ic">∑</span>Calcolo imposte</button>
-<button class="workspace-link" data-view="returns" type="button"><span class="ws-ic">▦</span>Dichiarativi</button>
-<button class="workspace-link" data-view="openpoints" type="button"><span class="ws-ic">◔</span>Open points &amp; conclusioni</button>
-</div>
-<span class="sb-cap sb-groupcap">Gestione</span>
-<div class="workspace-group workspace-group--always" data-workspace-group="clients">
-<button class="workspace-link" data-archive-anchor="clients-saved" type="button"><span class="ws-ic">▣</span>Clienti salvati</button>
-<button class="workspace-link" data-archive-anchor="clients-current" type="button"><span class="ws-ic">✎</span>Fascicolo corrente</button>
-<button class="workspace-link" data-archive-anchor="clients-export" type="button"><span class="ws-ic">↧</span>Export e backup</button>
-</div>
-</div>
-<div class="sb-foot">100% locale · nessun dato lascia il dispositivo</div>
+<button class="sb-toggle" id="sb-toggle" type="button" aria-label="Apri o chiudi il menu">☰ Menu</button>
+<nav class="appbar" id="sidebar" aria-label="Navigazione principale">
+  <div class="sb-brand">
+    <span class="sb-logo">TFA</span>
+    <span class="sb-brandtext"><b>TFA Client File</b><small>Tax for Audit · working paper</small></span>
+  </div>
+
+  <div class="sb-context" id="context-label"><b>Cliente senza denominazione</b> · fascicolo corrente</div>
+
+  <div class="sb-modewrap">
+    <span class="sb-cap">Modalità di lavoro</span>
+    <div class="primary-nav" id="primary-nav" aria-label="Modalità di lavoro">
+      <button class="primary-tab active" type="button" data-primary-mode="commentary">Commentary</button>
+      <button class="primary-tab" type="button" data-primary-mode="schematic">Analitica</button>
+    </div>
+  </div>
+
+  <div class="workspace-nav" id="workspace-nav">
+    <span class="sb-cap sb-groupcap">Lavoro</span>
+    <button class="workspace-link ws-dash" type="button" data-view="dashboard"><span class="ws-ic">◧</span>Dashboard</button>
+    <button class="workspace-link ws-irl" type="button" data-view="irl"><span class="ws-ic">☷</span>IRL <span class="ws-count" id="sb-irl-pending"></span></button>
+
+    <div class="workspace-group" data-workspace-group="commentary">
+      <button class="workspace-link active" type="button" data-commentary-section="summary"><span class="ws-ic">▤</span>Sintesi e cliente</button>
+      <button class="workspace-link" type="button" data-commentary-section="tax"><span class="ws-ic">∑</span>Calcolo imposte</button>
+      <button class="workspace-link" type="button" data-commentary-section="returns"><span class="ws-ic">▦</span>Dichiarativi</button>
+      <button class="workspace-link" type="button" data-commentary-section="open"><span class="ws-ic">◔</span>Open points &amp; conclusioni</button>
+    </div>
+
+    <div class="workspace-group" data-workspace-group="schematic">
+      <button class="workspace-link active" type="button" data-view="profile"><span class="ws-ic">▤</span>Anagrafica</button>
+      <button class="workspace-link" type="button" data-view="tax"><span class="ws-ic">∑</span>Calcolo imposte</button>
+      <button class="workspace-link" type="button" data-view="returns"><span class="ws-ic">▦</span>Dichiarativi</button>
+      <button class="workspace-link" type="button" data-view="openpoints"><span class="ws-ic">◔</span>Open points &amp; conclusioni</button>
+    </div>
+
+    <span class="sb-cap sb-groupcap">Gestione</span>
+    <div class="workspace-group workspace-group--always" data-workspace-group="clients">
+      <button class="workspace-link" type="button" data-archive-anchor="clients-saved"><span class="ws-ic">▣</span>Clienti salvati</button>
+      <button class="workspace-link" type="button" data-archive-anchor="clients-current"><span class="ws-ic">✎</span>Fascicolo corrente</button>
+      <button class="workspace-link" type="button" data-archive-anchor="clients-export"><span class="ws-ic">↧</span>Export e backup</button>
+    </div>
+  </div>
+
+  <div class="sb-foot">100% locale · nessun dato lascia il dispositivo</div>
 </nav>
 <div class="app-main">
-<section aria-label="Informazioni di pubblicazione" class="tal-publication">
-<div class="tal-publication-top">
-<div class="tal-publication-links">
-<a href="/">Tax Automation Lab</a>
-<a href="/tools/">Catalogo strumenti</a>
-<a href="/licenses/">Licenze</a>
-<a href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" rel="noopener noreferrer" target="_blank">Download GitHub ↗</a>
-</div>
-<div aria-label="Selezione lingua" class="tal-publication-lang">
-<button aria-pressed="true" class="active" data-tal-lang="it" type="button">ITA</button>
-<button aria-pressed="false" data-tal-lang="en" type="button">ENG</button>
-<button aria-pressed="false" data-tal-lang="es" type="button">ESP</button>
-</div>
-</div>
-<details>
-<summary data-tal-key="summary">Informazioni sullo strumento</summary>
-<div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Tax for Audit · v1.5.3</span>
-<h2 data-tal-key="title">Scheda fiscale cliente e fascicolo annuale per Tax for Audit</h2>
-<p data-tal-key="lead">Organizza profilo permanente, calcolo imposte, dichiarativi, documentazione richiesta, open points e conclusioni in un unico working paper locale e riutilizzabile.</p>
-<div class="tal-publication-facts">
-<div class="tal-publication-fact" data-tal-fact="0">Profilo: dati permanenti e regimi</div><div class="tal-publication-fact" data-tal-fact="1">Anno: calcolo imposte e dichiarativi</div><div class="tal-publication-fact" data-tal-fact="2">Controlli: IRL, open points e conclusioni</div><div class="tal-publication-fact" data-tal-fact="3">Archivio: clienti e annualità</div>
-</div>
-<p class="tal-publication-note" data-tal-key="note">La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano.</p>
-</div>
-</details>
+<section class="tal-publication" aria-label="Informazioni di pubblicazione">
+  <div class="tal-publication-top">
+    <div class="tal-publication-links">
+      <a href="/?skipIntro=1">Tax Automation Lab</a>
+      <a href="/tools/">Catalogo strumenti</a>
+      <a href="/licenses/">Licenze</a>
+      <a href="https://github.com/zeddariccardo/tax-automation-lab/releases/latest" target="_blank" rel="noopener noreferrer">Download GitHub ↗</a>
+    </div>
+    <div class="tal-publication-lang" aria-label="Selezione lingua">
+      <button type="button" data-tal-lang="it" class="active" aria-pressed="true">ITA</button>
+      <button type="button" data-tal-lang="en" aria-pressed="false">ENG</button>
+      <button type="button" data-tal-lang="es" aria-pressed="false">ESP</button>
+    </div>
+  </div>
+  <details>
+    <summary data-tal-key="summary">Informazioni sullo strumento</summary>
+    <div class="tal-publication-body">
+      <span class="tal-publication-label" data-tal-key="label">Tax for Audit · v1.5.3</span>
+      <h2 data-tal-key="title">Scheda fiscale cliente e fascicolo annuale per Tax for Audit</h2>
+      <p data-tal-key="lead">Organizza profilo permanente, calcolo imposte, dichiarativi, documentazione richiesta, open points e conclusioni in un unico working paper locale e riutilizzabile.</p>
+      <div class="tal-publication-facts">
+        <div class="tal-publication-fact" data-tal-fact="0">Profilo: dati permanenti e regimi</div><div class="tal-publication-fact" data-tal-fact="1">Anno: calcolo imposte e dichiarativi</div><div class="tal-publication-fact" data-tal-fact="2">Controlli: IRL, open points e conclusioni</div><div class="tal-publication-fact" data-tal-fact="3">Archivio: clienti e annualità</div>
+      </div>
+      <p class="tal-publication-note" data-tal-key="note">La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano.</p>
+    </div>
+  </details>
 </section>
+
 <main>
 <!-- DASHBOARD -->
 <div class="view" id="view-dashboard">
 <section class="block">
-<h2 class="bt"><span class="num">I · Quadro generale</span>Stato del fascicolo TFA</h2><div class="rule"></div>
-<p class="bd">La sintesi evidenzia completezza, punti aperti, rilevazioni da riconfermare e aree potenzialmente critiche. Il riporto dall'anno precedente non equivale a validazione.</p>
-<div class="demo-banner" id="demo-banner"><b>Modalità esempio:</b> stai visualizzando dati interamente fittizi riferiti ad Alfa Industriale S.r.l. Puoi modificarli liberamente ed esportarli per valutare il risultato.</div>
-<div class="start-card">
-<div>
-<h3>Inizia dal cliente o guarda subito un fascicolo completo</h3>
-<p>Il tool salva automaticamente il draft sul dispositivo. Per capire rapidamente la logica, carica l'esempio Alfa Industriale: troverai anagrafica, gruppo, consolidato, operazione straordinaria, contenzioso, tax assets, dichiarativi e open points già compilati.</p>
-<div class="btn-row"><button class="btn" id="dashboard-demo">Carica esempio Alfa Industriale</button><button class="btn secondary" id="dashboard-new">Crea un cliente vuoto</button><button class="btn ghost" data-jump="profile">Apri la scheda cliente</button></div>
-</div>
-<div class="start-steps">
-<div class="start-step"><span>1</span><div><b>Compila la scheda permanente</b><small>Anagrafica, gruppo, regimi e presidi.</small></div></div>
-<div class="start-step"><span>2</span><div><b>Aggiungi le rilevazioni annuali</b><small>Calcolo imposte, contenziosi e dichiarativi.</small></div></div>
-<div class="start-step"><span>3</span><div><b>Esporta e riporta</b><small>Excel, PDF, JSON e nuovo esercizio.</small></div></div>
-</div>
-</div>
-<div class="summary-bar" id="dashboard-summary"></div>
-<div class="kpi-grid" id="kpi-grid"></div>
-<div class="panel" style="margin-top:20px">
-<h3>Avanzamento del fascicolo</h3><p>La percentuale misura i campi principali compilati e i record classificati; non esprime un giudizio sulla qualità o sufficienza delle procedure.</p>
-<div class="progress"><span id="completion-bar"></span></div>
-<div class="hint" id="completion-text" style="margin-top:8px"></div>
-</div>
-<div class="panel">
-<h3>Accesso rapido</h3><p>Le aree sono organizzate tra informazioni permanenti, attività sul calcolo imposte e controlli sui modelli dichiarativi.</p>
-<div class="section-index">
-<button class="jump" data-jump="profile"><b>Scheda cliente</b><small>Anagrafica, gruppo, regimi e dati permanenti</small></button>
-<button class="jump" data-jump="tax"><b>Calcolo imposte</b><small>Materialità, documenti, tax risks e verifiche</small></button>
-<button class="jump" data-jump="returns"><b>Dichiarativi</b><small>Redditi SC, IRAP, CNM e riconciliazioni</small></button>
-<button class="jump" data-jump="openpoints"><b>Open points</b><small>Rilievi, risposte, adjustment e conclusioni</small></button>
-<button class="jump" data-jump="archive"><b>Archivio annuale</b><small>Salvataggio, riporto, import ed export</small></button>
-</div>
-</div>
-<div class="panel warn-panel">
-<h3>Uso professionale</h3><p>Il tool è una working paper digitale. Non sostituisce le procedure previste dall'incarico, le istruzioni dei modelli, la normativa applicabile, il giudizio professionale o la review del responsabile.</p>
-</div>
+  <h2 class="bt"><span class="num">I · Quadro generale</span>Stato del fascicolo TFA</h2><div class="rule"></div>
+  <p class="bd">La sintesi evidenzia completezza, punti aperti, rilevazioni da riconfermare e aree potenzialmente critiche. Il riporto dall'anno precedente non equivale a validazione.</p>
+  <div class="demo-banner" id="demo-banner"><b>Modalità esempio:</b> stai visualizzando dati interamente fittizi riferiti ad Alfa Industriale S.r.l. Puoi modificarli liberamente ed esportarli per valutare il risultato.</div>
+  <div class="start-card">
+    <div>
+      <h3>Inizia dal cliente o guarda subito un fascicolo completo</h3>
+      <p>Il tool salva automaticamente il draft sul dispositivo. Per capire rapidamente la logica, carica l'esempio Alfa Industriale: troverai anagrafica, gruppo, consolidato, operazione straordinaria, contenzioso, tax assets, dichiarativi e open points già compilati.</p>
+      <div class="btn-row"><button class="btn" id="dashboard-demo">Carica esempio Alfa Industriale</button><button class="btn secondary" id="dashboard-new">Crea un cliente vuoto</button><button class="btn ghost" data-jump="profile">Apri la scheda cliente</button></div>
+    </div>
+    <div class="start-steps">
+      <div class="start-step"><span>1</span><div><b>Compila la scheda permanente</b><small>Anagrafica, gruppo, regimi e presidi.</small></div></div>
+      <div class="start-step"><span>2</span><div><b>Aggiungi le rilevazioni annuali</b><small>Calcolo imposte, contenziosi e dichiarativi.</small></div></div>
+      <div class="start-step"><span>3</span><div><b>Esporta e riporta</b><small>Excel, PDF, JSON e nuovo esercizio.</small></div></div>
+    </div>
+  </div>
+  <div id="dashboard-summary" class="summary-bar"></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="panel" style="margin-top:20px">
+    <h3>Avanzamento del fascicolo</h3><p>La percentuale misura i campi principali compilati e i record classificati; non esprime un giudizio sulla qualità o sufficienza delle procedure.</p>
+    <div class="progress"><span id="completion-bar"></span></div>
+    <div class="hint" id="completion-text" style="margin-top:8px"></div>
+  </div>
+  <div class="panel">
+    <h3>Accesso rapido</h3><p>Le aree sono organizzate tra informazioni permanenti, attività sul calcolo imposte e controlli sui modelli dichiarativi.</p>
+    <div class="section-index">
+      <button class="jump" data-jump="profile"><b>Scheda cliente</b><small>Anagrafica, gruppo, regimi e dati permanenti</small></button>
+      <button class="jump" data-jump="tax"><b>Calcolo imposte</b><small>Materialità, documenti, tax risks e verifiche</small></button>
+      <button class="jump" data-jump="returns"><b>Dichiarativi</b><small>Redditi SC, IRAP, CNM e riconciliazioni</small></button>
+      <button class="jump" data-jump="openpoints"><b>Open points</b><small>Rilievi, risposte, adjustment e conclusioni</small></button>
+      <button class="jump" data-jump="archive"><b>Archivio annuale</b><small>Salvataggio, riporto, import ed export</small></button>
+    </div>
+  </div>
+  <div class="panel warn-panel">
+    <h3>Uso professionale</h3><p>Il tool è una working paper digitale. Non sostituisce le procedure previste dall'incarico, le istruzioni dei modelli, la normativa applicabile, il giudizio professionale o la review del responsabile.</p>
+  </div>
 </section>
 </div>
+
+
 <!-- COMMENTARY -->
 <div class="view active" id="view-commentary">
 <section class="block commentary-shell">
-<div class="page-intro">
-<div class="copy"><h2 id="commentary-page-title">Sintesi e cliente</h2><p id="commentary-page-description">Identifica il fascicolo e descrivi in modo discorsivo il profilo fiscale e le conclusioni principali.</p></div>
-<div class="page-actions"><button class="btn secondary small" id="commentary-demo" type="button">Carica esempio</button><button class="btn ghost small" id="commentary-new" type="button">Nuovo fascicolo</button></div>
-</div>
-<div class="commentary-identity" id="commentary-identity">
-<div class="grid">
-<div class="field wide"><label>Denominazione</label><input data-path="profile.companyName" placeholder="Es. Alfa Industriale S.r.l." type="text"/></div>
-<div class="field"><label>Codice fiscale</label><input data-path="profile.taxCode" type="text"/></div>
-<div class="field"><label>Partita IVA</label><input data-path="profile.vatNumber" type="text"/></div>
-<div class="field"><label>Periodo d’imposta</label><input data-path="year.year" max="2100" min="2000" type="number"/></div>
-<div class="field"><label>Preparer</label><input data-path="year.engagement.preparer" type="text"/></div>
-<div class="field"><label>Reviewer</label><input data-path="year.engagement.reviewer" type="text"/></div>
-<div class="field"><label>Stato</label><select data-path="year.engagement.status"><option>Da avviare</option><option>In corso</option><option>In review</option><option>Concluso</option></select></div>
-</div>
-</div>
-<div class="commentary-grid" id="commentary-grid"></div>
+  <div class="page-intro">
+    <div class="copy"><h2 id="commentary-page-title">Sintesi e cliente</h2><p id="commentary-page-description">Identifica il fascicolo e descrivi in modo discorsivo il profilo fiscale e le conclusioni principali.</p></div>
+    <div class="page-actions"><button class="btn secondary small" id="commentary-demo" type="button">Carica esempio</button><button class="btn ghost small" id="commentary-new" type="button">Nuovo fascicolo</button></div>
+  </div>
+  <div class="commentary-identity" id="commentary-identity">
+    <div class="grid">
+      <div class="field wide"><label>Denominazione</label><input data-path="profile.companyName" type="text" placeholder="Es. Alfa Industriale S.r.l."></div>
+      <div class="field"><label>Codice fiscale</label><input data-path="profile.taxCode" type="text"></div>
+      <div class="field"><label>Partita IVA</label><input data-path="profile.vatNumber" type="text"></div>
+      <div class="field"><label>Periodo d’imposta</label><input data-path="year.year" type="number" min="2000" max="2100"></div>
+      <div class="field"><label>Preparer</label><input data-path="year.engagement.preparer" type="text"></div>
+      <div class="field"><label>Reviewer</label><input data-path="year.engagement.reviewer" type="text"></div>
+      <div class="field"><label>Stato</label><select data-path="year.engagement.status"><option>Da avviare</option><option>In corso</option><option>In review</option><option>Concluso</option></select></div>
+    </div>
+  </div>
+  <div class="commentary-grid" id="commentary-grid"></div>
 </section>
 </div>
+
+
 <!-- IRL -->
 <div class="view" id="view-irl">
-<div class="view-head irl-view-head">
-<h2><span class="num">Information Request List</span>Documentazione del fascicolo</h2>
-<p class="bd">Un unico registro per richieste, ricezioni, solleciti, versioni e commenti. La IRL alimenta automaticamente il riepilogo documentale della Commentary.</p>
+  <div class="view-head irl-view-head">
+    <h2><span class="num">Information Request List</span>Documentazione del fascicolo</h2>
+    <p class="bd">Un unico registro per richieste, ricezioni, solleciti, versioni e commenti. La IRL alimenta automaticamente il riepilogo documentale della Commentary.</p>
+  </div>
+
+  <div class="irl-topbar">
+    <div class="irl-area-tabs" role="tablist" aria-label="Area IRL">
+      <button class="irl-area-tab active" type="button" data-irl-area="tax">Calcolo imposte</button>
+      <button class="irl-area-tab" type="button" data-irl-area="returns">Dichiarativi</button>
+      <button class="irl-area-tab" type="button" data-irl-area="all">Tutti</button>
+    </div>
+    <div class="irl-top-actions">
+      <button class="btn small" id="add-irl-item" type="button">＋ Aggiungi documento</button>
+      <button class="btn secondary small" id="generate-irl-request" type="button">Genera richiesta</button>
+    </div>
+  </div>
+
+  <div class="irl-kpi-grid" id="irl-kpis"></div>
+  <div class="irl-progress-card">
+    <div class="irl-progress-copy"><b id="irl-progress-title">Raccolta documentale</b><span id="irl-progress-text"></span></div>
+    <div class="progress"><span id="irl-progress-bar"></span></div>
+  </div>
+
+  <div class="irl-actions-panel">
+    <div class="irl-seed-actions">
+      <span class="mini-label">Liste iniziali</span>
+      <button class="btn ghost small" id="seed-irl-tax" type="button">Carica base calcolo imposte</button>
+      <button class="btn ghost small" id="seed-irl-returns" type="button">Carica base dichiarativi</button>
+    </div>
+    <div class="irl-export-actions">
+      <span class="mini-label">Export IRL</span>
+      <button class="btn secondary small" id="export-irl-excel" type="button">Excel a colori</button>
+      <button class="btn secondary small" id="export-irl-pdf" type="button">PDF IRL</button>
+    </div>
+  </div>
+
+  <div class="irl-filterbar">
+    <div class="field"><label>Cerca</label><input type="search" id="irl-search" placeholder="Documento, commento, categoria..."></div>
+    <div class="field"><label>Stato</label><select id="irl-status-filter"><option value="all">Tutti gli stati</option><option value="pending">Pending</option><option value="received">Ricevuti</option><option value="partial">Ricevuti parzialmente</option><option value="reminded">Sollecitati</option><option value="update">Da aggiornare</option><option value="na">Non applicabili</option></select></div>
+    <div class="field"><label>Categoria</label><select id="irl-category-filter"><option value="all">Tutte le categorie</option></select></div>
+  </div>
+
+  <div class="irl-table-wrap">
+    <table class="irl-table">
+      <thead><tr><th>Stato</th><th>Documento</th><th>Periodo</th><th>Richiesto</th><th>Ricevuto</th><th>Commento</th><th>Azioni</th></tr></thead>
+      <tbody id="irl-table-body"></tbody>
+    </table>
+  </div>
+  <div id="irl-empty" class="record-empty" style="display:none"></div>
 </div>
-<div class="irl-topbar">
-<div aria-label="Area IRL" class="irl-area-tabs" role="tablist">
-<button class="irl-area-tab active" data-irl-area="tax" type="button">Calcolo imposte</button>
-<button class="irl-area-tab" data-irl-area="returns" type="button">Dichiarativi</button>
-<button class="irl-area-tab" data-irl-area="all" type="button">Tutti</button>
-</div>
-<div class="irl-top-actions">
-<button class="btn small" id="add-irl-item" type="button">＋ Aggiungi documento</button>
-<button class="btn secondary small" id="generate-irl-request" type="button">Genera richiesta</button>
-</div>
-</div>
-<div class="irl-kpi-grid" id="irl-kpis"></div>
-<div class="irl-progress-card">
-<div class="irl-progress-copy"><b id="irl-progress-title">Raccolta documentale</b><span id="irl-progress-text"></span></div>
-<div class="progress"><span id="irl-progress-bar"></span></div>
-</div>
-<div class="irl-actions-panel">
-<div class="irl-seed-actions">
-<span class="mini-label">Liste iniziali</span>
-<button class="btn ghost small" id="seed-irl-tax" type="button">Carica base calcolo imposte</button>
-<button class="btn ghost small" id="seed-irl-returns" type="button">Carica base dichiarativi</button>
-</div>
-<div class="irl-export-actions">
-<span class="mini-label">Export IRL</span>
-<button class="btn secondary small" id="export-irl-excel" type="button">Excel a colori</button>
-<button class="btn secondary small" id="export-irl-pdf" type="button">PDF IRL</button>
-</div>
-</div>
-<div class="irl-filterbar">
-<div class="field"><label>Cerca</label><input id="irl-search" placeholder="Documento, commento, categoria..." type="search"/></div>
-<div class="field"><label>Stato</label><select id="irl-status-filter"><option value="all">Tutti gli stati</option><option value="pending">Pending</option><option value="received">Ricevuti</option><option value="partial">Ricevuti parzialmente</option><option value="reminded">Sollecitati</option><option value="update">Da aggiornare</option><option value="na">Non applicabili</option></select></div>
-<div class="field"><label>Categoria</label><select id="irl-category-filter"><option value="all">Tutte le categorie</option></select></div>
-</div>
-<div class="irl-table-wrap">
-<table class="irl-table">
-<thead><tr><th>Stato</th><th>Documento</th><th>Periodo</th><th>Richiesto</th><th>Ricevuto</th><th>Commento</th><th>Azioni</th></tr></thead>
-<tbody id="irl-table-body"></tbody>
-</table>
-</div>
-<div class="record-empty" id="irl-empty" style="display:none"></div>
-</div>
+
 <!-- PROFILE -->
 <div class="view" id="view-profile">
 <div class="view-head"><h2><span class="num">II · Scheda cliente permanente</span>Identità e perimetro fiscale</h2><p class="bd">Informazioni permanenti: possono essere riportate negli esercizi successivi ma vanno riconfermate. Usa l'indice qui sotto per aprire una sezione alla volta.</p></div>
 <div class="subnav" data-subnav="profile"></div>
 <section class="block" id="profile-identity">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Anagrafica</h3><p>Dati identificativi, attività e principi contabili della società.</p></div><button class="btn small secondary" data-add-observation="profile_identity">＋ Nuova rilevazione</button></div>
-<div class="notice warn">Le informazioni permanenti sono riportate nel nuovo esercizio, ma devono essere espressamente riconfermate.</div>
-<div class="grid" style="margin-bottom:20px">
-<div class="field"><label>Conferma scheda per l’anno</label><select data-path="year.profileReview.status"><option>Da riconfermare</option><option>Confermata</option><option>Modificata</option><option>Review in corso</option></select></div>
-<div class="field"><label>Data conferma</label><input data-path="year.profileReview.date" type="date"/></div>
-<div class="field wide"><label>Confermata / aggiornata da</label><input data-path="year.profileReview.by" type="text"/></div>
-</div>
-<div class="grid">
-<div class="field wide"><label>Denominazione</label><input data-path="profile.companyName" placeholder="Es. Alfa Industriale S.r.l." type="text"/></div>
-<div class="field"><label>Codice fiscale</label><input data-path="profile.taxCode" maxlength="16" type="text"/></div>
-<div class="field"><label>Partita IVA</label><input data-path="profile.vatNumber" maxlength="16" type="text"/></div>
-<div class="field"><label>Forma giuridica</label><input data-path="profile.legalForm" placeholder="S.p.A., S.r.l., S.c.a.r.l." type="text"/></div>
-<div class="field"><label>Sede legale</label><input data-path="profile.registeredOffice" type="text"/></div>
-<div class="field"><label>Data costituzione</label><input data-path="profile.incorporationDate" type="date"/></div>
-<div class="field"><label>Chiusura esercizio</label><input data-path="profile.yearEnd" placeholder="31 dicembre" type="text"/></div>
-<div class="field"><label>Codice ATECO</label><input data-path="profile.ateco" type="text"/></div>
-<div class="field wide"><label>Attività e modello operativo</label><textarea data-path="profile.businessDescription" placeholder="Descrizione sintetica del business, delle fonti di ricavo e delle specificità operative"></textarea></div>
-<div class="field"><label>Principi contabili</label><select data-path="profile.accountingStandards"><option value="">—</option><option>OIC</option><option>IAS/IFRS</option><option>OIC con reporting IFRS</option><option>Altro</option></select></div>
-<div class="field"><label>ERP / sistema contabile</label><input data-path="profile.erp" type="text"/></div>
-<div class="field"><label>Revisore / società di revisione</label><input data-path="profile.auditor" type="text"/></div>
-<div class="field"><label>Referente fiscale cliente</label><input data-path="profile.taxContact" type="text"/></div>
-</div>
-<div class="observation-list" data-observations="profile_identity"></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Anagrafica</h3><p>Dati identificativi, attività e principi contabili della società.</p></div><button class="btn small secondary" data-add-observation="profile_identity">＋ Nuova rilevazione</button></div>
+    <div class="notice warn">Le informazioni permanenti sono riportate nel nuovo esercizio, ma devono essere espressamente riconfermate.</div>
+    <div class="grid" style="margin-bottom:20px">
+      <div class="field"><label>Conferma scheda per l’anno</label><select data-path="year.profileReview.status"><option>Da riconfermare</option><option>Confermata</option><option>Modificata</option><option>Review in corso</option></select></div>
+      <div class="field"><label>Data conferma</label><input data-path="year.profileReview.date" type="date"></div>
+      <div class="field wide"><label>Confermata / aggiornata da</label><input data-path="year.profileReview.by" type="text"></div>
+    </div>
+    <div class="grid">
+      <div class="field wide"><label>Denominazione</label><input data-path="profile.companyName" type="text" placeholder="Es. Alfa Industriale S.r.l."></div>
+      <div class="field"><label>Codice fiscale</label><input data-path="profile.taxCode" type="text" maxlength="16"></div>
+      <div class="field"><label>Partita IVA</label><input data-path="profile.vatNumber" type="text" maxlength="16"></div>
+      <div class="field"><label>Forma giuridica</label><input data-path="profile.legalForm" type="text" placeholder="S.p.A., S.r.l., S.c.a.r.l."></div>
+      <div class="field"><label>Sede legale</label><input data-path="profile.registeredOffice" type="text"></div>
+      <div class="field"><label>Data costituzione</label><input data-path="profile.incorporationDate" type="date"></div>
+      <div class="field"><label>Chiusura esercizio</label><input data-path="profile.yearEnd" type="text" placeholder="31 dicembre"></div>
+      <div class="field"><label>Codice ATECO</label><input data-path="profile.ateco" type="text"></div>
+      <div class="field wide"><label>Attività e modello operativo</label><textarea data-path="profile.businessDescription" placeholder="Descrizione sintetica del business, delle fonti di ricavo e delle specificità operative"></textarea></div>
+      <div class="field"><label>Principi contabili</label><select data-path="profile.accountingStandards"><option value="">—</option><option>OIC</option><option>IAS/IFRS</option><option>OIC con reporting IFRS</option><option>Altro</option></select></div>
+      <div class="field"><label>ERP / sistema contabile</label><input data-path="profile.erp" type="text"></div>
+      <div class="field"><label>Revisore / società di revisione</label><input data-path="profile.auditor" type="text"></div>
+      <div class="field"><label>Referente fiscale cliente</label><input data-path="profile.taxContact" type="text"></div>
+    </div>
+    <div class="observation-list" data-observations="profile_identity"></div>
+  </div>
 </section>
+
 <section class="block" id="profile-group">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Gruppo societario e consolidamento</h3><p>Distingue l'appartenenza al gruppo dal consolidamento contabile e dalle opzioni fiscali.</p></div><button class="btn small secondary" data-add-observation="profile_group">＋ Nuova rilevazione</button></div>
-<div class="grid">
-<div class="field"><label>Appartiene a un gruppo?</label><select data-condition="group" data-path="profile.group.isMember"><option value="">—</option><option value="no">No</option><option value="yes">Sì</option></select></div>
-<div class="field"><label>Capogruppo diretta</label><input data-path="profile.group.directParent" type="text"/></div>
-<div class="field"><label>Ultimate parent</label><input data-path="profile.group.ultimateParent" type="text"/></div>
-<div class="field"><label>Paese ultimate parent</label><input data-path="profile.group.ultimateCountry" type="text"/></div>
-<div class="field"><label>Consolidamento contabile</label><select data-path="profile.group.accountingConsolidation"><option value="">—</option><option>No</option><option>Integrale</option><option>Proporzionale</option><option>Patrimonio netto</option><option>Altro</option></select></div>
-<div class="field"><label>Perimetro rilevante per Pillar 2</label><select data-path="profile.group.pillar2Scope"><option value="">—</option><option>No</option><option>Sì</option><option>Da valutare</option></select></div>
-</div>
-<hr class="section-divider"/>
-<div class="panel-head"><div class="copy"><h3>Società del gruppo</h3><p>Elenco estendibile utilizzato anche per valutare la replicabilità di contestazioni e rilievi.</p></div><button class="btn small" data-add-record="groupEntities">＋ Aggiungi società</button></div>
-<div class="record-list" data-list="groupEntities"></div>
-<div class="observation-list" data-observations="profile_group"></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Gruppo societario e consolidamento</h3><p>Distingue l'appartenenza al gruppo dal consolidamento contabile e dalle opzioni fiscali.</p></div><button class="btn small secondary" data-add-observation="profile_group">＋ Nuova rilevazione</button></div>
+    <div class="grid">
+      <div class="field"><label>Appartiene a un gruppo?</label><select data-path="profile.group.isMember" data-condition="group"><option value="">—</option><option value="no">No</option><option value="yes">Sì</option></select></div>
+      <div class="field"><label>Capogruppo diretta</label><input data-path="profile.group.directParent" type="text"></div>
+      <div class="field"><label>Ultimate parent</label><input data-path="profile.group.ultimateParent" type="text"></div>
+      <div class="field"><label>Paese ultimate parent</label><input data-path="profile.group.ultimateCountry" type="text"></div>
+      <div class="field"><label>Consolidamento contabile</label><select data-path="profile.group.accountingConsolidation"><option value="">—</option><option>No</option><option>Integrale</option><option>Proporzionale</option><option>Patrimonio netto</option><option>Altro</option></select></div>
+      <div class="field"><label>Perimetro rilevante per Pillar 2</label><select data-path="profile.group.pillar2Scope"><option value="">—</option><option>No</option><option>Sì</option><option>Da valutare</option></select></div>
+    </div>
+    <hr class="section-divider">
+    <div class="panel-head"><div class="copy"><h3>Società del gruppo</h3><p>Elenco estendibile utilizzato anche per valutare la replicabilità di contestazioni e rilievi.</p></div><button class="btn small" data-add-record="groupEntities">＋ Aggiungi società</button></div>
+    <div class="record-list" data-list="groupEntities"></div>
+    <div class="observation-list" data-observations="profile_group"></div>
+  </div>
 </section>
+
 <section class="block" id="profile-consolidation">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Consolidato fiscale</h3><p>Ruolo, perimetro, durata dell'opzione e principali elementi trasferiti o riportabili.</p></div><button class="btn small secondary" data-add-observation="profile_consolidation">＋ Nuova rilevazione</button></div>
-<div class="grid">
-<div class="field"><label>Consolidato fiscale nazionale</label><select data-condition="taxConsolidation" data-path="profile.taxConsolidation.active"><option value="">—</option><option value="no">No</option><option value="yes">Sì</option><option value="assess">Da valutare</option></select></div>
-<div class="field"><label>Ruolo</label><select data-path="profile.taxConsolidation.role"><option value="">—</option><option>Consolidante</option><option>Consolidata</option></select></div>
-<div class="field"><label>Consolidante</label><input data-path="profile.taxConsolidation.parent" type="text"/></div>
-<div class="field"><label>Decorrenza opzione</label><input data-path="profile.taxConsolidation.startYear" max="2100" min="2000" type="number"/></div>
-<div class="field"><label>Scadenza / rinnovo</label><input data-path="profile.taxConsolidation.endYear" max="2100" min="2000" type="number"/></div>
-<div class="field"><label>Accordo di consolidamento</label><select data-path="profile.taxConsolidation.agreement"><option value="">—</option><option>Disponibile</option><option>Non disponibile</option><option>Da aggiornare</option></select></div>
-<div class="field"><label>Perdite ante-consolidato</label><input data-path="profile.taxConsolidation.preGroupLosses" placeholder="Importo / descrizione" type="text"/></div>
-<div class="field"><label>Tax assets trasferibili</label><input data-path="profile.taxConsolidation.transfers" placeholder="Crediti, interessi, ecc." type="text"/></div>
-<div class="field full"><label>Note permanenti</label><textarea data-path="profile.taxConsolidation.notes" placeholder="Criteri di remunerazione, vincoli, soggetti entrati o usciti, aspetti da monitorare"></textarea></div>
-</div>
-<div class="observation-list" data-observations="profile_consolidation"></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Consolidato fiscale</h3><p>Ruolo, perimetro, durata dell'opzione e principali elementi trasferiti o riportabili.</p></div><button class="btn small secondary" data-add-observation="profile_consolidation">＋ Nuova rilevazione</button></div>
+    <div class="grid">
+      <div class="field"><label>Consolidato fiscale nazionale</label><select data-path="profile.taxConsolidation.active" data-condition="taxConsolidation"><option value="">—</option><option value="no">No</option><option value="yes">Sì</option><option value="assess">Da valutare</option></select></div>
+      <div class="field"><label>Ruolo</label><select data-path="profile.taxConsolidation.role"><option value="">—</option><option>Consolidante</option><option>Consolidata</option></select></div>
+      <div class="field"><label>Consolidante</label><input data-path="profile.taxConsolidation.parent" type="text"></div>
+      <div class="field"><label>Decorrenza opzione</label><input data-path="profile.taxConsolidation.startYear" type="number" min="2000" max="2100"></div>
+      <div class="field"><label>Scadenza / rinnovo</label><input data-path="profile.taxConsolidation.endYear" type="number" min="2000" max="2100"></div>
+      <div class="field"><label>Accordo di consolidamento</label><select data-path="profile.taxConsolidation.agreement"><option value="">—</option><option>Disponibile</option><option>Non disponibile</option><option>Da aggiornare</option></select></div>
+      <div class="field"><label>Perdite ante-consolidato</label><input data-path="profile.taxConsolidation.preGroupLosses" type="text" placeholder="Importo / descrizione"></div>
+      <div class="field"><label>Tax assets trasferibili</label><input data-path="profile.taxConsolidation.transfers" type="text" placeholder="Crediti, interessi, ecc."></div>
+      <div class="field full"><label>Note permanenti</label><textarea data-path="profile.taxConsolidation.notes" placeholder="Criteri di remunerazione, vincoli, soggetti entrati o usciti, aspetti da monitorare"></textarea></div>
+    </div>
+    <div class="observation-list" data-observations="profile_consolidation"></div>
+  </div>
 </section>
+
 <section class="block" id="profile-regimes">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Regimi, opzioni e presidi permanenti</h3><p>Regimi fiscali e organizzativi che influenzano le procedure annuali.</p></div><button class="btn small" data-add-record="permanentFacts">＋ Aggiungi elemento</button></div>
-<div class="record-list" data-list="permanentFacts"></div>
-<div class="observation-list" data-observations="profile_regimes"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="profile_regimes">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Regimi, opzioni e presidi permanenti</h3><p>Regimi fiscali e organizzativi che influenzano le procedure annuali.</p></div><button class="btn small" data-add-record="permanentFacts">＋ Aggiungi elemento</button></div>
+    <div class="record-list" data-list="permanentFacts"></div>
+    <div class="observation-list" data-observations="profile_regimes"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="profile_regimes">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
 </div>
+
 <!-- TAX CALCULATION -->
 <div class="view" id="view-tax">
 <div class="view-head"><h2><span class="num">III · Fascicolo annuale</span>Calcolo imposte e reporting package</h2><p class="bd">Procedure e risultanze del calcolo imposte. I controlli su Redditi SC, IRAP e CNM stanno nella scheda “Dichiarativi”. L'indice raggruppa i blocchi in Impostazione, Analisi dell'esercizio e Verifiche &amp; fiscalità.</p></div>
 <div class="subnav" data-subnav="tax"></div>
-<div class="irl-inline-summary" data-irl-summary="tax" id="irl-summary-tax"></div>
+<div class="irl-inline-summary" id="irl-summary-tax" data-irl-summary="tax"></div>
 <section class="block" id="tax-engagement">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Incarico, periodo e materialità</h3><p>Imposta il perimetro del lavoro e le soglie comunicate dal team di revisione.</p></div><button class="btn small secondary" data-add-observation="tax_engagement">＋ Nuova rilevazione</button></div>
-<div class="grid">
-<div class="field"><label>Anno d'imposta</label><input data-path="year.year" max="2100" min="2000" type="number"/></div>
-<div class="field"><label>Tipo attività</label><select data-path="year.engagement.type"><option value="">—</option><option>Calcolo imposte civilistico</option><option>Reporting package</option><option>Tax provision IFRS</option><option>Interim / hard close</option><option>Altro</option></select></div>
-<div class="field"><label>Scadenza concordata</label><input data-path="year.engagement.deadline" type="date"/></div>
-<div class="field"><label>Stato attività</label><select data-path="year.engagement.status"><option>Da avviare</option><option>In corso</option><option>In review</option><option>In discussione</option><option>Conclusa</option></select></div>
-<div class="field"><label>Materialità complessiva</label><input data-path="year.engagement.overallMateriality" step="0.01" type="number"/></div>
-<div class="field"><label>Performance materiality</label><input data-path="year.engagement.performanceMateriality" step="0.01" type="number"/></div>
-<div class="field"><label>Clearly trivial</label><input data-path="year.engagement.clearlyTrivial" step="0.01" type="number"/></div>
-<div class="field"><label>Valuta</label><input data-path="year.engagement.currency" type="text" value="EUR"/></div>
-<div class="field"><label>Preparer</label><input data-path="year.engagement.preparer" type="text"/></div>
-<div class="field"><label>Reviewer</label><input data-path="year.engagement.reviewer" type="text"/></div>
-<div class="field"><label>Data review</label><input data-path="year.engagement.reviewDate" type="date"/></div>
-<div class="field"><label>Team di revisione / referente</label><input data-path="year.engagement.auditContact" type="text"/></div>
-</div>
-<div class="observation-list" data-observations="tax_engagement"></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Incarico, periodo e materialità</h3><p>Imposta il perimetro del lavoro e le soglie comunicate dal team di revisione.</p></div><button class="btn small secondary" data-add-observation="tax_engagement">＋ Nuova rilevazione</button></div>
+    <div class="grid">
+      <div class="field"><label>Anno d'imposta</label><input data-path="year.year" type="number" min="2000" max="2100"></div>
+      <div class="field"><label>Tipo attività</label><select data-path="year.engagement.type"><option value="">—</option><option>Calcolo imposte civilistico</option><option>Reporting package</option><option>Tax provision IFRS</option><option>Interim / hard close</option><option>Altro</option></select></div>
+      <div class="field"><label>Scadenza concordata</label><input data-path="year.engagement.deadline" type="date"></div>
+      <div class="field"><label>Stato attività</label><select data-path="year.engagement.status"><option>Da avviare</option><option>In corso</option><option>In review</option><option>In discussione</option><option>Conclusa</option></select></div>
+      <div class="field"><label>Materialità complessiva</label><input data-path="year.engagement.overallMateriality" type="number" step="0.01"></div>
+      <div class="field"><label>Performance materiality</label><input data-path="year.engagement.performanceMateriality" type="number" step="0.01"></div>
+      <div class="field"><label>Clearly trivial</label><input data-path="year.engagement.clearlyTrivial" type="number" step="0.01"></div>
+      <div class="field"><label>Valuta</label><input data-path="year.engagement.currency" type="text" value="EUR"></div>
+      <div class="field"><label>Preparer</label><input data-path="year.engagement.preparer" type="text"></div>
+      <div class="field"><label>Reviewer</label><input data-path="year.engagement.reviewer" type="text"></div>
+      <div class="field"><label>Data review</label><input data-path="year.engagement.reviewDate" type="date"></div>
+      <div class="field"><label>Team di revisione / referente</label><input data-path="year.engagement.auditContact" type="text"></div>
+    </div>
+    <div class="observation-list" data-observations="tax_engagement"></div>
+  </div>
 </section>
+
+
 <section class="block" id="tax-business">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Business e cambiamenti dell'anno</h3><p>Nuove attività, mercati, finanziamenti, sistemi, incentivi o variazioni organizzative con potenziali effetti fiscali.</p></div><button class="btn small" data-add-record="businessChanges">＋ Aggiungi cambiamento</button></div>
-<div class="record-list" data-list="businessChanges"></div>
-<div class="observation-list" data-observations="tax_business"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_business">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Business e cambiamenti dell'anno</h3><p>Nuove attività, mercati, finanziamenti, sistemi, incentivi o variazioni organizzative con potenziali effetti fiscali.</p></div><button class="btn small" data-add-record="businessChanges">＋ Aggiungi cambiamento</button></div>
+    <div class="record-list" data-list="businessChanges"></div>
+    <div class="observation-list" data-observations="tax_business"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_business">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-extraordinary">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Operazioni straordinarie</h3><p>Ogni operazione è gestita come scheda autonoma, con effetti giuridici, contabili e fiscali, tax attributes e interpelli.</p></div><button class="btn small" data-add-record="extraordinaryOps">＋ Aggiungi operazione</button></div>
-<div class="record-list" data-list="extraordinaryOps"></div>
-<div class="observation-list" data-observations="tax_extraordinary"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_extraordinary">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Operazioni straordinarie</h3><p>Ogni operazione è gestita come scheda autonoma, con effetti giuridici, contabili e fiscali, tax attributes e interpelli.</p></div><button class="btn small" data-add-record="extraordinaryOps">＋ Aggiungi operazione</button></div>
+    <div class="record-list" data-list="extraordinaryOps"></div>
+    <div class="observation-list" data-observations="tax_extraordinary"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_extraordinary">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-disputes">
-<div class="panel error-panel">
-<div class="panel-head"><div class="copy"><h3>Contestazioni, verifiche e contenziosi</h3><p>Oltre alla posizione della società, valuta espressamente se la contestazione sia replicabile su altri periodi d'imposta o su altre società del gruppo.</p></div><button class="btn small" data-add-record="disputes">＋ Aggiungi posizione</button></div>
-<div class="record-list" data-list="disputes"></div>
-<div class="observation-list" data-observations="tax_disputes"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_disputes">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel error-panel">
+    <div class="panel-head"><div class="copy"><h3>Contestazioni, verifiche e contenziosi</h3><p>Oltre alla posizione della società, valuta espressamente se la contestazione sia replicabile su altri periodi d'imposta o su altre società del gruppo.</p></div><button class="btn small" data-add-record="disputes">＋ Aggiungi posizione</button></div>
+    <div class="record-list" data-list="disputes"></div>
+    <div class="observation-list" data-observations="tax_disputes"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_disputes">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-assets">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Tax assets e carry-forward</h3><p>Perdite fiscali, interessi, ROL, eccedenze ACE pregresse, crediti, disallineamenti e imposte sostitutive.</p></div><button class="btn small" data-add-record="taxAssets">＋ Aggiungi tax asset</button></div>
-<div class="record-list" data-list="taxAssets"></div>
-<div class="observation-list" data-observations="tax_assets"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_assets">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Tax assets e carry-forward</h3><p>Perdite fiscali, interessi, ROL, eccedenze ACE pregresse, crediti, disallineamenti e imposte sostitutive.</p></div><button class="btn small" data-add-record="taxAssets">＋ Aggiungi tax asset</button></div>
+    <div class="record-list" data-list="taxAssets"></div>
+    <div class="observation-list" data-observations="tax_assets"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_assets">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-checks">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Controlli sul calcolo imposte</h3><p>Checklist estendibile per variazioni IRES e IRAP, riconciliazioni, formule, componenti fiscali e documenti a supporto.</p></div><button class="btn small" data-add-record="taxChecks">＋ Aggiungi controllo</button></div>
-<div class="record-list" data-list="taxChecks"></div>
-<div class="observation-list" data-observations="tax_checks"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_checks">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-tax-checks">Carica checklist base</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Controlli sul calcolo imposte</h3><p>Checklist estendibile per variazioni IRES e IRAP, riconciliazioni, formule, componenti fiscali e documenti a supporto.</p></div><button class="btn small" data-add-record="taxChecks">＋ Aggiungi controllo</button></div>
+    <div class="record-list" data-list="taxChecks"></div>
+    <div class="observation-list" data-observations="tax_checks"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_checks">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-tax-checks">Carica checklist base</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-international">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Fiscalità internazionale e intercompany</h3><p>CFC, ritenute, cash pooling, finanziamenti, royalties, transfer pricing, ibridi e Global Minimum Tax.</p></div><button class="btn small" data-add-record="internationalItems">＋ Aggiungi tema</button></div>
-<div class="record-list" data-list="internationalItems"></div>
-<div class="observation-list" data-observations="tax_international"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_international">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Fiscalità internazionale e intercompany</h3><p>CFC, ritenute, cash pooling, finanziamenti, royalties, transfer pricing, ibridi e Global Minimum Tax.</p></div><button class="btn small" data-add-record="internationalItems">＋ Aggiungi tema</button></div>
+    <div class="record-list" data-list="internationalItems"></div>
+    <div class="observation-list" data-observations="tax_international"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_international">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
+
 <section class="block" id="tax-deferred">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Imposte anticipate e differite</h3><p>Riconcilia saldo iniziale, movimenti dell'esercizio, utilizzi, nuove iscrizioni e saldo finale per singola differenza temporanea.</p></div><button class="btn small" data-add-record="deferredTaxes">＋ Aggiungi differenza</button></div>
-<div class="record-list" data-list="deferredTaxes"></div>
-<div class="observation-list" data-observations="tax_deferred"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="tax_deferred">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Imposte anticipate e differite</h3><p>Riconcilia saldo iniziale, movimenti dell'esercizio, utilizzi, nuove iscrizioni e saldo finale per singola differenza temporanea.</p></div><button class="btn small" data-add-record="deferredTaxes">＋ Aggiungi differenza</button></div>
+    <div class="record-list" data-list="deferredTaxes"></div>
+    <div class="observation-list" data-observations="tax_deferred"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="tax_deferred">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
 </div>
+
 <!-- RETURNS -->
 <div class="view" id="view-returns">
 <div class="view-head"><h2><span class="num">IV · Scheda separata</span>Modelli dichiarativi</h2><p class="bd">Area autonoma rispetto al calcolo imposte: bozze dichiarative, riconciliazioni con bilancio e tax computation, riporti e evidenze di trasmissione.</p></div>
 <div class="subnav" data-subnav="returns"></div>
-<div class="irl-inline-summary" data-irl-summary="returns" id="irl-summary-returns"></div>
+<div class="irl-inline-summary" id="irl-summary-returns" data-irl-summary="returns"></div>
 <section class="block" id="returns-models">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Perimetro dichiarativo</h3><p>Definisci i modelli oggetto del lavoro e la versione effettivamente verificata.</p></div><button class="btn small" data-add-record="returnModels">＋ Aggiungi modello</button></div>
-<div class="record-list" data-list="returnModels"></div>
-<div class="observation-list" data-observations="returns_models"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="returns_models">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-return-models">Carica modelli base</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Perimetro dichiarativo</h3><p>Definisci i modelli oggetto del lavoro e la versione effettivamente verificata.</p></div><button class="btn small" data-add-record="returnModels">＋ Aggiungi modello</button></div>
+    <div class="record-list" data-list="returnModels"></div>
+    <div class="observation-list" data-observations="returns_models"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="returns_models">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-return-models">Carica modelli base</button></div>
+  </div>
 </section>
+
+
 <section class="block" id="returns-checks">
-<div class="panel">
-<div class="panel-head"><div class="copy"><h3>Controlli dichiarativi</h3><p>Frontespizio, firme, quadri, tax assets, crediti, acconti, TP, operazioni straordinarie e riconciliazioni.</p></div><button class="btn small" data-add-record="returnChecks">＋ Aggiungi controllo</button></div>
-<div class="record-list" data-list="returnChecks"></div>
-<div class="observation-list" data-observations="returns_checks"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="returns_checks">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-return-checks">Carica checklist base</button></div>
-</div>
+  <div class="panel">
+    <div class="panel-head"><div class="copy"><h3>Controlli dichiarativi</h3><p>Frontespizio, firme, quadri, tax assets, crediti, acconti, TP, operazioni straordinarie e riconciliazioni.</p></div><button class="btn small" data-add-record="returnChecks">＋ Aggiungi controllo</button></div>
+    <div class="record-list" data-list="returnChecks"></div>
+    <div class="observation-list" data-observations="returns_checks"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="returns_checks">＋ Nuova rilevazione libera</button><button class="btn ghost small" id="seed-return-checks">Carica checklist base</button></div>
+  </div>
 </section>
+
 <section class="block" id="returns-tp">
-<div class="panel warn-panel">
-<div class="panel-head"><div class="copy"><h3>Transfer pricing e adempimenti connessi</h3><p>Disponibilità dei documenti, flag dichiarativo, firma digitale e marca temporale, APA/BAPA e coerenza con i flussi intercompany.</p></div><button class="btn small" data-add-record="tpItems">＋ Aggiungi rilevazione</button></div>
-<div class="record-list" data-list="tpItems"></div>
-<div class="observation-list" data-observations="returns_tp"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="returns_tp">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel warn-panel">
+    <div class="panel-head"><div class="copy"><h3>Transfer pricing e adempimenti connessi</h3><p>Disponibilità dei documenti, flag dichiarativo, firma digitale e marca temporale, APA/BAPA e coerenza con i flussi intercompany.</p></div><button class="btn small" data-add-record="tpItems">＋ Aggiungi rilevazione</button></div>
+    <div class="record-list" data-list="tpItems"></div>
+    <div class="observation-list" data-observations="returns_tp"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="returns_tp">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
 </div>
+
 <!-- OPEN POINTS -->
 <div class="view" id="view-openpoints">
 <div class="view-head"><h2><span class="num">V · Esiti del lavoro</span>Open points, adjustment e conclusioni</h2><p class="bd">Centralizza domande, evidenze, risposte, importi, rischi e conclusioni. I punti possono essere collegati a qualsiasi area del fascicolo.</p></div>
 <div class="subnav" data-subnav="openpoints"></div>
 <section class="block" id="op-open">
-<div class="panel error-panel">
-<div class="panel-head"><div class="copy"><h3>Open points</h3><p>Ogni punto ha owner, scadenza, materialità, stato, risposta ricevuta e adjustment proposto o registrato.</p></div><button class="btn small" data-add-record="openPoints">＋ Aggiungi open point</button></div>
-<div class="record-list" data-list="openPoints"></div>
-<div class="observation-list" data-observations="open_points"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="open_points">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel error-panel">
+    <div class="panel-head"><div class="copy"><h3>Open points</h3><p>Ogni punto ha owner, scadenza, materialità, stato, risposta ricevuta e adjustment proposto o registrato.</p></div><button class="btn small" data-add-record="openPoints">＋ Aggiungi open point</button></div>
+    <div class="record-list" data-list="openPoints"></div>
+    <div class="observation-list" data-observations="open_points"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="open_points">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
 <section class="block" id="op-conclusions">
-<div class="panel ok-panel">
-<div class="panel-head"><div class="copy"><h3>Conclusioni e memorandum</h3><p>Conclusioni per area, esito complessivo, limiti del lavoro e aspetti da riportare nell'esercizio successivo.</p></div><button class="btn small" data-add-record="conclusions">＋ Aggiungi conclusione</button></div>
-<div class="record-list" data-list="conclusions"></div>
-<div class="observation-list" data-observations="conclusions"></div>
-<div class="btn-row"><button class="btn secondary small" data-add-observation="conclusions">＋ Nuova rilevazione libera</button></div>
-</div>
+  <div class="panel ok-panel">
+    <div class="panel-head"><div class="copy"><h3>Conclusioni e memorandum</h3><p>Conclusioni per area, esito complessivo, limiti del lavoro e aspetti da riportare nell'esercizio successivo.</p></div><button class="btn small" data-add-record="conclusions">＋ Aggiungi conclusione</button></div>
+    <div class="record-list" data-list="conclusions"></div>
+    <div class="observation-list" data-observations="conclusions"></div>
+    <div class="btn-row"><button class="btn secondary small" data-add-observation="conclusions">＋ Nuova rilevazione libera</button></div>
+  </div>
 </section>
 </div>
+
 <!-- ARCHIVE -->
 <div class="view" id="view-archive">
 <section class="block archive-layout">
-<div class="clients-heading"><div><h2>Clienti e archivio</h2><p>Qui gestisci i fascicoli salvati, il riporto annuale e le esportazioni. La compilazione resta separata da questa area.</p></div></div>
-<div class="panel" id="clients-saved">
-<div class="panel-head"><div class="copy"><h3>Clienti salvati</h3><p>Fascicoli presenti esclusivamente su questo dispositivo.</p></div><button class="btn secondary small" id="archive-demo" type="button">Carica esempio Alfa</button></div>
-<div class="saved-list" id="saved-files"></div>
-</div>
-<div class="panel" id="clients-current">
-<h3>Fascicolo corrente</h3><p>Salva il lavoro oppure crea un nuovo cliente o esercizio.</p>
-<div class="btn-row"><button class="btn" id="save-current">Salva fascicolo</button><button class="btn secondary" id="new-client">Nuovo cliente</button><button class="btn ghost" id="new-year">Nuovo esercizio</button><button class="btn ghost" id="duplicate-year">Riporta esercizio</button></div>
-</div>
-<div class="panel export-card" id="clients-export">
-<h3>Export e backup</h3><p>Excel e PDF seguono la modalità di lavoro selezionata. Il JSON conserva il fascicolo completo.</p>
-<div class="btn-row"><button class="btn" id="export-excel">Esporta Excel</button><button class="btn secondary" id="export-pdf">Esporta PDF</button><button class="btn ghost" id="export-json">Esporta JSON</button><label class="btn ghost" for="import-json">Importa JSON</label><input accept=".json" id="import-json" type="file"/><button class="btn ghost" id="export-report">Report HTML</button><button class="btn danger" id="clear-current">Azzera corrente</button></div>
-<div id="export-notice"></div>
-</div>
-<div class="data-protection-note">I dati restano nel browser. Conserva i backup esclusivamente in ambienti autorizzati e conformi alle policy dell’incarico.</div>
+  <div class="clients-heading"><div><h2>Clienti e archivio</h2><p>Qui gestisci i fascicoli salvati, il riporto annuale e le esportazioni. La compilazione resta separata da questa area.</p></div></div>
+  <div class="panel" id="clients-saved">
+    <div class="panel-head"><div class="copy"><h3>Clienti salvati</h3><p>Fascicoli presenti esclusivamente su questo dispositivo.</p></div><button class="btn secondary small" id="archive-demo" type="button">Carica esempio Alfa</button></div>
+    <div id="saved-files" class="saved-list"></div>
+  </div>
+  <div class="panel" id="clients-current">
+    <h3>Fascicolo corrente</h3><p>Salva il lavoro oppure crea un nuovo cliente o esercizio.</p>
+    <div class="btn-row"><button class="btn" id="save-current">Salva fascicolo</button><button class="btn secondary" id="new-client">Nuovo cliente</button><button class="btn ghost" id="new-year">Nuovo esercizio</button><button class="btn ghost" id="duplicate-year">Riporta esercizio</button></div>
+  </div>
+  <div class="panel export-card" id="clients-export">
+    <h3>Export e backup</h3><p>Excel e PDF seguono la modalità di lavoro selezionata. Il JSON conserva il fascicolo completo.</p>
+    <div class="btn-row"><button class="btn" id="export-excel">Esporta Excel</button><button class="btn secondary" id="export-pdf">Esporta PDF</button><button class="btn ghost" id="export-json">Esporta JSON</button><label class="btn ghost" for="import-json">Importa JSON</label><input type="file" id="import-json" accept=".json"><button class="btn ghost" id="export-report">Report HTML</button><button class="btn danger" id="clear-current">Azzera corrente</button></div>
+    <div id="export-notice"></div>
+  </div>
+  <div class="data-protection-note">I dati restano nel browser. Conserva i backup esclusivamente in ambienti autorizzati e conformi alle policy dell’incarico.</div>
 </section>
 </div>
 </main>
 <footer class="foot"><div class="disclaimer">Strumento indipendente di supporto operativo, sviluppato sulla base dell'esperienza professionale dell'autore.﻿​‌​‌​​‌​​‌‌​‌​​‌​‌‌​​​‌‌​‌‌​​​‌‌​‌‌​​​​‌​‌‌‌​​‌​​‌‌​​‌​​​‌‌​‌‌‌‌​​‌​​​​​​‌​‌‌​‌​​‌‌​​‌​‌​‌‌​​‌​​​‌‌​​‌​​​‌‌​​​​‌​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​‌​​​‌‌​​​​‌​‌‌‌‌​​​​​‌​​​​​​‌​​​​​‌​‌‌‌​‌​‌​‌‌‌​‌​​​‌‌​‌‌‌‌​‌‌​‌‌​‌​‌‌​​​​‌​‌‌‌​‌​​​‌‌​‌​​‌​‌‌​‌‌‌‌​‌‌​‌‌‌​​​‌​​​​​​‌​​‌‌​​​‌‌​​​​‌​‌‌​​​‌​​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​‌​​​‌​​​‌‌​​‌​​​​​‌​​‌​​​​​​‌​​​​‌‌​‌‌​‌‌​​​‌‌​‌​​‌​‌‌​​‌​‌​‌‌​‌‌‌​​‌‌‌​‌​​​​‌​​​​​​‌​​​‌‌​​‌‌​‌​​‌​‌‌​‌‌​​​‌‌​​‌​‌​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​​‌‌​​‌​​​‌‌​​​​​​‌‌​​‌​​​‌‌​‌‌​​​‌​​​​​​‌‌‌‌‌​​​​‌​​​​​​‌​‌​​‌​​‌​‌‌​‌​​​‌​‌‌​‌​‌​‌​‌​​​‌​​​‌‌​​‌​​​​​‌​​‌​‌‌​‌​​‌‌​​‌​​​‌‌​​​​​​‌‌​​‌​​​‌‌​‌‌​​​‌​‌‌​‌​​‌‌​‌‌‌​‌‌​​​‌‌​​‌‌​‌​​​‌‌​​‌​‌​​‌‌‌​​‌​​‌‌​​​‌﻿ Non sostituisce il giudizio professionale, le procedure di audit, le istruzioni dichiarative o l'analisi della normativa applicabile al caso concreto.</div><div class="meta">Elaborazione locale · nessun dato lascia il browser · fascicolo pluriennale · Excel e PDF strutturati · open access</div></footer>
 </div><!-- /.app-main -->
-<div class="modal-ov" id="year-modal"><div class="modal"><button class="close-btn" data-close="year-modal" type="button">×</button><h3>Crea un nuovo esercizio</h3><p class="sub">Puoi creare un fascicolo vuoto oppure riportare quello corrente. I dati riportati vengono marcati come “Da riconfermare”.</p>
-<div class="grid three">
-<div class="field"><label>Nuovo anno</label><input id="modal-new-year" max="2100" min="2000" type="number"/></div>
-<div class="field"><label>Modalità</label><select id="modal-year-mode"><option value="blank">Fascicolo vuoto</option><option value="carry">Riporta esercizio corrente</option></select></div>
-<div class="field"><label>Conserva open points?</label><select id="modal-carry-open"><option value="open">Solo punti ancora aperti</option><option value="all">Tutti</option><option value="none">Nessuno</option></select></div>
-</div>
-<div class="modal-actions"><button class="btn ghost" data-close="year-modal">Annulla</button><button class="btn" id="confirm-new-year">Crea esercizio</button></div>
+
+<div class="modal-ov" id="year-modal"><div class="modal"><button class="close-btn" type="button" data-close="year-modal">×</button><h3>Crea un nuovo esercizio</h3><p class="sub">Puoi creare un fascicolo vuoto oppure riportare quello corrente. I dati riportati vengono marcati come “Da riconfermare”.</p>
+  <div class="grid three">
+    <div class="field"><label>Nuovo anno</label><input id="modal-new-year" type="number" min="2000" max="2100"></div>
+    <div class="field"><label>Modalità</label><select id="modal-year-mode"><option value="blank">Fascicolo vuoto</option><option value="carry">Riporta esercizio corrente</option></select></div>
+    <div class="field"><label>Conserva open points?</label><select id="modal-carry-open"><option value="open">Solo punti ancora aperti</option><option value="all">Tutti</option><option value="none">Nessuno</option></select></div>
+  </div>
+  <div class="modal-actions"><button class="btn ghost" data-close="year-modal">Annulla</button><button class="btn" id="confirm-new-year">Crea esercizio</button></div>
 </div></div>
-<div class="modal-ov" id="irl-request-modal"><div class="modal irl-request-modal"><button class="close-btn" data-close="irl-request-modal" type="button">×</button><h3>Genera richiesta documentale</h3><p class="sub">Il testo include i documenti ancora pending nella vista selezionata. Puoi modificarlo prima di copiarlo.</p>
-<div class="grid three">
-<div class="field"><label>Tipo comunicazione</label><select id="irl-request-type"><option value="first">Prima richiesta</option><option value="reminder">Sollecito</option></select></div>
-<div class="field"><label>Area</label><select id="irl-request-area"><option value="tax">Calcolo imposte</option><option value="returns">Dichiarativi</option><option value="all">Entrambe</option></select></div>
-<div class="field"><label>Scadenza richiesta</label><input id="irl-request-deadline" type="date"/></div>
-<div class="field full"><label>Testo generato</label><textarea id="irl-request-text" style="min-height:340px"></textarea></div>
-</div>
-<div class="modal-actions"><button class="btn ghost" data-close="irl-request-modal">Chiudi</button><button class="btn secondary" id="regenerate-irl-request" type="button">Rigenera</button><button class="btn" id="copy-irl-request" type="button">Copia testo</button></div>
+
+<div class="modal-ov" id="irl-request-modal"><div class="modal irl-request-modal"><button class="close-btn" type="button" data-close="irl-request-modal">×</button><h3>Genera richiesta documentale</h3><p class="sub">Il testo include i documenti ancora pending nella vista selezionata. Puoi modificarlo prima di copiarlo.</p>
+  <div class="grid three">
+    <div class="field"><label>Tipo comunicazione</label><select id="irl-request-type"><option value="first">Prima richiesta</option><option value="reminder">Sollecito</option></select></div>
+    <div class="field"><label>Area</label><select id="irl-request-area"><option value="tax">Calcolo imposte</option><option value="returns">Dichiarativi</option><option value="all">Entrambe</option></select></div>
+    <div class="field"><label>Scadenza richiesta</label><input id="irl-request-deadline" type="date"></div>
+    <div class="field full"><label>Testo generato</label><textarea id="irl-request-text" style="min-height:340px"></textarea></div>
+  </div>
+  <div class="modal-actions"><button class="btn ghost" data-close="irl-request-modal">Chiudi</button><button class="btn secondary" id="regenerate-irl-request" type="button">Rigenera</button><button class="btn" id="copy-irl-request" type="button">Copia testo</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
-<button aria-label="Torna all’inizio" id="back-to-top" title="Torna all’inizio" type="button">↑</button>
+<button id="back-to-top" type="button" title="Torna all’inizio" aria-label="Torna all’inizio">↑</button>
+
 <script data-vendored="SheetJS 0.18.5">
 
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
@@ -2039,22 +2078,22 @@ function renderAll(){ensureCommentary();hydrateFixed();renderAllRecords();render
    if(persist){try{localStorage.setItem('tal-language',lang)}catch(e){}}
  }
  buttons.forEach(btn=>btn.addEventListener('click',()=>setLang(btn.dataset.talLang)));
- let initial='it';try{initial=localStorage.getItem('tal-language')||'it'}catch(e){}
- setLang(initial,false);
+ setLang('it',false);
 })();
 </script>
 
+<script id="tal-tool-language-routes">
 document.addEventListener("click",function(event){
   const trigger=event.target.closest("[data-tal-lang]");
   if(!trigger)return;
   const lang=trigger.getAttribute("data-tal-lang");
   const routes={"it":"/tools/tfa-client-file/","en":"/en/tools/tfa-client-file/","es":"/es/tools/tfa-client-file/"};
-  if(routes[lang]){
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    window.location.href=routes[lang];
-  }
+  if(!routes[lang])return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  if(lang==="it")return;
+  window.location.href=routes[lang];
 },true);
-
-ody&gt;
-</body></html>
+</script>
+</body>
+</html>

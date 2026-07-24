@@ -34,16 +34,12 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 <link href="https://taxautomationlab.com/en/insights/ias-ifrs-to-italian-statutory-financial-statements/" hreflang="en" rel="alternate"/>
 <link href="https://taxautomationlab.com/es/analisis/reclasificacion-ias-ifrs-estados-financieros-italianos/" hreflang="es" rel="alternate"/>
 <link href="https://taxautomationlab.com/approfondimenti/riclassificazione-bilancio-ias-ifrs-oic/" hreflang="x-default" rel="alternate"/>
+<style id="tal-v634-touch-targets">.button{min-height:44px!important}.lang a,.lang button{min-width:44px!important;min-height:44px!important;height:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}</style>
 </head>
 <body>
 <header class="topbar"><div class="wrap nav">
-<a class="brand" href="/">Tax Automation Lab</a>
-<nav aria-label="Navigazione principale" class="nav-links">
-<a data-i18n="common_home" href="/">Home</a>
-<a data-i18n="common_insights" href="/approfondimenti/">Approfondimenti</a>
-<a data-i18n="common_tool" href="/tools/financial-statement/">Apri il tool</a>
-<a data-i18n="common_guide" download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Scarica la guida (PDF)</a>
-</nav>
+<a class="brand" href="/?skipIntro=1">Tax Automation Lab</a>
+<nav aria-label="Navigazione principale" class="nav-links"><a href="/?skipIntro=1">Home</a><a href="/tools/">Strumenti</a><a href="/approfondimenti/">Approfondimenti</a><a download="Guida_Automazione_Processi_Fiscali_Riccardo_Zedda.pdf" href="/resources/guida-automazione-processi-fiscali.pdf">Guida</a></nav>
 <div aria-label="Selezione lingua" class="lang">
 <button aria-pressed="true" class="active" data-lang="it" type="button">ITA</button>
 <button aria-pressed="false" data-lang="en" type="button">ENG</button>
@@ -114,8 +110,7 @@ a{color:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
     if(persist){try{localStorage.setItem('tal-language',lang)}catch(e){}}
   }
   buttons.forEach(btn=>btn.addEventListener('click',()=>setLang(btn.dataset.lang)));
-  let initial='it';try{initial=localStorage.getItem('tal-language')||'it'}catch(e){}
-  setLang(initial,false);
+  setLang('it',false);
 })();
 </script>
 <script id="tal-language-routes">

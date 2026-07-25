@@ -1,0 +1,24 @@
+THIRD-PARTY NOTICES
+
+The TaxTool HTML files contain vendored third-party JavaScript libraries so
+that the applications can operate locally as single files.
+
+Libraries identified in the published files:
+- SheetJS Community Edition 0.20.3
+- jsPDF 4.2.1
+- jsPDF AutoTable 5.0.8
+
+The original copyright and licence notices embedded in those libraries are
+preserved inside each distributed HTML file. The libraries remain subject to
+their respective licences and are not relicensed by the Tax Automation Lab
+MIT licence.
+
+Official project references:
+- https://sheetjs.com/
+- https://github.com/parallax/jsPDF
+- https://github.com/simonbengtsson/jsPDF-AutoTable
+
+Vendored SheetJS CE build verification:
+- File: xlsx.full.min.js 0.20.3 (embedded in each operational tool HTML)
+- MD5: 6b3130af1ceadf07caa0ec08af7addff
+- SHA-256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41

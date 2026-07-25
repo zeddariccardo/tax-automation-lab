@@ -1,0 +1,11 @@
+SITE, BRAND AND CONTENT NOTICE
+
+Copyright (c) 2026 Riccardo Zedda. All rights reserved.
+
+Unless a specific licence states otherwise, the Tax Automation Lab website,
+its original texts, visual design, logo, photography, project name and brand
+identity are not distributed under the MIT licence.
+
+The software tools are licensed under MIT.
+The guide is licensed under CC BY-NC-ND 4.0.
+Third-party components remain subject to their respective licences.

@@ -1,0 +1,152 @@
+{
+  "release": "v6.9.0",
+  "date": "2026-07-25",
+  "status": "production_candidate_passed",
+  "site": {
+    "html_files": 48,
+    "javascript_blocks_syntax_checked": 118,
+    "structured_data_blocks_skipped_by_js_parser": 36,
+    "structural_audit": "PASS"
+  },
+  "sheetjs": {
+    "version": "0.20.3",
+    "official_file_md5": "6b3130af1ceadf07caa0ec08af7addff",
+    "official_file_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+    "tool_pages": [
+      {
+        "page": "en/tools/financial-statement/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "en/tools/lipe/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "en/tools/tfa-client-file/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "es/tools/financial-statement/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "es/tools/lipe/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "es/tools/tfa-client-file/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "tools/financial-statement/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "tools/lipe/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      },
+      {
+        "page": "tools/tfa-client-file/index.html",
+        "sheetjs_version": "0.20.3",
+        "embedded_bytes": 951904,
+        "embedded_sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41",
+        "exact_official_build": true
+      }
+    ],
+    "all_exact": true
+  },
+  "browser_load": {
+    "method": "Chromium headless using page.set_content (inline/offline execution)",
+    "pages_tested": 9,
+    "xlsx_version_on_all_pages": "0.20.3",
+    "result": "PASS",
+    "note": "Direct file:// and localhost navigation are blocked by the execution environment administrator. Inline monofile execution and tool workflows were tested instead."
+  },
+  "financial_statement": {
+    "version": "1.1.2",
+    "excel_import_accounts": 15,
+    "ui_totals": [
+      "Totale attivo",
+      "Totale passivo"
+    ],
+    "excel_export_totals": [
+      "TOTALE ATTIVO",
+      "TOTALE PASSIVO"
+    ],
+    "pdf_export_totals": [
+      "Totale attivo",
+      "Totale passivo"
+    ],
+    "excel_output_sha256": "23a69adc32a2562f590c4f1937e92f2e5832bffa3261e31601d718774ac1108f",
+    "pdf_output_sha256": "6f596c6a812c3b9932db2731a3e5db9146dc1f7907d1e742d45cc03b9708a8c1",
+    "result": "PASS"
+  },
+  "tfa": {
+    "version": "1.6.2",
+    "import_preview": {
+      "anagrafica": 6,
+      "analitica": 2,
+      "commentary": 2,
+      "altro": 1
+    },
+    "imported_company": "Gamma Test S.r.l.",
+    "mode_switch": "schematic_to_commentary",
+    "template_sheets": [
+      "Istruzioni",
+      "Anagrafica",
+      "Analitica",
+      "Commentary"
+    ],
+    "export_sheets": [
+      "Commentary"
+    ],
+    "result": "PASS"
+  },
+  "lipe": {
+    "version": "3.2.4",
+    "demo_mapping_rows": 7,
+    "demo_period_rows": 9,
+    "mapping_reimport_rows": 7,
+    "amounts_reimport_rows": 4,
+    "import_issues": 0,
+    "outputs": [
+      "LIPE codiciario",
+      "LIPE importi",
+      "LIPE working paper"
+    ],
+    "result": "PASS"
+  },
+  "regression": {
+    "application_code_vs_v6.9.0_rc": "Identical after removing SheetJS blocks and normalising TFA/LIPE patch version strings",
+    "result": "PASS"
+  },
+  "post_deployment": {
+    "cloudflare_it_redirect": "Pending hosting rule",
+    "guide_pdf_rebuild": "Pending editable source",
+    "production_smoke_test": "Required after GitHub Pages deployment and cache purge"
+  }
+}

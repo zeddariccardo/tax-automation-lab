@@ -1,0 +1,396 @@
+{
+  "release": "v6.8.0",
+  "date": "2026-07-25",
+  "base": "v6.7.1 Excel-import hotfix",
+  "scope": [
+    "future-proof AI onboarding copy",
+    "alternating homepage accents",
+    "unified responsive header",
+    "mobile dock removal",
+    "Goldman Sachs profile reference",
+    "footer link colour",
+    "AI CTA labels",
+    "real TFA screenshots",
+    "typography alignment",
+    "IT/EN/ES parity"
+  ],
+  "static_audit": {
+    "html_files": 48,
+    "result": "PASS",
+    "internal_targets": "PASS",
+    "canonical_and_social_metadata": "PASS",
+    "zero_width_payload_check": "PASS"
+  },
+  "javascript": {
+    "classic_blocks_syntax_checked": 118,
+    "syntax_failures": 0,
+    "tool_operational_scripts": [
+      {
+        "file": "tools/financial-statement/index.html",
+        "blocks": 10,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "en/tools/financial-statement/index.html",
+        "blocks": 10,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "es/tools/financial-statement/index.html",
+        "blocks": 10,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "tools/tfa-client-file/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "en/tools/tfa-client-file/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "es/tools/tfa-client-file/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "tools/lipe/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "en/tools/lipe/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      },
+      {
+        "file": "es/tools/lipe/index.html",
+        "blocks": 7,
+        "byte_identical_to_v6.7.1": true
+      }
+    ]
+  },
+  "excel_libraries": {
+    "financial_statement": {
+      "read": {
+        "version": "0.18.5",
+        "sheets": [
+          "Istruzioni",
+          "Anagrafica",
+          "Voci IV Direttiva",
+          "Stato Patrimoniale",
+          "Conto Economico",
+          "Esiti AI"
+        ]
+      },
+      "page_errors": []
+    },
+    "tfa": {
+      "read": {
+        "version": "0.18.5",
+        "sheets": [
+          "Istruzioni",
+          "Anagrafica",
+          "Analitica",
+          "Commentary"
+        ]
+      },
+      "page_errors": []
+    },
+    "lipe": {
+      "read": {
+        "version": "0.18.5",
+        "sheets": [
+          "Anagrafica",
+          "Codiciario",
+          "Istruzioni",
+          "Esiti AI"
+        ]
+      },
+      "page_errors": [
+        "Failed to read the 'localStorage' property from 'Window': Access is denied for this document."
+      ]
+    }
+  },
+  "tfa_import_preview": {
+    "file": "tfa_test_import.xlsx",
+    "company": "Gamma Test S.r.l.",
+    "fiscal_year": "2026",
+    "master_data_fields": 6,
+    "analytical_records": 2,
+    "commentary_sections": 2,
+    "other_items": 1,
+    "page_errors": 0,
+    "result": "PASS"
+  },
+  "responsive_390px": [
+    {
+      "file": "index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "en/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "es/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "configura-con-ai/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Home",
+        "Configura con AI",
+        "Strumenti",
+        "I casi",
+        "Chi sono"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "en/configure-with-ai/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Home",
+        "Configure with AI",
+        "Tools",
+        "Cases",
+        "About"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "es/configura-con-ia/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Inicio",
+        "Configura con IA",
+        "Herramientas",
+        "Casos",
+        "Sobre mí"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "tools/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Home",
+        "Configura con AI",
+        "Strumenti",
+        "I casi",
+        "Chi sono"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "approfondimenti/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Home",
+        "Configura con AI",
+        "Strumenti",
+        "I casi",
+        "Chi sono"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    },
+    {
+      "file": "privacy/index.html",
+      "overflow": false,
+      "header_count": 1,
+      "nav": [
+        "Home",
+        "Configura con AI",
+        "Strumenti",
+        "I casi",
+        "Chi sono"
+      ],
+      "guide_or_contact_in_header": 0,
+      "bottom_mobile_nav_markup": 0,
+      "page_errors": []
+    }
+  ],
+  "ui_copy": {
+    "headers_count": 46,
+    "headers_without_guide_contact": true,
+    "headers_nav_lengths": [
+      5
+    ],
+    "header_examples": {
+      "configura-con-ai/index.html": [
+        "Home",
+        "Configura con AI",
+        "Strumenti",
+        "I casi",
+        "Chi sono"
+      ],
+      "en/configure-with-ai/index.html": [
+        "Home",
+        "Configure with AI",
+        "Tools",
+        "Cases",
+        "About"
+      ],
+      "es/configura-con-ia/index.html": [
+        "Inicio",
+        "Configura con IA",
+        "Herramientas",
+        "Casos",
+        "Sobre mí"
+      ]
+    },
+    "mobile_nav_markup_count": 0,
+    "ai_pages": [
+      {
+        "file": "configura-con-ai/index.html",
+        "cards": 3,
+        "hero_primary": "Configura →",
+        "tfa_images": [
+          "/resources/images/ai-onboarding/tfa-import-sidebar.png",
+          "/resources/images/ai-onboarding/tfa-import-preview.png"
+        ]
+      },
+      {
+        "file": "en/configure-with-ai/index.html",
+        "cards": 3,
+        "hero_primary": "Configure →",
+        "tfa_images": [
+          "/resources/images/ai-onboarding/tfa-import-sidebar.png",
+          "/resources/images/ai-onboarding/tfa-import-preview.png"
+        ]
+      },
+      {
+        "file": "es/configura-con-ia/index.html",
+        "cards": 3,
+        "hero_primary": "Configurar →",
+        "tfa_images": [
+          "/resources/images/ai-onboarding/tfa-import-sidebar.png",
+          "/resources/images/ai-onboarding/tfa-import-preview.png"
+        ]
+      }
+    ],
+    "stale_public_patterns": {
+      "v1.5.3": 0,
+      "guida_v4_visible": 0,
+      "two_tool_configuration_claims": 0
+    },
+    "goldman_sachs": {
+      "index.html": true,
+      "en/index.html": true,
+      "es/index.html": true
+    },
+    "home_teasers": {
+      "index.html": [
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "teaser-ai"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-tools"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-cases"
+        ]
+      ],
+      "en/index.html": [
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "teaser-ai"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-tools"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-cases"
+        ]
+      ],
+      "es/index.html": [
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "teaser-ai"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-tools"
+        ],
+        [
+          "ai-onboarding-teaser",
+          "surface",
+          "home-compact-teaser",
+          "teaser-cases"
+        ]
+      ]
+    }
+  },
+  "typography": {
+    "body_stack": "Inter, system sans-serif",
+    "display_stack": "Newsreader, Iowan Old Style, Baskerville, Times New Roman, serif",
+    "representative_pages_checked": 7,
+    "result": "PASS"
+  },
+  "footer_links": {
+    "computed_color": "rgb(165, 172, 184)",
+    "blue_link_regression": false,
+    "result": "PASS"
+  },
+  "screenshots": {
+    "tfa_sidebar": "resources/images/ai-onboarding/tfa-import-sidebar.png",
+    "tfa_preview": "resources/images/ai-onboarding/tfa-import-preview.png",
+    "source": "real TFA Client File v1.6.1 interface and actual test workbook import"
+  },
+  "limitations": [
+    "The browser QA uses page.set_content in an opaque origin. LIPE emits a localStorage access warning in that test environment; workbook parsing succeeds and the warning is not representative of the deployed HTTPS origin.",
+    "Production cache/CDN behaviour must be verified after GitHub Pages deployment."
+  ]
+}

@@ -1,5 +1,7 @@
 # Audit remediation report — Tax Automation Lab v6.5.0
 
+
+> **Nota release corrente:** questo documento fotografa la remediation eseguita sulla v6.5.0. La release v6.8.0 include TFA Client File v1.6.1; i riferimenti a v1.5.3 qui sotto restano come evidenza storica dell’audit.
 **Date:** 24 July 2026  
 **Working base:** v6.4.0 AI Onboarding, itself derived from the definitive v6.3.5 package  
 **Primary constraint:** preserve all functions, tool versions, file formats and content introduced by the latest releases.
@@ -8,7 +10,7 @@
 
 The findings were checked against the package, not inferred from the public deployment. Static HTML, metadata, Unicode code points, links, embedded-library declarations, tool scripts and downloadable templates were inspected. Corrections were limited to the publication shell, metadata, legal/editorial content and progressive navigation unless explicitly stated otherwise.
 
-The operational JavaScript blocks of Financial Statement v1.1.1, TFA Client File v1.6.0 and LIPE v3.2.3 were compared before and after remediation and remain byte-identical.
+The operational JavaScript blocks of Financial Statement v1.1.1, TFA Client File v1.5.3 and LIPE v3.2.3 were compared before and after remediation and remain byte-identical.
 
 ## P1 — blocking findings
 

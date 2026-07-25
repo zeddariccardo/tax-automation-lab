@@ -1,0 +1,57 @@
+{
+  "release": "6.7.1",
+  "date": "2026-07-24",
+  "root_cause": "The v6.7.0 build inserted the TFA enhancement CSS into an internal HTML string inside the embedded SheetJS script because a global replacement targeted every </head> token. The resulting JavaScript syntax error prevented SheetJS from defining window.XLSX.",
+  "fix": "Restored the known-good embedded SheetJS 0.18.5 script from v6.6.0, kept the enhancement CSS only in the real document head, and bumped TFA Client File to 1.6.1.",
+  "functional_changes": "None beyond restoring Excel import/export availability.",
+  "tests": {
+    "javascript_syntax": {
+      "html_files_checked": 48,
+      "script_blocks_checked": 118,
+      "failures": 0
+    },
+    "browser_library_check": {
+      "languages": [
+        "it",
+        "en",
+        "es"
+      ],
+      "tools": {
+        "Financial Statement": {
+          "version": "1.1.1",
+          "xlsx_global": "object",
+          "xlsx_version": "0.18.5",
+          "template_read": true
+        },
+        "TFA Client File": {
+          "version": "1.6.1",
+          "xlsx_global": "object",
+          "xlsx_version": "0.18.5",
+          "template_read": true
+        },
+        "LIPE": {
+          "version": "3.2.3",
+          "xlsx_global": "object",
+          "xlsx_version": "0.18.5",
+          "template_read": true
+        }
+      }
+    },
+    "tfa_import_ui": {
+      "file": "tfa_test_import.xlsx",
+      "preview_opened": true,
+      "client": "Gamma Test S.r.l.",
+      "fiscal_year": "2026",
+      "anagrafica_fields": 6,
+      "analytic_records": 2,
+      "commentary_sections": 2,
+      "other_records": 1,
+      "page_errors": 0
+    },
+    "standalone_tfa": {
+      "xlsx_available": true,
+      "preview_opened": true,
+      "page_errors": 0
+    }
+  }
+}

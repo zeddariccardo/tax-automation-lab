@@ -1,29 +1,29 @@
 {
-  "release": "v2026.07.24",
-  "date": "2026-07-24",
+  "release": "v2026.07.25",
+  "date": "2026-07-25",
   "tools": [
     {
       "slug": "financial-statement",
       "name": "Riclassifica IV Direttiva",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "site_url": "https://taxautomationlab.com/tools/financial-statement/",
-      "release_filename": "TaxTool_FinancialStatement_v1.1.1.html",
+      "release_filename": "TaxTool_FinancialStatement_v1.1.2.html",
       "license": "MIT"
     },
     {
       "slug": "tfa-client-file",
       "name": "TFA Client File",
-      "version": "1.6.0",
+      "version": "1.6.2",
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
-      "release_filename": "TaxTool_TFA_ClientFile_v1.6.0.html",
+      "release_filename": "TaxTool_TFA_ClientFile_v1.6.2.html",
       "license": "MIT"
     },
     {
       "slug": "lipe",
       "name": "Generatore LIPE",
-      "version": "3.2.3",
+      "version": "3.2.4",
       "site_url": "https://taxautomationlab.com/tools/lipe/",
-      "release_filename": "TaxTool_LIPE_v3.2.3.html",
+      "release_filename": "TaxTool_LIPE_v3.2.4.html",
       "license": "MIT"
     }
   ]

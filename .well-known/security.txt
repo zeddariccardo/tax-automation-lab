@@ -1,0 +1,5 @@
+Contact: mailto:security@taxautomationlab.com
+Preferred-Languages: it, en, es
+Canonical: https://taxautomationlab.com/.well-known/security.txt
+Policy: https://taxautomationlab.com/security/
+Expires: 2027-07-25T23:59:59Z

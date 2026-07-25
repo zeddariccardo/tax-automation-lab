@@ -1,29 +1,12 @@
-# Post-deployment actions - v6.10.0
+# Azioni successive al deploy v6.12.0
 
-## 1. GitHub Pages and Cloudflare smoke test
-
-After the GitHub Pages deployment is green, purge the Cloudflare cache for `taxautomationlab.com`, close existing browser tabs and verify the site in a private window. Test the home page, the three AI-onboarding pages, and Excel import/export in Financial Statement, TFA and LIPE.
-
-## 2. Recommended Cloudflare cache policy
-
-Avoid long-lived edge caching for HTML documents. Keep long caching only for versioned or stable static assets (images, PDFs, fonts and downloads). This reduces the risk of the domain serving an older HTML build after a deployment.
-
-## 3. Permanent redirects
-
-The static package includes compatibility pages, but true HTTP redirects require Cloudflare rules:
-
-- `/it/*` -> the corresponding Italian root-language URL;
-- `/resources/Guida_Automazione_Processi_Fiscali_v4.pdf` -> `/resources/guida-automazione-processi-fiscali.pdf` (optional compatibility cleanup).
-
-Use permanent redirects only after confirming that the destination URLs are live.
-
-## 4. Production functional checks
-
-- Financial Statement: import the example, verify Total assets and Total liabilities in UI, Excel and PDF.
-- TFA: import the test workbook, verify Analytical, Commentary and Other, save to archive and reopen.
-- LIPE: import mapping and period values, verify VP output and working paper.
-- Open browser developer tools and confirm that no red errors appear during import or export.
-
-## 5. Search Console
-
-After production validation, resubmit the sitemap and request re-indexing for the home page, AI configuration page, tool pages and the new guide landing pages.
+1. Attendere GitHub Actions verde.
+2. Eseguire il purge Cloudflare dopo il deployment.
+3. Aprire il sito in una finestra anonima.
+4. Verificare homepage, lingue, Configura con AI, screenshot e download dei template.
+5. Financial Statement: caricare l’esempio, verificare quadrature, comparativo, PDF nominato correttamente ed export Excel.
+6. TFA: importare il file di prova, verificare anteprima, badge di stato, ricerca, salvataggio, archivio completo, ripristino e protezione del lavoro non archiviato.
+7. LIPE: verificare demo, riporto VP7/VP8, import codiciario/importi, PDF, Excel e XML.
+8. Controllare la console del browser: nessun errore rosso.
+9. Solo dopo i test, creare la GitHub Release v6.12.0 con gli asset dedicati.
+10. Richiedere la nuova indicizzazione delle pagine aggiornate in Search Console.

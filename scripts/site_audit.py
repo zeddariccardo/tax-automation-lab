@@ -58,7 +58,7 @@ for rel in ('tools/financial-statement/index.html','tools/tfa-client-file/index.
     if js<500_000: issues.append(f'{rel}: operational JavaScript unexpectedly small ({js} bytes)')
 
 
-# v6.10.0: reject suspicious long zero-width watermark sequences.
+# v6.12.0: reject suspicious long zero-width watermark sequences.
 ZERO_WIDTH_FORBIDDEN = re.compile(r'[\u200b\u200c\ufeff]{20,}')
 for _p in ROOT.rglob('*.html'):
     _t = _p.read_text(encoding='utf-8', errors='replace')

@@ -1,0 +1,153 @@
+{
+  "release": "v6.12.0",
+  "date": "2026-07-25",
+  "status": "production_candidate_passed",
+  "site": {
+    "html_files": 57,
+    "javascript_blocks_syntax_checked": 178,
+    "json_ld_blocks_validated": 36,
+    "structural_audit": "PASS",
+    "internal_links_and_assets": "PASS",
+    "desktop_overflow": false,
+    "mobile_overflow": false
+  },
+  "versions": {
+    "financial_statement": "1.2.0",
+    "tfa_client_file": "1.7.0",
+    "lipe": "3.3.0",
+    "sheetjs": "0.20.3"
+  },
+  "financial_statement": {
+    "result": "PASS",
+    "sample_accounts": 15,
+    "sample_totals": {
+      "current_assets": 687200,
+      "current_liabilities_and_equity": 687200,
+      "previous_assets": 674800,
+      "previous_liabilities_and_equity": 674800
+    },
+    "sample_checks": "all green",
+    "optional_comparative_import": "PASS",
+    "cross_section_reversals": "PASS",
+    "signed_reversals": "PASS",
+    "current_and_previous_adjustments": "PASS",
+    "sign_diagnostics": "PASS",
+    "mapping_only_memory": "PASS",
+    "schema_codes_verified": [
+      "A2",
+      "A3",
+      "B9D",
+      "B10C",
+      "C15B",
+      "C15C",
+      "C15D",
+      "C16A",
+      "C16B",
+      "C16C",
+      "C16D2",
+      "C16D3",
+      "C16D4",
+      "C17B",
+      "C17D",
+      "D18A",
+      "D18B",
+      "D18C",
+      "D18D",
+      "D19A",
+      "D19B",
+      "D19C",
+      "D19D"
+    ],
+    "excel_output": "TaxTool_FS_Abbreviato_Alfa_Industriale_S_r_l_.xlsx",
+    "pdf_output": "Bilancio_TaxTool_FS_Abbreviato_2026_Alfa_Industriale_S_r_l_.pdf",
+    "excel_output_sha256": "bb6ed74809c371ab6c7ad0586eb1a2acf2a8603298f2487c37b1b6af3ff66d4b",
+    "pdf_output_sha256": "6da4a986093f0645d309f8c2be99028a50c33979cebe345bd949277497a0d1d3"
+  },
+  "tfa": {
+    "result": "PASS",
+    "import_preview": {
+      "anagrafica": 6,
+      "analitica_records": 2,
+      "commentary_sections": 2,
+      "altro": 1
+    },
+    "imported_company": "Gamma Test S.r.l.",
+    "imported_year": 2026,
+    "stable_client_id_after_tax_id_change": true,
+    "invalid_year_blocked": true,
+    "italian_number_parser": 1234.56,
+    "international_number_parser": 1234.56,
+    "quota_error_detected": true,
+    "false_success_toast_removed": true,
+    "destructive_guards": "PASS",
+    "full_archive_export": "PASS",
+    "full_archive_restore": "PASS",
+    "dynamic_export_labels": "PASS",
+    "global_search": "PASS",
+    "starter_checklist": "PASS",
+    "generated_label_association": "PASS",
+    "keyboard_record_toggle": "PASS",
+    "template_sheets": [
+      "Istruzioni",
+      "Anagrafica",
+      "Analitica",
+      "Commentary"
+    ],
+    "template_formula_errors": 0,
+    "embedded_template_matches_external_all_languages": true,
+    "template_sha256": "6db9dbae9099db01f5d6bd0a5ef9e7cf8791857af4f93502242bf68ec15a94ce",
+    "screenshots": {
+      "command_bar": {
+        "size": "1600x720",
+        "sha256": "988dd014fd073da818a6adc56b0de99cf5c723cee5cc06f6105f6d93d8bd58a7"
+      },
+      "import_preview": {
+        "size": "1240x900",
+        "sha256": "f3cf29025b8df5d97038c9e0e62fc5bb141a7b068807d0f2a88f46b900939d8a"
+      }
+    }
+  },
+  "lipe_regression": {
+    "version": "3.3.0",
+    "result": "PASS",
+    "demo": {
+      "june_vp8": 4600,
+      "june_balance": 19300,
+      "blocking_checks": 0,
+      "xml_problems": 0
+    },
+    "carry_forward_credit": "PASS",
+    "small_debt_carry_forward": "PASS",
+    "year_end_stop": "PASS",
+    "number_and_date_parsing": "PASS",
+    "ambiguous_columns_blocked": "PASS",
+    "manual_values_preserved": "PASS",
+    "period_persistence": "PASS",
+    "group_vat_checks": "PASS",
+    "xml_element": "VersamentiAuto"
+  },
+  "all_tool_pages": {
+    "pages_tested": 9,
+    "languages": [
+      "it",
+      "en",
+      "es"
+    ],
+    "page_errors": 0,
+    "sheetjs_version_all": "0.20.3",
+    "result": "PASS"
+  },
+  "deferred": {
+    "tfa": [
+      "per-keystroke undo",
+      "mobile show-only-filled-fields mode",
+      "legacy compactExportPlan cleanup"
+    ],
+    "financial_statement": [
+      "legacy engine consolidation",
+      "embedded Unicode PDF font",
+      "stable mapping identifier migration",
+      "zero-detail-row and presentation-rounding refinements"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # Tax Automation Lab
 
-Pacchetto sito: **v6.10.0**
+Pacchetto sito: **v6.12.0**
 
 Portfolio personale dedicato all’automazione di processi fiscali e contabili.
 
@@ -8,52 +8,48 @@ Portfolio personale dedicato all’automazione di processi fiscali e contabili.
 
 | Tool | Versione | Consultazione online |
 |---|---:|---|
-| TaxTool Financial Statement | 1.1.3 | https://taxautomationlab.com/tools/financial-statement/ |
-| TaxTool TFA Client File | 1.6.3 | https://taxautomationlab.com/tools/tfa-client-file/ |
-| TaxTool LIPE | 3.2.5 | https://taxautomationlab.com/tools/lipe/ |
+| TaxTool Financial Statement | 1.2.0 | https://taxautomationlab.com/tools/financial-statement/ |
+| TaxTool TFA Client File | 1.7.0 | https://taxautomationlab.com/tools/tfa-client-file/ |
+| TaxTool LIPE | 3.3.0 | https://taxautomationlab.com/tools/lipe/ |
 
 I tool sono applicazioni HTML monofile utilizzabili localmente nel browser. I dati inseriti non vengono inviati al sito.
 
 ## Configurazione assistita dall’AI
 
-La sezione `/configura-con-ai/` mette a disposizione, per gli strumenti supportati:
+La sezione `/configura-con-ai/` mette a disposizione template compatibili, prompt guidati, materiali esemplificativi e istruzioni visuali di caricamento. Il template TFA alimenta Anagrafica, Analitica, Commentary e Altro e viene validato tramite un’anteprima prima dell’importazione.
 
-- template compatibili scaricabili;
-- prompt guidati;
-- indicazioni flessibili sui documenti utilizzabili;
-- istruzioni visuali per il caricamento nei tool;
-- obbligo di verifica professionale prima dell’importazione.
+## Financial Statement v1.2.0
 
-La formulazione del sito non dipende dal numero dei tool configurabili, così la sezione può essere estesa senza introdurre riferimenti numerici obsoleti.
+- nome PDF coerente con società, anno e schema;
+- memoria cliente limitata al mapping, senza riapplicazione automatica di storni e rettifiche;
+- comparativo facoltativo con warning quando assente;
+- storni tra sezioni con segno corretto;
+- rettifiche e storni distinti per esercizio corrente e precedente;
+- schemi ordinario e abbreviato completati;
+- controlli su segni e quadrature con tolleranza uniforme.
 
-## TFA Client File
+## TFA Client File v1.7.0
 
-TFA Client File v1.6.3 comprende:
+- salvataggi verificati e messaggi espliciti in caso di quota browser esaurita;
+- protezione del lavoro non archiviato;
+- identificativo cliente stabile;
+- backup e ripristino dell’intero archivio;
+- una sola barra comandi con stato permanente;
+- ricerca globale e checklist di primo avvio;
+- import Excel con anno e numeri validati;
+- accessibilità migliorata e conferme per le cancellazioni.
 
-- modalità Analitica predefinita per i nuovi fascicoli;
-- importazione Excel di Anagrafica, Analitica e Commentary;
-- sezione `Altro` per informazioni rilevanti non classificabili;
-- anteprima prima dell’importazione;
-- gestione più chiara di salvataggio, nuovo cliente, nuovo esercizio, archivio e backup;
-- hotfix della libreria Excel incluso nella release v6.7.1.
+## LIPE v3.3.0
+
+La release mantiene integralmente le correzioni della v6.11.0: riporti automatici VP7/VP8, soglia vigente, stop di fine anno, import robusto, arrotondamenti coerenti, persistenza del periodo di lavoro e controlli XML/PDF.
 
 ## Guida
 
-La guida “Automazione dei processi fiscali e contabili” è disponibile in PDF:
-
-https://taxautomationlab.com/guide/
-
-Nel sito l’etichetta pubblica è semplicemente **Guida**.
+La guida “Automazione dei processi fiscali e contabili” è disponibile in PDF: https://taxautomationlab.com/guide/
 
 ## Lingue e navigazione
 
-Le pagine informative sono disponibili in italiano, inglese e spagnolo:
-
-- Italiano: https://taxautomationlab.com/
-- English: https://taxautomationlab.com/en/
-- Español: https://taxautomationlab.com/es/
-
-Le tre versioni utilizzano struttura, header, tipografia e gerarchia grafica coerenti. Le interfacce operative dei tool restano in italiano.
+Le pagine informative sono disponibili in italiano, inglese e spagnolo. Le interfacce operative dei tool restano in italiano.
 
 ## Licenze
 
@@ -79,29 +75,3 @@ I tool elaborano i documenti localmente nel browser. Il sito non utilizza Analyt
 ## Disclaimer
 
 Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.
-
-## v6.10.0
-
-- Financial Statement v1.1.3 con righe esplicite **Totale attivo** e **Totale passivo** in interfaccia, Excel, PDF sintetico/esteso/dettaglio e schema vuoto;
-- controllo dei totali per periodo corrente e comparativo;
-- etichette di esempio, export, backup e reset rese più esplicite;
-- numerazione e claim dei tool resi più coerenti;
-- articolo TFA ampliato con onboarding Excel AI e sezione Altro;
-- badge versione e navigazione degli articoli uniformati.
-
-- SheetJS CE aggiornato dalla versione 0.18.5 alla versione ufficiale 0.20.3 nei nove HTML operativi;
-- regressione Excel completata in modalità locale e tramite server HTTP.
-
-## v6.8.0
-
-- header semplificato e uniforme in tutte le pagine;
-- navigazione `Home · Configura con AI · Strumenti · I casi · Chi sono`;
-- eliminazione della seconda navigazione mobile;
-- homepage alleggerita con tre pannelli compatti e accenti differenziati;
-- copy di configurazione reso generico e future-proof;
-- riferimento a Goldman Sachs nel profilo professionale;
-- footer e tipografia uniformati;
-- screenshot TFA reali;
-- TFA v1.6.1 e hotfix Excel integralmente inclusi.
-
-Per i controlli eseguiti, vedere `QA-v6.8.0.json`.

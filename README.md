@@ -1,6 +1,6 @@
 # Tax Automation Lab
 
-Pacchetto sito: **v6.9.0**
+Pacchetto sito: **v6.10.0**
 
 Portfolio personale dedicato all’automazione di processi fiscali e contabili.
 
@@ -8,9 +8,9 @@ Portfolio personale dedicato all’automazione di processi fiscali e contabili.
 
 | Tool | Versione | Consultazione online |
 |---|---:|---|
-| TaxTool Financial Statement | 1.1.2 | https://taxautomationlab.com/tools/financial-statement/ |
-| TaxTool TFA Client File | 1.6.2 | https://taxautomationlab.com/tools/tfa-client-file/ |
-| TaxTool LIPE | 3.2.4 | https://taxautomationlab.com/tools/lipe/ |
+| TaxTool Financial Statement | 1.1.3 | https://taxautomationlab.com/tools/financial-statement/ |
+| TaxTool TFA Client File | 1.6.3 | https://taxautomationlab.com/tools/tfa-client-file/ |
+| TaxTool LIPE | 3.2.5 | https://taxautomationlab.com/tools/lipe/ |
 
 I tool sono applicazioni HTML monofile utilizzabili localmente nel browser. I dati inseriti non vengono inviati al sito.
 
@@ -28,7 +28,7 @@ La formulazione del sito non dipende dal numero dei tool configurabili, così la
 
 ## TFA Client File
 
-TFA Client File v1.6.2 comprende:
+TFA Client File v1.6.3 comprende:
 
 - modalità Analitica predefinita per i nuovi fascicoli;
 - importazione Excel di Anagrafica, Analitica e Commentary;
@@ -41,7 +41,7 @@ TFA Client File v1.6.2 comprende:
 
 La guida “Automazione dei processi fiscali e contabili” è disponibile in PDF:
 
-https://taxautomationlab.com/resources/Guida_Automazione_Processi_Fiscali_v4.pdf
+https://taxautomationlab.com/guide/
 
 Nel sito l’etichetta pubblica è semplicemente **Guida**.
 
@@ -80,9 +80,9 @@ I tool elaborano i documenti localmente nel browser. Il sito non utilizza Analyt
 
 Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.
 
-## v6.9.0
+## v6.10.0
 
-- Financial Statement v1.1.2 con righe esplicite **Totale attivo** e **Totale passivo** in interfaccia, Excel, PDF sintetico/esteso/dettaglio e schema vuoto;
+- Financial Statement v1.1.3 con righe esplicite **Totale attivo** e **Totale passivo** in interfaccia, Excel, PDF sintetico/esteso/dettaglio e schema vuoto;
 - controllo dei totali per periodo corrente e comparativo;
 - etichette di esempio, export, backup e reset rese più esplicite;
 - numerazione e claim dei tool resi più coerenti;

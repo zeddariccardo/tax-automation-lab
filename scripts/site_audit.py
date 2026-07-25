@@ -57,6 +57,14 @@ for rel in ('tools/financial-statement/index.html','tools/tfa-client-file/index.
     js=sum(len((x.string or x.get_text() or '')) for x in soup.find_all('script') if (x.get('type') or '').lower()!='application/ld+json')
     if js<500_000: issues.append(f'{rel}: operational JavaScript unexpectedly small ({js} bytes)')
 
+
+# v6.10.0: reject suspicious long zero-width watermark sequences.
+ZERO_WIDTH_FORBIDDEN = re.compile(r'[\u200b\u200c\ufeff]{20,}')
+for _p in ROOT.rglob('*.html'):
+    _t = _p.read_text(encoding='utf-8', errors='replace')
+    if ZERO_WIDTH_FORBIDDEN.search(_t):
+        issues.append(f'{_p.relative_to(ROOT)}: suspicious long zero-width sequence')
+
 if issues:
     print(f'FAILED: {len(issues)} issue(s)')
     for x in issues: print('-',x)

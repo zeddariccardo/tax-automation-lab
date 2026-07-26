@@ -142,6 +142,50 @@ footer a:hover{color:#F7F7F5!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
+
+<style id="tal-v6141-tools-hotfix">
+/* v6.14.1 — card ispirate alla sezione Chi sono */
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.tool-card-v614{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:410px!important;
+  padding:27px!important;
+  border:1px solid rgba(247,247,245,.11)!important;
+  border-top-width:3px!important;
+  border-radius:16px!important;
+  background:linear-gradient(165deg,rgba(68,22,98,.25),rgba(30,17,44,.43))!important;
+  box-shadow:0 22px 64px rgba(5,12,18,.27),inset 0 1px rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.tool-card-v614:nth-child(1){border-top-color:#35C5D5!important}
+.tool-card-v614:nth-child(2){border-top-color:#72D49B!important}
+.tool-card-v614:nth-child(3){border-top-color:#D9A35F!important}
+.tool-card-v614:nth-child(4){border-top-color:#C6A0E8!important}
+.tool-card-v614 h2{font-size:35px!important;line-height:1.04!important;margin:10px 0 7px!important}
+.tool-card-v614 .category-tag{
+  display:inline-block!important;
+  align-self:flex-start!important;
+  width:auto!important;
+  min-height:0!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  line-height:1.3!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+}
+.tool-card-v614 .label{margin-top:0!important;color:#A5ACB8!important}
+.tool-card-v614>p{margin-top:2px!important}
+.tool-card-v614 .facts{margin-top:14px!important}
+.tool-card-v614 .actions{padding-top:12px!important}
+@media(max-width:820px){.grid{grid-template-columns:1fr!important}.tool-card-v614{min-height:0!important}}
+</style>
 </head><body><div class="wrap">
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -155,7 +199,7 @@ footer a:hover{color:#F7F7F5!important}
 <span class="eyebrow">AVAILABLE TOOLS</span>
 <h1>Four professional tools, available online</h1>
 <p class="lead">Four free applications available online, with local processing in the browser. Files are not uploaded to or retained by an application server. Browser data may be lost when changing device or clearing site data: export a local backup regularly.</p>
-<div class="online-note"><strong>Local processing.</strong> Files and data are not uploaded, transmitted or retained by an application server or online service. Archives depend on the browser and device used.</div>
+
 </section>
 <section class="onboarding-banner">
 <div><span class="label">AI-ASSISTED ONBOARDING</span><h2>Prepare configuration files with your AI</h2><p>Downloadable templates, guided prompts and upload instructions to configure the tools with data you already have.</p></div>
@@ -163,9 +207,7 @@ footer a:hover{color:#F7F7F5!important}
 </section>
 <section class="grid">
 <article class="card tool-card-v614">
-<span class="category-tag category-accounting">Accounting</span>
-<span class="label">Statutory statements · v1.3.0</span>
-<h2>Italian statutory financial statements</h2>
+<span class="label">Statutory statements · v1.3.0</span><h2>Italian statutory financial statements</h2><span class="category-tag category-accounting">Accounting</span>
 <p>Fourth Directive reclassification from an IAS/IFRS trial balance, with ordinary or abbreviated layouts, mapping, maturity breakdown by category, adjustments and reconciliations.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel trial balance</div>
@@ -176,9 +218,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/en/tools/financial-statement/">Open statutory statements (IT) →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-controlling">Controlling</span>
-<span class="label">Management analysis · v1.8.0</span>
-<h2>Financial analysis</h2>
+<span class="label">Management analysis · v1.8.0</span><h2>Financial analysis</h2><span class="category-tag category-controlling">Controlling</span>
 <p>Management reclassifications, KPIs, cash flow, budget, forecast, cost centres, documented benchmarks and quality gates.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Verified financial statements and optional modules</div>
@@ -189,9 +229,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/en/tools/financial-analysis/">Open financial analysis (IT) →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-client">Client management</span>
-<span class="label">Tax for Audit · v1.7.0</span>
-<h2>Client tax file</h2>
+<span class="label">Tax for Audit · v1.7.0</span><h2>Client tax file</h2><span class="category-tag category-client">Client management</span>
 <p>Client profile and annual tax working paper for Tax for Audit, M&amp;A due diligence and other tax review processes, with open items and full backup.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Client and tax documentation</div>
@@ -202,9 +240,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/en/tools/tfa-client-file/">Open client tax file (IT) →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-vat">Tax · VAT</span>
-<span class="label">LIPE · v3.4.0</span>
-<h2>LIPE Generator</h2>
+<span class="label">LIPE · v3.4.0</span><h2>LIPE Generator</h2><span class="category-tag category-vat">Tax · VAT</span>
 <p>VAT codes, VP section and IVP18 XML for periodic VAT settlement communications, with controlled carry-forwards, PDF and working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>VAT code mapping and Excel amounts</div>

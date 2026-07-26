@@ -141,6 +141,50 @@ footer a:hover{color:#F7F7F5!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
+
+<style id="tal-v6141-tools-hotfix">
+/* v6.14.1 — card ispirate alla sezione Chi sono */
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.tool-card-v614{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:410px!important;
+  padding:27px!important;
+  border:1px solid rgba(247,247,245,.11)!important;
+  border-top-width:3px!important;
+  border-radius:16px!important;
+  background:linear-gradient(165deg,rgba(68,22,98,.25),rgba(30,17,44,.43))!important;
+  box-shadow:0 22px 64px rgba(5,12,18,.27),inset 0 1px rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.tool-card-v614:nth-child(1){border-top-color:#35C5D5!important}
+.tool-card-v614:nth-child(2){border-top-color:#72D49B!important}
+.tool-card-v614:nth-child(3){border-top-color:#D9A35F!important}
+.tool-card-v614:nth-child(4){border-top-color:#C6A0E8!important}
+.tool-card-v614 h2{font-size:35px!important;line-height:1.04!important;margin:10px 0 7px!important}
+.tool-card-v614 .category-tag{
+  display:inline-block!important;
+  align-self:flex-start!important;
+  width:auto!important;
+  min-height:0!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  line-height:1.3!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+}
+.tool-card-v614 .label{margin-top:0!important;color:#A5ACB8!important}
+.tool-card-v614>p{margin-top:2px!important}
+.tool-card-v614 .facts{margin-top:14px!important}
+.tool-card-v614 .actions{padding-top:12px!important}
+@media(max-width:820px){.grid{grid-template-columns:1fr!important}.tool-card-v614{min-height:0!important}}
+</style>
 </head><body><div class="wrap">
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -154,7 +198,7 @@ footer a:hover{color:#F7F7F5!important}
 <span class="eyebrow">STRUMENTI DISPONIBILI</span>
 <h1>Quattro strumenti professionali, utilizzabili online</h1>
 <p class="lead">Quattro applicazioni gratuite, utilizzabili online con elaborazione locale nel browser. I file non vengono caricati o conservati su server applicativi. I dati salvati nel browser possono andare persi cambiando dispositivo o cancellando i dati del sito: esporta periodicamente una copia di sicurezza.</p>
-<div class="online-note"><strong>Elaborazione locale.</strong> I file e i dati non vengono caricati, trasmessi o conservati su alcun server o servizio online. Gli archivi dipendono dal browser e dal dispositivo utilizzato.</div>
+
 </section>
 <section class="onboarding-banner">
 <div><span class="label">CONFIGURAZIONE ASSISTITA DALL’AI</span><h2>Prepara i file di configurazione con la tua AI</h2><p>Template scaricabili, prompt guidati e istruzioni di caricamento per configurare gli strumenti con i dati che già possiedi.</p></div>
@@ -162,9 +206,7 @@ footer a:hover{color:#F7F7F5!important}
 </section>
 <section class="grid">
 <article class="card tool-card-v614">
-<span class="category-tag category-accounting">Contabilità</span>
-<span class="label">Bilancio civilistico · v1.3.0</span>
-<h2>Bilancio civilistico ITA GAAP</h2>
+<span class="label">Bilancio civilistico · v1.3.0</span><h2>Bilancio civilistico ITA GAAP</h2><span class="category-tag category-accounting">Contabilità</span>
 <p>Riclassificazione IV Direttiva da trial balance IAS/IFRS, con schemi ordinari o abbreviati, mappatura, scadenze per categoria, rettifiche, quadrature e archivio annuale.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Trial balance Excel</div>
@@ -175,9 +217,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/tools/financial-statement/">Apri Bilancio civilistico →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-controlling">Controlling</span>
-<span class="label">Analisi gestionale · v1.8.0</span>
-<h2>Analisi di bilancio</h2>
+<span class="label">Analisi gestionale · v1.8.0</span><h2>Analisi di bilancio</h2><span class="category-tag category-controlling">Controlling</span>
 <p>Riclassificazioni gestionali, KPI, rendiconto finanziario, budget, forecast, centri di costo, benchmark e controlli di qualità.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Bilancio verificato e moduli facoltativi</div>
@@ -188,9 +228,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/tools/financial-analysis/">Apri Analisi di bilancio →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-client">Gestione clienti</span>
-<span class="label">Tax for Audit · v1.7.0</span>
-<h2>Fascicolo fiscale cliente</h2>
+<span class="label">Tax for Audit · v1.7.0</span><h2>Fascicolo fiscale cliente</h2><span class="category-tag category-client">Gestione clienti</span>
 <p>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Anagrafica e documentazione fiscale</div>
@@ -201,9 +239,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="actions"><a class="button" href="/tools/tfa-client-file/">Apri Fascicolo fiscale →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="category-tag category-vat">Fiscalità · IVA</span>
-<span class="label">LIPE · v3.4.0</span>
-<h2>Generatore LIPE</h2>
+<span class="label">LIPE · v3.4.0</span><h2>Generatore LIPE</h2><span class="category-tag category-vat">Fiscalità · IVA</span>
 <p>Codici IVA, quadro VP e XML IVP18 per le comunicazioni delle liquidazioni periodiche IVA, con riporti controllati, PDF e working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Codiciario e importi Excel</div>

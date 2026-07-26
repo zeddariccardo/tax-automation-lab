@@ -517,7 +517,36 @@ html.tal-show-intro .intro{display:grid!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
-<style id="tal-v614-intro-state">html.tal-skip-intro #intro{display:none!important}html.tal-show-intro #intro{display:flex!important}</style></head>
+<style id="tal-v614-intro-state">html.tal-skip-intro #intro{display:none!important}html.tal-show-intro #intro{display:grid!important;place-items:center!important}</style>
+<style id="tal-v6141-home-hotfix">
+/* v6.14.1 — centratura landing e informativa dati nel footer */
+html.tal-show-intro #intro{
+  display:grid!important;
+  place-items:center!important;
+}
+#intro .intro-inner{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(980px,calc(100% - 40px))!important;
+  margin:0!important;
+  text-align:center!important;
+  align-items:center!important;
+}
+.footer-local-note{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(247,247,245,.09);
+  color:#A5ACB8;
+  font-size:11px;
+  line-height:1.55;
+}
+@media(max-width:760px){
+  #intro .intro-inner{top:52%!important;width:calc(100% - 28px)!important}
+}
+</style>
+</head>
 <body class="intro-open">
 <section aria-labelledby="intro-title" class="intro" id="intro">
 <canvas aria-hidden="true" id="tubes-canvas"></canvas>
@@ -559,7 +588,7 @@ html.tal-show-intro .intro{display:grid!important}
 <div class="home-hero">
 <h1 class="display" id="home-title" tabindex="-1">Processi fiscali e contabili, trasformati in <em>strumenti tecnologici verificabili</em></h1>
 <p class="lead">Non serve essere sviluppatori per automatizzare un’attività professionale. Serve conoscere il lavoro, scrivere le regole, definire i controlli e verificare il risultato.</p>
-<div class="hero-actions"><a class="button" href="/tools/">Esplora gli strumenti</a><a class="button secondary" href="/approfondimenti/">Casi e metodo</a></div><div class="home-quick-links"><a href="/tools/financial-statement/">Bilancio civilistico ITA GAAP</a><a href="/tools/financial-analysis/">Analisi di bilancio</a><a href="/tools/tfa-client-file/">Fascicolo fiscale cliente</a><a href="/tools/lipe/">Generatore LIPE</a></div><div class="home-privacy-badge"><span>Elaborazione nel browser · nessun file inviato a un server applicativo</span><a href="/privacy/">Come trattiamo i dati →</a></div><div class="author-signature">Progetto di Riccardo Zedda, Tax Manager e dottore commercialista abilitato.<a data-route="about" href="#about">Esperienza e approccio →</a></div>
+<div class="hero-actions"><a class="button" href="/tools/">Esplora gli strumenti</a><a class="button secondary" href="/approfondimenti/">Casi e metodo</a></div><div class="author-signature">Progetto di Riccardo Zedda, Tax Manager e dottore commercialista abilitato.<a data-route="about" href="#about">Esperienza e approccio →</a></div>
 </div>
 <div class="lab-goals-wrap">
 <article class="lab-goals surface">
@@ -622,7 +651,7 @@ html.tal-show-intro .intro{display:grid!important}
 <div class="shell" style="margin-top:10px;color:#A5ACB8;font-size:10px">
 Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.
 </div>
-</footer>
+<div class="shell footer-local-note">Elaborazione locale nel browser: i file non vengono inviati a server applicativi. I dati salvati possono andare persi cambiando dispositivo o cancellando i dati del sito; esporta periodicamente una copia di sicurezza.</div></footer>
 </div>
 <script>
 (function(){
@@ -660,7 +689,7 @@ Tax Automation Lab è un progetto personale e indipendente, non approvato o spon
   function enter(){
     rememberIntroSeen();
     intro.classList.add('is-leaving');app.classList.add('is-visible');app.setAttribute('aria-hidden','false');body.classList.remove('intro-open');
-    setTimeout(()=>{intro.hidden=true;const target=document.getElementById('home-title');if(target)target.focus({preventScroll:true});},680);
+    setTimeout(()=>{intro.hidden=true;openWelcome();},680);
   }
   function enterDirect(){
     rememberIntroSeen();

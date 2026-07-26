@@ -510,7 +510,36 @@ html.tal-show-intro .intro{display:grid!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
-<style id="tal-v614-intro-state">html.tal-skip-intro #intro{display:none!important}html.tal-show-intro #intro{display:flex!important}</style></head>
+<style id="tal-v614-intro-state">html.tal-skip-intro #intro{display:none!important}html.tal-show-intro #intro{display:grid!important;place-items:center!important}</style>
+<style id="tal-v6141-home-hotfix">
+/* v6.14.1 — centratura landing e informativa dati nel footer */
+html.tal-show-intro #intro{
+  display:grid!important;
+  place-items:center!important;
+}
+#intro .intro-inner{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(980px,calc(100% - 40px))!important;
+  margin:0!important;
+  text-align:center!important;
+  align-items:center!important;
+}
+.footer-local-note{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(247,247,245,.09);
+  color:#A5ACB8;
+  font-size:11px;
+  line-height:1.55;
+}
+@media(max-width:760px){
+  #intro .intro-inner{top:52%!important;width:calc(100% - 28px)!important}
+}
+</style>
+</head>
 <body class="intro-open">
 <section aria-labelledby="intro-title" class="intro" id="intro">
 <canvas aria-hidden="true" id="tubes-canvas"></canvas>
@@ -552,7 +581,7 @@ html.tal-show-intro .intro{display:grid!important}
 <div class="home-hero">
 <h1 class="display" id="home-title" tabindex="-1">Tax and accounting processes, transformed into <em>verifiable technology tools</em></h1>
 <p class="lead">You do not need to be a developer to automate professional work. You need to understand the process, write the rules, define controls and verify the result.</p>
-<div class="hero-actions"><a class="button" href="/en/tools/">Explore the tools</a><a class="button secondary" href="/en/insights/">Cases &amp; method</a></div><div class="home-quick-links"><a href="/en/tools/financial-statement/">Italian statutory financial statements</a><a href="/en/tools/financial-analysis/">Financial analysis</a><a href="/en/tools/tfa-client-file/">Client tax file</a><a href="/en/tools/lipe/">LIPE Generator</a></div><div class="home-privacy-badge"><span>Processing in the browser · no file sent to an application server</span><a href="/en/privacy/">How data is handled →</a></div><div class="author-signature">A project by Riccardo Zedda, Tax Manager and qualified Italian chartered accountant.<a data-route="about" href="#about">Experience and approach →</a></div>
+<div class="hero-actions"><a class="button" href="/en/tools/">Explore the tools</a><a class="button secondary" href="/en/insights/">Cases &amp; method</a></div><div class="author-signature">A project by Riccardo Zedda, Tax Manager and qualified Italian chartered accountant.<a data-route="about" href="#about">Experience and approach →</a></div>
 </div>
 <div class="lab-goals-wrap">
 <article class="lab-goals surface">
@@ -613,7 +642,7 @@ html.tal-show-intro .intro{display:grid!important}
 <span><a href="/en/insights/">Cases &amp; method</a> · <a href="/en/privacy/">Privacy</a> · <a href="/en/security/">Security</a> · <a href="/en/terms/">Terms</a> · <a href="/en/licenses/">Licences</a></span>
 </div>
 <div class="shell" style="margin-top:10px;color:#A5ACB8;font-size:10px">Tax Automation Lab is a personal and independent project, not approved or sponsored by third parties. Published content, opinions and tools do not represent third parties.</div>
-</footer>
+<div class="shell footer-local-note">Local processing in the browser: files are not sent to application servers. Saved data may be lost when changing device or clearing site data; export a backup regularly.</div></footer>
 </div>
 <script>
 (function(){

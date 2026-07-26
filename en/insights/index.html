@@ -155,6 +155,93 @@ footer a:hover{color:#F7F7F5!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
+
+<style id="tal-v6141-cases-hotfix">
+/* v6.14.1 — Casi e metodo nello stile delle superfici di Chi sono */
+main{
+  width:min(1120px,calc(100% - 34px))!important;
+  margin:0 auto!important;
+  padding-bottom:62px!important;
+}
+main>.hero{padding:52px 0 28px!important}
+main>.hero h1{font-size:clamp(46px,7vw,72px)!important;line-height:.98!important}
+.case-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+  margin-top:20px!important;
+}
+.case-card{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:300px!important;
+  padding:27px!important;
+  border:1px solid rgba(247,247,245,.11)!important;
+  border-top-width:3px!important;
+  border-radius:16px!important;
+  background:linear-gradient(165deg,rgba(68,22,98,.25),rgba(30,17,44,.43))!important;
+  box-shadow:0 22px 64px rgba(5,12,18,.27),inset 0 1px rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.case-card:nth-child(1){border-top-color:#35C5D5!important}
+.case-card:nth-child(2){border-top-color:#72D49B!important}
+.case-card:nth-child(3){border-top-color:#D9A35F!important}
+.case-card:nth-child(4){border-top-color:#C6A0E8!important}
+.case-card h2{font-family:var(--serif)!important;font-size:34px!important;font-weight:300!important;line-height:1.04!important;margin:8px 0 7px!important}
+.case-card .category-tag{
+  display:inline-block!important;
+  align-self:flex-start!important;
+  width:auto!important;
+  min-height:0!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  font-size:9px!important;
+  font-weight:800!important;
+  line-height:1.3!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+}
+.case-card p{font-size:13px!important;line-height:1.65!important;color:#D7DBE0!important;margin:2px 0 8px!important}
+.case-meta{margin-top:auto!important;padding-top:10px!important;color:#A5ACB8!important}
+.case-card .button{margin-top:5px!important}
+.case-bridge{
+  margin:24px 0!important;
+  padding:22px!important;
+  border:1px solid rgba(247,247,245,.11)!important;
+  border-radius:16px!important;
+  background:linear-gradient(165deg,rgba(20,83,104,.26),rgba(30,17,44,.38))!important;
+  box-shadow:0 20px 58px rgba(5,12,18,.24)!important;
+}
+.bridge-node{
+  border:1px solid rgba(247,247,245,.12)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.028)!important;
+  font-size:25px!important;
+}
+.bridge-arrow strong{display:block!important;max-width:330px!important;margin:3px auto 0!important;font-size:12px!important;line-height:1.45!important}
+.method-strip{
+  margin:24px 0 0!important;
+  padding:25px 27px!important;
+  border:1px solid rgba(247,247,245,.11)!important;
+  border-left:3px solid #725D6A!important;
+  border-radius:16px!important;
+  background:linear-gradient(165deg,rgba(68,22,98,.22),rgba(30,17,44,.42))!important;
+  box-shadow:0 20px 58px rgba(5,12,18,.24)!important;
+}
+.method-strip h2{font-family:var(--serif)!important;font-size:36px!important;font-weight:300!important;line-height:1.05!important}
+@media(max-width:760px){
+  main{width:min(100% - 24px,1120px)!important}
+  .case-grid{grid-template-columns:1fr!important}
+  .case-card{min-height:0!important}
+  .case-bridge{grid-template-columns:1fr!important}
+  .bridge-arrow span{transform:rotate(90deg)}
+  .method-strip{grid-template-columns:1fr!important}
+}
+</style>
 </head><body>
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -165,7 +252,7 @@ footer a:hover{color:#F7F7F5!important}
 </header>
 <main>
 <section class="hero"><span class="eyebrow">CASES &amp; METHOD</span><h1>Practical cases and method</h1><p class="lead">Four applied cases, in the same order as the tools, plus the method used to turn professional rules into verifiable software.</p></section>
-<section class="grid case-grid"><article class="card case-card"><span class="category-tag category-accounting">Accounting</span><h2>Italian statutory financial statements</h2><p>From an IAS/IFRS trial balance to Italian statutory layouts, with mapping, adjustments and reconciliations.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read the case →</a></article><article class="card case-card"><span class="category-tag category-controlling">Controlling</span><h2>Financial analysis</h2><p>Management reclassifications, KPIs, cash flow, budget, forecast and control gates.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/financial-analysis-and-reclassification/">Read the case →</a></article><article class="card case-card"><span class="category-tag category-client">Client management</span><h2>Build the client tax file</h2><p>From client data to open items, with preparer, reviewer and full archive backup.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/tfa-client-file/">Read the case →</a></article><article class="card case-card"><span class="category-tag category-vat">Tax · VAT</span><h2>LIPE automation and control</h2><p>From VAT codes to the VP section and XML file, with controlled carry-forwards and professional checks.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/lipe-automation/">Read the case →</a></article></section>
+<section class="grid case-grid"><article class="card case-card"><h2>Italian statutory financial statements</h2><span class="category-tag category-accounting">Accounting</span><p>From an IAS/IFRS trial balance to Italian statutory layouts, with mapping, adjustments and reconciliations.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/ias-ifrs-to-italian-statutory-financial-statements/">Read the case →</a></article><article class="card case-card"><h2>Financial analysis</h2><span class="category-tag category-controlling">Controlling</span><p>Management reclassifications, KPIs, cash flow, budget, forecast and control gates.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/financial-analysis-and-reclassification/">Read the case →</a></article><article class="card case-card"><h2>Build the client tax file</h2><span class="category-tag category-client">Client management</span><p>From client data to open items, with preparer, reviewer and full archive backup.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/tfa-client-file/">Read the case →</a></article><article class="card case-card"><h2>LIPE automation and control</h2><span class="category-tag category-vat">Tax · VAT</span><p>From VAT codes to the VP section and XML file, with controlled carry-forwards and professional checks.</p><div class="case-meta">Aggiornato il 26 luglio 2026</div><a class="button" href="/en/insights/lipe-automation/">Read the case →</a></article></section>
 <section aria-label="CONNECTED WORKFLOW" class="case-bridge">
 <div class="bridge-node">Italian statutory financial statements</div>
 <div class="bridge-arrow"><span>→</span><strong>Statements ready? Reclassify them for management purposes and analyse KPIs and cash flows.</strong></div>

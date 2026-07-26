@@ -16,5 +16,8 @@
       "sizes": "180x180",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "Strumenti online per fiscalità, contabilità e analisi di bilancio con elaborazione locale nel browser.",
+  "scope": "/",
+  "lang": "it"
 }

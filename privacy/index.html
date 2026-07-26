@@ -8,8 +8,8 @@
 <meta content="index,follow,max-image-preview:large" name="robots"/>
 <meta content="Riccardo Zedda" name="author"/>
 <link href="https://taxautomationlab.com/privacy/" rel="canonical"/>
-<link href="/favicon.ico" rel="icon" sizes="any">
-<link href="/site.webmanifest" rel="manifest"/>
+<link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/site.webmanifest" rel="manifest">
 <meta content="website" property="og:type"/>
 <meta content="it_IT" property="og:locale"/>
 <meta content="Tax Automation Lab" property="og:site_name"/>
@@ -116,24 +116,71 @@ h1,h2,h3{font-family:var(--serif);font-weight:300}h1{max-width:980px;margin:15px
 footer a{color:inherit!important}
 footer a:hover{color:#F7F7F5!important}
 .mobile-nav{display:none!important}
-</style></link></head><body><header class="tal-global-header">
+</style></link>
+<style id="tal-v614-global-polish">
+.tal-site-footer,.site-footer,footer{font-size:13px!important;line-height:1.5}
+.tal-site-footer a,.site-footer a,footer a{font-size:13px!important}
+.tal-gh-menu-toggle{display:none;appearance:none;border:1px solid rgba(247,247,245,.22);background:rgba(8,15,26,.42);color:#F7F7F5;border-radius:999px;min-width:44px;min-height:44px;padding:0 12px;font:800 11px/1 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer}
+.button,.btn,a.button,button.btn{min-height:44px;font-size:max(12px,inherit)}
+.intro-lang-switch{display:grid!important;grid-template-columns:repeat(3,42px)!important;gap:2px!important;width:auto!important;min-width:134px!important;padding:4px!important;align-items:center!important}
+.intro-lang-switch .lang-option{width:42px!important;min-width:42px!important;height:40px!important;display:grid!important;place-items:center!important;padding:0!important}
+@media(max-width:760px){
+ .tal-global-header{padding:8px 8px 0!important}
+ .tal-gh-frame{min-height:58px!important;padding:7px 8px!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"brand lang menu"!important;gap:7px!important;border-radius:13px!important}
+ .tal-gh-brand{grid-area:brand!important;min-width:0!important}
+ .tal-gh-logo{width:34px!important;height:38px!important}
+ .tal-gh-brand-copy{max-width:150px!important;font-size:9px!important;letter-spacing:.1em!important}
+ .tal-gh-lang{grid-area:lang!important;display:grid!important;grid-template-columns:repeat(3,34px)!important;gap:1px!important;padding:2px!important}
+ .tal-gh-lang a{width:34px!important;min-width:34px!important;min-height:36px!important;padding:0!important;font-size:8.5px!important}
+ .tal-gh-menu-toggle{display:inline-flex!important;grid-area:menu;align-items:center;justify-content:center}
+ .tal-gh-nav{grid-area:nav!important;display:none!important;overflow:visible!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;width:100%!important;padding:8px 0 2px!important;border-top:1px solid rgba(247,247,245,.12)!important}
+ .tal-global-header.tal-menu-open .tal-gh-frame{grid-template-areas:"brand lang menu" "nav nav nav"!important}
+ .tal-global-header.tal-menu-open .tal-gh-nav{display:flex!important}
+ .tal-gh-nav a,.tal-gh-nav button{width:100%!important;justify-content:flex-start!important;min-height:44px!important;padding:0 13px!important;font-size:12px!important}
+}
+@media(max-width:390px){
+ .tal-gh-brand-copy{max-width:115px!important;font-size:8.5px!important}
+ .tal-gh-lang{grid-template-columns:repeat(3,31px)!important}
+ .tal-gh-lang a{width:31px!important;min-width:31px!important}
+ .tal-gh-menu-toggle{min-width:40px;padding:0 9px;font-size:10px}
+ .intro-lang-switch{grid-template-columns:repeat(3,39px)!important;min-width:125px!important}
+ .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
+}
+</style>
+</head><body><header class="tal-global-header">
 <div class="tal-gh-frame">
 <a aria-label="Home" class="tal-gh-brand" href="/"><img alt="RZ" class="tal-gh-logo" src="data:image/png;base64,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"/><span class="tal-gh-brand-copy">Tax &amp; Accounting — Automation Lab</span></a>
-<nav aria-label="Main navigation" class="tal-gh-nav">
-<a class="" href="/">Home</a>
-<a class="" href="/configura-con-ai/">Configura con AI</a>
-<a class="" href="/tools/">Strumenti</a>
-<a class="" href="/approfondimenti/">I casi</a>
-<a href="/#about">Chi sono</a>
-</nav>
-<div aria-label="Language selection" class="tal-gh-lang" role="navigation"><a aria-current="page" class="active" href="/privacy/" hreflang="it">ITA</a><a class="" href="/en/privacy/" hreflang="en">ENG</a><a class="" href="/es/privacidad/" hreflang="es">ESP</a></div>
+<nav aria-label="Navigazione principale" class="tal-gh-nav"><a class="" href="/">Home</a><a class="" href="/tools/">Strumenti</a><a class="" href="/configura-con-ai/">Configura con AI</a><a class="" href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
+<div aria-label="Selezione lingua" class="tal-gh-lang" role="navigation"><a aria-current="page" class="active" href="/privacy/" hreflang="it">ITA</a><a class="" href="/en/privacy/" hreflang="en">ENG</a><a class="" href="/es/privacidad/" hreflang="es">ESP</a></div>
 </div>
 </header>
-<main class="wrap"><section class="hero"><span class="eyebrow">Trasparenza</span><h1>Privacy</h1><p class="lead">Informazioni sul trattamento dei dati e sull’assenza di strumenti di profilazione.</p><p class="legal-updated"><strong>Ultimo aggiornamento:</strong> 24 luglio 2026</p></section>
+<main class="wrap"><section class="hero"><span class="eyebrow">Trasparenza</span><h1>Privacy</h1><p class="lead">Informazioni sul trattamento dei dati e sull’assenza di strumenti di profilazione.</p><p class="legal-updated"><strong>Ultimo aggiornamento:</strong> 26 luglio 2026</p></section>
 <section class="panel"><h2>Titolare e contatti</h2><p>Il titolare del trattamento relativo al sito e alle comunicazioni ricevute è <strong>Riccardo Zedda</strong>. Per richieste sulla privacy puoi scrivere a <a href="mailto:contact@taxautomationlab.com">contact@taxautomationlab.com</a>.</p></section>
 <section class="panel"><h2>Dati caricati, memoria locale e backup</h2><p>L’elaborazione avviene interamente sul tuo dispositivo. I file e i dati non vengono caricati, trasmessi o conservati su alcun server o servizio online dal sito o dai tool. Le configurazioni, le lavorazioni e gli archivi possono essere memorizzati nel browser del singolo dispositivo: cambiando computer o browser, usando la navigazione privata oppure cancellando cache e dati del sito, tali informazioni possono andare perse. Prima di chiudere una sessione rilevante o modificare il dispositivo, esporta e conserva un backup locale degli archivi. Resta responsabilità dell’utente verificare policy, autorizzazioni, riservatezza e adeguatezza dei documenti utilizzati.</p></section>
 <section class="panel"><h2>Dati tecnici e infrastruttura</h2><p>Il sito non utilizza Google Analytics, cookie pubblicitari o strumenti di profilazione. I fornitori dell’infrastruttura, tra cui GitHub Pages e Cloudflare, possono generare log tecnici e dati di sicurezza necessari a erogare e proteggere il servizio. Tali trattamenti sono svolti secondo le rispettive informative e, ove applicabile, le garanzie previste per i trasferimenti internazionali.</p></section>
 <section class="panel"><h2>Comunicazioni volontarie</h2><p>Quando scrivi agli indirizzi del progetto, sono trattati l’indirizzo del mittente, il contenuto del messaggio e gli eventuali allegati per rispondere alla richiesta e gestire il relativo seguito. La base giuridica è l’esecuzione di misure richieste dall’interessato e, per la sicurezza e la gestione ordinaria del progetto, il legittimo interesse del titolare.</p></section>
 <section class="panel"><h2>Conservazione e destinatari</h2><p>Le comunicazioni sono conservate per il tempo necessario a gestire la richiesta e, di regola, non oltre 24 mesi, salvo obblighi di legge o necessità di tutela di diritti. I dati possono essere trattati dai fornitori tecnici utilizzati per posta elettronica, hosting, distribuzione e protezione del sito. Non sono venduti né utilizzati per pubblicità comportamentale.</p></section>
 <section class="panel"><h2>Diritti dell’interessato</h2><p>Nei casi previsti dal GDPR puoi chiedere accesso, rettifica, cancellazione, limitazione, portabilità e opposizione al trattamento. Puoi inoltre presentare reclamo al Garante per la protezione dei dati personali. Il sito non adotta processi decisionali automatizzati o profilazione.</p></section></main>
-<footer class="footer"><div class="wrap"><div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span></div><p class="footer-note">Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.</p></div></footer><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script></body></html>
+<footer class="footer"><div class="wrap"><div class="footer-row"><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span></div><p class="footer-note">Tax Automation Lab è un progetto personale e indipendente, non approvato o sponsorizzato da terze parti. I contenuti, le opinioni e gli strumenti pubblicati non rappresentano terze parti.</p></div></footer><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script>
+
+<script id="tal-v614-global-nav">
+(function(){
+ function init(){
+  document.querySelectorAll('.tal-global-header').forEach(function(header){
+   var frame=header.querySelector('.tal-gh-frame'), nav=header.querySelector('.tal-gh-nav');
+   if(!frame||!nav||frame.querySelector('.tal-gh-menu-toggle')) return;
+   var loc=(document.documentElement.lang||'it').toLowerCase();
+   var open=loc.indexOf('es')===0?'Abrir el menú':(loc.indexOf('en')===0?'Open menu':'Apri il menu');
+   var close=loc.indexOf('es')===0?'Cerrar el menú':(loc.indexOf('en')===0?'Close menu':'Chiudi il menu');
+   var btn=document.createElement('button'); btn.type='button'; btn.className='tal-gh-menu-toggle'; btn.textContent='Menu'; btn.setAttribute('aria-label',open); btn.setAttribute('aria-expanded','false');
+   frame.appendChild(btn);
+   function setOpen(on){header.classList.toggle('tal-menu-open',on);btn.setAttribute('aria-expanded',String(on));btn.setAttribute('aria-label',on?close:open);}
+   btn.addEventListener('click',function(){setOpen(!header.classList.contains('tal-menu-open'));});
+   nav.querySelectorAll('a,button').forEach(function(x){x.addEventListener('click',function(){if(window.matchMedia('(max-width:760px)').matches)setOpen(false);});});
+   document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body></html>

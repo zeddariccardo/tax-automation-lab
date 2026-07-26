@@ -1,1 +1,55 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=/es/seguridad/"><meta name="robots" content="noindex,follow"><link rel="canonical" href="https://taxautomationlab.com/es/seguridad/"><title>Redirección | Tax Automation Lab</title><meta name="author" content="Riccardo Zedda"><meta property="og:image" content="https://taxautomationlab.com/assets/social-preview.png"><meta property="og:url" content="https://taxautomationlab.com/es/seguridad/"><meta name="twitter:card" content="summary_large_image"><script>location.replace("/es/seguridad/");</script></head><body><p>La página se ha trasladado a <a href="/es/seguridad/">/es/seguridad/</a></p></body></html>
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="0; url=/es/seguridad/" http-equiv="refresh"/><meta content="noindex,follow" name="robots"/><link href="https://taxautomationlab.com/es/seguridad/" rel="canonical"/><title>Redirección | Tax Automation Lab</title><meta content="Riccardo Zedda" name="author"/><meta content="https://taxautomationlab.com/assets/social-preview.png" property="og:image"/><meta content="https://taxautomationlab.com/es/seguridad/" property="og:url"/><meta content="summary_large_image" name="twitter:card"/><script>location.replace("/es/seguridad/");</script>
+<style id="tal-v614-global-polish">
+.tal-site-footer,.site-footer,footer{font-size:13px!important;line-height:1.5}
+.tal-site-footer a,.site-footer a,footer a{font-size:13px!important}
+.tal-gh-menu-toggle{display:none;appearance:none;border:1px solid rgba(247,247,245,.22);background:rgba(8,15,26,.42);color:#F7F7F5;border-radius:999px;min-width:44px;min-height:44px;padding:0 12px;font:800 11px/1 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer}
+.button,.btn,a.button,button.btn{min-height:44px;font-size:max(12px,inherit)}
+.intro-lang-switch{display:grid!important;grid-template-columns:repeat(3,42px)!important;gap:2px!important;width:auto!important;min-width:134px!important;padding:4px!important;align-items:center!important}
+.intro-lang-switch .lang-option{width:42px!important;min-width:42px!important;height:40px!important;display:grid!important;place-items:center!important;padding:0!important}
+@media(max-width:760px){
+ .tal-global-header{padding:8px 8px 0!important}
+ .tal-gh-frame{min-height:58px!important;padding:7px 8px!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"brand lang menu"!important;gap:7px!important;border-radius:13px!important}
+ .tal-gh-brand{grid-area:brand!important;min-width:0!important}
+ .tal-gh-logo{width:34px!important;height:38px!important}
+ .tal-gh-brand-copy{max-width:150px!important;font-size:9px!important;letter-spacing:.1em!important}
+ .tal-gh-lang{grid-area:lang!important;display:grid!important;grid-template-columns:repeat(3,34px)!important;gap:1px!important;padding:2px!important}
+ .tal-gh-lang a{width:34px!important;min-width:34px!important;min-height:36px!important;padding:0!important;font-size:8.5px!important}
+ .tal-gh-menu-toggle{display:inline-flex!important;grid-area:menu;align-items:center;justify-content:center}
+ .tal-gh-nav{grid-area:nav!important;display:none!important;overflow:visible!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;width:100%!important;padding:8px 0 2px!important;border-top:1px solid rgba(247,247,245,.12)!important}
+ .tal-global-header.tal-menu-open .tal-gh-frame{grid-template-areas:"brand lang menu" "nav nav nav"!important}
+ .tal-global-header.tal-menu-open .tal-gh-nav{display:flex!important}
+ .tal-gh-nav a,.tal-gh-nav button{width:100%!important;justify-content:flex-start!important;min-height:44px!important;padding:0 13px!important;font-size:12px!important}
+}
+@media(max-width:390px){
+ .tal-gh-brand-copy{max-width:115px!important;font-size:8.5px!important}
+ .tal-gh-lang{grid-template-columns:repeat(3,31px)!important}
+ .tal-gh-lang a{width:31px!important;min-width:31px!important}
+ .tal-gh-menu-toggle{min-width:40px;padding:0 9px;font-size:10px}
+ .intro-lang-switch{grid-template-columns:repeat(3,39px)!important;min-width:125px!important}
+ .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
+}
+</style>
+</head><body><p>La página se ha trasladado a <a href="/es/seguridad/">/es/seguridad/</a></p>
+
+<script id="tal-v614-global-nav">
+(function(){
+ function init(){
+  document.querySelectorAll('.tal-global-header').forEach(function(header){
+   var frame=header.querySelector('.tal-gh-frame'), nav=header.querySelector('.tal-gh-nav');
+   if(!frame||!nav||frame.querySelector('.tal-gh-menu-toggle')) return;
+   var loc=(document.documentElement.lang||'it').toLowerCase();
+   var open=loc.indexOf('es')===0?'Abrir el menú':(loc.indexOf('en')===0?'Open menu':'Apri il menu');
+   var close=loc.indexOf('es')===0?'Cerrar el menú':(loc.indexOf('en')===0?'Close menu':'Chiudi il menu');
+   var btn=document.createElement('button'); btn.type='button'; btn.className='tal-gh-menu-toggle'; btn.textContent='Menu'; btn.setAttribute('aria-label',open); btn.setAttribute('aria-expanded','false');
+   frame.appendChild(btn);
+   function setOpen(on){header.classList.toggle('tal-menu-open',on);btn.setAttribute('aria-expanded',String(on));btn.setAttribute('aria-label',on?close:open);}
+   btn.addEventListener('click',function(){setOpen(!header.classList.contains('tal-menu-open'));});
+   nav.querySelectorAll('a,button').forEach(function(x){x.addEventListener('click',function(){if(window.matchMedia('(max-width:760px)').matches)setOpen(false);});});
+   document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body></html>

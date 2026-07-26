@@ -1,5 +1,5 @@
 {
-  "release": "v6.13.0",
+  "release": "v6.14.0",
   "date": "2026-07-26",
   "privacy_model": {
     "processing": "local_in_browser",
@@ -7,19 +7,20 @@
     "persistence": "device_browser_storage",
     "backup_recommended": true
   },
+  "distribution_note": "All tools are available exclusively online. No standalone packages are published through GitHub Releases.",
   "tools": [
     {
       "slug": "financial-statement",
-      "name": "Riclassifica IV Direttiva",
+      "name": "Bilancio civilistico ITA GAAP",
       "version": "1.3.0",
       "site_url": "https://taxautomationlab.com/tools/financial-statement/",
-      "release_filename": "TaxTool_FinancialStatement_v1.3.0.html",
-      "distribution": "online_and_github",
+      "release_filename": null,
+      "distribution": "online_only",
       "license": "MIT"
     },
     {
       "slug": "financial-analysis",
-      "name": "Financial Analysis & Reclassification",
+      "name": "Analisi di bilancio",
       "version": "1.8.0",
       "site_url": "https://taxautomationlab.com/tools/financial-analysis/",
       "release_filename": null,
@@ -28,7 +29,7 @@
     },
     {
       "slug": "tfa-client-file",
-      "name": "TFA Client File",
+      "name": "Fascicolo fiscale cliente",
       "version": "1.7.0",
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
       "release_filename": null,

@@ -6,7 +6,7 @@ Official source: https://github.com/zeddariccardo/tax-automation-lab
 -->
 <!DOCTYPE html>
 
-<html lang="es">
+<html data-tool-version="1.3.0" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -393,7 +393,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
 }
 
 /* ============================================================
-   v1.2.0 — Sidebar palette Tax Automation Lab
+   v1.3.0 — Sidebar palette Tax Automation Lab
    Richiamo cromatico al sito: navy, viola, petrolio e verde.
    ============================================================ */
 :root{
@@ -461,7 +461,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
   box-shadow:0 10px 28px rgba(14,22,36,.26);
 }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Reclasificar estados financieros IAS/IFRS en los esquemas estatutarios italianos", "alternateName": "Riclassifica IV Direttiva", "url": "https://taxautomationlab.com/es/tools/financial-statement/", "description": "Herramienta gratuita en el navegador para reclasificar trial balances IAS/IFRS en estados financieros estatutarios italianos, con mapping, ajustes, cuadres y exportación Excel/PDF.", "applicationCategory": "BusinessApplication", "operatingSystem": "Web browser", "isAccessibleForFree": true, "softwareVersion": "1.2.0", "inLanguage": "es-ES", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "license": "https://taxautomationlab.com/legal-docs/MIT.txt", "downloadUrl": "https://github.com/zeddariccardo/tax-automation-lab/releases/latest", "codeRepository": "https://github.com/zeddariccardo/tax-automation-lab", "featureList": ["Mapping entre cuentas y partidas y diagnóstico de cuentas no mapeadas", "Reclasificaciones y ajustes book-to-book IAS/IFRS–OIC", "Cuadres del período corriente y anterior", "Archivo local de clientes y ejercicios", "Working paper Excel y exportación PDF"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Reclasificar estados financieros IAS/IFRS en los esquemas estatutarios italianos","alternateName":"Riclassifica IV Direttiva","url":"https://taxautomationlab.com/es/tools/financial-statement/","description":"Herramienta gratuita en el navegador para reclasificar trial balances IAS/IFRS en estados financieros estatutarios italianos, con mapping, ajustes, cuadres y exportación Excel/PDF.","applicationCategory":"BusinessApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"softwareVersion":"1.3.0","inLanguage":"es-ES","author":{"@type":"Person","name":"Riccardo Zedda","url":"https://taxautomationlab.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"license":"https://taxautomationlab.com/legal-docs/MIT.txt","downloadUrl":"https://github.com/zeddariccardo/tax-automation-lab/releases/latest","codeRepository":"https://github.com/zeddariccardo/tax-automation-lab","featureList":["Mapping entre cuentas y partidas y diagnóstico de cuentas no mapeadas","Reclasificaciones y ajustes book-to-book IAS/IFRS–OIC","Cuadres del período corriente y anterior","Archivo local de clientes y ejercicios","Working paper Excel y exportación PDF"]}</script>
 <style id="tal-publication-layer">
 .tal-publication{position:relative;z-index:52;padding:12px clamp(16px,3vw,34px);background:#0E1624;color:#F7F7F5;border-bottom:1px solid rgba(247,247,245,.14);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif}
 .tal-publication-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -585,7 +585,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Información sobre la herramienta</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Estados financieros · v1.2.0</span>
+<span class="tal-publication-label" data-tal-key="label">Estados financieros · v1.3.0</span>
 <h2 data-tal-key="title">Reclasificación IAS/IFRS en los esquemas estatutarios italianos</h2>
 <p data-tal-key="lead">Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.</p>
 <div class="tal-publication-facts">
@@ -2958,17 +2958,17 @@ renderSavedList();
   function legacyMap(map){var lo={};Object.keys(map||{}).forEach(function(code){var e=map[code];lo[code]=(e&&e.v)?e.v:e;});return lo;}
   function migrate(a){var leg;try{leg=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');}catch(_){leg={};}Object.keys(leg||{}).forEach(function(k){if(a.clients[k])return;var s=leg[k]||{};a.clients[k]={key:k,denominazione:s.denominazione||'',piva:k,cf:'',updatedAt:s.updated||now(),carryBase:{an:{an_denom:s.denominazione||'',an_piva:k},schema:s.schema||'abbrev',leafOverrides:legacyMap(s.map),storni:s.storni||[],adjustments:s.adjustments||[]},years:{}};});}
   function archLoad(){var a;try{a=JSON.parse(localStorage.getItem(ARCH_KEY)||'null');}catch(_){a=null;}if(!a||typeof a!=='object')a={clients:{},_migrated:false};if(!a.clients)a.clients={};if(!a._migrated){migrate(a);a._migrated=true;archSave(a);}return a;}
-  function archSave(a){try{localStorage.setItem(ARCH_KEY,JSON.stringify(a));}catch(_){}}
+  function archSave(a){try{localStorage.setItem(ARCH_KEY,JSON.stringify(a));if(window.fsSetSaveStatus)window.fsSetSaveStatus('Archivio locale aggiornato','ok');return true;}catch(e){if(window.fsSetSaveStatus)window.fsSetSaveStatus('Salvataggio non riuscito: esporta un backup e libera spazio nel browser.','fail');T('Salvataggio locale non riuscito: '+(e&&e.message?e.message:'spazio non disponibile'),true);return false;}}
 
   function capture(){var an={};AN_IDS.forEach(function(id){var el=$id(id);an[id]=el?el.value:'';});return {an:an,schema:(window.schemaMode?window.schemaMode():an.an_schema),accounts:clone(STATE.accounts||[]),leafOverrides:clone(STATE.leafOverrides||{}),storni:clone(STATE.storni||[]),adjustments:clone(STATE.adjustments||[])};}
   function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
 
-  function saveDraft(){if(!fsReady)return;try{localStorage.setItem(DRAFT_KEY,JSON.stringify(capture()));}catch(_){}}
+  function saveDraft(){if(!fsReady)return;try{localStorage.setItem(DRAFT_KEY,JSON.stringify(capture()));if(window.fsSetSaveStatus)window.fsSetSaveStatus('Bozza salvata automaticamente','ok');return true;}catch(e){if(window.fsSetSaveStatus)window.fsSetSaveStatus('Bozza non salvata: esporta un backup.','fail');return false;}}
   function restoreDraft(){var d;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}catch(_){d=null;}if(d&&((d.accounts&&d.accounts.length)||(d.an&&d.an.an_denom))){restore(d,false);}}
 
   function defaultYear(){var pa=(($id('an_periodo_a')||{}).value||($id('an_periodo_da')||{}).value||'');var m=pa.match(/(\d{4})/);return (m&&m[1])||String(new Date().getFullYear());}
   function refreshSaveCard(){var ke=$id('fs_save_key');if(ke)ke.value=key()||'';var ye=$id('fs_save_year');if(ye&&!ye.value)ye.value=defaultYear();}
-  function saveToYear(){var k=key();if(!k){T('Inserisci la P.IVA o il codice fiscale in Anagrafica',true);return;}var ye=$id('fs_save_year');var year=((ye&&ye.value)||'').trim()||defaultYear();var a=archLoad();var cl=a.clients[k]||{key:k,years:{}};cl.key=k;cl.piva=($id('an_piva')||{}).value||'';cl.cf=($id('an_cf')||{}).value||'';cl.denominazione=($id('an_denom')||{}).value||cl.denominazione||'';cl.updatedAt=now();cl.years=cl.years||{};var st=capture();cl.years[year]={savedAt:now(),state:st};cl.carryBase={an:st.an,schema:st.schema,leafOverrides:st.leafOverrides,storni:st.storni,adjustments:st.adjustments};a.clients[k]=cl;archSave(a);selectedClient=k;renderUI();T('Fascicolo salvato: '+(cl.denominazione||k)+' · anno '+year);}
+  function saveToYear(){var k=key();if(!k){T('Inserisci la P.IVA o il codice fiscale in Anagrafica',true);return;}var ye=$id('fs_save_year');var year=((ye&&ye.value)||'').trim()||defaultYear();var a=archLoad();var cl=a.clients[k]||{key:k,years:{}};cl.key=k;cl.piva=($id('an_piva')||{}).value||'';cl.cf=($id('an_cf')||{}).value||'';cl.denominazione=($id('an_denom')||{}).value||cl.denominazione||'';cl.updatedAt=now();cl.years=cl.years||{};var st=capture();cl.years[year]={savedAt:now(),state:st};cl.carryBase={an:st.an,schema:st.schema,leafOverrides:st.leafOverrides,storni:st.storni,adjustments:st.adjustments};a.clients[k]=cl;if(!archSave(a))return;selectedClient=k;renderUI();T('Fascicolo salvato: '+(cl.denominazione||k)+' · anno '+year);}
 
   function clientArr(a){return Object.keys(a.clients).map(function(k){return a.clients[k];}).sort(function(x,y){return new Date(y.updatedAt||0)-new Date(x.updatedAt||0);});}
   function renderClients(){var a=archLoad();var host=$id('fs_client_list');if(!host)return;var arr=clientArr(a);if(!arr.length){host.innerHTML='<div style="font-size:12px;color:var(--g4);font-style:italic;margin-top:8px">Nessun cliente in archivio. Compila l’Anagrafica, elabora un bilancio e salvalo qui.</div>';return;}host.innerHTML=arr.map(function(c){var ny=Object.keys(c.years||{}).length;return '<div class="fs-cli '+(c.key===selectedClient?'active':'')+'" data-fscli="'+esc(c.key)+'"><div class="info"><b>'+esc(c.denominazione||c.key)+'</b><small>'+esc(c.key)+'</small></div><span class="cnt">'+ny+' '+(ny===1?'anno':'anni')+'</span></div>';}).join('');}
@@ -3000,10 +3000,10 @@ renderSavedList();
     if(window.fsShowView)window.fsShowView('import');
     T(carry?('Nuovo anno '+year+': carica il nuovo Excel, la configurazione verrà riapplicata'):('Nuovo anno '+year+' creato: carica il bilancio Excel'));
   }
-  function delYear(y){if(!confirm('Eliminare l’anno '+y+' di questo cliente?'))return;var a=archLoad();var c=a.clients[selectedClient];if(c&&c.years){delete c.years[y];c.updatedAt=now();archSave(a);renderUI();T('Anno '+y+' eliminato');}}
-  function delClient(){if(!selectedClient)return;var a=archLoad();var c=a.clients[selectedClient];if(!confirm('Eliminare il cliente '+((c&&c.denominazione)||selectedClient)+' e tutte le sue annualità?'))return;delete a.clients[selectedClient];archSave(a);selectedClient=null;renderUI();T('Cliente eliminato');}
+  function delYear(y){if(!confirm('Eliminare l’anno '+y+' di questo cliente?'))return;var a=archLoad();var c=a.clients[selectedClient];if(c&&c.years){delete c.years[y];c.updatedAt=now();if(!archSave(a))return;renderUI();T('Anno '+y+' eliminato');}}
+  function delClient(){if(!selectedClient)return;var a=archLoad();var c=a.clients[selectedClient];if(!confirm('Eliminare il cliente '+((c&&c.denominazione)||selectedClient)+' e tutte le sue annualità?'))return;delete a.clients[selectedClient];if(!archSave(a))return;selectedClient=null;renderUI();T('Cliente eliminato');}
   function exportAll(){var a=archLoad();var blob=new Blob([JSON.stringify(a,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var el=document.createElement('a');el.href=url;el.download='FS_archivio_clienti.json';document.body.appendChild(el);el.click();setTimeout(function(){URL.revokeObjectURL(url);el.remove();},400);T('Archivio esportato');}
-  function importAll(file){var r=new FileReader();r.onload=function(){try{var obj=JSON.parse(r.result);if(!obj||!obj.clients)throw new Error('Formato non valido');var a=archLoad();Object.keys(obj.clients).forEach(function(k){a.clients[k]=obj.clients[k];});archSave(a);renderUI();T('Archivio importato');}catch(e){T('Import non riuscito: '+e.message,true);}};r.readAsText(file);}
+  function importAll(file){var r=new FileReader();r.onload=function(){try{var obj=JSON.parse(r.result);if(!obj||!obj.clients)throw new Error('Formato non valido');var a=archLoad();Object.keys(obj.clients).forEach(function(k){a.clients[k]=obj.clients[k];});if(!archSave(a))throw new Error('Salvataggio locale non riuscito');renderUI();T('Archivio importato');}catch(e){T('Import non riuscito: '+e.message,true);}};r.readAsText(file);}
 
   document.addEventListener('click',function(e){
     var cli=e.target.closest('[data-fscli]');if(cli){selectedClient=cli.getAttribute('data-fscli');renderUI();return;}
@@ -3026,7 +3026,7 @@ renderSavedList();
 })();
 </script>
 <script id="fs-v120-reliability">/* ====================================================================
-   Financial Statement v1.2.0 — schema completeness, comparative safety
+   Financial Statement v1.3.0 — schema completeness, comparative safety
    and reliable adjustments / reclassifications
    ==================================================================== */
 (function(){
@@ -3143,13 +3143,205 @@ loadSampleData=function(){fsOriginalLoadSampleData();STATE.comparativeColumnPres
 
 // Keep UI/version metadata aligned.
 V13.version=FS_PATCH_VERSION;document.documentElement.setAttribute('data-tool-version',FS_PATCH_VERSION);
-const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?1\.1\.3/g,'v1.2.0');
+const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?1\.1\.3/g,'v1.3.0');
 const style=document.createElement('style');style.textContent='.adj-tbl{font-size:11px}.adj-edit-tbl input{min-width:92px}.fs-comparative-note{padding:10px;border-radius:8px;background:#fff5d9;color:#72520b}';document.head.appendChild(style);
+if(STATE.accounts&&STATE.accounts.length)refreshAll();
+})();
+</script><script id="fs-v130-audit-remediation">/* ====================================================================
+   Financial Statement v1.3.0 — remediation audit 2026-07-26
+   Schema art. 2424, scadenze per categoria, storage, import e sicurezza.
+   ==================================================================== */
+(function(){
+'use strict';
+const PATCH_VERSION='1.3.0';
+const maturityWarnings=new Set();
+const $id=id=>document.getElementById(id);
+
+function findNode(root,code){let found=null;(function walk(nodes){for(const n of (nodes||[])){if(n.code===code){found=n;return true;}if(walk(n.children||[]))return true;}return false;})(root&&root.nodes);return found;}
+function upsertVoce(code,label,sec){
+  let v=VOCI_ORD.find(x=>x.code===code);
+  if(v){v.label=label;v.sec=sec;}else VOCI_ORD.push({code,label,sec});
+  window.CODE_SECTION[code]=sec;
+}
+function removeVoce(code){const i=VOCI_ORD.findIndex(v=>v.code===code);if(i>=0)VOCI_ORD.splice(i,1);}
+function maturityChildren(base,kind){
+  const prefix=kind==='biii'?'di cui ':'';
+  return [
+    {code:base+'E',label:prefix+'esigibili entro l’esercizio successivo',leaves:[base+'E']},
+    {code:base+'O',label:(kind==='biii'?'esigibili oltre':'di cui esigibili oltre')+' l’esercizio successivo',leaves:[base+'O']}
+  ];
+}
+function configureSchema(){
+  const att=window.SCHEMA_ORD.sp_attivo,pas=window.SCHEMA_ORD.sp_passivo;
+  const biii1=findNode(att,'BIII1');
+  if(biii1){
+    biii1.children=[
+      {code:'BIII1a',label:'a) imprese controllate',leaves:['BIII1a']},
+      {code:'BIII1b',label:'b) imprese collegate',leaves:['BIII1b']},
+      {code:'BIII1c',label:'c) imprese controllanti',leaves:['BIII1c']},
+      {code:'BIII1d',label:'d) imprese sottoposte al controllo delle controllanti',leaves:['BIII1d']},
+      {code:'BIII1dbis',label:'d-bis) altre imprese',leaves:['BIII1dbis']}
+    ];
+  }
+  const biii2=findNode(att,'BIII2');
+  const biiiCats=[
+    ['BIII2a','a) verso imprese controllate'],['BIII2b','b) verso imprese collegate'],
+    ['BIII2c','c) verso controllanti'],['BIII2d','d) verso imprese sottoposte al controllo delle controllanti'],
+    ['BIII2dbis','d-bis) verso altri']
+  ];
+  if(biii2)biii2.children=biiiCats.map(([code,label])=>({code,label,children:maturityChildren(code,'biii')}));
+  const biii=findNode(att,'BIII');
+  if(biii&&!findNode(att,'BIII4'))biii.children.push({code:'BIII4',label:'4) strumenti finanziari derivati attivi',leaves:['BIII4']});
+
+  const cii=findNode(att,'CII');
+  const ciiCats=[
+    ['CII1','1) verso clienti'],['CII2','2) verso imprese controllate'],['CII3','3) verso imprese collegate'],
+    ['CII4','4) verso controllanti'],['CII5','5) verso imprese sottoposte al controllo delle controllanti'],
+    ['CII5bis','5-bis) crediti tributari'],['CII5ter','5-ter) imposte anticipate'],['CII5quater','5-quater) verso altri']
+  ];
+  if(cii)cii.children=ciiCats.map(([code,label])=>({code,label,children:maturityChildren(code,'cii')}));
+
+  const ciii=findNode(att,'CIII');
+  if(ciii)ciii.children=[
+    {code:'CIII1',label:'1) partecipazioni in imprese controllate',leaves:['CIII1']},
+    {code:'CIII2',label:'2) partecipazioni in imprese collegate',leaves:['CIII2']},
+    {code:'CIII3',label:'3) partecipazioni in imprese controllanti',leaves:['CIII3']},
+    {code:'CIII3bis',label:'3-bis) partecipazioni in imprese sottoposte al controllo delle controllanti',leaves:['CIII3bis']},
+    {code:'CIII4',label:'4) altre partecipazioni',leaves:['CIII4']},
+    {code:'CIII5',label:'5) strumenti finanziari derivati attivi',leaves:['CIII5']},
+    {code:'CIII6',label:'6) altri titoli',leaves:['CIII6','CIII']}
+  ];
+  const civ=findNode(att,'CIV');
+  if(civ)civ.children=[
+    {code:'CIV1',label:'1) depositi bancari e postali',leaves:['CIV1','CIV']},
+    {code:'CIV2',label:'2) assegni',leaves:['CIV2']},
+    {code:'CIV3',label:'3) danaro e valori in cassa',leaves:['CIV3']}
+  ];
+
+  const debt=findNode(pas,'D');
+  const debtCats=[
+    ['D1','1) obbligazioni'],['D2','2) obbligazioni convertibili'],['D3','3) debiti verso soci per finanziamenti'],
+    ['D4','4) debiti verso banche'],['D5','5) debiti verso altri finanziatori'],['D6','6) acconti'],
+    ['D7','7) debiti verso fornitori'],['D8','8) debiti rappresentati da titoli di credito'],
+    ['D9','9) debiti verso imprese controllate'],['D10','10) debiti verso imprese collegate'],
+    ['D11','11) debiti verso controllanti'],['D11bis','11-bis) debiti verso imprese sottoposte al controllo delle controllanti'],
+    ['D12','12) debiti tributari'],['D13','13) debiti verso istituti di previdenza e sicurezza sociale'],['D14','14) altri debiti']
+  ];
+  if(debt)debt.children=debtCats.map(([code,label])=>({code,label,children:maturityChildren(code,'debt')}));
+
+  const entries=[
+    ['BIII1d','B) Immobilizzazioni › III - Immobilizzazioni finanziarie › 1) partecipazioni › d) imprese sottoposte al controllo delle controllanti','sp_attivo'],
+    ['BIII1dbis','B) Immobilizzazioni › III - Immobilizzazioni finanziarie › 1) partecipazioni › d-bis) altre imprese','sp_attivo'],
+    ['BIII4','B) Immobilizzazioni › III - Immobilizzazioni finanziarie › 4) strumenti finanziari derivati attivi','sp_attivo'],
+    ['CIII2','C) Attivo circolante › III - Attività finanziarie non immobilizzate › 2) partecipazioni in imprese collegate','sp_attivo'],
+    ['CIII3','C) Attivo circolante › III - Attività finanziarie non immobilizzate › 3) partecipazioni in imprese controllanti','sp_attivo'],
+    ['CIII3bis','C) Attivo circolante › III - Attività finanziarie non immobilizzate › 3-bis) partecipazioni in imprese sottoposte al controllo delle controllanti','sp_attivo'],
+    ['CIII5','C) Attivo circolante › III - Attività finanziarie non immobilizzate › 5) strumenti finanziari derivati attivi','sp_attivo'],
+    ['CIV2','C) Attivo circolante › IV - Disponibilità liquide › 2) assegni','sp_attivo']
+  ];
+  entries.forEach(x=>upsertVoce(...x));
+  biiiCats.forEach(([base,label])=>{
+    upsertVoce(base+'E','B) Immobilizzazioni › III - Immobilizzazioni finanziarie › 2) crediti › '+label+' › esigibili entro esercizio successivo','sp_attivo');
+    upsertVoce(base+'O','B) Immobilizzazioni › III - Immobilizzazioni finanziarie › 2) crediti › '+label+' › esigibili oltre esercizio successivo','sp_attivo');
+  });
+  ciiCats.forEach(([base,label])=>{
+    upsertVoce(base+'E','C) Attivo circolante › II - Crediti › '+label+' › esigibili entro esercizio successivo','sp_attivo');
+    upsertVoce(base+'O','C) Attivo circolante › II - Crediti › '+label+' › esigibili oltre esercizio successivo','sp_attivo');
+  });
+  debtCats.forEach(([base,label])=>{
+    upsertVoce(base+'E','D) Debiti › '+label+' › esigibili entro esercizio successivo','sp_passivo');
+    upsertVoce(base+'O','D) Debiti › '+label+' › esigibili oltre esercizio successivo','sp_passivo');
+  });
+  ['D2','D8'].forEach(c=>window.CODE_SECTION[c]='sp_passivo');
+  const legacyBases=[...biiiCats.map(x=>x[0]),...ciiCats.map(x=>x[0]),...debtCats.map(x=>x[0]),'CIIE','CIIO','CIIIA','DE','DO','BIII'];
+  legacyBases.forEach(removeVoce);
+}
+configureSchema();
+
+const LEGACY={CIIE:'CII5quaterE',CIIO:'CII5quaterO',CIIIA:'CII5terE',DE:'D14E',DO:'D14O',BIII:'BIII2dbisO'};
+['BIII2a','BIII2b','BIII2c','BIII2d','BIII2dbis'].forEach(c=>LEGACY[c]=c+'O');
+['CII1','CII2','CII3','CII4','CII5','CII5bis','CII5ter','CII5quater'].forEach(c=>LEGACY[c]=c+'E');
+['D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D11bis','D12','D13','D14'].forEach(c=>LEGACY[c]=c+'E');
+const oldCanonical=V13.canonicalLeaf;
+V13.canonicalLeaf=function(code,mode){
+  const raw=String(code==null?'':code).trim();
+  if(mode==='ordinary'&&LEGACY[raw]){maturityWarnings.add(raw+' → '+LEGACY[raw]);return LEGACY[raw];}
+  return oldCanonical.call(V13,code,mode);
+};
+
+function formulaGuard(wb){
+  const norm=s=>String(s==null?'':s).trim().toLowerCase();
+  for(const name of wb.SheetNames||[]){
+    const ws=wb.Sheets[name];if(!ws||!ws['!ref'])continue;
+    const range=XLSX.utils.decode_range(ws['!ref']);let hdr=-1,amountCols=[];
+    for(let r=range.s.r;r<=Math.min(range.e.r,range.s.r+14);r++){
+      const row=[];for(let c=range.s.c;c<=range.e.c;c++){const cell=ws[XLSX.utils.encode_cell({r,c})];row.push(norm(cell&&cell.v));}
+      const cols=[];row.forEach((v,i)=>{if(v==='importo esercizio corrente'||v==='importo esercizio precedente')cols.push(range.s.c+i);});
+      if(cols.length){hdr=r;amountCols=cols;break;}
+    }
+    if(hdr<0)continue;
+    const bad=[];
+    for(let r=hdr+1;r<=range.e.r;r++)for(const c of amountCols){const addr=XLSX.utils.encode_cell({r,c}),cell=ws[addr];if(cell&&cell.f&&(cell.v===undefined||cell.v===null||cell.v===''))bad.push(addr);}
+    if(bad.length)throw new Error('Il foglio "'+name+'" contiene formule senza risultato memorizzato ('+bad.slice(0,8).join(', ')+(bad.length>8?'…':'')+'). Apri e salva il file in Excel/LibreOffice oppure sostituisci le formule con valori.');
+  }
+}
+const previousParseWorkbook=parseWorkbook;
+parseWorkbook=function(wb){formulaGuard(wb);const out=previousParseWorkbook(wb);setSaveStatus('Bilancio importato · fascicolo non ancora salvato','warn');return out;};
+
+function safeRecord(raw,key){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('Memoria '+key+' non valida.');
+  const map={};
+  for(const [ak,av] of Object.entries(raw.map||{})){
+    if(!av||typeof av!=='object')continue;
+    const leaf=V13.canonicalLeaf(av.v,schemaMode());
+    if(!leaf)continue;
+    map[String(ak).slice(0,180)]={code:String(av.code||'').slice(0,80),source:String(av.source||'').slice(0,20),d:String(av.d||'').slice(0,300),v:leaf};
+  }
+  return {denominazione:String(raw.denominazione||key).slice(0,200),updated:String(raw.updated||new Date().toISOString()),count:Object.keys(map).length,map,format:5};
+}
+function button(text,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.addEventListener('click',fn);return b;}
+renderSavedList=function(){
+  const all=loadAllMemory(),el=$id('saved_list');if(!el)return;el.replaceChildren();
+  const keys=Object.keys(all);if(!keys.length){const d=document.createElement('div');d.style.cssText='font-size:12px;color:var(--g4);font-style:italic;margin-top:8px';d.textContent='Nessuna memoria salvata.';el.appendChild(d);return;}
+  keys.forEach(k=>{const s=all[k]||{},row=document.createElement('div');row.className='saved-item';const info=document.createElement('div');info.className='info';const bold=document.createElement('b');bold.textContent=s.denominazione||k;const small=document.createElement('small');const date=s.updated?new Date(s.updated).toLocaleDateString('it-IT'):'—';small.textContent=k+' · '+(s.count||0)+' conti · '+date;info.append(bold,small);row.append(info,button('Carica','lk',()=>loadSpecificMemory(k)),button('Esporta','lk',()=>exportSingleMemory(k)),button('Elimina','lk del',()=>deleteMemory(k)));el.appendChild(row);});
+};
+renderMemoryModal=function(){
+  const host=$id('modal_mappings_list');if(!host)return;host.replaceChildren();const all=loadAllMemory(),keys=Object.keys(all);
+  if(!keys.length){const p=document.createElement('p');p.style.cssText='font-style:italic;color:var(--g4)';p.textContent='Nessuna memoria salvata.';host.appendChild(p);return;}
+  const list=document.createElement('div');list.className='saved-list';keys.forEach(k=>{const s=all[k]||{},row=document.createElement('div');row.className='saved-item';const info=document.createElement('div');info.className='info';const b=document.createElement('b');b.textContent=s.denominazione||k;const sm=document.createElement('small');sm.textContent=k+' · '+(s.count||0)+' conti · '+(s.updated?new Date(s.updated).toLocaleDateString('it-IT'):'—');info.append(b,sm);row.append(info,button('Esporta','lk',()=>exportSingleMemory(k)),button('Elimina','lk del',()=>deleteMemory(k)));list.appendChild(row);});host.appendChild(list);
+  const actions=document.createElement('div');actions.className='btn-row';actions.style.marginTop='20px';actions.append(button('Esporta tutte (JSON)','btn secondary',exportAllMemory));const label=document.createElement('label');label.className='btn ghost';label.htmlFor='import_mem_file';label.textContent='Importa da JSON';const input=document.createElement('input');input.type='file';input.id='import_mem_file';input.accept='.json,application/json';input.addEventListener('change',importMemoryFile);actions.append(label,input);host.appendChild(actions);
+};
+importMemoryFile=function(evt){const file=evt.target.files&&evt.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const data=JSON.parse(e.target.result);if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Struttura radice non valida.');const all=loadAllMemory();let n=0;for(const [k,v] of Object.entries(data)){const key=String(k).trim().slice(0,80);if(!key)continue;all[key]=safeRecord(v,key);n++;}if(!n)throw new Error('Nessuna memoria valida trovata.');if(!writeAllMemory(all))return;renderMemoryModal();renderSavedList();toast('Importate '+n+' memorie verificate.');}catch(err){toast('File non valido: '+err.message,true);}finally{evt.target.value='';}};reader.readAsText(file);};
+
+const previousLoadSpecific=loadSpecificMemory;
+loadSpecificMemory=function(piva){const current=currentPIVA();if(STATE.accounts.length&&current&&current!==piva){toast('La memoria appartiene a un’altra società. Apri un nuovo fascicolo prima di applicarla, per evitare contaminazioni tra clienti.',true);return;}return previousLoadSpecific(piva);};
+
+function clearWorkingData(){STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];window.RESULT=null;const e=$id('empty_results'),r=$id('results_content');if(e)e.style.display='block';if(r)r.style.display='none';if(window.fsArchRefreshUI)window.fsArchRefreshUI();}
+['an_piva','an_cf'].forEach(id=>{const el=$id(id);if(!el)return;el.addEventListener('focus',()=>{el.dataset.fsOldValue=el.value;});el.addEventListener('change',()=>{const old=String(el.dataset.fsOldValue||'').trim(),now=String(el.value||'').trim();if(old&&now&&old!==now&&STATE.accounts.length){if(confirm('Stai cambiando l’identità della società. Per evitare contaminazioni, il bilancio e le rettifiche correnti saranno rimossi. Continuare?')){clearWorkingData();setSaveStatus('Nuova società · carica il relativo bilancio','warn');}else el.value=old;}});});
+
+function setSaveStatus(text,kind){let el=$id('fs_save_status');if(!el){el=document.createElement('div');el.id='fs_save_status';el.setAttribute('role','status');el.setAttribute('aria-live','polite');const anchor=$id('fs_save_hint')||$id('fs_save_btn');if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(el,anchor.nextSibling);}if(!el)return;el.className='fs-save-status '+(kind||'');el.textContent=text;}
+window.fsSetSaveStatus=setSaveStatus;
+const oldSaveMapping=saveCurrentMapping;
+saveCurrentMapping=function(){const before=(loadAllMemory()[currentPIVA()]||{}).updated;const r=oldSaveMapping();const after=(loadAllMemory()[currentPIVA()]||{}).updated;if(after&&after!==before)setSaveStatus('Mappatura salvata · '+new Date(after).toLocaleString('it-IT'),'ok');return r;};
+
+const oldChecks=renderChecks;
+renderChecks=function(){oldChecks();const grid=document.querySelector('#tab_checks .checks-grid');if(!grid)return;const warn=[...maturityWarnings];const card=document.createElement('div');card.className='check-item '+(warn.length?'warn':'ok');card.innerHTML='<div class="name">Scadenze entro/oltre</div><div class="value">'+(warn.length?warn.length+' mapping migrati':'Complete')+'</div><div class="desc"></div>';card.querySelector('.desc').textContent=warn.length?'Le vecchie voci sono state migrate con una scadenza prudenziale predefinita. Verifica: '+warn.slice(0,6).join(' · ')+(warn.length>6?'…':''):'Ogni categoria di crediti e debiti distingue la quota entro e oltre l’esercizio successivo.';grid.appendChild(card);};
+
+function accessibility(){
+  document.querySelectorAll('.modal-ov').forEach(m=>{m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');});
+  document.querySelectorAll('.close-btn').forEach(b=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label','Chiudi finestra');});
+  const tabs=[...document.querySelectorAll('[data-tab]')];tabs.forEach((t,i)=>{t.setAttribute('role','tab');t.setAttribute('tabindex',t.classList.contains('active')?'0':'-1');t.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();let n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[n].focus();tabs[n].click();});});
+}
+
+V13.version=PATCH_VERSION;document.documentElement.setAttribute('data-tool-version',PATCH_VERSION);
+document.querySelectorAll('.tool-version,.version-chip').forEach(el=>{el.textContent=String(el.textContent||'').replace(/v?1\.2\.0/g,'v1.3.0');});
+const style=document.createElement('style');style.textContent='.fs-save-status{margin-top:8px;font-size:12px;font-weight:700;color:var(--g5)}.fs-save-status.ok{color:#176b45}.fs-save-status.warn{color:#8a5a00}.fs-save-status.fail{color:var(--warn)}';document.head.appendChild(style);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{accessibility();setSaveStatus('Bozza locale attiva · salva il fascicolo per archiviarlo','warn');});else{accessibility();setSaveStatus('Bozza locale attiva · salva il fascicolo per archiviarlo','warn');}
 if(STATE.accounts&&STATE.accounts.length)refreshAll();
 })();
 </script><script id="tal-publication-i18n">
 (function(){
- const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.2.0","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.2.0","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.2.0","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
+ const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.3.0","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.3.0","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.3.0","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
  const seo={"it":{"title":"Tool riclassificazione bilancio IAS/IFRS in IV Direttiva | Tax Automation Lab","description":"Tool gratuito per riclassificare trial balance e bilanci IAS/IFRS secondo gli schemi civilistici italiani, con mapping dei conti, rettifiche, quadrature, archivio clienti ed esportazione Excel e PDF."},"en":{"title":"IAS/IFRS reclassification into Italian statutory formats | Tax Automation Lab","description":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail."},"es":{"title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos | Tax Automation Lab","description":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta."}};
  const buttons=[...document.querySelectorAll('[data-tal-lang]')];
  function setLang(lang,persist=true){

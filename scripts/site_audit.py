@@ -52,13 +52,13 @@ for p in html_files:
         if not target.exists(): issues.append(f'{rel}: missing internal target {u}')
 
 # Ensure operational scripts in the tool pages have not been unexpectedly removed.
-for rel in ('tools/financial-statement/index.html','tools/tfa-client-file/index.html','tools/lipe/index.html'):
+for rel in ('tools/financial-statement/index.html','tools/financial-analysis/index.html','tools/tfa-client-file/index.html','tools/lipe/index.html'):
     p=ROOT/rel; soup=BeautifulSoup(p.read_text(encoding='utf-8'),'html.parser')
     js=sum(len((x.string or x.get_text() or '')) for x in soup.find_all('script') if (x.get('type') or '').lower()!='application/ld+json')
     if js<500_000: issues.append(f'{rel}: operational JavaScript unexpectedly small ({js} bytes)')
 
 
-# v6.12.0: reject suspicious long zero-width watermark sequences.
+# v6.13.0: reject suspicious long zero-width watermark sequences.
 ZERO_WIDTH_FORBIDDEN = re.compile(r'[\u200b\u200c\ufeff]{20,}')
 for _p in ROOT.rglob('*.html'):
     _t = _p.read_text(encoding='utf-8', errors='replace')

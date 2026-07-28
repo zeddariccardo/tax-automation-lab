@@ -1,5 +1,5 @@
 {
-  "release": "v6.15.2",
+  "release": "v6.15.3",
   "date": "2026-07-28",
   "privacy_model": {
     "processing": "local_in_browser",
@@ -21,7 +21,7 @@
     {
       "slug": "financial-analysis",
       "name": "Analisi di bilancio",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "site_url": "https://taxautomationlab.com/tools/financial-analysis/",
       "release_filename": null,
       "distribution": "online_only",

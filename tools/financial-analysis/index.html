@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-tool-version="2.0.2" lang="it">
+<html data-tool-version="2.0.3" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -2604,7 +2604,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="tal-fa-v202-ux">
 (function(){
 'use strict';
-const TAL_VERSION='2.0.2';
+const TAL_VERSION='2.0.3';
 let installed=false;
 function esc2(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function css(){if(document.getElementById('tal-commandbar-style'))return;const s=document.createElement('style');s.id='tal-commandbar-style';s.textContent=`
@@ -2638,6 +2638,98 @@ function bar(){if(document.getElementById('tal-commandbar'))return;const h=docum
 function version(){document.documentElement.dataset.toolVersion=TAL_VERSION;document.querySelectorAll('.tal-publication-label').forEach(x=>x.textContent=x.textContent.replace(/v\d+\.\d+\.\d+/,'v'+TAL_VERSION));document.querySelectorAll('.sb-brandtext small').forEach(x=>x.textContent='Dashboard · KPI · Pianificazione');}
 function install(){if(installed)return;installed=true;css();installSetView();ensureDashboard();bar();version();if(typeof renderExecutive==='function')renderExecutive();updateLabel();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(install,0));else setTimeout(install,0);
+})();
+</script>
+<script id="tal-fa-v203-dashboard-nav-fix">
+/* Tax Automation Lab — Financial Analysis v2.0.3
+   Persistent Dashboard entry: survives every sidebar re-render. */
+(function(){
+'use strict';
+const VERSION='2.0.3';
+let observer=null;
+
+function dashboardButton(){
+  const button=document.createElement('button');
+  button.className='fs-link';
+  button.type='button';
+  button.dataset.view='executive';
+  button.setAttribute('aria-label','Dashboard');
+  button.innerHTML='<span class="ws-ic" aria-hidden="true">▦</span><span>Dashboard</span><span class="nav-badge" id="navbadge-executive"></span>';
+  button.addEventListener('click',function(){
+    if(typeof window.setView==='function') window.setView('executive');
+    if(typeof window.renderExecutive==='function') window.renderExecutive();
+  });
+  return button;
+}
+
+function ensureDashboardView(){
+  if(document.getElementById('view-executive')) return true;
+  if(typeof window.v20InstallExecutive==='function'){
+    window.v20InstallExecutive();
+    return !!document.getElementById('view-executive');
+  }
+  return false;
+}
+
+function ensureDashboardNav(){
+  const nav=document.getElementById('workspace-nav');
+  if(!nav) return;
+  if(nav.querySelector('.fs-link[data-view="executive"]')) return;
+
+  ensureDashboardView();
+  const button=dashboardButton();
+  const reclass=nav.querySelector('.fs-link[data-view="reclass"]');
+  const kpi=nav.querySelector('.fs-link[data-view="kpi"]');
+  const anchor=reclass||kpi;
+  if(anchor) nav.insertBefore(button,anchor);
+  else nav.appendChild(button);
+
+  const active=document.querySelector('.fs-view.active');
+  if(active&&active.id==='view-executive') button.classList.add('active');
+}
+
+function protectSidebarRendering(){
+  if(window.__talDashboardSidebarProtected203) return;
+  window.__talDashboardSidebarProtected203=true;
+  if(typeof window.renderSidebar==='function'){
+    const base=window.renderSidebar;
+    window.renderSidebar=function(){
+      const result=base.apply(this,arguments);
+      queueMicrotask(ensureDashboardNav);
+      return result;
+    };
+    try{ renderSidebar=window.renderSidebar; }catch(_){ }
+  }
+}
+
+function observeSidebar(){
+  const nav=document.getElementById('workspace-nav');
+  if(!nav||observer) return;
+  observer=new MutationObserver(function(){
+    if(!nav.querySelector('.fs-link[data-view="executive"]')) queueMicrotask(ensureDashboardNav);
+  });
+  observer.observe(nav,{childList:true});
+}
+
+function updateVersion(){
+  document.documentElement.dataset.toolVersion=VERSION;
+  document.querySelectorAll('.tal-publication-label').forEach(function(el){
+    el.textContent=el.textContent.replace(/v\d+\.\d+\.\d+/,'v'+VERSION);
+  });
+}
+
+function install(){
+  protectSidebarRendering();
+  ensureDashboardNav();
+  observeSidebar();
+  updateVersion();
+  setTimeout(ensureDashboardNav,50);
+  setTimeout(ensureDashboardNav,250);
+  setTimeout(ensureDashboardNav,1000);
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
+else install();
 })();
 </script>
 </body></html>

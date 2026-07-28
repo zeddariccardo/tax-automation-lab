@@ -1,0 +1,46 @@
+{
+  "release": "v6.15.3",
+  "date": "2026-07-28",
+  "status": "passed_browser_qa",
+  "checks": {
+    "it": {
+      "tool_version": "2.0.3",
+      "dashboard_nav_count": 1,
+      "dashboard_nav_visible": true,
+      "dashboard_before_reclass": true,
+      "dashboard_view_active_after_click": 1,
+      "dashboard_empty_text": "Dashboard non disponibile\n\nCarica un bilancio valido per generare il cruscotto.",
+      "dashboard_nav_count_after_sidebar_rerender": 1,
+      "dashboard_nav_visible_after_sidebar_rerender": true,
+      "dashboard_before_reclass_after_rerender": true,
+      "page_errors": [],
+      "javascript_syntax_errors": []
+    },
+    "en": {
+      "tool_version": "2.0.3",
+      "dashboard_nav_count": 1,
+      "dashboard_nav_visible": true,
+      "dashboard_before_reclass": true,
+      "dashboard_view_active_after_click": 1,
+      "dashboard_empty_text": "Dashboard non disponibile\n\nCarica un bilancio valido per generare il cruscotto.",
+      "dashboard_nav_count_after_sidebar_rerender": 1,
+      "dashboard_nav_visible_after_sidebar_rerender": true,
+      "dashboard_before_reclass_after_rerender": true,
+      "page_errors": [],
+      "javascript_syntax_errors": []
+    },
+    "es": {
+      "tool_version": "2.0.3",
+      "dashboard_nav_count": 1,
+      "dashboard_nav_visible": true,
+      "dashboard_before_reclass": true,
+      "dashboard_view_active_after_click": 1,
+      "dashboard_empty_text": "Dashboard non disponibile\n\nCarica un bilancio valido per generare il cruscotto.",
+      "dashboard_nav_count_after_sidebar_rerender": 1,
+      "dashboard_nav_visible_after_sidebar_rerender": true,
+      "dashboard_before_reclass_after_rerender": true,
+      "page_errors": [],
+      "javascript_syntax_errors": []
+    }
+  }
+}

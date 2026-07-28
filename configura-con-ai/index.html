@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#0E1624" name="theme-color"/>
 <title>Configura i tool con la tua AI | Tax Automation Lab</title><meta content="Scarica i template disponibili, usa prompt guidati per prepararli con la tua AI e segui le istruzioni di importazione nei tool." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><meta content="Riccardo Zedda" name="author"/>
@@ -122,10 +123,39 @@ REGOLA VINCOLANTE — CONTI, SOTTOCONTI E GRANULARITÀ
 - Mantieni invariato il codice ERP completo. Non inventare suffissi e non rinumerare i conti, salvo richiesta espressa dell’utente.
 - Conti con lo stesso codice ma descrizione diversa devono essere conservati come righe distinte e classificati separatamente.
 - Se un conto principale e i relativi sottoconti hanno la stessa natura contabile, assegna la medesima categoria/voce, senza aggregarne gli importi.
-- Il numero delle righe restituite deve coincidere con quello delle righe contabili del sorgente, escluse soltanto righe vuote e righe di totale chiaramente identificabili.
-- Prima di restituire il file, esegui una quadratura del numero di righe: righe sorgente considerate = righe di output. Segnala ogni esclusione nel riepilogo.
+- Tutte le righe contabili originarie devono essere restituite 1:1, escluse soltanto righe vuote e righe di totale chiaramente identificabili. L’eventuale TAL_AIX è l’unica riga tecnica aggiuntiva ammessa da questa regola.
+- Prima di restituire il file, esegui una quadratura distinta: righe originarie sorgente considerate = righe originarie conservate nell’output. Segnala ogni esclusione e indica separatamente l’eventuale TAL_AIX.
+
+GESTIONE DEL RISULTATO D’ESERCIZIO E DELLE DIVERSE FORME DI BILANCIO
+Il file sorgente può essere un bilancio di verifica ante chiusura, un bilancio post chiusura oppure uno schema già riclassificato. Per ciascun esercizio:
+1. calcola separatamente il saldo netto dello Stato Patrimoniale;
+2. calcola separatamente il risultato del Conto Economico;
+3. verifica se la differenza dello Stato Patrimoniale coincide, con segno opposto, con il risultato del Conto Economico;
+4. verifica se nel patrimonio netto è già presente una voce riconducibile a Utile dell’esercizio, Perdita dell’esercizio, Risultato dell’esercizio o equivalente, classificata in A.IX.
+
+Se il risultato è già presente nello Stato Patrimoniale, non aggiungere né duplicare alcuna riga.
+
+Se il risultato non è presente e la differenza dello Stato Patrimoniale coincide esattamente con il risultato del Conto Economico, considera il file ante chiusura. Conserva tutte le righe originarie e aggiungi una sola riga tecnica aggiuntiva:
+- Codice conto: TAL_AIX;
+- Descrizione: Utile dell’esercizio — voce tecnica derivata, oppure Perdita dell’esercizio — voce tecnica derivata;
+- Voce IV Direttiva: AIX;
+- Importo: quello necessario a completare la quadratura secondo la convenzione dei segni del template.
+
+La riga TAL_AIX non è un codice ERP e non modifica il conteggio delle righe sorgente: deve essere indicata separatamente negli Esiti AI come riga tecnica derivata, specificando saldo SP, risultato CE, importo ricostruito e verifica richiesta al professionista.
+
+Se la differenza dello Stato Patrimoniale non coincide con il risultato del Conto Economico, non creare scritture di quadratura, conti fittizi o valori compensativi. Mantieni i dati disponibili e segnala l’anomalia negli Esiti AI. È vietato creare TAL_AIX al solo scopo di forzare una quadratura non dimostrata.
+
+CONTROLLO DI CHIUSURA DA RIPORTARE IN “ESITI AI”
+- tipologia rilevata: ante chiusura, post chiusura o non determinabile;
+- convenzione dei segni rilevata;
+- saldo dello Stato Patrimoniale;
+- risultato del Conto Economico;
+- presenza o assenza del risultato in A.IX;
+- eventuale riga TAL_AIX aggiunta;
+- quadratura finale;
+- anomalie non risolte.
 </pre></details><p class="prompt-note">Il prompt ordina all’AI di non inventare, di non modificare la struttura del template e di separare chiaramente i punti da verificare.</p></div></article><article class="tool-card surface fa-config-card" id="financial-analysis-card"><span class="label">CONTROLLING · ANALISI E PIANIFICAZIONE</span><h2>Analisi di bilancio</h2><p>Prepara il bilancio già classificato per riclassificazioni gestionali, KPI, dashboard, rendiconto, budget, forecast e centri di costo, preservando ogni conto e sottoconto.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Bilancio civilistico o trial balance già classificato</li><li>Piano dei conti con saldi comparativi</li><li>Budget, forecast e allocazioni per centro di costo</li><li>Reporting gestionale e informazioni integrative</li></ul></div><div class="callout">Il template principale contiene Actual, Budget, Forecast e centri di costo. Budget, Forecast e allocazioni possono essere parziali e vengono segnalati come moduli facoltativi.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx">Scarica il template ↓</a><button class="button secondary copy-btn" data-copy="fa-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/financial-analysis/">Apri il tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="fa-prompt">TAX AUTOMATION LAB — PROMPT DI CONFIGURAZIONE
-ANALISI DI BILANCIO v2.0.0
+ANALISI DI BILANCIO v2.0.4
 
 Agisci come assistente di data preparation contabile e finanziaria per Tax Automation Lab.
 
@@ -137,7 +167,7 @@ REGOLE OBBLIGATORIE SU CONTI E SOTTOCONTI
 2. Non aggregare, eliminare o compensare righe che condividono lo stesso codice conto.
 3. Mantieni invariato il codice ERP originale. Non inventare un nuovo codice contabile e non aggiungere suffissi al codice visibile.
 4. Quando più righe hanno lo stesso codice, distinguerle tramite la descrizione completa. Il tool creerà internamente una chiave tecnica univoca.
-5. Il numero delle righe restituite deve coincidere con il file sorgente, escluse soltanto righe vuote e righe di totale esplicite.
+5. Tutte le righe contabili originarie devono essere conservate 1:1, escluse soltanto righe vuote e righe di totale esplicite. L’eventuale TAL_AIX è una riga tecnica aggiuntiva e non sostituisce né modifica alcuna riga ERP.
 6. Assegna a ciascun sottoconto la voce IV Direttiva appropriata. Se la natura contabile è la stessa del conto principale, utilizza la medesima categoria.
 7. Se la descrizione del sottoconto indica una natura differente dal conto principale, classifica secondo la sostanza economico-contabile e segnala il dubbio nel foglio “Esiti AI”.
 8. Non utilizzare la sola coincidenza del codice per fondere due righe.
@@ -169,7 +199,7 @@ DIVIETI
 
 CONTROLLO FINALE
 Prima di restituire il file:
-1. confronta il numero di righe del sorgente con quello dell’output;
+1. confronta il numero delle righe contabili originarie del sorgente con il numero delle righe originarie conservate nell’output, separando l’eventuale TAL_AIX;
 2. verifica che ogni conto/sottoconto abbia codice, descrizione, importi e voce IV coerenti;
 3. elenca separatamente le righe non classificabili con sufficiente affidabilità;
 4. fornisci un breve riepilogo delle fonti utilizzate e delle verifiche ancora richieste al professionista.
@@ -182,8 +212,37 @@ REGOLA VINCOLANTE — CONTI, SOTTOCONTI E GRANULARITÀ
 - Mantieni invariato il codice ERP completo. Non inventare suffissi e non rinumerare i conti, salvo richiesta espressa dell’utente.
 - Conti con lo stesso codice ma descrizione diversa devono essere conservati come righe distinte e classificati separatamente.
 - Se un conto principale e i relativi sottoconti hanno la stessa natura contabile, assegna la medesima categoria/voce, senza aggregarne gli importi.
-- Il numero delle righe restituite deve coincidere con quello delle righe contabili del sorgente, escluse soltanto righe vuote e righe di totale chiaramente identificabili.
-- Prima di restituire il file, esegui una quadratura del numero di righe: righe sorgente considerate = righe di output. Segnala ogni esclusione nel riepilogo.
+- Tutte le righe contabili originarie devono essere restituite 1:1, escluse soltanto righe vuote e righe di totale chiaramente identificabili. L’eventuale TAL_AIX è l’unica riga tecnica aggiuntiva ammessa da questa regola.
+- Prima di restituire il file, esegui una quadratura distinta: righe originarie sorgente considerate = righe originarie conservate nell’output. Segnala ogni esclusione e indica separatamente l’eventuale TAL_AIX.
+
+GESTIONE DEL RISULTATO D’ESERCIZIO E DELLE DIVERSE FORME DI BILANCIO
+Il file sorgente può essere un bilancio di verifica ante chiusura, un bilancio post chiusura oppure uno schema già riclassificato. Per ciascun esercizio:
+1. calcola separatamente il saldo netto dello Stato Patrimoniale;
+2. calcola separatamente il risultato del Conto Economico;
+3. verifica se la differenza dello Stato Patrimoniale coincide, con segno opposto, con il risultato del Conto Economico;
+4. verifica se nel patrimonio netto è già presente una voce riconducibile a Utile dell’esercizio, Perdita dell’esercizio, Risultato dell’esercizio o equivalente, classificata in A.IX.
+
+Se il risultato è già presente nello Stato Patrimoniale, non aggiungere né duplicare alcuna riga.
+
+Se il risultato non è presente e la differenza dello Stato Patrimoniale coincide esattamente con il risultato del Conto Economico, considera il file ante chiusura. Conserva tutte le righe originarie e aggiungi una sola riga tecnica aggiuntiva:
+- Codice conto: TAL_AIX;
+- Descrizione: Utile dell’esercizio — voce tecnica derivata, oppure Perdita dell’esercizio — voce tecnica derivata;
+- Voce IV Direttiva: AIX;
+- Importo: quello necessario a completare la quadratura secondo la convenzione dei segni del template.
+
+La riga TAL_AIX non è un codice ERP e non modifica il conteggio delle righe sorgente: deve essere indicata separatamente negli Esiti AI come riga tecnica derivata, specificando saldo SP, risultato CE, importo ricostruito e verifica richiesta al professionista.
+
+Se la differenza dello Stato Patrimoniale non coincide con il risultato del Conto Economico, non creare scritture di quadratura, conti fittizi o valori compensativi. Mantieni i dati disponibili e segnala l’anomalia negli Esiti AI. È vietato creare TAL_AIX al solo scopo di forzare una quadratura non dimostrata.
+
+CONTROLLO DI CHIUSURA DA RIPORTARE IN “ESITI AI”
+- tipologia rilevata: ante chiusura, post chiusura o non determinabile;
+- convenzione dei segni rilevata;
+- saldo dello Stato Patrimoniale;
+- risultato del Conto Economico;
+- presenza o assenza del risultato in A.IX;
+- eventuale riga TAL_AIX aggiunta;
+- quadratura finale;
+- anomalie non risolte.
 </pre></details><p class="prompt-note">Il prompt conserva la granularità del piano dei conti, vieta aggregazioni e richiede la quadratura tra righe sorgente e righe di output.</p></div></article>
 <article class="tool-card surface"><span class="label">IVA · CONFIGURAZIONE PERMANENTE</span><h2>Codiciario LIPE</h2><p>Configura anagrafica e significato stabile dei codici IVA. Questa fase non contiene gli importi mensili o trimestrali, che saranno caricati successivamente nel tool.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Codiciario IVA del gestionale</li><li>Registri IVA o liquidazioni periodiche</li><li>Report contabili o esempi di registrazione</li><li>LIPE, XML o istruzioni interne precedenti</li></ul></div><div class="callout">Qui configuri una sola volta il codiciario. Per ogni periodo caricherai poi nel tool il file con Codice IVA, Imponibile, IVA e Mese.</div><div class="actions"><a class="button" download="" href="/resources/templates/LIPE_Codiciario_AI.xlsx">Scarica il template ↓</a><button class="button secondary copy-btn" data-copy="lipe-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/lipe/">Apri il tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="lipe-prompt">Agisci come assistente di data preparation IVA per Tax Automation Lab.
 

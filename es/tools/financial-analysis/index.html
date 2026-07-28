@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-tool-version="2.0.3" lang="it">
+<html data-tool-version="2.0.4" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -2543,8 +2543,8 @@ updateAll=function(){v20BaseUpdateAll();v20InstallFirstYear();v20SyncFirstYear()
 syncCompanyInputs=function(){v20BaseSyncCompany();v20SyncFirstYear();};
 saveExtraKpi=function(){STATE.extra=STATE.extra||{};const r=v20BaseSaveExtra();return r;};
 
-function v20TemplateInstructions(){return [['ANALISI DI BILANCIO — TEMPLATE AI v2.0.2'],[''],['REGOLE SU CONTI E SOTTOCONTI'],['1. Conserva ogni conto e sottoconto come riga autonoma. Non aggregare righe con lo stesso codice.'],['2. Mantieni invariato il codice ERP originale. Se più righe condividono il codice, distinguerle tramite descrizione; non inventare codici contabili sostitutivi.'],['3. Il numero di righe dell’output deve coincidere con il sorgente, escluse soltanto righe vuote e totali espliciti.'],['4. Assegna a ciascun sottoconto la voce IV Direttiva appropriata. I sottoconti possono condividere la stessa voce del conto principale quando la natura è la medesima.'],['5. Se la descrizione indica una natura diversa dal conto principale, classifica sulla sostanza e segnala il dubbio in Esiti AI.'],[''],['PRIMO ESERCIZIO'],['Se non esiste un esercizio precedente, lascia vuoti gli importi precedenti e indica in Esiti AI che si tratta del primo esercizio. Non copiare gli importi correnti nella colonna precedente.'],[''],['MODULI FACOLTATIVI'],['Budget e Forecast accettano soltanto conti economici; righe SP vengono escluse dal confronto. Sono ammesse coperture parziali, segnalate come provvisorie.'],['Le allocazioni per centro possono essere parziali, ma ogni conto inserito deve essere riconciliato.']];}
-downloadMainTemplate=function(){const wb=XLSX.utils.book_new(),wsI=XLSX.utils.aoa_to_sheet(v20TemplateInstructions());wsI['!cols']=[{wch:120}];XLSX.utils.book_append_sheet(wb,wsI,'Istruzioni');const an=[['ANAGRAFICA SOCIETA',''],['',''],['Denominazione',''],['Forma giuridica',''],['Codice fiscale',''],['Partita IVA',''],['Capitale sociale',''],['Data costituzione',''],['Sede legale — indirizzo',''],['CAP',''],['Comune',''],['Provincia',''],['Iscrizione REA — sigla',''],['Numero REA',''],['PEC',''],['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio','abbreviato'],['Redatto da','']];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(an),'Anagrafica');const v=[['CODICE','SEZIONE','DESCRIZIONE — abbreviato']];VOCI_ABBR.forEach(x=>v.push([x.code,x.sec,x.label]));v.push([]);v.push(['CODICE','SEZIONE','DESCRIZIONE — ordinario']);VOCI_ORD.forEach(x=>v.push([x.code,x.sec,x.label]));XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(v),'Voci IV Direttiva');const h=[['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva']];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(h),'Stato Patrimoniale');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(h),'Conto Economico');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Foglio','Riga / conto','Esito','Fonte','Assunzione','Verifica richiesta']]),'Esiti AI');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva','Note']]),'Budget');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva','Note']]),'Forecast');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Codice centro','Descrizione centro','Area / Business unit','Responsabile','Note']]),'Catalogo centri');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Codice conto','Descrizione conto','Centro di costo','Importo esercizio corrente','Importo esercizio precedente','Note']]),'Allocazioni centri');XLSX.writeFile(wb,'Template_Analisi_di_Bilancio_AI_v2.0.2.xlsx');toast('Template Analisi di bilancio v2.0.2 scaricato.');};
+function v20TemplateInstructions(){return [['ANALISI DI BILANCIO — TEMPLATE AI v2.0.4'],[''],['REGOLE SU CONTI E SOTTOCONTI'],['1. Conserva ogni conto e sottoconto come riga autonoma. Non aggregare righe con lo stesso codice.'],['2. Mantieni invariato il codice ERP originale. Se più righe condividono il codice, distinguerle tramite descrizione; non inventare codici contabili sostitutivi.'],['3. Il numero di righe dell’output deve coincidere con il sorgente, escluse soltanto righe vuote e totali espliciti.'],['4. Assegna a ciascun sottoconto la voce IV Direttiva appropriata. I sottoconti possono condividere la stessa voce del conto principale quando la natura è la medesima.'],['5. Se la descrizione indica una natura diversa dal conto principale, classifica sulla sostanza e segnala il dubbio in Esiti AI.'],[''],['PRIMO ESERCIZIO'],['Se non esiste un esercizio precedente, lascia vuoti gli importi precedenti e indica in Esiti AI che si tratta del primo esercizio. Non copiare gli importi correnti nella colonna precedente.'],[''],['RISULTATO D’ESERCIZIO E QUADRATURA'],['Riconosci se il file è ante chiusura o post chiusura. Verifica separatamente saldo SP, risultato CE e presenza della voce A.IX.'],['Se SP e CE si compensano e A.IX manca, aggiungi una sola riga tecnica TAL_AIX classificata in A.IX; conserva tutte le righe ERP e documenta la ricostruzione in Esiti AI.'],['Se la differenza SP non coincide con il risultato CE, non creare conti compensativi e segnala l’anomalia.'],[''],['MODULI FACOLTATIVI'],['Budget e Forecast accettano soltanto conti economici; righe SP vengono escluse dal confronto. Sono ammesse coperture parziali, segnalate come provvisorie.'],['Le allocazioni per centro possono essere parziali, ma ogni conto inserito deve essere riconciliato.']];}
+downloadMainTemplate=function(){const wb=XLSX.utils.book_new(),wsI=XLSX.utils.aoa_to_sheet(v20TemplateInstructions());wsI['!cols']=[{wch:120}];XLSX.utils.book_append_sheet(wb,wsI,'Istruzioni');const an=[['ANAGRAFICA SOCIETA',''],['',''],['Denominazione',''],['Forma giuridica',''],['Codice fiscale',''],['Partita IVA',''],['Capitale sociale',''],['Data costituzione',''],['Sede legale — indirizzo',''],['CAP',''],['Comune',''],['Provincia',''],['Iscrizione REA — sigla',''],['Numero REA',''],['PEC',''],['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio','abbreviato'],['Redatto da','']];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(an),'Anagrafica');const v=[['CODICE','SEZIONE','DESCRIZIONE — abbreviato']];VOCI_ABBR.forEach(x=>v.push([x.code,x.sec,x.label]));v.push([]);v.push(['CODICE','SEZIONE','DESCRIZIONE — ordinario']);VOCI_ORD.forEach(x=>v.push([x.code,x.sec,x.label]));XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(v),'Voci IV Direttiva');const h=[['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva']];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(h),'Stato Patrimoniale');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(h),'Conto Economico');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Foglio','Riga / conto','Esito','Fonte','Assunzione','Verifica richiesta']]),'Esiti AI');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva','Note']]),'Budget');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva','Note']]),'Forecast');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Codice centro','Descrizione centro','Area / Business unit','Responsabile','Note']]),'Catalogo centri');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Codice conto','Descrizione conto','Centro di costo','Importo esercizio corrente','Importo esercizio precedente','Note']]),'Allocazioni centri');XLSX.writeFile(wb,'Template_Analisi_di_Bilancio_AI_v2.0.4.xlsx');toast('Template Analisi di bilancio v2.0.4 scaricato.');};
 
 const v20BaseSaveConfig=saveConfig;
 saveConfig=function(show=true){STATE.extra=STATE.extra||{};STATE.extra.toolVersion=V20_VERSION;const ok=v20BaseSaveConfig(show);return ok;};
@@ -2604,7 +2604,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="tal-fa-v202-ux">
 (function(){
 'use strict';
-const TAL_VERSION='2.0.3';
+const TAL_VERSION='2.0.4';
 let installed=false;
 function esc2(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function css(){if(document.getElementById('tal-commandbar-style'))return;const s=document.createElement('style');s.id='tal-commandbar-style';s.textContent=`
@@ -2641,11 +2641,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <script id="tal-fa-v203-dashboard-nav-fix">
-/* Tax Automation Lab — Financial Analysis v2.0.3
+/* Tax Automation Lab — Financial Analysis v2.0.4
    Persistent Dashboard entry: survives every sidebar re-render. */
 (function(){
 'use strict';
-const VERSION='2.0.3';
+const VERSION='2.0.4';
 let observer=null;
 
 function dashboardButton(){
@@ -2730,6 +2730,106 @@ function install(){
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
 else install();
+})();
+</script>
+<script id="tal-fa-v204-result-reconciliation">
+/* Tax Automation Lab — Analisi di bilancio v2.0.4
+   Riconoscimento bilanci ante/post chiusura e voce A.IX tecnica controllata. */
+(function(){
+'use strict';
+const VERSION='2.0.4';
+const TECH_CODE='TAL_AIX';
+const baseParse=window.v18ParseAccounts;
+const baseUpdate=window.updateAll;
+
+function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
+function tol(rows,field){const base=(rows||[]).reduce((s,a)=>s+Math.abs(n(a[field])),0);return Math.max(.01,base*1e-9);}
+function iv(a){return String(a&&a.iv||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function isReservedTechnical(a){return /^TAL[_\- ]?AIX$/i.test(String(a&&a.code||''))||(/voce tecnica/i.test(String(a&&a.desc||''))&&iv(a)==='AIX');}
+function fmt(v){try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:(STATE&&STATE.company&&STATE.company.currency)||'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}catch(_){return Number(v||0).toFixed(2);}}
+function fieldLabel(field){return field==='current'?'corrente':'precedente';}
+function parseResultReconciliation(parsed){
+  const accounts=parsed.accounts||[], diagnostics=parsed.diagnostics||[];
+  accounts.filter(isReservedTechnical).forEach(a=>{a.technicalResult=true;a.technicalOrigin='ai_file';a.resultStatus=a.resultStatus||'proposed';a.originalCode=a.originalCode||a.code;});
+  const available={current:true,previous:!!(parsed.periods&&parsed.periods.previous&&parsed.periods.previous.available)};
+  const proposed=[];const amounts={current:0,previous:0};
+  ['current','previous'].forEach(field=>{
+    if(!available[field])return;
+    const sp=accounts.filter(a=>a.type==='SP'&&!a.technicalResult),ce=accounts.filter(a=>a.type==='CE');
+    const t=tol([...sp,...ce],field),spDiff=sp.reduce((s,a)=>s+n(a[field]),0),ceDiff=ce.reduce((s,a)=>s+n(a[field]),0);
+    const aixRaw=sp.filter(a=>iv(a)==='AIX').reduce((s,a)=>s+n(a[field]),0);
+    const reserved=accounts.filter(a=>a.type==='SP'&&a.technicalResult).reduce((s,a)=>s+n(a[field]),0);
+    if(Math.abs(reserved)>t){
+      proposed.push({field,origin:'ai_file',spDifference:spDiff,ceDifference:ceDiff,technicalAmount:reserved,status:'proposed'});
+      return;
+    }
+    if(Math.abs(spDiff)>t&&Math.abs(spDiff+ceDiff)<=t&&Math.abs(ceDiff)>t&&Math.abs(aixRaw)<=t){
+      amounts[field]=-spDiff;
+      proposed.push({field,origin:'tool',spDifference:spDiff,ceDifference:ceDiff,technicalAmount:-spDiff,status:'proposed'});
+      const rx=new RegExp(`Stato Patrimoniale ${fieldLabel(field)} non quadrato`,'i');
+      parsed.diagnostics=parsed.diagnostics.filter(d=>!rx.test(String(d.text||'')));
+    }else if(Math.abs(spDiff)>t&&Math.abs(spDiff+ceDiff)>t){
+      const rx=new RegExp(`Stato Patrimoniale ${fieldLabel(field)} non quadrato`,'i');
+      const extra=` La differenza SP (${fmt(spDiff)}) non coincide con il risultato CE (${fmt(-ceDiff)}): nessuna voce tecnica A.IX è stata creata.`;
+      const existing=parsed.diagnostics.find(d=>rx.test(String(d.text||'')));
+      if(existing&&!String(existing.text||'').includes('nessuna voce tecnica A.IX'))existing.text=String(existing.text||'')+extra;
+      else if(!existing)parsed.diagnostics.push({level:'error',code:'TAL_RESULT_UNRECONCILED',field,text:`Quadratura ${fieldLabel(field)} non riconciliata.${extra}`});
+    }
+  });
+  if((Math.abs(amounts.current)>.009||Math.abs(amounts.previous)>.009)){
+    const tech={id:'SP|TAL_AIX|DERIVED',type:'SP',code:TECH_CODE,originalCode:TECH_CODE,desc:"Utile (perdita) dell'esercizio — voce tecnica derivata",current:amounts.current,previous:amounts.previous,iv:'AIX',ivRaw:'AIX',row:0,alias:false,unsupported:false,technicalResult:true,technicalOrigin:'tool',resultStatus:'proposed',techKey:'SP|TAL_AIX|utile perdita esercizio voce tecnica derivata|1',subaccountIndex:1};
+    accounts.push(tech);
+  }
+  proposed.forEach(x=>{
+    const natural=-x.technicalAmount;
+    parsed.diagnostics.push({level:'warn',code:'TAL_RESULT_AIX',field:x.field,text:`Risultato d’esercizio non presente come conto patrimoniale ${fieldLabel(x.field)}. ${x.origin==='tool'?'Il tool ha proposto':'Il file contiene'} una voce tecnica A.IX di ${fmt(natural)}. Conferma la ricostruzione prima degli export finali.`});
+  });
+  parsed.resultReconciliation=proposed;
+  return parsed;
+}
+
+if(typeof baseParse==='function'){
+  const patched=function(wb,opts){return parseResultReconciliation(baseParse(wb,opts||{}));};
+  window.v18ParseAccounts=patched;
+  try{v18ParseAccounts=patched;}catch(_){ }
+}
+
+function technicalRows(){try{return (STATE.accounts||[]).filter(a=>a.technicalResult);}catch(_){return[];}}
+function pendingRows(){return technicalRows().filter(a=>a.resultStatus!=='confirmed');}
+function reconcileText(rows){
+  const a=rows[0];if(!a)return'';
+  const parts=[];
+  if(Math.abs(n(a.current))>.009)parts.push(`esercizio corrente ${fmt(-n(a.current))}`);
+  if(Math.abs(n(a.previous))>.009)parts.push(`esercizio precedente ${fmt(-n(a.previous))}`);
+  return parts.join(' · ');
+}
+function confirmTechnicalResult(){const rows=technicalRows();if(!rows.length)return;const fields=['current'];try{if(STATE.periods&&STATE.periods.previous&&STATE.periods.previous.available)fields.push('previous');for(const field of fields){const s=spCore(STATE.accounts,field),t=Math.max(.01,Math.abs(s.totalAssets||0)*1e-9);if(Math.abs(s.balanceDifference)>t){toast(`La voce tecnica A.IX non completa la quadratura ${fieldLabel(field)} (${fmt(s.balanceDifference)}). Correggi il file prima della conferma.`,true);return;}}}catch(_){ }rows.forEach(a=>a.resultStatus='confirmed');STATE.diagnostics=(STATE.diagnostics||[]).map(d=>d.code==='TAL_RESULT_AIX'?{...d,text:String(d.text||'').replace('Conferma la ricostruzione prima degli export finali.','Ricostruzione confermata dall’utente.')} : d);if(typeof saveConfig==='function')saveConfig(false);updateAll();toast('Voce tecnica A.IX confermata.');}
+function renderResultNotice(){
+  const rows=technicalRows(),pending=pendingRows();
+  ['import','executive','reclass','reportcenter'].forEach(view=>{
+    const section=document.getElementById('view-'+view);if(!section)return;
+    let box=section.querySelector('.tal-result-reconciliation');
+    if(!rows.length){if(box)box.remove();return;}
+    if(!box){box=document.createElement('div');box.className='tal-result-reconciliation';const rule=section.querySelector('.rule');(rule||section.firstElementChild).insertAdjacentElement(rule?'afterend':'afterend',box);}
+    const source=rows.some(a=>a.technicalOrigin==='tool')?'ricostruita dal tool':'inserita nel file preparato con AI';
+    box.className='tal-result-reconciliation callout '+(pending.length?'warn':'ok');
+    box.innerHTML=`<b>${pending.length?'Voce A.IX da confermare':'Voce A.IX confermata'}.</b> Il risultato d’esercizio non era presente come conto originario: la voce è stata ${source}: ${reconcileText(rows)}. Le righe ERP originali non sono state modificate.${pending.length?'<div class="btn-row"><button class="btn tiny" type="button" onclick="confirmTechnicalResult()">Conferma voce tecnica</button></div>':''}`;
+  });
+}
+function gate(){
+  if(pendingRows().length){toast('Conferma la voce tecnica A.IX prima di generare gli output finali.',true);if(typeof setView==='function')setView('import');return false;}
+  try{const s=spCore(),t=Math.max(.01,Math.abs(s.totalAssets||0)*1e-9);if(Math.abs(s.balanceDifference)>t){toast(`Export bloccato: Stato Patrimoniale non quadrato (${fmt(s.balanceDifference)}).`,true);return false;}}catch(_){ }
+  return true;
+}
+function protect(name){const fn=window[name];if(typeof fn!=='function'||fn.__talResultGate)return;const w=function(){if(!gate())return;return fn.apply(this,arguments);};w.__talResultGate=true;window[name]=w;try{eval(name+'=window[name]');}catch(_){ }}
+['exportExcel','exportKpiExcel','exportCashFlowExcel','exportAdequacyExcel','exportHistoryExcel','exportAdvancedExcel','printReclassReport','printKpiReport'].forEach(protect);
+
+window.updateAll=function(){const r=baseUpdate.apply(this,arguments);renderResultNotice();return r;};
+try{updateAll=window.updateAll;}catch(_){ }
+window.confirmTechnicalResult=confirmTechnicalResult;
+function version(){document.documentElement.dataset.toolVersion=VERSION;document.querySelectorAll('.tal-publication-label').forEach(x=>x.textContent=x.textContent.replace(/v\d+\.\d+\.\d+/,'v'+VERSION));}
+function install(){version();renderResultNotice();setTimeout(version,50);setTimeout(version,300);setTimeout(version,1200);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
 </script>
 </body></html>

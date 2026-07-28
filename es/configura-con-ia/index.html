@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#0E1624" name="theme-color"/>
 <title>Configura las herramientas con tu IA | Tax Automation Lab</title><meta content="Descarga los templates disponibles, utiliza prompts guiados para prepararlos con tu IA y sigue las instrucciones de carga de cada herramienta." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><meta content="Riccardo Zedda" name="author"/>
@@ -121,8 +122,37 @@ REGLA OBLIGATORIA — CUENTAS, SUBCUENTAS Y GRANULARIDAD
 - No agrupes nunca una subcuenta con la cuenta principal. Conserva cada fila contable del origen de forma independiente.
 - Mantén sin cambios el código ERP completo; no inventes sufijos ni renumeres cuentas.
 - Conserva como filas distintas las cuentas con el mismo código y descripciones diferentes.
-- El número de filas de salida debe coincidir con las filas contables del origen, salvo filas vacías y totales claramente identificados.
-- Cuadra el número de filas antes de devolver el archivo e informa de cada exclusión.
+- Cada fila contable original debe conservarse 1:1, salvo filas vacías y totales claramente identificados. TAL_AIX es la única fila técnica adicional permitida por esta regla.
+- Concilia por separado las filas originales antes de devolver el archivo: filas originales consideradas = filas originales conservadas en la salida. Informa de cada exclusión y presenta TAL_AIX por separado.
+
+RESULTADO DEL EJERCICIO Y DISTINTAS FORMAS DE BALANCE
+El origen puede ser un balance de comprobación antes del cierre, después del cierre o un estado ya reclasificado. Para cada ejercicio:
+1. calcula por separado el saldo neto del Estado de Situación Patrimonial;
+2. calcula por separado el resultado de la Cuenta de Resultados;
+3. comprueba si la diferencia patrimonial coincide, con signo opuesto, con el resultado de la Cuenta de Resultados;
+4. comprueba si el patrimonio neto ya incluye el beneficio o la pérdida del ejercicio en A.IX.
+
+Si el resultado ya está incluido en el Estado de Situación Patrimonial, no añadas ni dupliques ninguna fila.
+
+Si falta y la diferencia patrimonial concilia exactamente con el resultado de la Cuenta de Resultados, considera el archivo anterior al cierre. Conserva todas las filas de origen y añade únicamente una fila técnica adicional:
+- Código de cuenta: TAL_AIX;
+- Descripción: Beneficio del ejercicio — fila técnica derivada, o Pérdida del ejercicio — fila técnica derivada;
+- Partida legal italiana: AIX;
+- Importe: el necesario para completar la conciliación según la convención de signos de la plantilla.
+
+TAL_AIX no es un código ERP y no altera el recuento de filas de origen. Regístralo por separado en “Esiti AI” como fila técnica derivada, indicando diferencia patrimonial, resultado, importe reconstruido y revisión profesional requerida.
+
+Si la diferencia patrimonial no coincide con el resultado de la Cuenta de Resultados, no crees asientos de cuadre, cuentas ficticias ni valores compensatorios. Conserva los datos disponibles e informa de la anomalía en “Esiti AI”. No crees TAL_AIX únicamente para forzar un cuadre no demostrado.
+
+CONTROL DE CIERRE A INCLUIR EN “ESITI AI”
+- forma detectada: antes del cierre, después del cierre o no determinable;
+- convención de signos detectada;
+- saldo patrimonial;
+- resultado de la Cuenta de Resultados;
+- presencia o ausencia de A.IX;
+- eventual fila TAL_AIX añadida;
+- conciliación final;
+- anomalías no resueltas.
 </pre></details><p class="prompt-note">El prompt ordena a la IA no inventar, no cambiar la estructura del template y separar claramente todos los puntos que deben revisarse.</p></div></article><article class="tool-card surface fa-config-card" id="financial-analysis-card"><span class="label">CONTROLLING · ANÁLISIS Y PLANIFICACIÓN</span><h2>Análisis financiero</h2><p>Prepara datos contables ya clasificados para reclasificaciones de gestión, KPI, dashboard, flujo de caja, presupuesto, previsión y centros de coste, conservando cada cuenta y subcuenta.</p><div class="doc-box"><h3>Documentación útil, incluidas fuentes equivalentes</h3><ul><li>Estados financieros o balance de comprobación ya clasificado</li><li>Plan de cuentas con saldos comparativos</li><li>Presupuesto, previsión y asignaciones por centro de coste</li><li>Reporting de gestión e información complementaria</li></ul></div><div class="callout">La plantilla principal incluye Actual, Budget, Forecast y centros de coste. Budget, Forecast y asignaciones pueden ser parciales y se tratan como módulos opcionales.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx">Descargar plantilla ↓</a><button class="button secondary copy-btn" data-copy="fa-prompt" type="button">Copiar prompt</button><a class="button secondary" href="/tools/financial-analysis/">Abrir herramienta →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="fa-prompt">Actúa como asistente de preparación de datos contables para Tax Automation Lab.
 
 OBJETIVO
@@ -145,8 +175,8 @@ REGLAS OBLIGATORIAS DE GRANULARIDAD
 - Mantén intacto el código ERP completo. No inventes sufijos ni renumeres cuentas.
 - Las filas con el mismo código y distinta descripción deben permanecer separadas.
 - No modifiques la granularidad del plan de cuentas de origen.
-- El número de filas contables devueltas debe coincidir con el número de filas contables de origen, excluyendo únicamente filas vacías y totales claramente identificados.
-- Antes de devolver el archivo, concilia: filas de origen consideradas = filas de salida. Explica cada exclusión.
+- Cada fila contable original debe conservarse 1:1, excluyendo únicamente filas vacías y totales claramente identificados. TAL_AIX es la única fila técnica adicional permitida por esta regla.
+- Antes de devolver el archivo, concilia por separado las filas originales: filas originales consideradas = filas originales conservadas en la salida. Explica cada exclusión y presenta TAL_AIX por separado.
 
 OTRAS REGLAS OBLIGATORIAS
 - No renombres hojas, encabezados o columnas obligatorias.
@@ -156,7 +186,37 @@ OTRAS REGLAS OBLIGATORIAS
 - Cuando una clasificación no esté suficientemente respaldada, déjala vacía y registra la cuestión en “Esiti AI”.
 
 RESULTADO ESPERADO
-Devuelve el archivo XLSX completado con los nombres de hojas y encabezados originales, junto con un breve resumen de los datos completados y las revisiones profesionales pendientes.</pre></details><p class="prompt-note">El prompt conserva la granularidad del plan de cuentas, prohíbe agregaciones y exige conciliar las filas de origen con las filas de salida.</p></div></article>
+Devuelve el archivo XLSX completado con los nombres de hojas y encabezados originales, junto con un breve resumen de los datos completados y las revisiones profesionales pendientes.
+
+RESULTADO DEL EJERCICIO Y DISTINTAS FORMAS DE BALANCE
+El origen puede ser un balance de comprobación antes del cierre, después del cierre o un estado ya reclasificado. Para cada ejercicio:
+1. calcula por separado el saldo neto del Estado de Situación Patrimonial;
+2. calcula por separado el resultado de la Cuenta de Resultados;
+3. comprueba si la diferencia patrimonial coincide, con signo opuesto, con el resultado de la Cuenta de Resultados;
+4. comprueba si el patrimonio neto ya incluye el beneficio o la pérdida del ejercicio en A.IX.
+
+Si el resultado ya está incluido en el Estado de Situación Patrimonial, no añadas ni dupliques ninguna fila.
+
+Si falta y la diferencia patrimonial concilia exactamente con el resultado de la Cuenta de Resultados, considera el archivo anterior al cierre. Conserva todas las filas de origen y añade únicamente una fila técnica adicional:
+- Código de cuenta: TAL_AIX;
+- Descripción: Beneficio del ejercicio — fila técnica derivada, o Pérdida del ejercicio — fila técnica derivada;
+- Partida legal italiana: AIX;
+- Importe: el necesario para completar la conciliación según la convención de signos de la plantilla.
+
+TAL_AIX no es un código ERP y no altera el recuento de filas de origen. Regístralo por separado en “Esiti AI” como fila técnica derivada, indicando diferencia patrimonial, resultado, importe reconstruido y revisión profesional requerida.
+
+Si la diferencia patrimonial no coincide con el resultado de la Cuenta de Resultados, no crees asientos de cuadre, cuentas ficticias ni valores compensatorios. Conserva los datos disponibles e informa de la anomalía en “Esiti AI”. No crees TAL_AIX únicamente para forzar un cuadre no demostrado.
+
+CONTROL DE CIERRE A INCLUIR EN “ESITI AI”
+- forma detectada: antes del cierre, después del cierre o no determinable;
+- convención de signos detectada;
+- saldo patrimonial;
+- resultado de la Cuenta de Resultados;
+- presencia o ausencia de A.IX;
+- eventual fila TAL_AIX añadida;
+- conciliación final;
+- anomalías no resueltas.
+</pre></details><p class="prompt-note">El prompt conserva la granularidad del plan de cuentas, prohíbe agregaciones y exige conciliar las filas de origen con las filas de salida.</p></div></article>
 <article class="tool-card surface"><span class="label">IVA · CONFIGURACIÓN PERMANENTE</span><h2>Mapeo LIPE de códigos de IVA</h2><p>Configura los datos maestros y el significado permanente de los códigos de IVA. Esta fase no contiene importes mensuales o trimestrales, que se cargarán después en la herramienta.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Listado de códigos de IVA del ERP</li><li>Libros de IVA o liquidaciones periódicas</li><li>Reportes contables o ejemplos de contabilización</li><li>LIPE, XML o instrucciones internas anteriores</li></ul></div><div class="callout">Configura aquí una sola vez el mapeo de códigos. Para cada período cargarás después en la herramienta el archivo con Código IVA, Base imponible, IVA y Mes.</div><div class="actions"><a class="button" download="" href="/resources/templates/LIPE_Codiciario_AI.xlsx">Descargar plantilla ↓</a><button class="button secondary copy-btn" data-copy="lipe-prompt" type="button">Copiar prompt</button><a class="button secondary" href="/es/tools/lipe/">Abrir herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="lipe-prompt">Actúa como asistente de preparación de datos de IVA para Tax Automation Lab.
 
 OBJETIVO

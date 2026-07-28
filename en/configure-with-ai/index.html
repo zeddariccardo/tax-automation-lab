@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#0E1624" name="theme-color"/>
 <title>Configure the tools with your AI | Tax Automation Lab</title><meta content="Download the available templates, use guided prompts to prepare them with your AI and follow the upload instructions for each tool." name="description"/><meta content="index,follow,max-image-preview:large" name="robots"/><meta content="Riccardo Zedda" name="author"/>
@@ -121,8 +122,37 @@ MANDATORY RULE — ACCOUNTS, SUBACCOUNTS AND GRANULARITY
 - Never merge a subaccount into its parent account. Preserve every source accounting row independently.
 - Keep the complete ERP account code unchanged; do not invent suffixes or renumber accounts.
 - Preserve repeated account codes with different descriptions as separate rows.
-- The output row count must equal the source accounting-row count, excluding only blank and clearly identified total rows.
-- Reconcile row counts before returning the file and disclose every exclusion.
+- Every original accounting row must be preserved 1:1, excluding only blank and clearly identified total rows. TAL_AIX is the only additional technical row permitted by this rule.
+- Reconcile original rows separately before returning the file: source original rows considered = original rows preserved in the output. Disclose every exclusion and report TAL_AIX separately.
+
+YEAR-END RESULT AND DIFFERENT TRIAL-BALANCE FORMS
+The source may be a pre-closing trial balance, a post-closing trial balance or an already reclassified statement. For each year:
+1. calculate the net Balance Sheet balance separately;
+2. calculate the Income Statement result separately;
+3. verify whether the Balance Sheet difference equals the Income Statement result with the opposite sign;
+4. verify whether equity already includes a current-year profit/loss line mapped to A.IX.
+
+If the result is already included in the Balance Sheet, do not add or duplicate any row.
+
+If it is absent and the Balance Sheet difference exactly reconciles to the Income Statement result, treat the file as pre-closing. Preserve all source rows and add one additional technical row only:
+- Account code: TAL_AIX;
+- Description: Current-year profit — derived technical row, or Current-year loss — derived technical row;
+- Italian statutory line: AIX;
+- Amount: the amount required to complete the reconciliation under the template sign convention.
+
+TAL_AIX is not an ERP code and does not alter the source-row count. Record it separately in “Esiti AI” as a derived technical row, showing the Balance Sheet difference, Income Statement result, reconstructed amount and required professional review.
+
+If the Balance Sheet difference does not reconcile to the Income Statement result, do not create balancing entries, fictitious accounts or compensating values. Preserve the available data and report the anomaly in “Esiti AI”. Never create TAL_AIX merely to force an unsupported balance.
+
+CLOSING CONTROL TO REPORT IN “ESITI AI”
+- detected form: pre-closing, post-closing or undetermined;
+- detected sign convention;
+- Balance Sheet balance;
+- Income Statement result;
+- presence or absence of A.IX;
+- any TAL_AIX row added;
+- final reconciliation;
+- unresolved anomalies.
 </pre></details><p class="prompt-note">The prompt tells the AI not to invent information, not to change the template structure and to separate all review points clearly.</p></div></article><article class="tool-card surface fa-config-card" id="financial-analysis-card"><span class="label">CONTROLLING · ANALYSIS AND PLANNING</span><h2>Financial Analysis</h2><p>Prepare classified financial-statement data for management reclassifications, KPIs, dashboard, cash-flow analysis, budget, forecast and cost centres while preserving every account and subaccount.</p><div class="doc-box"><h3>Useful materials, including equivalent sources</h3><ul><li>Statutory financial statements or a classified trial balance</li><li>Chart of accounts with comparative balances</li><li>Budget, forecast and cost-centre allocations</li><li>Management reporting and supporting information</li></ul></div><div class="callout">The main template includes Actual, Budget, Forecast and cost centres. Budget, Forecast and allocations may be partial and are treated as optional modules.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx">Download template ↓</a><button class="button secondary copy-btn" data-copy="fa-prompt" type="button">Copy prompt</button><a class="button secondary" href="/tools/financial-analysis/">Open tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Read the full prompt</summary><pre id="fa-prompt">Act as an accounting data-preparation assistant for Tax Automation Lab.
 
 OBJECTIVE
@@ -145,8 +175,8 @@ MANDATORY GRANULARITY RULES
 - Keep the complete original ERP account code unchanged. Do not invent suffixes or renumber accounts.
 - Rows with the same code but different descriptions must remain separate.
 - Do not change the source chart-of-accounts granularity.
-- The number of accounting rows returned must equal the number of source accounting rows, excluding only blank rows and clearly identified totals.
-- Before returning the workbook, reconcile: source rows considered = output rows. Explain every exclusion.
+- Every original accounting row must be preserved 1:1, excluding only blank rows and clearly identified totals. TAL_AIX is the only additional technical row permitted by this rule.
+- Before returning the workbook, reconcile original rows separately: source original rows considered = original rows preserved in the output. Explain every exclusion and report TAL_AIX separately.
 
 OTHER MANDATORY RULES
 - Do not rename sheets, headers or required columns.
@@ -156,7 +186,37 @@ OTHER MANDATORY RULES
 - When a classification is not sufficiently supported, leave it blank and record the issue in “Esiti AI”.
 
 EXPECTED OUTPUT
-Return the completed XLSX file with the original sheet names and headers, plus a brief summary of completed data and remaining professional-review points.</pre></details><p class="prompt-note">The prompt preserves chart-of-accounts granularity, prohibits aggregation and requires source-to-output row reconciliation.</p></div></article>
+Return the completed XLSX file with the original sheet names and headers, plus a brief summary of completed data and remaining professional-review points.
+
+YEAR-END RESULT AND DIFFERENT TRIAL-BALANCE FORMS
+The source may be a pre-closing trial balance, a post-closing trial balance or an already reclassified statement. For each year:
+1. calculate the net Balance Sheet balance separately;
+2. calculate the Income Statement result separately;
+3. verify whether the Balance Sheet difference equals the Income Statement result with the opposite sign;
+4. verify whether equity already includes a current-year profit/loss line mapped to A.IX.
+
+If the result is already included in the Balance Sheet, do not add or duplicate any row.
+
+If it is absent and the Balance Sheet difference exactly reconciles to the Income Statement result, treat the file as pre-closing. Preserve all source rows and add one additional technical row only:
+- Account code: TAL_AIX;
+- Description: Current-year profit — derived technical row, or Current-year loss — derived technical row;
+- Italian statutory line: AIX;
+- Amount: the amount required to complete the reconciliation under the template sign convention.
+
+TAL_AIX is not an ERP code and does not alter the source-row count. Record it separately in “Esiti AI” as a derived technical row, showing the Balance Sheet difference, Income Statement result, reconstructed amount and required professional review.
+
+If the Balance Sheet difference does not reconcile to the Income Statement result, do not create balancing entries, fictitious accounts or compensating values. Preserve the available data and report the anomaly in “Esiti AI”. Never create TAL_AIX merely to force an unsupported balance.
+
+CLOSING CONTROL TO REPORT IN “ESITI AI”
+- detected form: pre-closing, post-closing or undetermined;
+- detected sign convention;
+- Balance Sheet balance;
+- Income Statement result;
+- presence or absence of A.IX;
+- any TAL_AIX row added;
+- final reconciliation;
+- unresolved anomalies.
+</pre></details><p class="prompt-note">The prompt preserves chart-of-accounts granularity, prohibits aggregation and requires source-to-output row reconciliation.</p></div></article>
 <article class="tool-card surface"><span class="label">VAT · PERMANENT CONFIGURATION</span><h2>LIPE VAT-code mapping</h2><p>Configure master data and the permanent meaning of VAT codes. This stage does not include monthly or quarterly amounts, which are uploaded later in the tool.</p><div class="doc-box"><h3>Useful materials, including equivalent formats</h3><ul><li>ERP VAT-code list</li><li>VAT ledgers or periodic calculations</li><li>Accounting reports or posting examples</li><li>Previous LIPE filings, XML files or internal instructions</li></ul></div><div class="callout">Configure the VAT-code mapping once here. For each period, upload the file containing VAT code, taxable amount, VAT and month directly in the tool.</div><div class="actions"><a class="button" download="" href="/resources/templates/LIPE_Codiciario_AI.xlsx">Download template ↓</a><button class="button secondary copy-btn" data-copy="lipe-prompt" type="button">Copy prompt</button><a class="button secondary" href="/en/tools/lipe/">Open tool (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Read the full prompt</summary><pre id="lipe-prompt">Act as a VAT data-preparation assistant for Tax Automation Lab.
 
 OBJECTIVE

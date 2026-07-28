@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-tool-version="1.3.2" lang="it">
+<html data-tool-version="1.3.3" lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -796,19 +796,9 @@ function computeFrom(){
   // Risultato d'esercizio dal CE
   const ceResult = sumNodes(ce.nodes);    // ricavi - costi (civilistico)
 
-  // Inietto il risultato in AIX (utile/perdita d'esercizio) se non già presente come conto
-  const pnNode = sp_pas.nodes.find(n=>n.code==='A');
-  let resultInjected=false;
-  if(pnNode){
-    const aix = pnNode.children && pnNode.children.find(c=>c.code==='AIX');
-    if(aix && Math.abs(aix.amount)<0.005 && Math.abs(ceResult)>=0.005){
-      aix.amount = ceResult;
-      aix.detail = aix.detail||[];
-      aix.detail.push({code:'–', desc:"Risultato d'esercizio (da Conto Economico)", importo:ceResult, presented:ceResult, src:'PN'});
-      pnNode.amount = sumChildren(pnNode);
-      resultInjected=true;
-    }
-  }
+  // La voce A.IX viene inclusa solo se presente nel file oppure se il controllo
+  // ante-chiusura ha creato una riga tecnica esplicita e tracciabile in STATE.accounts.
+  const resultInjected=STATE.accounts.some(a=>a.technicalResult&&String(a.voce||'').toUpperCase()==='AIX');
   const totPasFinal = sumNodes(sp_pas.nodes);
 
   // Sub-totali CE
@@ -884,6 +874,9 @@ function downloadTemplate(){
     ['6. Se lasci vuota la voce, il conto risultera non mappato e potrai assegnarlo dopo il caricamento.'],
     ['7. Non aggregare conti o sottoconti: ogni riga del piano dei conti deve restare autonoma.'],
     ['8. Sono ammessi codici conto ripetuti: il tool distingue le righe tramite codice completo, descrizione e chiave tecnica interna.'],
+    ['9. Identifica se il bilancio è ante chiusura o post chiusura: verifica separatamente saldo SP, risultato CE e presenza della voce A.IX.'],
+    ['10. Se SP e CE si compensano e A.IX manca, aggiungi una sola riga tecnica TAL_AIX in A.IX e documentala in Esiti AI; non modificare le righe ERP.'],
+    ['11. Se la differenza non coincide con il risultato CE, non forzare la quadratura: segnala l’anomalia.'],
     [''],
     ['Strumento didattico. La responsabilita della classificazione resta del professionista.']
   ];
@@ -940,6 +933,17 @@ function downloadTemplate(){
 // ====================================================================
 // UPLOAD & PARSE
 // ====================================================================
+function talFsImportedNumber(value){
+  if(typeof value==='number')return Number.isFinite(value)?value:0;
+  let s=String(value==null?'':value).replace(/\u00a0/g,' ').trim();if(!s)return 0;
+  let neg=false;if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}else if(s.startsWith('-')){neg=true;s=s.slice(1);}else if(s.startsWith('+'))s=s.slice(1);
+  s=s.replace(/€|EUR|\s/gi,'').replace(/[^0-9.,]/g,'');if(!s)return 0;
+  const comma=s.lastIndexOf(','),dot=s.lastIndexOf('.');
+  if(comma>=0&&dot>=0){if(comma>dot)s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'');}
+  else if(comma>=0)s=s.replace(/\./g,'').replace(',','.');
+  else if((s.match(/\./g)||[]).length>1){const parts=s.split('.'),last=parts.pop();s=(last.length===2?parts.join('')+'.'+last:parts.join('')+last);}
+  const out=Number(s);return Number.isFinite(out)?(neg?-Math.abs(out):out):0;
+}
 function handleUpload(evt){
   const file=evt.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -963,8 +967,8 @@ function parseWorkbook(wb){
       const r=data[i]; if(!r||!r[0]) continue;
       accts.push({
         code:String(r[0]).trim(), desc:String(r[1]||'').trim(),
-        importo:parseFloat(String(r[2]||'0').replace(/\./g,'').replace(',','.'))||(parseFloat(r[2])||0),
-        importo_prev:parseFloat(String(r[3]||'0').replace(/\./g,'').replace(',','.'))||(parseFloat(r[3])||0),
+        importo:talFsImportedNumber(r[2]),
+        importo_prev:talFsImportedNumber(r[3]),
         voce:String(r[4]||'').trim()||null, source:src, sourceRow:i+1
       });
     }
@@ -1621,7 +1625,7 @@ renderSavedList();
 <script id="tal-fs-v132-ux">
 (function(){
 'use strict';
-const TAL_VERSION='1.3.2';
+const TAL_VERSION='1.3.3';
 function css(){if(document.getElementById('tal-commandbar-style'))return;const s=document.createElement('style');s.id='tal-commandbar-style';s.textContent=`
 .tal-commandbar{width:min(1180px,calc(100% - 36px));margin:14px auto 18px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(14,22,36,.12);border-radius:14px;background:rgba(255,255,255,.95);box-shadow:0 10px 30px rgba(14,22,36,.08);backdrop-filter:blur(14px)}.tal-commandbar-copy b{display:block;font-size:12px}.tal-commandbar-copy span{display:block;font-size:10.5px;color:#6e6b65;max-width:520px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tal-commandbar-actions{display:flex;gap:8px;flex-wrap:wrap}.tal-commandbar .tal-cmd{min-height:40px;border-radius:9px;padding:9px 14px;border:1px solid #1d1b16;background:#fff;color:#1d1b16;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;cursor:pointer}.tal-commandbar .tal-cmd.primary{background:linear-gradient(100deg,#59147D,#145368);border-color:transparent;color:#fff}.tal-commandbar .tal-cmd:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.10)}@media(max-width:760px){.tal-commandbar{width:calc(100% - 24px);align-items:stretch;flex-direction:column}.tal-commandbar-actions{display:grid;grid-template-columns:repeat(3,1fr)}.tal-commandbar .tal-cmd{padding-inline:8px}.tal-commandbar-copy span{white-space:normal}}
 `;document.head.appendChild(s);}
@@ -1661,6 +1665,60 @@ window.renderMemoryModal=function(){
   }
   const host=document.getElementById('modal_mappings_list');if(host)host.innerHTML=out;
 };
+})();
+</script>
+<script id="tal-fs-v133-result-reconciliation">
+/* Tax Automation Lab — Bilancio civilistico v1.3.3
+   Riconoscimento bilanci ante/post chiusura e voce A.IX tecnica controllata. */
+(function(){
+'use strict';
+const VERSION='1.3.3',TECH_CODE='TAL_AIX';
+const baseParse=window.parseWorkbook||parseWorkbook;
+const baseChecks=window.renderChecks||renderChecks;
+const baseExportExcel=window.exportExcel||exportExcel;
+const baseExportPDF=window.exportPDF||exportPDF;
+function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
+function norm(v){return String(v==null?'':v).toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function fmt2(v){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}
+function isTechnical(a){return /^TAL[_\- ]?AIX$/i.test(String(a&&a.code||''))||(/voce tecnica/i.test(String(a&&a.desc||''))&&norm(a&&a.voce)==='AIX');}
+function tolerance(rows,field){const b=(rows||[]).reduce((s,a)=>s+Math.abs(n(a[field])),0);return Math.max(.01,b*1e-9);}
+function analyse(accounts){
+  const rows=accounts||[],result=[];
+  ['importo','importo_prev'].forEach(field=>{
+    const meaningfulPrev=field==='importo'||rows.filter(a=>Math.abs(n(a.importo_prev))>.009).length>=Math.max(2,Math.ceil(rows.length*.10));if(!meaningfulPrev)return;
+    const sp=rows.filter(a=>a.source==='sp'&&!a.technicalResult),ce=rows.filter(a=>a.source==='ce'),t=tolerance([...sp,...ce],field),spDiff=sp.reduce((s,a)=>s+n(a[field]),0),ceDiff=ce.reduce((s,a)=>s+n(a[field]),0),aix=sp.filter(a=>norm(a.voce)==='AIX').reduce((s,a)=>s+n(a[field]),0);
+    if(Math.abs(spDiff)>t&&Math.abs(spDiff+ceDiff)<=t&&Math.abs(ceDiff)>t&&Math.abs(aix)<=t)result.push({field,spDifference:spDiff,ceDifference:ceDiff,technicalAmount:-spDiff});
+  });return result;
+}
+function applyReconciliation(){
+  const rows=STATE.accounts||[];rows.filter(isTechnical).forEach(a=>{a.technicalResult=true;a.technicalOrigin='ai_file';a.resultStatus=a.resultStatus||'proposed';a.voce='AIX';});
+  if(rows.some(a=>a.technicalResult))return false;
+  const r=analyse(rows);if(!r.length)return false;
+  const cur=r.find(x=>x.field==='importo'),prev=r.find(x=>x.field==='importo_prev');
+  rows.push({uid:'sp::tal_aix::utile perdita esercizio voce tecnica derivata::0001',code:TECH_CODE,desc:"Utile (perdita) dell'esercizio — voce tecnica derivata",importo:cur?cur.technicalAmount:0,importo_prev:prev?prev.technicalAmount:0,voce:'AIX',source:'sp',sourceRow:0,technicalResult:true,technicalOrigin:'tool',resultStatus:'proposed'});
+  return true;
+}
+window.parseWorkbook=function(wb){const r=baseParse(wb);if(applyReconciliation()){refreshAll(true);showResultsUI();toast('Bilancio acquisito con una voce tecnica A.IX da confermare.');}return r;};
+try{parseWorkbook=window.parseWorkbook;}catch(_){ }
+function rows(){return (STATE.accounts||[]).filter(a=>a.technicalResult);}
+function pending(){return rows().filter(a=>a.resultStatus!=='confirmed');}
+function confirmFsTechnicalResult(){const d=RESULT?RESULT.totAtt-RESULT.totPas:0,t=RESULT?Math.max(.01,Math.max(Math.abs(RESULT.totAtt||0),Math.abs(RESULT.totPas||0))*1e-9):.01;if(Math.abs(d)>t){toast(`La voce tecnica A.IX non completa la quadratura (${fmt2(d)}). Correggi il file prima della conferma.`,true);return;}rows().forEach(a=>a.resultStatus='confirmed');refreshAll(true);if(currentPIVA())try{window.saveCurrentMapping();}catch(_){}toast('Voce tecnica A.IX confermata.');}
+function notice(){const r=rows();if(!r.length)return'';const a=r[0],vals=[];if(Math.abs(n(a.importo))>.009)vals.push(`corrente ${fmt2(-n(a.importo))}`);if(Math.abs(n(a.importo_prev))>.009)vals.push(`precedente ${fmt2(-n(a.importo_prev))}`);return `<div class="callout ${pending().length?'warn':'ok'}" style="margin-top:16px"><b>${pending().length?'Voce A.IX da confermare':'Voce A.IX confermata'}.</b> Il risultato d’esercizio non era presente tra i conti patrimoniali originari. È stata ${a.technicalOrigin==='tool'?'ricostruita dal tool':'rilevata come riga tecnica nel file AI'} una posizione aggiuntiva A.IX (${vals.join(' · ')}), senza modificare le righe ERP.${pending().length?'<div class="btn-row"><button class="btn tiny" type="button" onclick="confirmFsTechnicalResult()">Conferma voce tecnica</button></div>':''}</div>`;}
+function unresolvedNotice(){
+  if(rows().length)return'';
+  const source=STATE.accounts||[],sp=source.filter(a=>a.source==='sp'),ce=source.filter(a=>a.source==='ce'),t=tolerance([...sp,...ce],'importo'),spDiff=sp.reduce((s,a)=>s+n(a.importo),0),ceDiff=ce.reduce((s,a)=>s+n(a.importo),0);
+  if(Math.abs(spDiff)<=t||Math.abs(spDiff+ceDiff)<=t)return'';
+  return `<div class="callout bad" style="margin-top:16px"><b>Quadratura non riconciliata.</b> La differenza dello Stato Patrimoniale (${fmt2(spDiff)}) non coincide con il risultato del Conto Economico (${fmt2(-ceDiff)}). Nessuna voce tecnica A.IX è stata creata: verifica conti mancanti, segni e classificazioni. Gli export finali restano bloccati.</div>`;
+}
+window.renderChecks=function(){baseChecks();const host=document.getElementById('tab_checks');if(!host)return;const html=notice()||unresolvedNotice();if(html)host.insertAdjacentHTML('afterbegin',html);};
+try{renderChecks=window.renderChecks;}catch(_){ }
+function gate(){if(pending().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);const b=document.querySelector('[data-tab="checks"]');if(b)b.click();return false;}if(RESULT){const d=RESULT.totAtt-RESULT.totPas,t=Math.max(.01,Math.max(Math.abs(RESULT.totAtt||0),Math.abs(RESULT.totPas||0))*1e-9);if(Math.abs(d)>t){toast(`Export bloccato: Stato Patrimoniale non quadrato (${fmt2(d)}).`,true);return false;}}return true;}
+window.exportExcel=function(){if(!gate())return;return baseExportExcel.apply(this,arguments);};try{exportExcel=window.exportExcel;}catch(_){ }
+window.exportPDF=function(){if(!gate())return;return baseExportPDF.apply(this,arguments);};try{exportPDF=window.exportPDF;}catch(_){ }
+window.confirmFsTechnicalResult=confirmFsTechnicalResult;
+const priorLoad=window.loadSpecificMemory;window.loadSpecificMemory=function(id){const r=priorLoad(id);if(applyReconciliation()){refreshAll(true);showResultsUI();}return r;};
+function version(){document.documentElement.dataset.toolVersion=VERSION;document.querySelectorAll('.tal-publication-label').forEach(x=>x.textContent=x.textContent.replace(/v\d+\.\d+\.\d+/,'v'+VERSION));}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',version,{once:true});else version();
 })();
 </script>
 </body>

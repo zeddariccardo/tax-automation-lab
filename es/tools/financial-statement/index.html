@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-tool-version="1.3.1" lang="it">
+<html data-tool-version="1.3.2" lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1616,6 +1616,52 @@ function openBlankSchema(){
 // ====================================================================
 $("#an_schema").addEventListener('change',()=>{ if(STATE.accounts.length){ refreshAll(); } });
 renderSavedList();
+</script>
+
+<script id="tal-fs-v132-ux">
+(function(){
+'use strict';
+const TAL_VERSION='1.3.2';
+function css(){if(document.getElementById('tal-commandbar-style'))return;const s=document.createElement('style');s.id='tal-commandbar-style';s.textContent=`
+.tal-commandbar{width:min(1180px,calc(100% - 36px));margin:14px auto 18px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid rgba(14,22,36,.12);border-radius:14px;background:rgba(255,255,255,.95);box-shadow:0 10px 30px rgba(14,22,36,.08);backdrop-filter:blur(14px)}.tal-commandbar-copy b{display:block;font-size:12px}.tal-commandbar-copy span{display:block;font-size:10.5px;color:#6e6b65;max-width:520px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tal-commandbar-actions{display:flex;gap:8px;flex-wrap:wrap}.tal-commandbar .tal-cmd{min-height:40px;border-radius:9px;padding:9px 14px;border:1px solid #1d1b16;background:#fff;color:#1d1b16;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;cursor:pointer}.tal-commandbar .tal-cmd.primary{background:linear-gradient(100deg,#59147D,#145368);border-color:transparent;color:#fff}.tal-commandbar .tal-cmd:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.10)}@media(max-width:760px){.tal-commandbar{width:calc(100% - 24px);align-items:stretch;flex-direction:column}.tal-commandbar-actions{display:grid;grid-template-columns:repeat(3,1fr)}.tal-commandbar .tal-cmd{padding-inline:8px}.tal-commandbar-copy span{white-space:normal}}
+`;document.head.appendChild(s);}
+function clone(v){return JSON.parse(JSON.stringify(v));}
+function collectForm(){const o={};document.querySelectorAll('[id^="an_"]').forEach(e=>{if('value'in e)o[e.id]=e.value;});return o;}
+function applyForm(o){Object.entries(o||{}).forEach(([id,v])=>{const e=document.getElementById(id);if(e&&'value'in e)e.value=v==null?'':v;});}
+function updateLabel(){const e=document.getElementById('tal-commandbar-context');if(e)e.textContent=(document.getElementById('an_denom')?.value||document.getElementById('an_piva')?.value||document.getElementById('an_cf')?.value||'Nessuna società selezionata');}
+const baseSave=window.saveCurrentMapping;
+window.saveCurrentMapping=function(){
+  const id=currentPIVA();
+  baseSave();
+  if(!id||!STATE.accounts.length)return false;
+  try{const all=loadAllMemory(),rec=all[id];if(!rec)return false;rec.accounts=clone(STATE.accounts);rec.leafOverrides=clone(STATE.leafOverrides||{});rec.form=collectForm();rec.fullWork=true;rec.toolVersion=TAL_VERSION;rec.updated=new Date().toISOString();writeAllMemory(all);renderSavedList();updateLabel();return true;}catch(e){console.error(e);toast('Il lavoro non è stato salvato integralmente.',true);return false;}
+};
+const baseLoad=window.loadSpecificMemory;
+window.loadSpecificMemory=function(id){const rec=loadAllMemory()[id];if(rec&&Array.isArray(rec.accounts)&&rec.accounts.length){applyForm(rec.form||{});if(!document.getElementById('an_piva').value)document.getElementById('an_piva').value=id;STATE.accounts=clone(rec.accounts);STATE.leafOverrides=clone(rec.leafOverrides||{});STATE.storni=clone(rec.storni||[]);STATE.adjustments=clone(rec.adjustments||[]);if(rec.schema)document.getElementById('an_schema').value=rec.schema;refreshAll(true);showResultsUI();updateLabel();toast('Società e lavoro caricati dall’Archivio.');return;}return baseLoad(id);};
+function newWork(){if(!confirm('Creare una nuova elaborazione? I dati non salvati della sessione corrente andranno persi. Le società già salvate resteranno nell’Archivio.'))return;location.reload();}
+function saveWork(){if(!STATE.accounts.length){toast('Carica un bilancio prima di salvare il lavoro.',true);return;}if(!currentPIVA()){toast('Inserisci Partita IVA o Codice fiscale prima di salvare.',true);return;}window.saveCurrentMapping();}
+function archive(){openMappingManager();}
+function bar(){if(document.getElementById('tal-commandbar'))return;const h=document.querySelector('.tal-global-header');if(!h)return;const d=document.createElement('div');d.id='tal-commandbar';d.className='tal-commandbar';d.innerHTML='<div class="tal-commandbar-copy"><b>Sessione di lavoro</b><span id="tal-commandbar-context">Nessuna società selezionata</span></div><div class="tal-commandbar-actions"><button class="tal-cmd" type="button" id="tal-cmd-new">Nuovo</button><button class="tal-cmd primary" type="button" id="tal-cmd-save">Salva</button><button class="tal-cmd" type="button" id="tal-cmd-archive">Archivio</button></div>';h.insertAdjacentElement('afterend',d);document.getElementById('tal-cmd-new').onclick=newWork;document.getElementById('tal-cmd-save').onclick=saveWork;document.getElementById('tal-cmd-archive').onclick=archive;document.querySelectorAll('[id^="an_"]').forEach(e=>e.addEventListener('input',updateLabel));updateLabel();}
+function version(){document.documentElement.dataset.toolVersion=TAL_VERSION;document.querySelectorAll('.tal-publication-label').forEach(x=>x.textContent=x.textContent.replace(/v\d+\.\d+\.\d+/,'v'+TAL_VERSION));}
+function install(){css();bar();version();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+<script id="tal-fs-v132-archive-modal">
+(function(){
+'use strict';
+const priorLoad=window.loadSpecificMemory;
+window.loadSpecificMemory=function(id){const r=priorLoad(id);try{closeModal('modal_mappings');}catch(_){}return r;};
+window.renderMemoryModal=function(){
+  const all=loadAllMemory(),keys=Object.keys(all);let out='';
+  if(!keys.length)out='<p style="font-style:italic;color:var(--g4)">Nessuna società salvata.</p>';
+  else{
+    out='<div class="saved-list">'+keys.sort((a,b)=>String(all[b].updated||'').localeCompare(String(all[a].updated||''))).map(k=>{const s=all[k],date=new Date(s.updated).toLocaleString('it-IT');return `<div class="saved-item"><div class="info"><b>${escapeHtml(s.denominazione||k)}</b><small>${escapeHtml(k)} · ${s.count||0} conti · ${date}</small></div><button class="lk" onclick="loadSpecificMemory('${escapeHtml(k)}')">Carica</button><button class="lk" onclick="exportSingleMemory('${escapeHtml(k)}')">Esporta</button><button class="lk del" onclick="deleteMemory('${escapeHtml(k)}')">Elimina</button></div>`;}).join('')+'</div>';
+    out+='<div class="btn-row" style="margin-top:20px"><button class="btn secondary" onclick="exportAllMemory()">Esporta tutte (JSON)</button><label class="btn ghost" for="import_mem_file">Importa da JSON</label><input type="file" id="import_mem_file" accept=".json" onchange="importMemoryFile(event)"></div>';
+  }
+  const host=document.getElementById('modal_mappings_list');if(host)host.innerHTML=out;
+};
+})();
 </script>
 </body>
 </html>

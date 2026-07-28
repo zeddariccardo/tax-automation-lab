@@ -1,0 +1,129 @@
+{
+  "release": "v6.15.2",
+  "date": "2026-07-28",
+  "status": "passed_static_qa",
+  "browser_qa": {
+    "status": "not_executed",
+    "reason": "A browser runtime was not available in the current execution environment. Interactive confirmation remains part of post-deploy smoke testing."
+  },
+  "checks": {
+    "config_it": {
+      "tool_cards": 4,
+      "financial_analysis_card": 1,
+      "upload_cards": 5,
+      "financial_analysis_upload": 1,
+      "financial_analysis_template_href": "/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx",
+      "financial_analysis_prompt_chars": 4032,
+      "upload_labels": [
+        "01 · FINANCIAL STATEMENT",
+        "02 · ANALISI DI BILANCIO",
+        "03 · LIPE — SETUP",
+        "04 · LIPE — PERIODO",
+        "05 · TFA CLIENT FILE"
+      ],
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "config_en": {
+      "tool_cards": 4,
+      "financial_analysis_card": 1,
+      "upload_cards": 5,
+      "financial_analysis_upload": 1,
+      "financial_analysis_template_href": "/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx",
+      "financial_analysis_prompt_chars": 1990,
+      "upload_labels": [
+        "01 · FINANCIAL STATEMENT",
+        "02 · FINANCIAL ANALYSIS",
+        "03 · LIPE — SETUP",
+        "04 · LIPE — PERIOD",
+        "05 · TFA CLIENT FILE"
+      ],
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "config_es": {
+      "tool_cards": 4,
+      "financial_analysis_card": 1,
+      "upload_cards": 5,
+      "financial_analysis_upload": 1,
+      "financial_analysis_template_href": "/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx",
+      "financial_analysis_prompt_chars": 2156,
+      "upload_labels": [
+        "01 · FINANCIAL STATEMENT",
+        "02 · ANÁLISIS FINANCIERO",
+        "03 · LIPE — SETUP",
+        "04 · LIPE — PERIODO",
+        "05 · TFA CLIENT FILE"
+      ],
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_analysis_it": {
+      "tool_version": "2.0.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": true,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_analysis_en": {
+      "tool_version": "2.0.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": true,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_analysis_es": {
+      "tool_version": "2.0.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": true,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_statement_it": {
+      "tool_version": "1.3.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": null,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_statement_en": {
+      "tool_version": "1.3.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": null,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    },
+    "financial_statement_es": {
+      "tool_version": "1.3.2",
+      "command_bar_script": true,
+      "new_button_logic": true,
+      "save_button_logic": true,
+      "archive_button_logic": true,
+      "confirmation_logic": true,
+      "dashboard_sidebar_logic": null,
+      "duplicate_ids": [],
+      "javascript_syntax_errors": []
+    }
+  },
+  "issues": []
+}

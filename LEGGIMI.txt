@@ -1,0 +1,14 @@
+TAX AUTOMATION LAB — HOTFIX v6.15.6
+
+Corregge l'export XLSX del Financial Analysis Tool e aggiorna il tool alla v2.0.5.
+
+Procedura:
+1. Estrai questa cartella fuori dal repository.
+2. Esegui APPLICA-HOTFIX-v6.15.6.bat.
+3. Incolla il percorso della cartella locale tax-automation-lab.
+4. Controlla git diff e segui ISTRUZIONI-DEPLOY-v6.15.6.md, che verrà copiato nella root del repository.
+
+Il programma non esegue commit o push automaticamente.
+
+In alternativa al file BAT, da terminale puoi eseguire:
+python apply-hotfix-v6.15.6.py "C:\percorso\tax-automation-lab"

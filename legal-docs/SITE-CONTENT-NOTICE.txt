@@ -7,5 +7,4 @@ its original texts, visual design, logo, photography, project name and brand
 identity are not distributed under the MIT licence.
 
 The software tools are licensed under MIT.
-The guide is licensed under CC BY-NC-ND 4.0.
 Third-party components remain subject to their respective licences.

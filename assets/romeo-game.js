@@ -3,33 +3,35 @@
 
   const COPY = {
     it: {
-      background: 'Background', family: 'Famiglia', familyPrefix: 'Marito e ', dad: 'papà',
+      background: 'Background', family: 'Famiglia', familyPrefix: 'Marito e', dad: 'papà',
       openLabel: 'Apri Il primo bilancio di Romeo', closeLabel: 'Chiudi il gioco',
-      title: 'Il primo bilancio di Romeo', instruction: 'Trascina ogni figura nella sezione corretta.',
+      title: 'Il primo bilancio di Romeo',
       balanceSheet: 'Stato patrimoniale', incomeStatement: 'Conto economico',
       zones: { assets: 'Attivo', liabilities: 'Passivo', equity: 'Patrimonio netto', revenue: 'Ricavi', raw: 'Materie prime', services: 'Servizi', staff: 'Personale' },
       items: { car: 'Macchinina', house: 'Casetta', cash: 'Sacchetto di denaro', loan: 'Prestito bancario', bill: 'Fattura da pagare', capital: 'Capitale', customer: 'Cliente che paga', brick: 'Mattoncino', cleaner: 'Servizio di pulizia', worker: 'Lavoratore' },
       letter: 'Se un giorno leggerai queste righe, probabilmente sarai abbastanza grande da capire che in ogni cosa che faccio, anche se sono distante, ti porto con me.\n\nOgni ora dedicata a questo progetto, o ad altri, ha solo un obiettivo, quello di costruire qualcosa che possa creare valore.\n\nSpero che qualunque cosa ti appassioni nella vita, tu abbia il coraggio di dedicarle tempo.\nPerché il tempo speso in ciò che ti appassiona o ti entusiasma non è mai tempo perso.\n\nCon amore,\nPapà'
     },
     en: {
-      background: 'Background', family: 'Family', familyPrefix: 'Husband and ', dad: 'dad',
+      background: 'Background', family: 'Family', familyPrefix: 'Husband and', dad: 'dad',
       openLabel: "Open Romeo's first balance sheet", closeLabel: 'Close the game',
-      title: "Romeo's first balance sheet", instruction: 'Drag each picture into the correct section.',
+      title: "Romeo's first balance sheet",
       balanceSheet: 'Balance sheet', incomeStatement: 'Income statement',
       zones: { assets: 'Assets', liabilities: 'Liabilities', equity: 'Equity', revenue: 'Revenue', raw: 'Raw materials', services: 'Services', staff: 'Personnel' },
       items: { car: 'Toy car', house: 'House', cash: 'Bag of money', loan: 'Bank loan', bill: 'Bill to pay', capital: 'Capital', customer: 'Paying customer', brick: 'Building block', cleaner: 'Cleaning service', worker: 'Worker' },
       letter: 'If one day you read these lines, you will probably be old enough to understand that in everything I do, even when I am far away, I carry you with me.\n\nEvery hour devoted to this project, or to others, has only one purpose: to build something that can create value.\n\nI hope that, whatever you become passionate about in life, you will have the courage to devote time to it.\nBecause time spent on what you are passionate or excited about is never time wasted.\n\nWith love,\nDad'
     },
     es: {
-      background: 'Trayectoria', family: 'Familia', familyPrefix: 'Marido y ', dad: 'papá',
+      background: 'Trayectoria', family: 'Familia', familyPrefix: 'Marido y', dad: 'papá',
       openLabel: 'Abrir el primer balance de Romeo', closeLabel: 'Cerrar el juego',
-      title: 'El primer balance de Romeo', instruction: 'Arrastra cada dibujo a la sección correcta.',
+      title: 'El primer balance de Romeo',
       balanceSheet: 'Balance', incomeStatement: 'Cuenta de resultados',
       zones: { assets: 'Activo', liabilities: 'Pasivo', equity: 'Patrimonio neto', revenue: 'Ingresos', raw: 'Materias primas', services: 'Servicios', staff: 'Personal' },
       items: { car: 'Coche de juguete', house: 'Casita', cash: 'Bolsa de dinero', loan: 'Préstamo bancario', bill: 'Factura por pagar', capital: 'Capital', customer: 'Cliente que paga', brick: 'Bloque de construcción', cleaner: 'Servicio de limpieza', worker: 'Trabajador' },
       letter: 'Si algún día lees estas líneas, probablemente serás lo bastante mayor para comprender que, en todo lo que hago, incluso cuando estoy lejos, te llevo conmigo.\n\nCada hora dedicada a este proyecto, o a otros, tiene un único objetivo: construir algo que pueda crear valor.\n\nEspero que, sea lo que sea que te apasione en la vida, tengas el valor de dedicarle tiempo.\nPorque el tiempo dedicado a lo que te apasiona o te entusiasma nunca es tiempo perdido.\n\nCon amor,\nPapá'
     }
   };
+
+  const BINARY_ROMEO = ['01010010', '01001111', '01001101', '01000101', '01001111'];
 
   const ITEMS = [
     { id: 'car', zone: 'assets' }, { id: 'house', zone: 'assets' }, { id: 'cash', zone: 'assets' },
@@ -81,10 +83,10 @@
     modal.className = 'rg-modal';
     modal.hidden = true;
     modal.innerHTML = `
-      <section class="rg-dialog" role="dialog" aria-modal="true" aria-labelledby="rg-title">
+      <section class="rg-dialog" role="dialog" aria-modal="true">
         <button class="rg-close" type="button">×</button>
         <div class="rg-game">
-          <div class="rg-intro"><h2 id="rg-title"></h2><p class="rg-instruction"></p></div>
+          <div class="rg-intro"><h2 id="rg-title" aria-hidden="true"></h2></div>
           <div class="rg-board">
             <section class="rg-statement">
               <h3 class="rg-statement-title" data-copy="balanceSheet"></h3>
@@ -134,8 +136,8 @@
     const copy = t();
     const root = createModal();
     root.querySelector('.rg-close').setAttribute('aria-label', copy.closeLabel);
-    root.querySelector('#rg-title').textContent = copy.title;
-    root.querySelector('.rg-instruction').textContent = copy.instruction;
+    root.querySelector('.rg-dialog').setAttribute('aria-label', copy.title);
+    root.querySelector('#rg-title').innerHTML = BINARY_ROMEO.map(byte => `<span>${byte}</span>`).join('');
     root.querySelector('[data-copy="balanceSheet"]').textContent = copy.balanceSheet;
     root.querySelector('[data-copy="incomeStatement"]').textContent = copy.incomeStatement;
     root.querySelectorAll('.rg-zone').forEach(zone => {

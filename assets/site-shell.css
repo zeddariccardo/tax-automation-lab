@@ -9,8 +9,10 @@
     linear-gradient(155deg,#4a2168 0%,#3d1a5c 20%,#33245a 44%,#1a4d63 78%,#123545 100%);
 }
 
-html{background:#0e1624!important;overflow-x:hidden!important}
-body{
+/* The shared background belongs only to public editorial pages.
+   Tool pages keep their own application canvas and colour system. */
+html:not(.tal-tool-page){background:#0e1624!important;overflow-x:hidden!important}
+body:not(.tal-tool-page){
   overflow-x:hidden!important;
   background:var(--tal-shell-bg)!important;
   background-attachment:fixed!important;

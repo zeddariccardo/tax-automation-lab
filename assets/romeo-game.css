@@ -598,3 +598,30 @@ body.romeo-game-open{overflow:hidden!important}
   .rg-modal,.rg-board,.rg-piece,.rg-letter-stage{transition:none!important}
   .rg-zone.is-wrong,.rg-zone .rg-piece,.rg-letter-stage.is-visible .rg-envelope-flap,.rg-letter-stage.is-visible .rg-paper{animation-duration:.01ms!important;animation-delay:0ms!important}
 }
+
+
+/* Mobile usability fix 04.08.2026 */
+.rg-dialog{
+  max-height:calc(100dvh - clamp(16px,4vw,48px));
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:480px){
+  .rg-modal{
+    padding:max(4px,env(safe-area-inset-top)) 4px max(4px,env(safe-area-inset-bottom));
+    place-items:start center;
+    touch-action:pan-y;
+  }
+  .rg-dialog{
+    width:calc(100% - 8px);
+    max-width:100%;
+    max-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)));
+    margin:0 auto;
+    overflow-x:hidden;
+    overflow-y:auto;
+    touch-action:pan-y;
+  }
+  .rg-game,.rg-board,.rg-statement,.rg-tray{min-width:0}
+  .rg-game{padding:20px 10px 24px}
+  .rg-piece{touch-action:manipulation}
+}

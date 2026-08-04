@@ -174,7 +174,7 @@
           selectPiece(button);
         }
       });
-      button.addEventListener('pointerdown', startDrag);
+      if (!window.matchMedia('(pointer: coarse)').matches) button.addEventListener('pointerdown', startDrag);
       tray.appendChild(button);
     });
   }

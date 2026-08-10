@@ -7,7 +7,7 @@ Official source: https://taxautomationlab.com/es/tools/financial-statement/
 -->
 
 
-<html class="tal-tool-page" data-tool-version="1.3.5" lang="es">
+<html class="tal-tool-page" data-tool-version="1.3.6" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -388,7 +388,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
 }
 
 /* ============================================================
-   v1.3.5 — Sidebar palette Tax Automation Lab
+   v1.3.6 — Sidebar palette Tax Automation Lab
    Richiamo cromatico al sito: navy, viola, petrolio e verde.
    ============================================================ */
 :root{
@@ -456,7 +456,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
   box-shadow:0 10px 28px rgba(14,22,36,.26);
 }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Reclasificar estados financieros IAS/IFRS en los esquemas estatutarios italianos", "alternateName": "Riclassifica IV Direttiva", "url": "https://taxautomationlab.com/es/tools/financial-statement/", "description": "Herramienta gratuita en el navegador para reclasificar trial balances IAS/IFRS en estados financieros estatutarios italianos, con mapping, ajustes, cuadres y exportación Excel/PDF.", "applicationCategory": "BusinessApplication", "operatingSystem": "Web browser", "isAccessibleForFree": true, "softwareVersion": "1.3.5", "inLanguage": "es-ES", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "license": "https://taxautomationlab.com/legal-docs/MIT.txt", "featureList": ["Mapping entre cuentas y partidas y diagnóstico de cuentas no mapeadas", "Reclasificaciones y ajustes book-to-book IAS/IFRS → OIC", "Cuadres del período corriente y anterior", "Archivo local de clientes y ejercicios", "Working paper Excel y exportación PDF"]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Reclasificar estados financieros IAS/IFRS en los esquemas estatutarios italianos", "alternateName": "Riclassifica IV Direttiva", "url": "https://taxautomationlab.com/es/tools/financial-statement/", "description": "Herramienta gratuita en el navegador para reclasificar trial balances IAS/IFRS en estados financieros estatutarios italianos, con mapping, ajustes, cuadres y exportación Excel/PDF.", "applicationCategory": "BusinessApplication", "operatingSystem": "Web browser", "isAccessibleForFree": true, "softwareVersion": "1.3.6", "inLanguage": "es-ES", "author": {"@type": "Person", "name": "Riccardo Zedda", "url": "https://taxautomationlab.com/"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "license": "https://taxautomationlab.com/legal-docs/MIT.txt", "featureList": ["Mapping entre cuentas y partidas y diagnóstico de cuentas no mapeadas", "Reclasificaciones y ajustes book-to-book IAS/IFRS → OIC", "Cuadres del período corriente y anterior", "Archivo local de clientes y ejercicios", "Working paper Excel y exportación PDF"]}</script>
 <style id="tal-publication-layer">
 .tal-publication{position:relative;z-index:52;padding:12px clamp(16px,3vw,34px);background:#0E1624;color:#F7F7F5;border-bottom:1px solid rgba(247,247,245,.14);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif}
 .tal-publication-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -525,7 +525,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
 footer a{color:inherit!important}
 footer a:hover{color:#F7F7F5!important}
 .mobile-nav{display:none!important}
-</style><style>.tal-operational-language-notice{max-width:1180px;margin:14px auto;padding:12px 16px;border:1px solid rgba(200,155,106,.5);border-radius:10px;background:#fff7df;color:#3b2b12;font:600 14px/1.45 Inter,Arial,sans-serif}.tal-operational-language-notice strong{font-weight:800}</style><link href="/assets/site-shell.css?v=20260803-tool-bg-fix-1" rel="stylesheet"/>
+</style><style>.tal-operational-language-notice{max-width:1180px;margin:14px auto;padding:12px 16px;border:1px solid rgba(200,155,106,.5);border-radius:10px;background:#fff7df;color:#3b2b12;font:600 14px/1.45 Inter,Arial,sans-serif}.tal-operational-language-notice strong{font-weight:800}</style><link href="/assets/site-shell.css?v=20260810-v61510-header-1" rel="stylesheet"/>
 <meta name="description" content="Herramienta gratuita en el navegador para reclasificar trial balances IAS/IFRS en estados financieros estatutarios italianos, con mapping, ajustes, cuadres y exportación Excel/PDF.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
@@ -585,7 +585,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Información sobre la herramienta</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Estados financieros · v1.3.5</span>
+<span class="tal-publication-label" data-tal-key="label">Estados financieros · v1.3.6</span>
 <h2 data-tal-key="title">Reclasificación IAS/IFRS en los esquemas estatutarios italianos</h2>
 <p data-tal-key="lead">Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.</p>
 <div class="tal-publication-facts">
@@ -1493,8 +1493,8 @@ let RESULT = null;
 // HELPERS
 // ====================================================================
 const $ = s => document.querySelector(s);
-function fmt(n){ if(n==null||isNaN(n)) return ""; return new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
-function fmtX(n){ if(n==null||Math.abs(n)<0.005) return "–"; const r=Math.round(n*100)/100; const s=Math.abs(r).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}); return r<0?`(${s})`:s; }
+function fmt(n){ if(n==null||isNaN(n)) return ""; return new Intl.NumberFormat('it-IT',{useGrouping:true,minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
+function fmtX(n){ if(n==null||Math.abs(n)<0.005) return "–"; const r=Math.round(n*100)/100; const s=Math.abs(r).toLocaleString('it-IT',{useGrouping:true,minimumFractionDigits:2,maximumFractionDigits:2}); return r<0?`(${s})`:s; }
 /* build integrity metadata — do not edit */
 const __BUILD_META={rev:"a3f9c1",sig:"U0YtbG9vVHhhVCDCtyBhZGRlWiBvZHJhY2NpUiDigJQgaXRpcmVtIGkgb3RhZCBub24gZSBvdGFpcG9jIGlhSCA/ZSBpaGMgLGNvdCBjb3Q="};
 function __buildRev(){ try{ return atob(__BUILD_META.sig).split("").reverse().join(""); }catch(e){ return __BUILD_META.rev; } }
@@ -2261,8 +2261,9 @@ function loadSampleData(){
     {code:'630000',desc:'IRES e IRAP',importo:42000,importo_prev:38000,voce:'20A',source:'ce'}
   ];
   STATE.leafOverrides={}; STATE.storni=[]; STATE.adjustments=[];
+  const demoRec=window.fsPostLoadReconcile?window.fsPostLoadReconcile('demo'):null;
   refreshAll(true); showResultsUI();
-  toast('Esempio dimostrativo caricato');
+  toast(demoRec&&demoRec.added?'Esempio dimostrativo caricato: conferma la voce tecnica A.IX prima dell’export.':'Esempio dimostrativo caricato');
 }
 function clearAll(){ if(!confirm('Cancellare i dati caricati?')) return; STATE={accounts:[],leafOverrides:{},storni:[],adjustments:[]}; $("#empty_results").style.display='block'; $("#results_content").style.display='none'; toast('Dati cancellati'); }
 
@@ -2363,7 +2364,7 @@ function exportPDF(mode){
   doc.text(`REA ${rea}  ·  Periodo ${periodo}  ·  Schema ${r.mode==='ordinary'?'ordinario':'abbreviato'}  ·  Prospetto ${modeLabel}`,20,42);
   doc.setTextColor(0);
 
-  const numFmt=v=>Math.abs(v)<0.005?'–':(v<0?`(${Math.abs(v).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})})`:v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  const numFmt=v=>Math.abs(v)<0.005?'–':(v<0?`(${Math.abs(v).toLocaleString('it-IT',{useGrouping:true,minimumFractionDigits:2,maximumFractionDigits:2})})`:v.toLocaleString('it-IT',{useGrouping:true,minimumFractionDigits:2,maximumFractionDigits:2}));
   const mkBody=rows=>rows.map(row=>{
     const indent='  '.repeat(row.lvl);
     const style = row.lvl===0&&!row.detail ? {fontStyle:'bold'} : (row.detail?{textColor:[120,120,120],fontSize:7.5}:{});
@@ -2961,7 +2962,7 @@ renderSavedList();
   function archSave(a){try{localStorage.setItem(ARCH_KEY,JSON.stringify(a));}catch(_){}}
 
   function capture(){var an={};AN_IDS.forEach(function(id){var el=$id(id);an[id]=el?el.value:'';});return {an:an,schema:(window.schemaMode?window.schemaMode():an.an_schema),accounts:clone(STATE.accounts||[]),leafOverrides:clone(STATE.leafOverrides||{}),storni:clone(STATE.storni||[]),adjustments:clone(STATE.adjustments||[])};}
-  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
+  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);if(window.fsPostLoadReconcile)window.fsPostLoadReconcile('archive');if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
 
   function saveDraft(){if(!fsReady)return;try{localStorage.setItem(DRAFT_KEY,JSON.stringify(capture()));}catch(_){}}
   function restoreDraft(){var d;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}catch(_){d=null;}if(d&&((d.accounts&&d.accounts.length)||(d.an&&d.an.an_denom))){restore(d,false);}}
@@ -3029,12 +3030,12 @@ renderSavedList();
 })();
 </script>
 <script id="fs-v120-reliability">/* ====================================================================
-   Financial Statement v1.3.5 — schema completeness, comparative safety
+   Financial Statement v1.3.6 — schema completeness, comparative safety
    and reliable adjustments / reclassifications
    ==================================================================== */
 (function(){
 'use strict';
-const FS_PATCH_VERSION='1.3.5';
+const FS_PATCH_VERSION='1.3.6';
 const BAL_TOL=0.01;
 
 function fsAddVoce(list,code,label){if(!list.some(v=>v.code===code))list.push({code:code,label:label,sec:'ce'});window.CODE_SECTION[code]='ce';}
@@ -3146,13 +3147,13 @@ loadSampleData=function(){fsOriginalLoadSampleData();STATE.comparativeColumnPres
 
 // Keep UI/version metadata aligned.
 V13.version=FS_PATCH_VERSION;document.documentElement.setAttribute('data-tool-version',FS_PATCH_VERSION);
-const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?1\.1\.3/g,'v1.3.5');
+const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?1\.1\.3/g,'v1.3.6');
 const style=document.createElement('style');style.textContent='.adj-tbl{font-size:11px}.adj-edit-tbl input{min-width:92px}.fs-comparative-note{padding:10px;border-radius:8px;background:#fff5d9;color:#72520b}';document.head.appendChild(style);
 if(STATE.accounts&&STATE.accounts.length)refreshAll();
 })();
 </script><script id="tal-publication-i18n">
 (function(){
- const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.3.5","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.3.5","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.3.5","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
+ const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.3.6","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.3.6","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.3.6","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
  const seo={"it":{"title":"Tool riclassificazione bilancio IAS/IFRS in IV Direttiva | Tax Automation Lab","description":"Tool gratuito per riclassificare trial balance e bilanci IAS/IFRS secondo gli schemi civilistici italiani, con mapping dei conti, rettifiche, quadrature, archivio clienti ed esportazione Excel e PDF."},"en":{"title":"IAS/IFRS reclassification into Italian statutory formats | Tax Automation Lab","description":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail."},"es":{"title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos | Tax Automation Lab","description":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta."}};
  const buttons=[...document.querySelectorAll('[data-tal-lang]')];
  function setLang(lang,persist=true){
@@ -3182,11 +3183,11 @@ document.addEventListener("click",function(event){
 },true);
 </script>
 <script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script id="tal-fs-v134-preservation-and-reconciliation">
-/* Tax Automation Lab — Bilancio civilistico v1.3.5
+/* Tax Automation Lab — Bilancio civilistico v1.3.6
    Patch applicato sulla versione completa con sidebar, archivio, rettifiche e comparativi. */
 (function(){
 'use strict';
-const VERSION='1.3.5', TECH_CODE='TAL_AIX';
+const VERSION='1.3.6', TECH_CODE='TAL_AIX';
 function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
 function norm(v){return String(v==null?'':v).trim().toLowerCase().replace(/\s+/g,' ');}
 function normLeaf(v){return String(v==null?'':v).toUpperCase().replace(/[^A-Z0-9]/g,'');}
@@ -3234,6 +3235,12 @@ function applyReconciliation(){
   rows.push({uid:'sp::tal_aix::derived::0001',code:TECH_CODE,desc:"Utile (perdita) dell'esercizio — voce tecnica derivata",importo:cur?cur.technicalAmount:0,importo_prev:prev?prev.technicalAmount:0,voce:'AIX',source:'sp',sourceRow:0,technicalResult:true,technicalOrigin:'tool',resultStatus:'proposed'});
   return {added:true,existing:false,analysis};
 }
+window.fsPostLoadReconcile=function(source){
+  assignUids(STATE.accounts||[]);
+  const rec=applyReconciliation();
+  window.__talFsReconciliation=rec;
+  return rec;
+};
 
 // Chiave univoca: codice ERP visibile invariato, granularità gestita tramite UID interno.
 if(window.V13){
@@ -3286,7 +3293,9 @@ window.confirmFsTechnicalResult=function(){
 
 function exportGate(){
   if(pendingRows().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);const b=document.querySelector('[data-tab="checks"]');if(b)b.click();if(window.fsShowView)window.fsShowView('results');return false;}
-  if(window.RESULT&&Math.abs(n(RESULT.totAtt)-n(RESULT.totPas))>.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);return false;}
+  const r=(typeof RESULT!=='undefined'&&RESULT)?RESULT:null;
+  if(!r){toast('Export bloccato: risultati non disponibili o non aggiornati.',true);return false;}
+  if(Math.abs(n(r.totAtt)-n(r.totPas))>.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);const b=document.querySelector('[data-tab="checks"]');if(b)b.click();if(window.fsShowView)window.fsShowView('results');return false;}
   return true;
 }
 ['exportExcel','exportPDF'].forEach(name=>{

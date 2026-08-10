@@ -1,6 +1,15 @@
 /* Shared public-site navigation behavior. */
 (function(){
   'use strict';
+
+  function normalizeConfigurePrompts(){
+    var fa=document.getElementById('fa-prompt');
+    if(!fa)return;
+    var current=fa.textContent||'';
+    var next=current.replace(/ANALISI DI BILANCIO v2\.0\.5/g,'ANALISI DI BILANCIO v2.0.6');
+    if(next!==current)fa.textContent=next;
+  }
+
   function init(){
     document.querySelectorAll('.tal-global-header').forEach(function(header){
       var frame=header.querySelector('.tal-gh-frame');
@@ -35,6 +44,7 @@
         if(!window.matchMedia('(max-width:760px)').matches) setOpen(false);
       },{passive:true});
     });
+    normalizeConfigurePrompts();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

@@ -89,7 +89,6 @@ body:not(.tal-tool-page){
   .tal-gh-nav{grid-area:nav!important}
 }
 
-
 /* Audit remediation 03.08.2026 */
 :where(h1,h2,h3,section,article)[id]{scroll-margin-top:118px}
 .prompt-wrap pre{max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
@@ -104,7 +103,6 @@ body:not(.tal-tool-page){
 .license-card .button{margin-top:10px;margin-right:7px}
 
 .tal-standard-footer nav{display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center}.tal-standard-footer nav a{display:inline-flex;align-items:center;min-height:32px}
-
 
 /* Fixes 04.08.2026 — mobile header and page-level eyebrow */
 .tal-page-eyebrow{
@@ -172,7 +170,6 @@ body:not(.tal-tool-page){
   .tal-gh-menu-toggle{min-width:40px!important;padding:0 9px!important;font-size:10px!important}
 }
 
-
 /* v6.15.10 — tool header containment */
 .tal-tool-page .tal-global-header{
   width:100%!important;
@@ -180,4 +177,25 @@ body:not(.tal-tool-page){
   min-width:0!important;
   margin-left:0!important;
   margin-right:0!important;
+}
+
+/* v6.15.11 — Financial Analysis header and print polish.
+   The app already has autosave + a command bar, so the duplicate header save control
+   is removed. On laptop widths the long wordmark is hidden rather than compressing
+   navigation or language labels. */
+html.tal-tool-page[data-tool-version^="2.0."] .tal-save-cluster{
+  display:none!important;
+}
+html.tal-tool-page[data-tool-version^="2.0."] .tal-gh-actions{
+  min-width:0!important;
+}
+@media(max-width:1440px){
+  html.tal-tool-page[data-tool-version^="2.0."] .tal-gh-brand-copy{
+    display:none!important;
+  }
+}
+@media print{
+  html.tal-tool-page[data-tool-version^="2.0."] .reclass-note{
+    display:none!important;
+  }
 }

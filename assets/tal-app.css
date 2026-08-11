@@ -1,0 +1,555 @@
+/* ==========================================================================
+   Tax Automation Lab — Design layer delle applicazioni (v1.0)
+   --------------------------------------------------------------------------
+   I quattro tool nascono dallo stesso scheletro (.appbar, .panel, .btn, .field,
+   .badge, .sb-*, .summary-bar, .toast) ma nel tempo hanno preso valori diversi:
+   due colori di focus, due corpi di testo, quattro raggi, quattro accenti.
+   Questo file riporta quei componenti a un'unica definizione.
+
+   Non tocca markup, struttura, griglie o logica: solo colore, tipografia,
+   raggi, bordi e stati. Tutto è agganciato a html.tal-tool-page, quindi non
+   può raggiungere le pagine editoriali.
+
+     01. Token
+     02. Superficie e tipografia
+     03. Intestazioni di sezione
+     04. Pannelli e schede
+     05. Controlli: bottoni
+     06. Controlli: campi
+     07. Tabelle
+     08. Barra applicativa, sidebar, navigazione
+     09. Stati: badge, hint, toast, summary
+     10. Focus e stampa
+   ========================================================================== */
+
+@import url("/assets/fonts/fonts.css");
+
+/* ---------- 01. Token ---------------------------------------------------- */
+
+html.tal-tool-page{
+  /* Carta e superfici */
+  --tal-paper:#F7F6F3;      /* fondo dell'applicazione */
+  --tal-card:#FFFFFF;       /* superfici di lavoro: pannelli, tabelle, campi */
+  --tal-sunken:#F1EFEA;     /* aree secondarie e intestazioni di tabella chiare */
+
+  /* Inchiostro */
+  --tal-ink:#14161B;
+  --tal-ink-2:#3B424B;
+  --tal-ink-3:#5E666F;
+  --tal-ink-4:#8B939C;
+
+  /* Linee */
+  --tal-line:#E4E1DA;
+  --tal-line-2:#CFCBC2;
+
+  /* Accento unico: il petrolio è già il colore primario del marchio */
+  --tal-accent:#145368;
+  --tal-accent-deep:#0C3341;
+  --tal-accent-soft:#EAF2F5;
+
+  /* Semantica invariata rispetto ai tool, ma con un solo valore ciascuna */
+  --tal-ok:#2E6B3D;      --tal-ok-soft:#EDF6EF;
+  --tal-warn:#A53D28;    --tal-warn-soft:#FCF1ED;
+  --tal-gold:#8B6A16;    --tal-gold-soft:#FCF6E4;
+
+  /* Forma */
+  --tal-r-xs:6px; --tal-r-sm:8px; --tal-r:10px; --tal-r-lg:14px; --tal-r-pill:999px;
+  --tal-sh-1:0 1px 2px rgba(20,22,27,.05);
+  --tal-sh-2:0 2px 10px rgba(20,22,27,.06),0 1px 2px rgba(20,22,27,.04);
+  --tal-sh-3:0 12px 34px -12px rgba(20,22,27,.22);
+
+  --tal-sans:"Inter","Segoe UI Variable Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --tal-mono:ui-monospace,"SF Mono",Menlo,Monaco,Consolas,monospace;
+  --tal-ease:cubic-bezier(.16,1,.3,1);
+
+  /* Allineamento delle variabili già usate dai tool: una sola sorgente di verità. */
+  --focus:var(--tal-accent);
+  --accent:var(--tal-accent);
+  --accent-deep:var(--tal-accent-deep);
+  --accent-soft:var(--tal-accent-soft);
+  --line:var(--tal-line);
+  --card:var(--tal-card);
+
+  /* Il viola era il colore di lavoro dei tool: monogramma, sidebar, pulsanti
+     avanzati, intestazioni. Ridefinendo le due variabili qui, tutte le regole
+     che le usano passano al petrolio senza toccarle una per una. */
+  --tal-purple:#1D6A7F;
+  --tal-purple-2:#0C3341;
+  --tal-teal:#145368;
+}
+
+/* ---------- 02. Superficie e tipografia ---------------------------------- */
+
+html.tal-tool-page{background:var(--tal-paper) !important}
+html.tal-tool-page body{
+  background:var(--tal-paper) !important;
+  color:var(--tal-ink) !important;
+  font-family:var(--tal-sans) !important;
+  font-size:15px !important;
+  line-height:1.55 !important;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"kern" 1,"liga" 1,"calt" 1;
+  font-variant-numeric:tabular-nums;
+}
+html.tal-tool-page code,
+html.tal-tool-page pre,
+html.tal-tool-page kbd{font-family:var(--tal-mono) !important}
+
+/* ---------- 03. Intestazioni di sezione ---------------------------------- */
+
+/* Un tool usava barre piene viola→petrolio, gli altri titoli nudi.
+   Ora tutti hanno lo stesso segnale: filo petrolio a sinistra e riga sotto.
+
+   Alcuni titoli vivono su superfici scure (barra del titolo, sezione di
+   pubblicazione, riepiloghi, sidebar): la forma è la stessa, il colore no.
+   L'elenco --tal-dark serve solo a tenere le due liste allineate. */
+html.tal-tool-page h1{
+  font-family:var(--tal-sans) !important;
+  font-size:22px !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+  letter-spacing:-.015em !important;
+  border-bottom:1px solid var(--tal-line) !important;
+  padding:0 0 12px !important;
+  margin:0 0 18px !important;
+}
+html.tal-tool-page h2{
+  font-family:var(--tal-sans) !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  line-height:1.3 !important;
+  letter-spacing:.01em !important;
+  background:none !important;
+  border:0 !important;
+  border-left:3px solid var(--tal-accent) !important;
+  border-bottom:1px solid var(--tal-line) !important;
+  border-radius:0 !important;
+  padding:0 0 8px 11px !important;
+  margin:26px 0 14px !important;
+}
+html.tal-tool-page h3{
+  font-family:var(--tal-sans) !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  letter-spacing:.02em !important;
+  margin:20px 0 8px !important;
+}
+html.tal-tool-page .panel>h2:first-child,
+html.tal-tool-page .panel>h3:first-child{margin-top:0 !important}
+
+/* Su carta: inchiostro. */
+html.tal-tool-page :is(h1,h2):not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) *){
+  color:var(--tal-ink) !important;
+}
+html.tal-tool-page h3:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) *){
+  color:var(--tal-ink-2) !important;
+}
+
+/* Su superficie scura: testo chiaro e filetti coerenti. */
+html.tal-tool-page :is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) :is(h1,h2,h3){
+  color:#F7F7F5 !important;
+  border-bottom-color:rgba(247,247,245,.20) !important;
+}
+html.tal-tool-page :is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) :is(.label,.hint,.meta,.muted-empty,.disclaimer){
+  color:rgba(247,247,245,.74) !important;
+}
+
+/* ---------- 04. Pannelli e schede ---------------------------------------- */
+
+html.tal-tool-page .panel{
+  background:var(--tal-card) !important;
+  border:1px solid var(--tal-line) !important;
+  border-left:3px solid var(--tal-accent) !important;
+  border-radius:var(--tal-r) !important;
+  box-shadow:var(--tal-sh-2) !important;
+  padding:22px 24px !important;
+  margin-bottom:18px !important;
+}
+html.tal-tool-page .card,
+html.tal-tool-page .box,
+html.tal-tool-page .tile{
+  background:var(--tal-card) !important;
+  border:1px solid var(--tal-line) !important;
+  border-radius:var(--tal-r) !important;
+  box-shadow:var(--tal-sh-1) !important;
+}
+html.tal-tool-page .rule{border-color:var(--tal-line) !important}
+
+/* ---------- 05. Controlli: bottoni --------------------------------------- */
+
+html.tal-tool-page .btn,
+html.tal-tool-page button.btn,
+html.tal-tool-page a.btn{
+  font-family:var(--tal-sans) !important;
+  font-size:11.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  min-height:40px !important;
+  padding:10px 18px !important;
+  border:1px solid var(--tal-ink) !important;
+  border-radius:var(--tal-r-sm) !important;
+  background:var(--tal-ink) !important;
+  color:#fff !important;
+  box-shadow:var(--tal-sh-1) !important;
+  cursor:pointer;
+  transition:transform 140ms var(--tal-ease),box-shadow 200ms var(--tal-ease),
+             background 140ms var(--tal-ease),border-color 140ms var(--tal-ease);
+}
+html.tal-tool-page .btn:hover{
+  transform:translateY(-1px) !important;
+  background:#262A31 !important;
+  border-color:#262A31 !important;
+  box-shadow:var(--tal-sh-3) !important;
+}
+html.tal-tool-page .btn:active{transform:translateY(0) scale(.99) !important}
+html.tal-tool-page .btn[disabled],
+html.tal-tool-page .btn:disabled{
+  opacity:.42 !important;
+  transform:none !important;
+  box-shadow:none !important;
+  cursor:not-allowed;
+}
+
+/* Secondari e fantasma: stessa forma, peso diverso. */
+html.tal-tool-page .btn.secondary,
+html.tal-tool-page .btn.ghost,
+html.tal-tool-page .secondary.btn,
+html.tal-tool-page .ghost.btn{
+  background:var(--tal-card) !important;
+  border-color:var(--tal-line-2) !important;
+  color:var(--tal-ink) !important;
+  box-shadow:none !important;
+}
+html.tal-tool-page .btn.secondary:hover,
+html.tal-tool-page .btn.ghost:hover{
+  background:var(--tal-accent-soft) !important;
+  border-color:var(--tal-accent) !important;
+  color:var(--tal-accent-deep) !important;
+}
+html.tal-tool-page .btn.danger{
+  background:var(--tal-warn) !important;
+  border-color:var(--tal-warn) !important;
+  color:#fff !important;
+}
+html.tal-tool-page .btn.danger:hover{background:#8E3220 !important;border-color:#8E3220 !important}
+html.tal-tool-page .btn-row{display:flex;flex-wrap:wrap;gap:8px !important}
+
+/* ---------- 06. Controlli: campi ----------------------------------------- */
+
+html.tal-tool-page input:not([type=checkbox]):not([type=radio]):not([type=file]),
+html.tal-tool-page select,
+html.tal-tool-page textarea{
+  font-family:var(--tal-sans) !important;
+  font-size:14px !important;
+  line-height:1.4 !important;
+  min-height:38px !important;
+  padding:8px 11px !important;
+  border:1px solid var(--tal-line-2) !important;
+  border-radius:var(--tal-r-sm) !important;
+  background:var(--tal-card) !important;
+  color:var(--tal-ink) !important;
+  transition:border-color 140ms ease,box-shadow 140ms ease;
+}
+html.tal-tool-page input:hover:not([type=checkbox]):not([type=radio]),
+html.tal-tool-page select:hover,
+html.tal-tool-page textarea:hover{border-color:var(--tal-ink-4) !important}
+html.tal-tool-page input:focus,
+html.tal-tool-page select:focus,
+html.tal-tool-page textarea:focus{
+  outline:none !important;
+  border-color:var(--tal-accent) !important;
+  box-shadow:0 0 0 3px rgba(20,83,104,.16) !important;
+}
+html.tal-tool-page input[type=checkbox],
+html.tal-tool-page input[type=radio]{accent-color:var(--tal-accent)}
+html.tal-tool-page .field{display:flex;flex-direction:column;gap:6px !important}
+html.tal-tool-page .field>.label,
+html.tal-tool-page .label{
+  font-size:10.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase !important;
+  color:var(--tal-ink-3) !important;
+}
+html.tal-tool-page .hint{
+  font-size:11.5px !important;
+  line-height:1.5 !important;
+  color:var(--tal-ink-3) !important;
+}
+
+/* ---------- 07. Tabelle --------------------------------------------------- */
+
+html.tal-tool-page table{
+  border-collapse:collapse !important;
+  background:var(--tal-card) !important;
+  font-size:13.5px !important;
+}
+html.tal-tool-page th{
+  background:var(--tal-accent-deep) !important;
+  color:#fff !important;
+  font-size:10.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  text-align:left;
+  padding:9px 11px !important;
+  border-color:var(--tal-accent-deep) !important;
+}
+html.tal-tool-page td{
+  padding:8px 11px !important;
+  border-bottom:1px solid var(--tal-line) !important;
+  color:var(--tal-ink) !important;
+}
+html.tal-tool-page tbody tr:hover td{background:var(--tal-accent-soft) !important}
+
+/* ---------- 08. Barra applicativa, sidebar, navigazione ------------------ */
+
+html.tal-tool-page .appbar{
+  background:rgba(247,246,243,.94) !important;
+  border-bottom:1px solid var(--tal-line) !important;
+  -webkit-backdrop-filter:saturate(120%) blur(10px);
+  backdrop-filter:saturate(120%) blur(10px);
+}
+/* Attenzione: .workspace-nav è una barra chiara sopra al contenuto in un tool
+   e la lista di navigazione dentro alla sidebar scura in un altro. Solo la
+   prima va schiarita, altrimenti il testo bianco finisce su fondo bianco. */
+html.tal-tool-page .workspace-nav:not(#sidebar *){
+  background:var(--tal-card) !important;
+  border-bottom:1px solid var(--tal-line) !important;
+}
+html.tal-tool-page .workspace-nav .active,
+html.tal-tool-page .ws-ic.active,
+html.tal-tool-page .workspace-nav button.active{
+  color:var(--tal-accent-deep) !important;
+  border-color:var(--tal-accent) !important;
+}
+/* Il monogramma era ora lime, ora sfumato viola: un solo colore, quello del marchio. */
+html.tal-tool-page .sb-logo{
+  background:var(--tal-accent) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  border-radius:var(--tal-r) !important;
+  box-shadow:var(--tal-sh-2) !important;
+}
+html.tal-tool-page .sb-cap,
+html.tal-tool-page .sb-groupcap{
+  font-size:9.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  color:var(--tal-ink-4) !important;
+}
+html.tal-tool-page .sb-brandtext{color:var(--tal-ink) !important}
+
+/* Sidebar: stessa architettura nei quattro tool, tre nomi diversi per la voce
+   di navigazione. Il gradiente viola dell'elemento attivo diventa petrolio. */
+html.tal-tool-page #sidebar{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(20,83,104,.70),transparent 36%),
+    radial-gradient(circle at 100% 100%,rgba(12,51,65,.60),transparent 42%),
+    linear-gradient(180deg,#0E1624 0%,#101B27 100%) !important;
+}
+html.tal-tool-page #sidebar .fs-link.active,
+html.tal-tool-page #sidebar .lipe-link.active,
+html.tal-tool-page #sidebar .workspace-link.active,
+html.tal-tool-page #sidebar .primary-tab.active,
+html.tal-tool-page .fs-link.active,
+html.tal-tool-page .lipe-link.active{
+  background:linear-gradient(100deg,#145368 0%,#12495B 46%,#0C3341 100%) !important;
+  color:#fff !important;
+}
+html.tal-tool-page #sidebar .fs-link:hover,
+html.tal-tool-page #sidebar .lipe-link:hover,
+html.tal-tool-page #sidebar .workspace-link:hover,
+html.tal-tool-page #sidebar .primary-tab:hover,
+html.tal-tool-page .fs-link:hover,
+html.tal-tool-page .lipe-link:hover{
+  background:rgba(20,83,104,.30) !important;
+  color:#fff !important;
+}
+html.tal-tool-page .sb-toggle{
+  background:linear-gradient(135deg,#145368,#0C3341) !important;
+  border-color:rgba(247,247,245,.20) !important;
+}
+
+/* Riquadri informativi: erano tinte viola/menta diverse per tool. */
+html.tal-tool-page .demo-card,
+html.tal-tool-page .demo-guide,
+html.tal-tool-page .mapping-help,
+html.tal-tool-page .factor-box.result,
+html.tal-tool-page .v16-exception-guide,
+html.tal-tool-page .advanced-guide>summary{
+  background:linear-gradient(135deg,rgba(20,83,104,.07),rgba(20,83,104,.04)) !important;
+  border-color:rgba(20,83,104,.20) !important;
+}
+html.tal-tool-page .demo-card{border-top-color:var(--tal-accent) !important}
+html.tal-tool-page .advanced-head.purple,
+html.tal-tool-page .reclass-section.sp .reclass-head{
+  background:linear-gradient(110deg,#145368,#0C3341) !important;
+}
+html.tal-tool-page .v16-scope-tag.advanced{
+  background:var(--tal-accent-soft) !important;
+  color:var(--tal-accent-deep) !important;
+}
+
+/* Barra di intestazione: nei tool sta accanto alla sidebar, quindi è più
+   stretta della finestra e i media query sulla viewport non la vedono. Il
+   risultato era il marchio esteso sovrapposto alle voci di menu. */
+html.tal-tool-page .tal-global-header{container-type:inline-size}
+html.tal-tool-page .tal-gh-frame{
+  min-height:60px !important;
+  gap:14px !important;
+  border-radius:var(--tal-r-lg) !important;
+  background:linear-gradient(140deg,rgba(14,22,36,.97),rgba(16,27,43,.97)) !important;
+  border:1px solid rgba(247,247,245,.14) !important;
+}
+html.tal-tool-page .tal-gh-brand-copy{
+  min-width:0 !important;
+  max-width:260px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-size:10.5px !important;
+  letter-spacing:.16em !important;
+}
+html.tal-tool-page .tal-gh-nav{
+  min-width:0 !important;
+  overflow-x:auto !important;
+  scrollbar-width:none;
+}
+html.tal-tool-page .tal-gh-nav::-webkit-scrollbar{display:none}
+html.tal-tool-page .tal-gh-nav a,
+html.tal-tool-page .tal-gh-nav button{
+  font-size:12px !important;
+  font-weight:600 !important;
+  white-space:nowrap;
+}
+html.tal-tool-page .tal-gh-nav a:hover,
+html.tal-tool-page .tal-gh-nav a.active,
+html.tal-tool-page .tal-gh-nav a[aria-current="page"]{
+  background:rgba(20,83,104,.42) !important;
+  color:#fff !important;
+}
+html.tal-tool-page .tal-gh-lang a.active,
+html.tal-tool-page .tal-gh-lang a[aria-current="page"]{background:#F7F7F5 !important;color:#11131A !important}
+html.tal-tool-page .tal-gh-logo{filter:drop-shadow(0 8px 18px rgba(20,83,104,.36)) !important}
+@container (max-width:960px){
+  html.tal-tool-page .tal-gh-brand-copy{display:none !important}
+}
+
+/* ---------- 09. Stati ----------------------------------------------------- */
+
+html.tal-tool-page .badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:var(--tal-r-pill) !important;
+  padding:3px 9px !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  background:var(--tal-sunken) !important;
+  color:var(--tal-ink-2) !important;
+}
+html.tal-tool-page .badge.ok,
+html.tal-tool-page .badge.saved{background:var(--tal-ok-soft) !important;color:var(--tal-ok) !important}
+html.tal-tool-page .badge.warn,
+html.tal-tool-page .badge.danger{background:var(--tal-warn-soft) !important;color:var(--tal-warn) !important}
+html.tal-tool-page .badge.info{background:var(--tal-accent-soft) !important;color:var(--tal-accent-deep) !important}
+/* Le pastiglie su fondo scuro restano scure. */
+html.tal-tool-page .badge.dark,
+html.tal-tool-page .tab.active .badge,
+html.tal-tool-page :is(#sidebar,.summary-bar,.tal-publication,header.top) .badge{
+  background:rgba(247,247,245,.14) !important;
+  color:#F7F7F5 !important;
+}
+
+html.tal-tool-page .summary-bar{
+  background:var(--tal-ink) !important;
+  color:#fff !important;
+  border-radius:var(--tal-r) !important;
+  box-shadow:var(--tal-sh-2) !important;
+  font-size:12.5px !important;
+}
+html.tal-tool-page .toast{
+  background:var(--tal-ink) !important;
+  color:#fff !important;
+  border-radius:var(--tal-r) !important;
+  box-shadow:var(--tal-sh-3) !important;
+  font-size:12.5px !important;
+}
+html.tal-tool-page .muted-empty,
+html.tal-tool-page .meta{color:var(--tal-ink-3) !important}
+
+/* La pagina finiva con due fasce scure sovrapposte: la banda nera del tool
+   (117px) e il piè di pagina del sito (146px). La prima ripeteva in forma più
+   lunga quello che il piè di pagina già dice — elaborazione locale e
+   responsabilità del professionista — e chiudeva l'applicazione con 263px di
+   nero. Resta il piè di pagina del sito, che porta anche i link legali. */
+html.tal-tool-page footer.foot{display:none !important}
+
+/* Avviso d'uso rimosso dalla vista in tutti i tool. Il markup resta nel file:
+   per rimetterlo basta cancellare questa regola. Le avvertenze generali —
+   elaborazione locale e verifica da parte del professionista — restano nel
+   piè di pagina del sito, presente su ogni pagina. */
+html.tal-tool-page #tal-tool-safety,
+html.tal-tool-page .tal-tool-safety{display:none !important}
+
+/* Il pulsante del menu è fisso: resta sullo schermo mentre la pagina scorre e
+   finiva per coprire il testo delle schede. Da pillola larga "☰ Menu" a
+   pulsante quadrato di 44px: copre meno della metà e resta un bersaglio
+   comodo. L'etichetta resta nel DOM, quindi il nome accessibile non cambia. */
+@media(max-width:980px){
+  html.tal-tool-page .sb-toggle{
+    width:44px !important;
+    min-width:44px !important;
+    height:44px !important;
+    padding:0 !important;
+    gap:0 !important;
+    justify-content:center !important;
+    border-radius:12px !important;
+    font-size:0 !important;
+    box-shadow:var(--tal-sh-3) !important;
+  }
+  html.tal-tool-page .sb-toggle::before{
+    content:"\2630";
+    font-size:17px;
+    line-height:1;
+    color:#fff;
+  }
+}
+html.tal-tool-page .disclaimer{
+  font-size:11.5px !important;
+  line-height:1.55 !important;
+  color:var(--tal-ink-3) !important;
+}
+
+/* ---------- 10. Focus e stampa -------------------------------------------- */
+
+/* Prima due anelli diversi: blu in due tool, verde negli altri due. */
+html.tal-tool-page a:focus-visible,
+html.tal-tool-page button:focus-visible,
+html.tal-tool-page input:focus-visible,
+html.tal-tool-page select:focus-visible,
+html.tal-tool-page textarea:focus-visible,
+html.tal-tool-page [tabindex]:focus-visible{
+  outline:2px solid var(--tal-accent) !important;
+  outline-offset:2px !important;
+}
+
+@media print{
+  html.tal-tool-page,
+  html.tal-tool-page body{background:#fff !important}
+  html.tal-tool-page .panel{
+    box-shadow:none !important;
+    border-color:#c9c6c0 !important;
+    break-inside:avoid;
+  }
+  html.tal-tool-page th{
+    background:#e9e6e0 !important;
+    color:#14161B !important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+}

@@ -1,0 +1,1213 @@
+/* ==========================================================================
+   Tax Automation Lab — Design layer condiviso (v7.0)
+   --------------------------------------------------------------------------
+   Obiettivo: una sola identità visiva per tutte le pagine pubbliche.
+   Non tocca gli applicativi (html.tal-tool-page) né la logica delle pagine:
+   agisce solo su tipografia, superfici, spaziature, sfondo e micro-interazioni.
+
+   Ordine dei blocchi
+     01. Font e token
+     02. Sfondo vivo (aurora + onde + grana)
+     03. Base tipografica
+     04. Contenitori e ritmo verticale
+     05. Header
+     06. Titoli e testo
+     07. Superfici e card
+     08. Bottoni, link, focus
+     09. Contenuti editoriali (articoli, legal, liste, tabelle)
+     10. Movimento (reveal, hover, transizioni)
+     11. Responsive
+     12. Reduced motion e stampa
+   ========================================================================== */
+
+@import url("/assets/fonts/fonts.css");
+
+/* ---------- 01. Token ---------------------------------------------------- */
+
+html:not(.tal-tool-page){
+  /* Famiglie */
+  --tal-sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --tal-serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;
+
+  /* Colori di base (invariati: sono quelli che funzionano già) */
+  --tal-ink:#F7F7F5;
+  --tal-body:#CBD4DC;
+  --tal-muted:#A3B0BC;
+  --tal-faint:#8A97A5;
+  --tal-hair:rgba(247,247,245,.12);
+  --tal-hair-strong:rgba(247,247,245,.20);
+
+  /* Accenti */
+  --tal-petrol:#2E93B0;
+  --tal-rust:#C08558;
+  --tal-mauve:#9A8190;
+  --tal-violet:#A867D8;
+
+  /* Superfici */
+  --tal-glass:linear-gradient(158deg,rgba(19,28,39,.78),rgba(14,19,29,.70));
+  --tal-glass-hi:linear-gradient(158deg,rgba(26,37,50,.86),rgba(17,23,34,.80));
+  --tal-blur:saturate(132%) blur(16px);
+
+  /* Ombre */
+  --tal-sh-1:0 2px 6px rgba(4,9,16,.20);
+  --tal-sh-2:0 18px 44px -18px rgba(4,9,16,.62),0 2px 8px rgba(4,9,16,.24);
+  --tal-sh-3:0 34px 80px -28px rgba(4,9,16,.78),0 4px 14px rgba(4,9,16,.30);
+
+  /* Raggi */
+  --tal-r-xs:8px; --tal-r-sm:12px; --tal-r:16px; --tal-r-lg:22px; --tal-r-pill:999px;
+
+  /* Spaziatura */
+  --tal-s1:4px;  --tal-s2:8px;  --tal-s3:12px; --tal-s4:16px;
+  --tal-s5:24px; --tal-s6:32px; --tal-s7:48px; --tal-s8:64px; --tal-s9:96px;
+
+  /* Misure */
+  --tal-max:1180px;
+  --tal-gutter:clamp(20px,4vw,40px);
+  --tal-measure:68ch;
+
+  /* Movimento */
+  --tal-ease:cubic-bezier(.16,1,.3,1);
+  --tal-fast:160ms;
+  --tal-mid:260ms;
+  --tal-slow:520ms;
+}
+
+/* ---------- 02. Sfondo vivo ---------------------------------------------- */
+
+/* La base cromatica passa su <html>: così <body> resta trasparente e i livelli
+   animati possono stare dietro al contenuto senza essere coperti. */
+/* Riequilibrio v7.1 — stessa tavolozza, proporzioni diverse.
+   Il viola occupava il 47% del quadro contro il 52% del petrolio, mentre il
+   ruggine, che è uno dei tre accenti del marchio, era sotto l'1%: il colore
+   più presente era quello che non segnalava nulla. Ora il petrolio guida
+   (76%) e il viola resta come tonalità d'apertura (23%). */
+html:not(.tal-tool-page){
+  background:
+    linear-gradient(155deg,#46265e 0%,#3a2559 18%,#2a3059 44%,#1a4d63 74%,#123545 100%)
+    fixed !important;
+  scroll-behavior:smooth;
+}
+body:not(.tal-tool-page){
+  background:transparent !important;
+  background-attachment:scroll !important;
+}
+
+/* Fallback senza JS: la nuvola di colore attuale, statica. */
+html:not(.tal-tool-page)::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(78% 68% at 2% 0%,rgba(172,111,66,.66),rgba(122,82,53,.26) 44%,transparent 64%),
+    radial-gradient(80% 78% at 100% 4%,rgba(150,54,200,.60),rgba(96,26,140,.24) 46%,transparent 66%),
+    radial-gradient(64% 62% at 84% 52%,rgba(120,48,175,.38),transparent 62%),
+    radial-gradient(94% 88% at 26% 62%,rgba(32,128,158,.70),rgba(22,96,120,.32) 46%,transparent 72%),
+    radial-gradient(100% 88% at 0% 94%,rgba(30,120,150,.74),transparent 66%);
+  transition:opacity 900ms ease;
+}
+/* Quando il livello animato è pronto, il fallback si dissolve. */
+html.tal-bg-live:not(.tal-tool-page)::before{opacity:0}
+
+.tal-bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+  contain:layout paint style;
+  opacity:0;
+  transition:opacity 900ms ease;
+}
+html.tal-bg-live .tal-bg{opacity:1}
+.tal-bg__blob{
+  position:absolute;
+  border-radius:50%;
+  will-change:transform;
+  transform:translate3d(0,0,0);
+}
+/* Le cinque masse di colore ricalcano il gradiente attuale: stesso quadro,
+   ma ogni massa respira con tempi e ampiezze diverse. */
+.tal-bg__blob--rust{
+  left:-26%; top:-32%; width:98vw; height:92vh;
+  background:radial-gradient(closest-side circle,rgba(172,111,66,.66),rgba(122,82,53,.26) 50%,transparent 100%);
+  animation:tal-drift-a 34s var(--tal-ease) infinite alternate;
+}
+.tal-bg__blob--purple{
+  right:-28%; top:-24%; width:88vw; height:86vh;
+  background:radial-gradient(closest-side circle,rgba(150,54,200,.60),rgba(96,26,140,.24) 48%,transparent 100%);
+  animation:tal-drift-b 44s var(--tal-ease) infinite alternate;
+}
+.tal-bg__blob--violet{
+  left:48%; top:26%; width:70vw; height:72vh;
+  background:radial-gradient(closest-side circle,rgba(120,48,175,.38),transparent 100%);
+  animation:tal-drift-c 38s var(--tal-ease) infinite alternate;
+}
+.tal-bg__blob--petrol{
+  left:-18%; top:34%; width:104vw; height:96vh;
+  background:radial-gradient(closest-side circle,rgba(32,128,158,.70),rgba(22,96,120,.32) 48%,transparent 100%);
+  animation:tal-drift-d 30s var(--tal-ease) infinite alternate;
+}
+.tal-bg__blob--teal{
+  left:-32%; bottom:-32%; width:106vw; height:96vh;
+  background:radial-gradient(closest-side circle,rgba(30,120,150,.74),transparent 100%);
+  animation:tal-drift-e 40s var(--tal-ease) infinite alternate;
+}
+
+@keyframes tal-drift-a{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(5%,4%,0) scale(1.09)}}
+@keyframes tal-drift-b{from{transform:translate3d(0,0,0) scale(1.04)}to{transform:translate3d(-6%,5%,0) scale(.96)}}
+@keyframes tal-drift-c{from{transform:translate3d(0,0,0) scale(.97)}to{transform:translate3d(-7%,-5%,0) scale(1.07)}}
+@keyframes tal-drift-d{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(7%,-4%,0) scale(1.06)}}
+@keyframes tal-drift-e{from{transform:translate3d(0,0,0) scale(1.02)}to{transform:translate3d(6%,-3%,0) scale(.95)}}
+
+/* Fasci luminosi: al posto delle bande d'onda statiche, gli stessi fili di luce
+   della schermata d'ingresso. In sovrapposizione additiva, così illuminano il
+   colore sotto invece di coprirlo. */
+.tal-bg__tubes{
+  position:absolute;
+  inset:-6%;
+  opacity:.85;
+  mix-blend-mode:screen;
+}
+.tal-bg__tubes svg{display:block;width:100%;height:100%}
+.tal-tube-group{will-change:transform;transform-origin:40% 70%}
+.tal-tube-group--1{animation:tal-tube-a 52s var(--tal-ease) infinite alternate}
+.tal-tube-group--2{animation:tal-tube-b 68s var(--tal-ease) infinite alternate}
+.tal-tube-group--3{animation:tal-tube-c 44s var(--tal-ease) infinite alternate}
+@keyframes tal-tube-a{
+  from{transform:translate3d(-1.5%,1.2%,0) scale(1)}
+  to{transform:translate3d(2%,-1.6%,0) scale(1.05)}
+}
+@keyframes tal-tube-b{
+  from{transform:translate3d(1.8%,-1%,0) scale(1.04) rotate(-.6deg)}
+  to{transform:translate3d(-2.2%,1.8%,0) scale(.98) rotate(.5deg)}
+}
+@keyframes tal-tube-c{
+  from{transform:translate3d(-2.4%,-.8%,0) scale(.99) rotate(.4deg)}
+  to{transform:translate3d(1.4%,2%,0) scale(1.06) rotate(-.5deg)}
+}
+
+/* Reticolo tecnico appena percettibile: dà misura al colore. */
+.tal-bg__grid{
+  position:absolute;
+  inset:0;
+  opacity:.055;
+  background-image:
+    linear-gradient(rgba(255,255,255,.4) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.4) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:linear-gradient(to bottom,#000,transparent 72%);
+  mask-image:linear-gradient(to bottom,#000,transparent 72%);
+}
+
+/* Grana: elimina il banding dei gradienti, che è il segno più evidente
+   di un fondo generato al volo. */
+.tal-bg__grain{
+  position:absolute;
+  inset:0;
+  opacity:.06;
+  background-size:180px 180px;
+  background-repeat:repeat;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Vignettatura: porta l'occhio al centro della colonna di testo. */
+.tal-bg__vignette{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(82% 68% at 50% 42%,transparent,rgba(5,9,17,.18) 72%,rgba(5,9,17,.40) 100%);
+}
+
+/* La home dipingeva il proprio fondo sopra a tutto: ora usa quello condiviso. */
+html:not(.tal-tool-page) .app{background:none !important}
+html:not(.tal-tool-page) .app::before,
+html:not(.tal-tool-page) .app::after{content:none !important}
+html:not(.tal-tool-page) .app-waves{display:none !important}
+
+/* ---------- 03. Base tipografica ----------------------------------------- */
+
+html:not(.tal-tool-page) body{
+  font-family:var(--tal-sans) !important;
+  font-size:16px !important;
+  line-height:1.65 !important;
+  font-weight:400;
+  color:var(--tal-body) !important;
+  letter-spacing:.002em;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"kern" 1,"liga" 1,"calt" 1;
+}
+/* Le cifre dei prospetti restano incolonnate. */
+html:not(.tal-tool-page) .data-row strong,
+html:not(.tal-tool-page) .info-row strong,
+html:not(.tal-tool-page) .facts,
+html:not(.tal-tool-page) .tool-suite-meta,
+html:not(.tal-tool-page) .timeline-row time,
+html:not(.tal-tool-page) table{font-variant-numeric:tabular-nums}
+html:not(.tal-tool-page) ::selection{background:rgba(46,147,176,.42);color:#fff}
+html:not(.tal-tool-page) body{scrollbar-color:rgba(247,247,245,.28) transparent;scrollbar-width:thin}
+html:not(.tal-tool-page) ::-webkit-scrollbar{width:11px;height:11px}
+html:not(.tal-tool-page) ::-webkit-scrollbar-thumb{
+  border:3px solid transparent;
+  border-radius:999px;
+  background:rgba(247,247,245,.24);
+  background-clip:content-box;
+}
+html:not(.tal-tool-page) ::-webkit-scrollbar-thumb:hover{background:rgba(247,247,245,.40);background-clip:content-box}
+html:not(.tal-tool-page) ::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- 04. Contenitori e ritmo verticale ---------------------------- */
+
+/* Le pagine annidano i contenitori in modi diversi (body>.wrap>main, .app>main>.shell,
+   footer dentro o fuori dal wrap). La gronda va applicata una volta sola: ogni
+   contenitore azzera la variabile per i propri discendenti, così la colonna di
+   testo cade sulla stessa verticale in tutte le pagine. */
+html:not(.tal-tool-page){--tal-pad:var(--tal-gutter)}
+html:not(.tal-tool-page) :where(.wrap,.shell,main,.tal-footer-inner,.tal-gh-frame) *{--tal-pad:0px}
+
+html:not(.tal-tool-page) .wrap,
+html:not(.tal-tool-page) .shell,
+html:not(.tal-tool-page) main,
+html:not(.tal-tool-page) .tal-footer-inner{
+  width:min(var(--tal-max),calc(100% - var(--tal-pad) * 2)) !important;
+  margin-inline:auto !important;
+}
+html:not(.tal-tool-page) main{padding-bottom:var(--tal-s7) !important}
+
+html:not(.tal-tool-page) .tal-standard-footer{
+  width:100% !important;
+  max-width:none !important;
+  padding-inline:0 !important;
+}
+
+/* Un solo respiro per l'apertura di pagina. */
+html:not(.tal-tool-page) .hero,
+html:not(.tal-tool-page) main>.hero,
+html:not(.tal-tool-page) .home-hero,
+html:not(.tal-tool-page) .page-header{
+  padding:clamp(40px,6vw,76px) 0 clamp(24px,3vw,34px) !important;
+}
+html:not(.tal-tool-page) .section,
+html:not(.tal-tool-page) .collaborations,
+html:not(.tal-tool-page) .method-strip,
+html:not(.tal-tool-page) .lab-goals-wrap{margin-top:clamp(28px,4vw,48px) !important}
+
+/* ---------- 05. Header ---------------------------------------------------- */
+
+html:not(.tal-tool-page) .tal-global-header{
+  width:100% !important;
+  max-width:none !important;
+  margin-inline:0 !important;
+  padding:clamp(12px,1.6vw,20px) 0 0 !important;
+  transition:padding-top var(--tal-mid) var(--tal-ease);
+}
+/* Il bordo esterno della barra cade sulla stessa verticale della colonna di testo. */
+html:not(.tal-tool-page) .tal-gh-frame{
+  width:min(var(--tal-max),calc(100% - var(--tal-pad) * 2)) !important;
+  margin-inline:auto !important;
+  min-height:68px !important;
+  padding:9px 12px 9px 14px !important;
+  gap:18px !important;
+  border-radius:var(--tal-r) !important;
+  border:1px solid var(--tal-hair) !important;
+  background:linear-gradient(140deg,rgba(16,22,34,.72),rgba(14,20,31,.66)) !important;
+  -webkit-backdrop-filter:var(--tal-blur) !important;
+  backdrop-filter:var(--tal-blur) !important;
+  box-shadow:var(--tal-sh-2) !important;
+  transition:background var(--tal-mid) var(--tal-ease),
+             border-color var(--tal-mid) var(--tal-ease),
+             box-shadow var(--tal-mid) var(--tal-ease),
+             min-height var(--tal-mid) var(--tal-ease);
+}
+/* Allo scroll la barra si compatta e si stacca dal fondo. */
+html.tal-scrolled:not(.tal-tool-page) .tal-global-header{padding-top:8px !important}
+html.tal-scrolled:not(.tal-tool-page) .tal-gh-frame{
+  min-height:60px !important;
+  background:linear-gradient(140deg,rgba(12,17,27,.90),rgba(11,15,24,.88)) !important;
+  border-color:var(--tal-hair-strong) !important;
+  box-shadow:var(--tal-sh-3) !important;
+}
+/* Avanzamento di lettura: solo sulle pagine lunghe, come filo sotto la barra. */
+.tal-progress{
+  position:fixed;
+  left:0;
+  top:0;
+  z-index:5200;
+  width:100%;
+  height:2px;
+  pointer-events:none;
+  transform:scaleX(0);
+  transform-origin:left center;
+  background:linear-gradient(90deg,var(--tal-petrol),var(--tal-rust) 55%,var(--tal-violet));
+  opacity:0;
+  transition:opacity 300ms ease;
+}
+html.tal-scrolled .tal-progress{opacity:.9}
+
+html:not(.tal-tool-page) .tal-gh-brand-copy{
+  font-size:10.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.17em !important;
+  color:var(--tal-ink);
+}
+html:not(.tal-tool-page) .tal-gh-brand{transition:opacity var(--tal-fast) var(--tal-ease)}
+html:not(.tal-tool-page) .tal-gh-brand:hover{opacity:.82}
+html:not(.tal-tool-page) .tal-gh-logo{
+  transition:transform var(--tal-mid) var(--tal-ease),filter var(--tal-mid) var(--tal-ease);
+}
+html:not(.tal-tool-page) .tal-gh-brand:hover .tal-gh-logo{
+  transform:translateY(-1px) rotate(-2deg);
+  filter:drop-shadow(0 10px 22px rgba(46,147,176,.42));
+}
+
+/* Voci di menu: sottolineatura che cresce, niente pillola pesante. */
+html:not(.tal-tool-page) .tal-gh-nav{gap:2px !important}
+html:not(.tal-tool-page) .tal-gh-nav a,
+html:not(.tal-tool-page) .tal-gh-nav button{
+  position:relative;
+  min-height:40px !important;
+  padding:0 14px !important;
+  border-radius:var(--tal-r-xs) !important;
+  font:600 12.5px/1 var(--tal-sans) !important;
+  letter-spacing:.01em !important;
+  color:var(--tal-muted) !important;
+  background:transparent !important;
+  transition:color var(--tal-fast) var(--tal-ease);
+}
+html:not(.tal-tool-page) .tal-gh-nav a::after,
+html:not(.tal-tool-page) .tal-gh-nav button::after{
+  content:"";
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:6px;
+  height:1.5px;
+  border-radius:2px;
+  background:linear-gradient(90deg,var(--tal-petrol),var(--tal-rust));
+  transform:scaleX(0);
+  transform-origin:left center;
+  transition:transform var(--tal-mid) var(--tal-ease);
+}
+html:not(.tal-tool-page) .tal-gh-nav a:hover,
+html:not(.tal-tool-page) .tal-gh-nav button:hover,
+html:not(.tal-tool-page) .tal-gh-nav a[aria-current="page"],
+html:not(.tal-tool-page) .tal-gh-nav a.active{color:var(--tal-ink) !important;transform:none !important}
+html:not(.tal-tool-page) .tal-gh-nav a:hover::after,
+html:not(.tal-tool-page) .tal-gh-nav button:hover::after,
+html:not(.tal-tool-page) .tal-gh-nav a[aria-current="page"]::after,
+html:not(.tal-tool-page) .tal-gh-nav a.active::after{transform:scaleX(1)}
+
+html:not(.tal-tool-page) .tal-gh-lang{
+  border-color:var(--tal-hair) !important;
+  background:rgba(8,13,22,.44) !important;
+}
+html:not(.tal-tool-page) .tal-gh-lang a{
+  font-size:10px !important;
+  font-weight:700 !important;
+  letter-spacing:.1em !important;
+  color:var(--tal-faint) !important;
+  transition:color var(--tal-fast) var(--tal-ease),background var(--tal-fast) var(--tal-ease);
+}
+html:not(.tal-tool-page) .tal-gh-lang a:hover{color:var(--tal-ink) !important;background:rgba(247,247,245,.08) !important}
+html:not(.tal-tool-page) .tal-gh-lang a.active,
+html:not(.tal-tool-page) .tal-gh-lang a[aria-current="page"]{
+  background:var(--tal-ink) !important;
+  color:#11131A !important;
+  box-shadow:var(--tal-sh-1);
+}
+
+/* ---------- 06. Titoli e testo ------------------------------------------- */
+
+/* Una sola scala per tutte le pagine: prima ogni pagina aveva la sua.
+   L'easter egg di Romeo (.rg-modal) resta fuori: ha una sua identità grafica. */
+html:not(.tal-tool-page) :is(h1,h2,h3,h4,.display,.intro-title):not(.rg-modal *){
+  font-family:var(--tal-serif) !important;
+  font-weight:300 !important;
+  font-optical-sizing:auto;
+  color:var(--tal-ink) !important;
+  text-wrap:balance;
+}
+
+/* Livello 1 — apertura di pagina */
+html:not(.tal-tool-page) .hero h1,
+html:not(.tal-tool-page) main>.hero h1,
+html:not(.tal-tool-page) .page-header h1,
+html:not(.tal-tool-page) .page-header h2,
+html:not(.tal-tool-page) .home-hero .display,
+html:not(.tal-tool-page) .display{
+  font-size:clamp(2.45rem,4.4vw,3.9rem) !important;
+  line-height:1.04 !important;
+  letter-spacing:-.032em !important;
+  margin:0 0 var(--tal-s4) !important;
+  max-width:19ch;
+}
+/* Home: il titolo sale e resta incolonnato al centro. Prima sommava la gronda
+   della pagina (54px) a quella dell'apertura (76px) e partiva troppo in basso. */
+html:not(.tal-tool-page) .page[data-page="home"]{padding-top:clamp(10px,1.4vw,18px) !important}
+html:not(.tal-tool-page) .home-hero{
+  padding:clamp(18px,2.6vw,40px) 0 clamp(18px,2.4vw,28px) !important;
+  text-align:center;
+}
+html:not(.tal-tool-page) .home-hero .display{
+  max-width:20ch;
+  margin-inline:auto !important;
+  text-align:center;
+}
+html:not(.tal-tool-page) .home-hero .lead{margin-inline:auto !important;text-align:center}
+html:not(.tal-tool-page) .home-hero .hero-actions{justify-content:center}
+html:not(.tal-tool-page) .display em,
+html:not(.tal-tool-page) .intro-title em{
+  font-style:italic;
+  font-weight:300;
+  color:#E4D8F2;
+}
+
+/* Livello 2 — titolo di sezione o di blocco */
+html:not(.tal-tool-page) .section-head h2,
+html:not(.tal-tool-page) .collaborations-head h2,
+html:not(.tal-tool-page) .method-strip h2,
+html:not(.tal-tool-page) .method-callout h2,
+html:not(.tal-tool-page) .onboarding-banner h2,
+html:not(.tal-tool-page) .ai-onboarding-teaser h2,
+html:not(.tal-tool-page) .featured-copy h3,
+html:not(.tal-tool-page) .profile h2,
+html:not(.tal-tool-page) .panel h2,
+html:not(.tal-tool-page) .content h2,
+html:not(.tal-tool-page) .welcome-card h2,
+html:not(.tal-tool-page) .ask-panel h2,
+html:not(.tal-tool-page) .collab-apply h3,
+html:not(.tal-tool-page) .contact h3,
+html:not(.tal-tool-page) .ecosystem h2,
+html:not(.tal-tool-page) .callout h2{
+  font-size:clamp(1.55rem,2.2vw,2.05rem) !important;
+  line-height:1.14 !important;
+  letter-spacing:-.022em !important;
+  margin:0 0 var(--tal-s3) !important;
+}
+
+/* Livello 3 — titolo di card */
+html:not(.tal-tool-page) .card h2,
+html:not(.tal-tool-page) .card h3,
+html:not(.tal-tool-page) .case-card h2,
+html:not(.tal-tool-page) .tool-card-v614 h2,
+html:not(.tal-tool-page) .tool-suite-card h3,
+html:not(.tal-tool-page) .tool-card h3,
+html:not(.tal-tool-page) .insight-card h3,
+html:not(.tal-tool-page) .method-card h3,
+html:not(.tal-tool-page) .value-card h3,
+html:not(.tal-tool-page) .principle h2,
+html:not(.tal-tool-page) .step h3,
+html:not(.tal-tool-page) .upload-card h3,
+html:not(.tal-tool-page) .doc-box h3{
+  font-size:clamp(1.28rem,1.5vw,1.55rem) !important;
+  line-height:1.2 !important;
+  letter-spacing:-.015em !important;
+  margin:0 0 var(--tal-s2) !important;
+}
+html:not(.tal-tool-page) .content h3,
+html:not(.tal-tool-page) .panel h3{
+  font-size:1.15rem !important;
+  line-height:1.3 !important;
+  margin:var(--tal-s5) 0 var(--tal-s2) !important;
+}
+
+/* Occhiello: tre nomi diversi per la stessa cosa, ora hanno lo stesso aspetto. */
+html:not(.tal-tool-page) .eyebrow,
+html:not(.tal-tool-page) .label,
+html:not(.tal-tool-page) .tal-page-eyebrow,
+html:not(.tal-tool-page) .category-tag,
+html:not(.tal-tool-page) .step-label,
+html:not(.tal-tool-page) .lab-goals>span{
+  display:flex !important;
+  align-items:center;
+  gap:9px;
+  margin:0 0 var(--tal-s3) !important;
+  font-family:var(--tal-sans) !important;
+  font-size:10.5px !important;
+  font-weight:700 !important;
+  line-height:1.3 !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+  color:var(--tal-muted) !important;
+}
+html:not(.tal-tool-page) .eyebrow::before,
+html:not(.tal-tool-page) .tal-page-eyebrow::before,
+html:not(.tal-tool-page) .label::before{
+  content:"";
+  width:20px;
+  height:1px;
+  flex:0 0 20px;
+  background:linear-gradient(90deg,var(--tal-petrol),var(--tal-rust));
+}
+html:not(.tal-tool-page) .category-tag::before,
+html:not(.tal-tool-page) .lab-goals>span::before{content:none}
+
+/* Occhiello dell'intro */
+html:not(.tal-tool-page) .intro-kicker{
+  font-family:var(--tal-sans) !important;
+  font-size:11px !important;
+  font-weight:600 !important;
+  letter-spacing:.22em !important;
+}
+
+/* Testo corrente. Dentro a un riquadro il paragrafo riempie il riquadro: una misura
+   di lettura più stretta lascerebbe un vuoto a destra e farebbe sembrare il testo
+   spinto a sinistra. Il limite di riga vale solo per il testo non incorniciato. */
+html:not(.tal-tool-page) p:not(.rg-modal *){color:var(--tal-body)}
+html:not(.tal-tool-page) main>p,
+html:not(.tal-tool-page) .content>p,
+html:not(.tal-tool-page) .hero>p{max-width:var(--tal-measure)}
+html:not(.tal-tool-page) .content p,
+html:not(.tal-tool-page) .panel p,
+html:not(.tal-tool-page) .hero>p,
+html:not(.tal-tool-page) main>p{margin:0 0 var(--tal-s4)}
+
+/* Landing: il paragrafo resta centrato e staccato dal titolo. */
+html:not(.tal-tool-page) .intro-copy{
+  max-width:54ch !important;
+  margin:24px auto 0 !important;
+  color:rgba(255,255,255,.82) !important;
+  text-align:center;
+}
+html:not(.tal-tool-page) .lead{
+  font-size:clamp(1.05rem,1.15vw,1.2rem) !important;
+  line-height:1.6 !important;
+  color:#DDE3E9 !important;
+  max-width:62ch !important;
+  margin:0 0 var(--tal-s5) !important;
+}
+html:not(.tal-tool-page) .home-hero .lead{margin-inline:auto !important;text-align:center}
+html:not(.tal-tool-page) .card p,
+html:not(.tal-tool-page) .case-card p,
+html:not(.tal-tool-page) .tool-card-v614 p,
+html:not(.tal-tool-page) .insight-card p,
+html:not(.tal-tool-page) .method-card p,
+html:not(.tal-tool-page) .value-card p,
+html:not(.tal-tool-page) .principle p,
+html:not(.tal-tool-page) .tool-suite-card p,
+html:not(.tal-tool-page) .ai-onboarding-teaser p,
+html:not(.tal-tool-page) .onboarding-banner p{
+  font-size:.9375rem !important;
+  line-height:1.62 !important;
+  color:var(--tal-body) !important;
+  margin:0 0 var(--tal-s3);
+}
+html:not(.tal-tool-page) .article-date,
+html:not(.tal-tool-page) .case-meta,
+html:not(.tal-tool-page) .legal-updated,
+html:not(.tal-tool-page) .interface-note,
+html:not(.tal-tool-page) .ask-note{
+  font-size:.8125rem !important;
+  color:var(--tal-faint) !important;
+}
+
+/* ---------- 07. Superfici e card ----------------------------------------- */
+
+html:not(.tal-tool-page) .surface,
+html:not(.tal-tool-page) .card,
+html:not(.tal-tool-page) .panel,
+html:not(.tal-tool-page) .case-card,
+html:not(.tal-tool-page) .tool-card-v614,
+html:not(.tal-tool-page) .tool-card,
+html:not(.tal-tool-page) .tool-suite-card,
+html:not(.tal-tool-page) .insight-card,
+html:not(.tal-tool-page) .method-card,
+html:not(.tal-tool-page) .value-card,
+html:not(.tal-tool-page) .principle,
+html:not(.tal-tool-page) .featured,
+html:not(.tal-tool-page) .contact,
+html:not(.tal-tool-page) .license-card,
+html:not(.tal-tool-page) .method-strip,
+html:not(.tal-tool-page) .collab-preview,
+html:not(.tal-tool-page) .collab-apply,
+html:not(.tal-tool-page) .onboarding-banner,
+html:not(.tal-tool-page) .ai-onboarding-teaser,
+html:not(.tal-tool-page) .step,
+html:not(.tal-tool-page) .upload-card,
+html:not(.tal-tool-page) .doc-box,
+html:not(.tal-tool-page) .callout,
+html:not(.tal-tool-page) .toc,
+html:not(.tal-tool-page) .credential,
+html:not(.tal-tool-page) .welcome-card,
+html:not(.tal-tool-page) .ask-panel{
+  border:1px solid var(--tal-hair) !important;
+  border-radius:var(--tal-r) !important;
+  background:var(--tal-glass) !important;
+  -webkit-backdrop-filter:var(--tal-blur) !important;
+  backdrop-filter:var(--tal-blur) !important;
+  box-shadow:var(--tal-sh-2) !important;
+}
+html:not(.tal-tool-page) .card,
+html:not(.tal-tool-page) .case-card,
+html:not(.tal-tool-page) .tool-card-v614,
+html:not(.tal-tool-page) .tool-suite-card,
+html:not(.tal-tool-page) .insight-card,
+html:not(.tal-tool-page) .method-card,
+html:not(.tal-tool-page) .value-card,
+html:not(.tal-tool-page) .principle,
+html:not(.tal-tool-page) .panel,
+html:not(.tal-tool-page) .step{
+  padding:clamp(20px,2.2vw,26px) !important;
+}
+/* Le card non hanno più bisogno di essere alte per essere importanti. */
+html:not(.tal-tool-page) .case-card,
+html:not(.tal-tool-page) .tool-card-v614,
+html:not(.tal-tool-page) .tool-suite-card,
+html:not(.tal-tool-page) .insight-card,
+html:not(.tal-tool-page) .card{min-height:0 !important}
+
+/* L'accento cromatico resta, ma come filo di luce e non come bordo spesso. */
+html:not(.tal-tool-page) .card,
+html:not(.tal-tool-page) .case-card,
+html:not(.tal-tool-page) .tool-card-v614,
+html:not(.tal-tool-page) .tool-suite-card,
+html:not(.tal-tool-page) .insight-card,
+html:not(.tal-tool-page) .method-card,
+html:not(.tal-tool-page) .principle,
+html:not(.tal-tool-page) .value-card,
+html:not(.tal-tool-page) .profile>article,
+html:not(.tal-tool-page) .profile>aside,
+html:not(.tal-tool-page) .lab-goals,
+html:not(.tal-tool-page) .ai-onboarding-teaser{
+  position:relative;
+  overflow:hidden;
+  border-top-width:1px !important;
+  border-left-width:1px !important;
+}
+html:not(.tal-tool-page) .card::before,
+html:not(.tal-tool-page) .case-card::before,
+html:not(.tal-tool-page) .tool-card-v614::before,
+html:not(.tal-tool-page) .tool-suite-card::before,
+html:not(.tal-tool-page) .insight-card::before,
+html:not(.tal-tool-page) .method-card::before,
+html:not(.tal-tool-page) .principle::before,
+html:not(.tal-tool-page) .value-card::before,
+html:not(.tal-tool-page) .profile>article::before,
+html:not(.tal-tool-page) .profile>aside::before,
+html:not(.tal-tool-page) .lab-goals::before,
+html:not(.tal-tool-page) .ai-onboarding-teaser::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:2px;
+  opacity:.85;
+  background:linear-gradient(90deg,var(--tal-petrol),transparent 82%);
+  transition:opacity var(--tal-mid) var(--tal-ease);
+}
+html:not(.tal-tool-page) .card:nth-child(2)::before,
+html:not(.tal-tool-page) .case-card:nth-child(2)::before,
+html:not(.tal-tool-page) .tool-card-v614:nth-child(2)::before,
+html:not(.tal-tool-page) .tool-suite-card:nth-child(2)::before,
+html:not(.tal-tool-page) .insight-card:nth-child(2)::before,
+html:not(.tal-tool-page) .method-card:nth-child(2)::before,
+html:not(.tal-tool-page) .principle:nth-child(2)::before,
+html:not(.tal-tool-page) .profile>aside::before{background:linear-gradient(90deg,var(--tal-rust),transparent 82%)}
+html:not(.tal-tool-page) .card:nth-child(3)::before,
+html:not(.tal-tool-page) .case-card:nth-child(3)::before,
+html:not(.tal-tool-page) .tool-card-v614:nth-child(3)::before,
+html:not(.tal-tool-page) .tool-suite-card:nth-child(3)::before,
+html:not(.tal-tool-page) .insight-card:nth-child(3)::before,
+html:not(.tal-tool-page) .method-card:nth-child(3)::before,
+html:not(.tal-tool-page) .principle:nth-child(3)::before,
+html:not(.tal-tool-page) .value-card:last-child::before{background:linear-gradient(90deg,var(--tal-mauve),transparent 82%)}
+html:not(.tal-tool-page) .card:nth-child(4)::before,
+html:not(.tal-tool-page) .case-card:nth-child(4)::before,
+html:not(.tal-tool-page) .tool-card-v614:nth-child(4)::before,
+html:not(.tal-tool-page) .method-card:nth-child(4)::before{background:linear-gradient(90deg,var(--tal-violet),transparent 82%)}
+
+/* Griglie: stessa gronda ovunque. */
+html:not(.tal-tool-page) .grid,
+html:not(.tal-tool-page) .case-grid,
+html:not(.tal-tool-page) .insights-grid,
+html:not(.tal-tool-page) .tool-suite-grid,
+html:not(.tal-tool-page) .method-grid,
+html:not(.tal-tool-page) .value-strip,
+html:not(.tal-tool-page) .principles,
+html:not(.tal-tool-page) .tool-grid,
+html:not(.tal-tool-page) .profile,
+html:not(.tal-tool-page) .steps{gap:clamp(14px,1.6vw,20px) !important;margin-top:var(--tal-s5) !important}
+
+/* Il ritratto in "Chi sono" era un rettangolo bianco netto: ora è integrato. */
+html:not(.tal-tool-page) .profile-portrait{
+  border-radius:var(--tal-r-sm) !important;
+  border-color:var(--tal-hair-strong) !important;
+  box-shadow:var(--tal-sh-2) !important;
+}
+
+/* Blocchi di dettaglio (righe input/output, timeline, fatti) */
+html:not(.tal-tool-page) .data-row,
+html:not(.tal-tool-page) .info-row,
+html:not(.tal-tool-page) .timeline-row,
+html:not(.tal-tool-page) .facts div,
+html:not(.tal-tool-page) .tool-suite-meta div,
+html:not(.tal-tool-page) .compact-list div{
+  border-bottom-color:rgba(247,247,245,.08) !important;
+}
+html:not(.tal-tool-page) .data-row span,
+html:not(.tal-tool-page) .info-row span,
+html:not(.tal-tool-page) .timeline-row time,
+html:not(.tal-tool-page) .tool-suite-meta span,
+html:not(.tal-tool-page) .credential span{
+  font-size:10px !important;
+  font-weight:600 !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase;
+  color:var(--tal-faint) !important;
+}
+html:not(.tal-tool-page) .data-row strong,
+html:not(.tal-tool-page) .info-row strong,
+html:not(.tal-tool-page) .timeline-row strong,
+html:not(.tal-tool-page) .credential strong,
+html:not(.tal-tool-page) .compact-list b{
+  font-size:.875rem !important;
+  font-weight:600 !important;
+  color:var(--tal-ink) !important;
+  letter-spacing:0 !important;
+  text-transform:none !important;
+}
+html:not(.tal-tool-page) .credential span{text-transform:none !important;letter-spacing:0 !important;font-size:.8125rem !important}
+
+/* Badge e stati */
+html:not(.tal-tool-page) .badge,
+html:not(.tal-tool-page) .status,
+html:not(.tal-tool-page) .tag{
+  display:inline-flex !important;
+  align-items:center;
+  gap:6px;
+  padding:5px 11px !important;
+  border-radius:var(--tal-r-pill) !important;
+  font-family:var(--tal-sans) !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  letter-spacing:.1em !important;
+  text-transform:uppercase !important;
+  border:1px solid rgba(46,147,176,.34) !important;
+  background:rgba(46,147,176,.14) !important;
+  color:#BFE2EE !important;
+}
+html:not(.tal-tool-page) .badge.live,
+html:not(.tal-tool-page) .status{
+  border-color:rgba(95,181,154,.36) !important;
+  background:rgba(95,181,154,.13) !important;
+  color:#C4E9DA !important;
+}
+
+/* ---------- 08. Bottoni, link, focus ------------------------------------- */
+
+html:not(.tal-tool-page) .button,
+html:not(.tal-tool-page) .btn,
+html:not(.tal-tool-page) a.button,
+html:not(.tal-tool-page) button.button,
+html:not(.tal-tool-page) .header-action,
+html:not(.tal-tool-page) .start-btn,
+html:not(.tal-tool-page) .copy-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  min-height:46px !important;
+  padding:0 22px !important;
+  border-radius:var(--tal-r-pill) !important;
+  border:1px solid transparent !important;
+  font-family:var(--tal-sans) !important;
+  font-size:13px !important;
+  font-weight:650 !important;
+  letter-spacing:.01em !important;
+  text-transform:none !important;
+  text-decoration:none !important;
+  cursor:pointer;
+  background:var(--tal-ink) !important;
+  color:#12151C !important;
+  box-shadow:var(--tal-sh-2) !important;
+  transition:transform var(--tal-fast) var(--tal-ease),
+             box-shadow var(--tal-mid) var(--tal-ease),
+             background var(--tal-fast) var(--tal-ease),
+             border-color var(--tal-fast) var(--tal-ease),
+             color var(--tal-fast) var(--tal-ease);
+}
+html:not(.tal-tool-page) .button:hover,
+html:not(.tal-tool-page) .btn:hover,
+html:not(.tal-tool-page) .header-action:hover,
+html:not(.tal-tool-page) .copy-btn:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:var(--tal-sh-3) !important;
+  background:#fff !important;
+}
+html:not(.tal-tool-page) .button:active,
+html:not(.tal-tool-page) .btn:active,
+html:not(.tal-tool-page) .header-action:active{transform:translateY(0) scale(.985) !important}
+
+html:not(.tal-tool-page) .button.secondary,
+html:not(.tal-tool-page) .btn.secondary,
+html:not(.tal-tool-page) .header-action.secondary,
+html:not(.tal-tool-page) .start-btn{
+  background:rgba(247,247,245,.05) !important;
+  border-color:var(--tal-hair-strong) !important;
+  color:var(--tal-ink) !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+html:not(.tal-tool-page) .button.secondary:hover,
+html:not(.tal-tool-page) .btn.secondary:hover,
+html:not(.tal-tool-page) .header-action.secondary:hover,
+html:not(.tal-tool-page) .start-btn:hover{
+  background:rgba(247,247,245,.11) !important;
+  border-color:rgba(247,247,245,.42) !important;
+  box-shadow:var(--tal-sh-2) !important;
+}
+
+/* Bottone d'ingresso della landing: un po' più di presenza. */
+html:not(.tal-tool-page) .start-btn{
+  min-width:168px !important;
+  min-height:54px !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+  letter-spacing:.18em !important;
+  text-transform:uppercase !important;
+}
+
+/* Link testuali dentro ai contenuti */
+html:not(.tal-tool-page) .content a:not(.button),
+html:not(.tal-tool-page) .panel a:not(.button),
+html:not(.tal-tool-page) p a:not(.button){
+  color:#9FD9EA;
+  text-decoration:none;
+  background-image:linear-gradient(90deg,currentColor,currentColor);
+  background-repeat:no-repeat;
+  background-position:0 100%;
+  background-size:100% 1px;
+  padding-bottom:1px;
+  transition:color var(--tal-fast) var(--tal-ease),background-size var(--tal-mid) var(--tal-ease);
+}
+html:not(.tal-tool-page) .content a:not(.button):hover,
+html:not(.tal-tool-page) .panel a:not(.button):hover,
+html:not(.tal-tool-page) p a:not(.button):hover{color:#fff;background-size:100% 2px}
+
+/* Focus: un solo anello, sempre lo stesso. */
+html:not(.tal-tool-page) a:focus-visible,
+html:not(.tal-tool-page) button:focus-visible,
+html:not(.tal-tool-page) [tabindex]:focus-visible{
+  outline:2px solid #7FD4EC !important;
+  outline-offset:3px !important;
+  border-radius:var(--tal-r-xs);
+}
+
+/* Pannello contatti flottante */
+html:not(.tal-tool-page) .ask-trigger{
+  min-height:48px !important;
+  padding:0 20px !important;
+  border-radius:var(--tal-r-pill) !important;
+  border:1px solid var(--tal-hair-strong) !important;
+  background:linear-gradient(140deg,rgba(18,26,38,.88),rgba(14,20,31,.86)) !important;
+  -webkit-backdrop-filter:var(--tal-blur);
+  backdrop-filter:var(--tal-blur);
+  font-size:13px !important;
+  font-weight:600 !important;
+  box-shadow:var(--tal-sh-3) !important;
+  transition:transform var(--tal-mid) var(--tal-ease),background var(--tal-mid) var(--tal-ease);
+}
+html:not(.tal-tool-page) .ask-trigger:hover{
+  transform:translateY(-3px) !important;
+  background:linear-gradient(140deg,rgba(28,72,90,.92),rgba(18,26,38,.90)) !important;
+}
+
+/* ---------- 09. Contenuti editoriali ------------------------------------- */
+
+html:not(.tal-tool-page) .content,
+html:not(.tal-tool-page) .layout{gap:clamp(20px,3vw,34px) !important}
+html:not(.tal-tool-page) .panel{margin-bottom:var(--tal-s4)}
+
+/* Negli articoli il testo riempie il riquadro. Per non arrivare a righe troppo
+   lunghe sui monitor larghi si allarga il margine interno, che agisce sui due lati:
+   la riga si accorcia restando centrata nel riquadro. */
+@media(min-width:1000px){
+  html:not(.tal-tool-page) .content .panel{
+    padding:clamp(24px,2.2vw,30px) clamp(28px,4.4vw,62px) !important;
+  }
+}
+
+html:not(.tal-tool-page) .content ul,
+html:not(.tal-tool-page) .panel ul,
+html:not(.tal-tool-page) .lab-goals ul{
+  margin:0 0 var(--tal-s4);
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:10px;
+}
+html:not(.tal-tool-page) .content li,
+html:not(.tal-tool-page) .panel li,
+html:not(.tal-tool-page) .lab-goals li{
+  position:relative;
+  padding-left:22px;
+  font-size:.9375rem;
+  line-height:1.6;
+  color:var(--tal-body);
+}
+html:not(.tal-tool-page) .content li::before,
+html:not(.tal-tool-page) .panel li::before,
+html:not(.tal-tool-page) .lab-goals li::before{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:.62em;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--tal-petrol);
+  box-shadow:0 0 0 4px rgba(46,147,176,.16);
+}
+
+html:not(.tal-tool-page) .toc{padding:20px !important}
+html:not(.tal-tool-page) .toc a{
+  display:block;
+  padding:7px 0;
+  font-size:.8125rem;
+  color:var(--tal-muted);
+  text-decoration:none;
+  border-left:2px solid transparent;
+  padding-left:12px;
+  margin-left:-12px;
+  transition:color var(--tal-fast) var(--tal-ease),border-color var(--tal-fast) var(--tal-ease);
+}
+html:not(.tal-tool-page) .toc a:hover{color:var(--tal-ink);border-left-color:var(--tal-petrol)}
+
+html:not(.tal-tool-page) table:not(.rg-modal *){
+  width:100%;
+  border-collapse:collapse;
+  font-size:.875rem;
+}
+html:not(.tal-tool-page) :is(th,td):not(.rg-modal *){
+  padding:11px 14px;
+  text-align:left;
+  border-bottom:1px solid rgba(247,247,245,.08);
+}
+html:not(.tal-tool-page) th{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--tal-faint);
+}
+html:not(.tal-tool-page) .compare-wrap{
+  overflow-x:auto;
+  border-radius:var(--tal-r);
+  border:1px solid var(--tal-hair);
+  background:var(--tal-glass);
+  -webkit-backdrop-filter:var(--tal-blur);
+  backdrop-filter:var(--tal-blur);
+}
+
+html:not(.tal-tool-page) pre,
+html:not(.tal-tool-page) code{
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.8125rem;
+}
+html:not(.tal-tool-page) .prompt-wrap pre{
+  padding:18px;
+  border-radius:var(--tal-r-sm);
+  border:1px solid var(--tal-hair);
+  background:rgba(6,10,18,.55);
+  line-height:1.6;
+}
+
+/* Blocchi di richiamo: stesso stile, colore diverso per funzione. */
+html:not(.tal-tool-page) .qualification,
+html:not(.tal-tool-page) .acronym-note,
+html:not(.tal-tool-page) .home-privacy-badge,
+html:not(.tal-tool-page) .safety-note,
+html:not(.tal-tool-page) .privacy,
+html:not(.tal-tool-page) .interface-note,
+html:not(.tal-tool-page) .release-banner{
+  padding:14px 18px !important;
+  border:1px solid var(--tal-hair) !important;
+  border-left:2px solid var(--tal-rust) !important;
+  border-radius:var(--tal-r-sm) !important;
+  background:rgba(115,76,52,.14) !important;
+  color:#EFE7E0 !important;
+  font-size:.875rem !important;
+  line-height:1.6 !important;
+}
+html:not(.tal-tool-page) .home-privacy-badge,
+html:not(.tal-tool-page) .privacy,
+html:not(.tal-tool-page) .safety-note{
+  border-left-color:var(--tal-petrol) !important;
+  background:rgba(20,83,104,.18) !important;
+  color:#DCEAF0 !important;
+}
+
+/* Footer */
+html:not(.tal-tool-page) .tal-standard-footer{
+  margin-top:var(--tal-s7) !important;
+  padding-top:var(--tal-s6) !important;
+  padding-bottom:var(--tal-s8) !important;
+  border-top:1px solid var(--tal-hair) !important;
+  font-family:var(--tal-sans) !important;
+  font-size:.8125rem !important;
+  line-height:1.6 !important;
+  color:var(--tal-faint) !important;
+}
+html:not(.tal-tool-page) .tal-footer-inner{gap:var(--tal-s3) !important}
+html:not(.tal-tool-page) .tal-standard-footer nav{gap:6px 20px !important}
+html:not(.tal-tool-page) .tal-standard-footer a{
+  font-size:.8125rem !important;
+  color:var(--tal-muted) !important;
+  text-decoration:none;
+  transition:color var(--tal-fast) var(--tal-ease);
+}
+html:not(.tal-tool-page) .tal-standard-footer a:hover{color:var(--tal-ink) !important}
+html:not(.tal-tool-page) .footer-local-note{color:var(--tal-faint);font-size:.75rem}
+
+/* ---------- 10. Movimento ------------------------------------------------ */
+
+/* Entrata di pagina: un solo movimento, breve. */
+html.tal-motion:not(.tal-tool-page) .tal-global-header,
+html.tal-motion:not(.tal-tool-page) main{
+  animation:tal-page-in 620ms var(--tal-ease) both;
+}
+html.tal-motion:not(.tal-tool-page) main{animation-delay:60ms}
+@keyframes tal-page-in{
+  from{opacity:0;transform:translate3d(0,10px,0)}
+  to{opacity:1;transform:none}
+}
+/* In home l'ingresso è già gestito dalla schermata iniziale. */
+html.tal-motion .app main{animation:none}
+
+/* Comparsa allo scroll */
+html.tal-motion:not(.tal-tool-page) [data-tal-reveal]{
+  opacity:0;
+  transform:translate3d(0,18px,0);
+  transition:opacity 640ms var(--tal-ease),transform 640ms var(--tal-ease);
+  transition-delay:calc(var(--tal-i,0) * 65ms);
+  will-change:opacity,transform;
+}
+html.tal-motion:not(.tal-tool-page) [data-tal-reveal].is-in{
+  opacity:1;
+  transform:none;
+}
+
+/* Sollevamento delle superfici interattive */
+html:not(.tal-tool-page) .card,
+html:not(.tal-tool-page) .case-card,
+html:not(.tal-tool-page) .tool-card-v614,
+html:not(.tal-tool-page) .tool-suite-card,
+html:not(.tal-tool-page) .insight-card,
+html:not(.tal-tool-page) .method-card,
+html:not(.tal-tool-page) .principle,
+html:not(.tal-tool-page) .value-card,
+html:not(.tal-tool-page) .credential,
+html:not(.tal-tool-page) .ai-onboarding-teaser,
+html:not(.tal-tool-page) .onboarding-banner,
+html:not(.tal-tool-page) .step{
+  transition:transform var(--tal-mid) var(--tal-ease),
+             box-shadow var(--tal-mid) var(--tal-ease),
+             border-color var(--tal-mid) var(--tal-ease),
+             background var(--tal-mid) var(--tal-ease);
+}
+@media(hover:hover){
+  html:not(.tal-tool-page) .card:hover,
+  html:not(.tal-tool-page) .case-card:hover,
+  html:not(.tal-tool-page) .tool-card-v614:hover,
+  html:not(.tal-tool-page) .tool-suite-card:hover,
+  html:not(.tal-tool-page) .insight-card:hover,
+  html:not(.tal-tool-page) .method-card:hover,
+  html:not(.tal-tool-page) .principle:hover,
+  html:not(.tal-tool-page) .value-card:hover,
+  html:not(.tal-tool-page) .ai-onboarding-teaser:hover,
+  html:not(.tal-tool-page) .onboarding-banner:hover,
+  html:not(.tal-tool-page) .step:hover{
+    transform:translateY(-4px);
+    border-color:var(--tal-hair-strong) !important;
+    background:var(--tal-glass-hi) !important;
+    box-shadow:var(--tal-sh-3) !important;
+  }
+  html:not(.tal-tool-page) .card:hover::before,
+  html:not(.tal-tool-page) .case-card:hover::before,
+  html:not(.tal-tool-page) .tool-card-v614:hover::before,
+  html:not(.tal-tool-page) .tool-suite-card:hover::before,
+  html:not(.tal-tool-page) .insight-card:hover::before,
+  html:not(.tal-tool-page) .method-card:hover::before,
+  html:not(.tal-tool-page) .principle:hover::before{opacity:1}
+}
+
+/* ---------- 11. Responsive ----------------------------------------------- */
+
+@media(max-width:1080px){
+  html:not(.tal-tool-page) .tal-gh-frame{gap:10px !important;padding:9px 10px !important}
+  html:not(.tal-tool-page) .tal-gh-nav a::after,
+  html:not(.tal-tool-page) .tal-gh-nav button::after{left:11px;right:11px}
+}
+@media(max-width:880px){
+  html:not(.tal-tool-page){--tal-gutter:20px}
+  html:not(.tal-tool-page) .grid,
+  html:not(.tal-tool-page) .case-grid,
+  html:not(.tal-tool-page) .insights-grid,
+  html:not(.tal-tool-page) .tool-suite-grid,
+  html:not(.tal-tool-page) .profile{grid-template-columns:1fr !important}
+  html:not(.tal-tool-page) .method-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  html:not(.tal-tool-page) .tal-bg__tubes{opacity:.72}
+}
+@media(max-width:620px){
+  html:not(.tal-tool-page) body{font-size:15.5px !important}
+  html:not(.tal-tool-page) .hero h1,
+  html:not(.tal-tool-page) main>.hero h1,
+  html:not(.tal-tool-page) .page-header h1,
+  html:not(.tal-tool-page) .page-header h2,
+  html:not(.tal-tool-page) .display{font-size:clamp(2.1rem,9vw,2.75rem) !important;max-width:none}
+  html:not(.tal-tool-page) .method-grid{grid-template-columns:1fr !important}
+  html:not(.tal-tool-page) .button,
+  html:not(.tal-tool-page) .btn{width:100%}
+  html:not(.tal-tool-page) .hero-actions,
+  html:not(.tal-tool-page) .actions,
+  html:not(.tal-tool-page) .card-actions{display:grid !important;gap:10px !important}
+  html:not(.tal-tool-page) .tal-bg__grid{background-size:32px 32px}
+  /* Su mobile la sfocatura di sfondo costa più di quanto renda: resta solo
+     sulla barra, dove serve a staccarla dal contenuto che scorre. */
+  html:not(.tal-tool-page) .surface,
+  html:not(.tal-tool-page) .card,
+  html:not(.tal-tool-page) .panel,
+  html:not(.tal-tool-page) .case-card,
+  html:not(.tal-tool-page) .tool-card-v614,
+  html:not(.tal-tool-page) .tool-suite-card,
+  html:not(.tal-tool-page) .insight-card,
+  html:not(.tal-tool-page) .method-card,
+  html:not(.tal-tool-page) .step{
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    background:linear-gradient(158deg,rgba(17,25,36,.92),rgba(13,18,27,.90)) !important;
+  }
+}
+
+/* ---------- 12. Reduced motion e stampa ---------------------------------- */
+
+@media(prefers-reduced-motion:reduce){
+  html:not(.tal-tool-page),
+  html:not(.tal-tool-page) *{
+    animation-duration:1ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:1ms !important;
+    scroll-behavior:auto !important;
+  }
+  html:not(.tal-tool-page) [data-tal-reveal]{opacity:1 !important;transform:none !important}
+  .tal-bg__blob,.tal-tube-group{animation:none !important}
+}
+
+@media print{
+  .tal-bg{display:none !important}
+  html:not(.tal-tool-page){background:#fff !important}
+  html:not(.tal-tool-page) body{color:#111 !important}
+  html:not(.tal-tool-page) .surface,
+  html:not(.tal-tool-page) .card,
+  html:not(.tal-tool-page) .panel{
+    background:#fff !important;
+    color:#111 !important;
+    border-color:#ccc !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+  }
+}

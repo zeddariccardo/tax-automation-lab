@@ -285,8 +285,70 @@ esperienze diverse per la stessa azione, e la finestra può essere bloccata dal
 popup blocker. Uniformarle vuol dire riscrivere sei generatori: è un lavoro a sé,
 non una correzione di audit.
 
+## LIPE — cosa è cambiato con la 3.5.0
+
+Audit del 12 agosto 2026, con a disposizione **una fornitura IVP18 realmente
+trasmessa e accettata** come riferimento. È stato quel confronto a far emergere
+tutto quello che segue: la sola specifica non bastava.
+
+**Quello che già funzionava:** cinque sezioni senza errori JavaScript, sei export
+che producono file (PDF compreso, con jsPDF), entrambi i template con righe di
+esempio, import di codiciario e importi. Sull'XML i nomi e l'ordine degli
+elementi, la virgola come separatore decimale, lo scambio
+`IvaDovuta`/`ImportoDaVersare` ↔ `IvaCredito`/`ImportoACredito`, il riporto di
+`CreditoPeriodoPrecedente` e il formato `DataImpegno` (ggmmaaaa) erano **già
+esatti**. La validazione su codici fiscali, partite IVA, codice carica e gruppo
+IVA è accurata.
+
+**Il difetto grave.** `buildXml()` legge `state.activeRecord.client`, cioè il
+cliente **salvato**, mentre l'utente guarda il modulo. Con i dati
+dell'intermediario digitati e non salvati il frontespizio usciva **senza**
+`CFIntermediario`, `ImpegnoPresentazione`, `DataImpegno` e `FirmaIntermediario`,
+e `problems` restava **vuoto**: la comunicazione risultava presentata dal
+contribuente invece che dall'intermediario, senza un solo avviso. Su un file che
+va all'Agenzia non è accettabile che accada in silenzio. Ora la generazione si
+blocca ed elenca i campi divergenti.
+
+**Gli altri tre.**
+
+| | Prima | Dopo (come nella fornitura reale) |
+|---|---|---|
+| `IdentificativoProdSoftware` | qualunque valore, nessuna validazione; il demo suggeriva `RZTAXLAB` | vuoto per scelta, validato se compilato |
+| `identificativo` della comunicazione | `String((Date.now()%99999)+1)`: cambiava a ogni generazione | `00001`, il progressivo dentro la fornitura |
+| intestazione | `encoding="utf-8"`, niente `standalone`, quattro namespace di cui due mai usati (`cm`, `sc`) | `encoding="UTF-8" standalone="yes"`, solo `iv` e `ds` |
+
+**Sull'identificativo del produttore software** vale la pena essere precisi,
+perché è facile fraintenderlo. Nel tracciato identifica **chi ha prodotto il
+software** che genera il file, non chi presenta la comunicazione: nella fornitura
+di riferimento è `01035310414`, il codice di una software house. Tax Automation
+Lab **non ne inserisce uno** — non avrebbe senso pubblicare un codice fiscale
+personale in un sito statico, e il progetto non è una software house. Quindi:
+campo vuoto per default, elemento non scritto nel file, nessun blocco. Se il
+canale di trasmissione lo richiede, l'utente lo compila con il codice fiscale del
+soggetto che assume quel ruolo; se il valore non è un codice fiscale valido la
+generazione si blocca. La spiegazione sta accanto al campo e in «Come si usa»,
+con il rimando al software di controllo dell'Agenzia come verifica definitiva.
+
+Il progressivo del **nome file** resta invece incrementale per cliente, anno e
+periodo (`_LI_00001`, `_LI_00002`, …) e avanza **solo** quando il file viene
+davvero scaricato: due invii successivi dello stesso periodo restano
+distinguibili, ma rigenerare la stessa comunicazione dà sempre lo stesso file.
+
+**Verifica strutturale:** frontespizio con gli **stessi 11 elementi nello stesso
+ordine** della fornitura reale, intestazione identica, moduli con la stessa
+sequenza. 16 controlli sul flusso completo, tutti passati.
+
+**Allineamento al concept:** «Esporta e storico» → **«Esporta»**, nuove sezioni
+**«Dati e backup»** e **«Come si usa»**, deep link su tutte e sette le sezioni.
+LIPE era l'ultimo tool non allineato.
+
 ## Aperto
 
+- **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia
+  delle Entrate**. È gratuito, è la verifica definitiva, e chiarirebbe anche se
+  `IdentificativoProdSoftware` sia davvero omissibile: la struttura è allineata a
+  una fornitura accettata, ma il confronto con un file non sostituisce il
+  validatore.
 - **XBRL**: validare un'istanza con lo strumento del Registro delle imprese, e
   confrontare lo schema **ordinario** con un'istanza ordinaria reale (l'unico
   punto ancora dedotto).

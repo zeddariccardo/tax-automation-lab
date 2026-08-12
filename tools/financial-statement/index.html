@@ -566,8 +566,6 @@ footer a:hover{color:#F7F7F5!important}
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://taxautomationlab.com/tools/financial-statement/">
 <link rel="alternate" hreflang="it" href="https://taxautomationlab.com/tools/financial-statement/">
-<link rel="alternate" hreflang="en" href="https://taxautomationlab.com/en/tools/financial-statement/">
-<link rel="alternate" hreflang="es" href="https://taxautomationlab.com/es/tools/financial-statement/">
 <link rel="alternate" hreflang="x-default" href="https://taxautomationlab.com/tools/financial-statement/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="it_IT">
@@ -591,7 +589,8 @@ footer a:hover{color:#F7F7F5!important}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css">
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260812">
+<script defer src="/assets/tal-app.js?v=20260812"></script>
 </head>
 <body class="tal-tool-page">
 <button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
@@ -602,12 +601,13 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 <div class="sb-context" id="fs-context"><b>Nessuna società</b>Schema abbreviato</div>
 <div class="workspace-nav">
-<span class="sb-cap sb-groupcap">Flusso di lavoro</span>
-<button class="fs-link active" data-fsview="anagrafica" type="button"><span aria-hidden="true" class="ws-ic">1</span>Anagrafica</button>
-<button class="fs-link" data-fsview="import" type="button"><span aria-hidden="true" class="ws-ic">2</span>Import bilancio</button>
-<button class="fs-link" data-fsview="results" type="button"><span aria-hidden="true" class="ws-ic">3</span>Bilancio riclassificato</button>
-<span class="sb-cap sb-groupcap">Gestione</span>
-<button class="fs-link" data-fsview="archive" type="button"><span aria-hidden="true" class="ws-ic">▣</span>Archivio clienti</button>
+<span class="sb-cap sb-groupcap">Configurazione</span>
+<button class="fs-link active" data-fsview="archive" type="button"><span aria-hidden="true" class="ws-ic">▣</span>Clienti</button>
+<button class="fs-link" data-fsview="anagrafica" type="button"><span aria-hidden="true" class="ws-ic">✎</span>Anagrafica</button>
+<button class="fs-link" data-fsview="import" type="button"><span aria-hidden="true" class="ws-ic">⇩</span>Importa da Excel</button>
+<a class="fs-link" href="/configura-con-ai/#financial-statement"><span aria-hidden="true" class="ws-ic">AI</span>Configura con AI</a>
+<span class="sb-cap sb-groupcap">Lavoro</span>
+<button class="fs-link" data-fsview="results" type="button"><span aria-hidden="true" class="ws-ic">1</span>Bilancio riclassificato</button>
 </div>
 <div class="sb-foot">100% locale · nessun dato lascia il dispositivo</div>
 </nav>
@@ -616,7 +616,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="tal-gh-frame">
 <a aria-label="Home" class="tal-gh-brand" href="/"><img alt="" aria-hidden="true" class="tal-gh-logo" src="data:image/png;base64,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"/><span class="tal-gh-brand-copy">Tax &amp; Accounting — Automation Lab</span></a>
 <nav aria-label="Navigazione principale" class="tal-gh-nav"><a href="/">Home</a><a href="/tools/" aria-current="page">Strumenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
-<div aria-label="Lingua" class="tal-gh-lang"><a href="/tools/financial-statement/" hreflang="it" aria-current="page" class="active">ITA</a><a href="/en/tools/financial-statement/" hreflang="en">ENG</a><a href="/es/tools/financial-statement/" hreflang="es">ESP</a></div>
+<div aria-label="Lingua" class="tal-gh-lang"><a href="/tools/financial-statement/" hreflang="it" aria-current="page" class="active">ITA</a><a href="/en/tools/" hreflang="en">ENG</a><a href="/es/tools/" hreflang="es">ESP</a></div>
 </div>
 </header>
 <section aria-label="Informazioni di pubblicazione" class="tal-publication">
@@ -641,7 +641,7 @@ footer a:hover{color:#F7F7F5!important}
 </header>
 <main>
 <!-- I - ANAGRAFICA -->
-<section class="block fs-view active" id="view-anagrafica">
+<section class="block fs-view" id="view-anagrafica">
 <h2 class="bt"><span class="num">I · Anagrafica della società</span>Compila i dati identificativi</h2>
 <div class="rule"></div>
 <p class="bd">Tutti i campi sono liberi. La partita IVA (o il codice fiscale) viene usata come chiave per salvare in locale la mappatura dei conti, gli storni e le rettifiche di questa società.</p>
@@ -730,8 +730,8 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 </section>
 <!-- ARCHIVIO CLIENTI -->
-<section class="block fs-view" id="view-archive">
-<h2 class="bt"><span class="num">IV · Archivio clienti e annualità</span>Salva, ritrova ed esporta per cliente e anno</h2>
+<section class="block fs-view active" id="view-archive">
+<h2 class="bt"><span class="num">Clienti</span>Salva, ritrova ed esporta per cliente e anno</h2><div class="tal-start"><p class="tal-start-lead">Da dove vuoi partire?</p><div class="tal-start-cards"><button class="tal-start-card" type="button" onclick="fsShowView('import')"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI. Il file può essere incompleto: quello che manca resta da verificare.</span></button><button class="tal-start-card" type="button" onclick="fsShowView('anagrafica')"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Compila l’anagrafica e carica il bilancio passo per passo.</span></button></div><button class="tal-start-demo" type="button" onclick="loadSampleData()">Prova con i dati dimostrativi</button></div>
 <div class="rule"></div>
 <p class="bd">Ogni cliente è identificato dalla P.IVA (o codice fiscale) inserita in Anagrafica. Per ciascun cliente puoi conservare più annualità, riaprirle, esportarle o creare un nuovo anno riportando la configurazione (anagrafica, mapping, storni e rettifiche). Il lavoro in corso viene salvato automaticamente in bozza.</p>
 <div class="panel">
@@ -2302,6 +2302,9 @@ function loadSampleData(){
   const demoRec=window.fsPostLoadReconcile?window.fsPostLoadReconcile('demo'):null;
   refreshAll(true); showResultsUI();
   toast(demoRec&&demoRec.added?'Esempio dimostrativo caricato: conferma la voce tecnica A.IX prima dell’export.':'Esempio dimostrativo caricato');
+
+  /* il contesto in sidebar deve dire la verita' subito dopo il caricamento */
+  try{ if(typeof window.fsUpdateContext==='function') window.fsUpdateContext(); }catch(_){}
 }
 function clearAll(){ if(!confirm('Cancellare i dati caricati?')) return; STATE={accounts:[],leafOverrides:{},storni:[],adjustments:[]}; $("#empty_results").style.display='block'; $("#results_content").style.display='none'; toast('Dati cancellati'); }
 
@@ -2943,7 +2946,7 @@ renderSavedList();
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function setSidebar(open){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.toggle('open',open);if(!setSidebar._bd){var b=document.createElement('div');b.className='sb-backdrop';b.addEventListener('click',function(){setSidebar(false);});document.body.appendChild(b);setSidebar._bd=b;}setSidebar._bd.classList.toggle('show',open);}
   function fsShowView(name){
-    if(VIEWS.indexOf(name)<0)name='anagrafica';
+    if(VIEWS.indexOf(name)<0)name='archive';
     document.querySelectorAll('.fs-view').forEach(function(v){v.classList.toggle('active',v.id==='view-'+name);});
     document.querySelectorAll('.fs-link').forEach(function(l){l.classList.toggle('active',l.dataset.fsview===name);});
     if(name==='archive'&&window.fsArchRefreshUI){try{window.fsArchRefreshUI();}catch(_){}}
@@ -3213,7 +3216,7 @@ document.addEventListener("click",function(event){
   const trigger=event.target.closest("[data-tal-lang]");
   if(!trigger)return;
   const lang=trigger.getAttribute("data-tal-lang");
-  const routes={"it":"/tools/financial-statement/","en":"/en/tools/financial-statement/","es":"/es/tools/financial-statement/"};
+  const routes={"it":"/tools/financial-statement/","en":"/en/tools/","es":"/es/tools/"};
   if(!routes[lang])return;
   event.preventDefault();
   event.stopImmediatePropagation();

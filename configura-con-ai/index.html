@@ -89,8 +89,8 @@ footer a:hover{color:#F7F7F5!important}
 <!-- Tax Automation Lab — livello estetico condiviso (v7.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-design.css">
-<script defer src="/assets/tal-experience.js"></script>
+<link rel="stylesheet" href="/assets/tal-design.css?v=20260812">
+<script defer src="/assets/tal-experience.js?v=20260812"></script>
 </head><body id="top">
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -291,48 +291,142 @@ REGOLE OBBLIGATORIE
 
 RISULTATO ATTESO
 Restituisci il file XLSX compilato e un riepilogo molto breve dei codici configurati, dei codici esclusi e dei punti che richiedono verifica professionale. Il file sarà controllato dal professionista prima dell’importazione.</pre></details><p class="prompt-note">Il prompt ordina all’AI di non inventare, di non modificare la struttura del template e di separare chiaramente i punti da verificare.</p></div></article>
-<article class="tool-card surface" id="tfa-client-file"><span class="label">TAX FOR AUDIT · FASCICOLO COMPLETO</span><h2>TFA Client File</h2><p>Prepara in un unico file anagrafica, record Analitici e prime bozze Commentary. L’importazione mostra un’anteprima, protegge il lavoro non archiviato e alimenta entrambe le viste senza perdere le informazioni non classificabili.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Visura, organigramma e informazioni societarie</li><li>Bilancio, trial balance e tax computation</li><li>Dichiarativi, F24 e prospetti tax assets</li><li>Working paper, report, contratti, contenziosi o IRL</li></ul></div><div class="callout">Le informazioni rilevanti non classificabili confluiscono in “Altro”, con fonte, rilevanza e motivo della mancata classificazione. Dopo l’importazione il tool distingue chiaramente draft e fascicolo archiviato e consente il backup dell’intero archivio clienti.</div><div class="actions"><a class="button" download="" href="/resources/templates/TFA_Client_File_AI.xlsx">Scarica il template ↓</a><button class="button secondary copy-btn" data-copy="tfa-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/tfa-client-file/">Apri il tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="tfa-prompt">Agisci come assistente di data preparation fiscale per Tax Automation Lab.
+<article class="tool-card surface" id="tfa-client-file"><span class="label">FASCICOLO FISCALE CLIENTE</span><h2>Fascicolo fiscale cliente</h2><p>Il fascicolo separa ciò che resta valido negli anni — anagrafica, business, impostazione contabile, gruppo, aree fiscali, contenzioso, operazioni — da ciò che cambia in un singolo esercizio. Il template prepara il profilo permanente; le novità dell’anno si aggiungono dopo, dal tool.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Visura, organigramma e informazioni societarie</li><li>Bilancio, trial balance e tax computation</li><li>Dichiarativi, working paper e prospetti fiscali</li><li>Contratti, atti di verifica, interpelli e memo interni</li></ul></div><div class="callout"><strong>Il file può restare parziale.</strong> Il template ha quattordici fogli e puoi lasciarne vuoti quanti ne vuoi: l’importazione legge quelli presenti, elenca ciò che manca e non si blocca. Le aree non compilate restano “da verificare”, non diventano conclusioni positive.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Fascicolo_Fiscale_Cliente_Configura_AI_v1.0.xlsx">Scarica il template ↓</a><button class="button secondary copy-btn" data-copy="tfa-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/tfa-client-file/">Apri il tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="tfa-prompt">Agisci come assistente di data preparation fiscale per Tax Automation Lab.
 
 OBIETTIVO
-Compilare il file “TFA_Client_File_AI.xlsx” per predisporre una prima configurazione del TFA Client File. Il file deve alimentare contemporaneamente:
-- l’anagrafica e i dati comuni del fascicolo;
-- la modalità Analitica, con record strutturati;
-- la modalità Commentary, con prime bozze discorsive;
-- la sezione “Altro”, per informazioni rilevanti non classificabili con sufficiente affidabilità.
+Compilare il file "Template_Fascicolo_Fiscale_Cliente_Configura_AI_v1.0.xlsx" per
+predisporre una prima configurazione del Fascicolo fiscale cliente. Il fascicolo
+distingue due piani:
+- il PROFILO PERMANENTE, cioè ciò che resta valido negli anni (anagrafica,
+  business, impostazione contabile, gruppo, aree fiscali, contenzioso,
+  operazioni straordinarie, altri aspetti);
+- l'ESERCIZIO, cioè soltanto ciò che cambia o merita attenzione in un anno.
 
 MATERIALI DISPONIBILI
-Ti allego il template e uno o più documenti, report o esportazioni. Possono essere, ad esempio, visure, organigrammi, bilanci, trial balance, tax computation, dichiarativi, F24, working paper, report fiscali, contratti, contenziosi, prospetti tax assets, Information Request List (IRL) o documenti equivalenti. L’elenco è soltanto esemplificativo: usa qualsiasi fonte allegata che consenta di ricostruire i dati richiesti in modo affidabile.
+Ti allego il template e uno o piu' documenti: possono essere visure, organigrammi,
+bilanci, trial balance, tax computation, dichiarativi, working paper, contratti,
+atti di verifica, memo interni. Non e' richiesto un elenco preciso: usa quello che
+c'e'. Se un documento e' illeggibile o ambiguo, non tentare di indovinarne il
+contenuto.
 
-ISTRUZIONI OPERATIVE
-1. Leggi integralmente il foglio “Istruzioni” prima di compilare il file.
-2. Non rinominare i fogli “Istruzioni”, “Anagrafica”, “Analitica” e “Commentary”.
-3. Non modificare intestazioni, codici campo o struttura delle tabelle.
-4. Nel foglio “Anagrafica”, compila esclusivamente la colonna “Valore” e indica sempre, quando disponibile, fonte e stato.
-5. Indica il periodo d’imposta con un anno di quattro cifre compreso tra 2000 e 2100, ad esempio 2026: non usare forme come “FY2026”.
-6. Per importi e soglie usa numeri riconoscibili; sono ammessi sia il formato italiano (1.234,56) sia quello internazionale (1,234.56). Non inserire simboli o testo dentro le celle numeriche.
-7. Nel foglio “Analitica”, usa le sezioni e i codici campo predisposti. Per più elementi della stessa tipologia duplica il gruppo di righe e assegna ID record univoci, ad esempio CT-001 e CT-002.
-8. Per la Information Request List (IRL) compila, quando disponibili, documento richiesto, area, stato, responsabile, scadenza, commento e impatto sul lavoro.
-9. Nel foglio “Commentary”, prepara testi chiari, tecnici e sintetici, distinguendo fatti documentati, inferenze, limitazioni e punti ancora da verificare.
-10. Se trovi un’informazione rilevante che non può essere classificata con sufficiente affidabilità, NON forzarla. Inseriscila nella sezione “miscItems” / “Altro” del foglio Analitica, con ID ALT-001, ALT-002 e così via, compilando titolo, informazione, fonte, rilevanza, stato e motivo della mancata classificazione.
-11. Se un codice o una sezione non è applicabile, lascia vuoto il valore o indica “Non applicabile” nello stato, senza inventare dati.
-12. Per ogni informazione inferita usa lo stato “Inferito” e spiega l’assunzione nelle note.
-13. Non formulare conclusioni fiscali, legali o di audit non supportate dai documenti allegati.
+REGOLE ASSOLUTE
+1. Non inventare. Compila solo cio' che e' sostenuto da un documento allegato.
+2. Lascia vuoto cio' che non e' disponibile o non e' verificabile. Una cella vuota
+   e' un risultato corretto; un dato plausibile ma non documentato e' un errore.
+3. Non scrivere "nessun rilievo", "non applicabile" o formule equivalenti se i
+   documenti non permettono di concluderlo. Lascia vuoto.
+4. Non modificare la struttura del workbook: non rinominare, aggiungere o
+   eliminare fogli e colonne, non spostare le intestazioni, non inserire righe
+   sopra la prima riga di intestazione.
+5. Un solo cliente per workbook.
+6. Il file puo' restare parziale. Fogli interi vuoti non bloccano l'importazione:
+   e' preferibile un file incompleto e affidabile a uno completo e inventato.
+7. Nel foglio FISCALE non indicare IRES e IRAP come peculiarita': sono ordinarie.
+   Inserisci soltanto regimi, caratteristiche o tematiche distintive.
+8. Nel foglio FY registra solo le novita' dell'esercizio. Non duplicare cio' che
+   e' gia' nel profilo permanente.
 
-CONTROLLI FINALI
-- Verifica che denominazione e periodo d’imposta siano coerenti in tutto il file.
-- Verifica che ogni record Analitico abbia un ID univoco.
-- Verifica che fonti, assunzioni e punti da confermare siano espliciti.
-- Verifica che nessuna informazione rilevante sia stata persa: usa “Altro” quando la classificazione non è affidabile.
-- Non modificare il formato XLSX del template.
+FORMATI
+- Date: YYYY-MM-DD (esempio 2026-03-31).
+- Percentuali: numero senza simbolo, con la virgola come separatore decimale
+  (esempio 80 oppure 30,5).
+- Elenchi dentro a una cella: separa con virgola.
+- Campi "Stato": usa Ricorrente, Da monitorare oppure Risolto.
+- Campo "Fonte": indica il documento e, se utile, il punto preciso
+  (esempio "Visura camerale 2026, pag. 2" oppure "Bilancio 2025, nota 14").
 
-OUTPUT
-Restituisci il file XLSX compilato mantenendo esattamente struttura, fogli e intestazioni. Accompagnalo con un riepilogo breve di:
-- dati compilati;
-- record creati per ciascuna sezione;
-- informazioni confluite in “Altro”;
-- assunzioni e verifiche professionali ancora necessarie.
+FOGLI E COLONNE
 
-Il professionista controllerà l’anteprima prima dell’importazione, sceglierà se creare o aggiornare il fascicolo e lo salverà esplicitamente nell’archivio. Il backup completo dell’archivio resta un’operazione separata del tool.</pre></details><p class="prompt-note">Il prompt compila Analitica e Commentary, conserva fonti e stati di verifica, usa “Altro” per i dati non classificabili e prepara un file compatibile con l’anteprima protetta del TFA.</p></div></article></div></div></section>
+ANAGRAFICA — una sola riga di dati.
+  Ragione_sociale | Codice_fiscale_PIVA | Paese | Esercizio_sociale |
+  Chiusura_esercizio_MM_GG | Tipo_attivita | Mercati | Descrizione_business
+  Esercizio_sociale: "anno solare" oppure la descrizione trovata nei documenti.
+  Chiusura_esercizio_MM_GG: formato MM-GG, esempio 12-31.
+  Tipo_attivita: fra Produttore, Distributore, Servizi, Holding, Immobiliare,
+  Agricolo, Energia, Finanziario, Altro.
+  Mercati: fra Italia, UE, Extra UE.
+
+TEMATICHE_BUSINESS — peculiarita' del modello di business.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+  Una riga per tematica. Righe senza Titolo vengono scartate.
+
+CONTABILITA — una sola riga di dati.
+  Principi_contabili | Tipo_bilancio | Reporting_di_gruppo | First_Time_Adoption
+
+TEMATICHE_CONTABILI — questioni contabili ricorrenti o da monitorare.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+SOCIETA_GRUPPO — una sola riga di dati.
+  Gruppo_di_appartenenza | Direzione_e_coordinamento | Consolidato_civilistico |
+  Parti_correlate
+
+TEMATICHE_GRUPPO — peculiarita' societarie non deducibili dal solo organigramma.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+CARATTERISTICHE_FISCALI — una riga per caratteristica, una sola colonna.
+  Caratteristica
+  Esempi ammessi: IVA mensile, IVA trimestrale, Consolidato fiscale,
+  Transfer Pricing, Fiscalita' internazionale, Regime di adempimento
+  collaborativo, Gruppo IVA, Pro-rata IVA, CFC, Pillar Two.
+
+GRUPPO_ENTITA — entita' da mostrare nell'organigramma.
+  ID | Denominazione | Tipo | Forma | Colore | Cliente | Note
+  ID: un identificativo breve e stabile (E1, E2, HOLD, OPCO...). Serve solo a
+  collegare le relazioni: inventalo tu se i documenti non ne hanno uno.
+  Tipo: Societa', Persona fisica, Fondo / Trust, JV / Partnership, Stabile
+  organizzazione, Altro.
+  Forma: rounded, rect, circle, triangle, diamond (facoltativo).
+  Colore: teal, purple, navy, green, amber, rust, gray (facoltativo).
+  Cliente: scrivi SI sulla riga dell'entita' che e' il cliente del fascicolo.
+  Righe senza Denominazione vengono scartate.
+
+GRUPPO_RELAZIONI — rapporti fra le entita'.
+  Da_ID | A_ID | Quota_percentuale | Diritti_voto_percentuale | Tipo_relazione |
+  Etichetta
+  Da_ID e A_ID devono corrispondere agli ID del foglio GRUPPO_ENTITA.
+  Quota e diritti di voto possono essere diversi: compilali entrambi solo se i
+  documenti li distinguono.
+  Tipo_relazione: Partecipazione, Controllo di fatto, Direzione e coordinamento,
+  Altro rapporto.
+
+FISCALE — aree e tematiche fiscali rilevanti.
+  Area | Esito_area | Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+  Area: Imposte dirette, IVA, Ritenute, Transfer Pricing, Consolidato fiscale,
+  Fiscalita' internazionale, Agevolazioni &amp; crediti, Altro.
+  Una riga per tematica; ripeti il nome dell'Area su ogni riga che le appartiene.
+  Esito_area: compilalo solo se i documenti sostengono una conclusione sull'area.
+
+CONTENZIOSO — verifiche, accertamenti, contenziosi, interpelli.
+  Titolo | Tipo | Autorita | Periodo | Tema | Stato | Rischio | Descrizione |
+  Data_apertura | Data_chiusura
+
+OPERAZIONI — operazioni straordinarie.
+  Titolo | Tipo | Data_efficacia | Descrizione | Aspetti_rilevanti
+  Inserisci anche operazioni concluse se producono effetti pluriennali.
+
+ALTRI_ASPETTI — altri elementi permanenti rilevanti che non rientrano altrove.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+FY — novita' di uno specifico esercizio.
+  Esercizio | Data | Sezione | Area | Titolo | Stato | Descrizione |
+  Riporta_nel_profilo
+  Esercizio: l'anno, esempio 2026.
+  Sezione: la sezione del profilo a cui la novita' si riferisce (Anagrafica &amp;
+  Business, Contabilita' &amp; Reporting, Societa' &amp; Gruppo, Fiscale, Contenzioso &amp;
+  Controlli, Operazioni straordinarie, Altri aspetti rilevanti).
+  Riporta_nel_profilo: scrivi SI solo se la novita' e' strutturale, cioe' cambia
+  il profilo permanente e non riguarda solo quell'anno.
+
+COSA CONSEGNARE
+1. Il workbook compilato, con lo stesso nome e la stessa struttura.
+2. Un riepilogo breve, fuori dal file, con:
+   - i fogli che hai compilato e quelli lasciati vuoti, con il motivo;
+   - le informazioni che hai trovato ma non hai saputo collocare;
+   - i punti in cui i documenti erano ambigui o in contraddizione;
+   - le voci che richiedono una verifica professionale prima dell'uso.
+
+Il file sara' controllato dal professionista prima dell'importazione. Il tuo
+compito e' preparare una base di lavoro tracciabile, non un fascicolo definitivo.</pre></details><p class="prompt-note">Il prompt vieta all’AI di inventare, le impone di lasciare vuoto ciò che i documenti non sostengono e di consegnare a parte l’elenco dei fogli non compilati e dei punti da verificare.</p></div></article></div></div></section>
 <section class="section"><div class="shell"><article class="privacy surface"><div class="privacy-icon">⌁</div><div><h3>Prima di caricare documenti nella tua AI</h3><p>Verifica che lo strumento utilizzato sia autorizzato dalle policy dello studio o dell’impresa e adeguato agli obblighi di riservatezza e protezione dei dati. Quando necessario, anonimizza i documenti. La classificazione finale resta responsabilità del professionista.</p></div></article></div></section>
 <section class="section" id="where-upload"><div class="shell"><header class="section-head"><div><span class="label">ISTRUZIONI DI CARICAMENTO</span><h2>Dove carico i file di import?</h2></div><p>I template compilati vengono caricati direttamente nelle sezioni operative dei rispettivi tool. Le schermate seguenti mostrano il percorso esatto.</p></header><div class="upload-grid">
 <article class="upload-card surface"><span class="label">01 · FINANCIAL STATEMENT</span><h3>Financial Statement</h3><div class="path">Financial Statement → menu laterale “2 Import bilancio” → sezione “2. Carica il file compilato” → “Carica Excel compilato” o trascinamento del file.</div><div class="screen-pair"><figure class="screen"><img alt="Financial Statement import tab" loading="lazy" src="/resources/images/ai-onboarding/financial-statement-import-tab.png"/><figcaption>1. Individua nel menu laterale la funzione “Import bilancio”.</figcaption></figure><figure class="screen"><img alt="Financial Statement upload button" loading="lazy" src="/resources/images/ai-onboarding/financial-statement-import-button.png"/><figcaption>2. Carica il file compilato dal pulsante evidenziato.</figcaption></figure></div></article><article class="upload-card surface" id="financial-analysis-upload"><span class="label">02 · ANALISI DI BILANCIO</span><h3>Analisi di bilancio</h3><div class="path">Analisi di bilancio → menu laterale “2 Import bilancio” → sezione “2. Carica il file compilato” → seleziona il template Excel. Dopo l’importazione la Dashboard resta sempre accessibile dal menu laterale.</div><div class="screen-pair"><figure class="screen"><img alt="Financial Analysis import tab" loading="lazy" src="/resources/images/ai-onboarding/financial-analysis-import-tab.png"/><figcaption>1. Individua nel menu laterale la funzione “Import file unico”.</figcaption></figure><figure class="screen"><img alt="Financial Analysis upload area" loading="lazy" src="/resources/images/ai-onboarding/financial-analysis-import-button.png"/><figcaption>2. Seleziona il file dall’area di caricamento evidenziata.</figcaption></figure></div></article>

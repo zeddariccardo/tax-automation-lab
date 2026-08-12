@@ -7,7 +7,7 @@ Official source: https://taxautomationlab.com/tools/financial-statement/
 -->
 
 
-<html class="tal-tool-page" data-tool-version="1.3.6" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.0" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -468,7 +468,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
   "operatingSystem": "Web browser",
   "browserRequirements": "JavaScript enabled; modern desktop or mobile browser",
   "isAccessibleForFree": true,
-  "softwareVersion": "1.3.6",
+  "softwareVersion": "1.4.0",
   "inLanguage": "it-IT",
   "author": {
     "@type": "Person",
@@ -608,6 +608,10 @@ footer a:hover{color:#F7F7F5!important}
 <a class="fs-link" href="/configura-con-ai/#financial-statement"><span aria-hidden="true" class="ws-ic">AI</span>Configura con AI</a>
 <span class="sb-cap sb-groupcap">Lavoro</span>
 <button class="fs-link" data-fsview="results" type="button"><span aria-hidden="true" class="ws-ic">1</span>Bilancio riclassificato</button>
+<span class="sb-cap sb-groupcap">Risultati e dati</span>
+<button class="fs-link" data-fsview="export" type="button"><span aria-hidden="true" class="ws-ic">↧</span>Esporta</button>
+<button class="fs-link" data-fsview="data" type="button"><span aria-hidden="true" class="ws-ic">⛁</span>Dati e backup</button>
+<button class="fs-link" data-fsview="help" type="button"><span aria-hidden="true" class="ws-ic">?</span>Come si usa</button>
 </div>
 <div class="sb-foot">100% locale · nessun dato lascia il dispositivo</div>
 </nav>
@@ -623,7 +627,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Bilancio · v1.3.6</span>
+<span class="tal-publication-label" data-tal-key="label">Bilancio · v1.4.0</span>
 <h2 data-tal-key="title">Riclassificazione IAS/IFRS negli schemi civilistici italiani</h2>
 <p data-tal-key="lead">Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.</p>
 <div class="tal-publication-facts">
@@ -665,6 +669,17 @@ footer a:hover{color:#F7F7F5!important}
 <div class="field"><label>Valuta</label><select id="an_valuta"><option value="EUR">EUR — Euro</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>
 <div class="field"><label>Redatto da</label><input id="an_redattore" placeholder="Nome del professionista" type="text"/></div>
 </div>
+<h3 style="margin-top:26px">Dati anagrafici del prospetto di deposito</h3>
+<p class="bd">Queste informazioni compaiono nell'intestazione del bilancio depositato al Registro delle imprese. Sono richieste dal prospetto e dall'istanza XBRL.</p>
+<div class="grid">
+<div class="field"><label>Capitale sociale interamente versato</label><select id="an_capitale_versato"><option value="si">sì</option><option value="no">no</option></select></div>
+<div class="field wide"><label>Settore di attività prevalente (ATECO)</label><input id="an_ateco" placeholder="Es. 25.62.00" type="text"/></div>
+<div class="field"><label>Società in liquidazione</label><select id="an_liquidazione"><option value="no">no</option><option value="si">sì</option></select></div>
+<div class="field"><label>Società con socio unico</label><select id="an_socio_unico"><option value="no">no</option><option value="si">sì</option></select></div>
+<div class="field"><label>Soggetta a direzione e coordinamento</label><select id="an_direzione_coord"><option value="no">no</option><option value="si">sì</option></select></div>
+<div class="field"><label>Appartenenza a un gruppo</label><select id="an_gruppo"><option value="no">no</option><option value="si">sì</option></select></div>
+<div class="field wide"><label>Denominazione della società che esercita la direzione e il coordinamento</label><input id="an_direzione_denom" placeholder="Compila solo se soggetta a direzione e coordinamento" type="text"/></div>
+</div>
 </section>
 <!-- II - IMPORT -->
 <section class="block fs-view" id="view-import">
@@ -685,13 +700,12 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 </div>
 <div class="panel">
-<h3>3. Memoria per società (salvata nel browser)</h3>
-<p>Mappatura conti, storni e rettifiche vengono salvati in locale associati alla P.IVA. Ricaricando un Excel della stessa società vengono riapplicati in automatico.</p>
+<h3>3. Mappatura ricorrente della società</h3>
+<p>La corrispondenza conto → voce civilistica viene salvata in locale sulla P.IVA e riapplicata automaticamente ai file successivi della stessa società. La gestione completa è in <b>Dati e backup</b>.</p>
 <div class="btn-row">
-<button class="btn secondary" onclick="saveCurrentMapping()">Salva memoria società</button>
-<button class="btn ghost" onclick="openMappingManager()">Gestisci memorie</button>
+<button class="btn secondary" onclick="saveCurrentMapping()">Salva mappatura</button>
+<button class="btn ghost" onclick="fsShowView('data')">Apri Dati e backup</button>
 </div>
-<div class="saved-list" id="saved_list"></div>
 </div>
 </section>
 <!-- III - RISULTATI -->
@@ -708,6 +722,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="tabs" id="results_tabs">
 <button class="tab active" data-tab="sp" onclick="showTab(event,'sp')">Stato Patrimoniale</button>
 <button class="tab" data-tab="ce" onclick="showTab(event,'ce')">Conto Economico</button>
+<button class="tab" data-tab="deposito" onclick="showTab(event,'deposito')">Prospetto di deposito</button>
 <button class="tab" data-tab="raw" onclick="showTab(event,'raw')">Riclassifica per conto</button>
 <button class="tab" data-tab="unmapped" onclick="showTab(event,'unmapped')">Non mappati <span class="badge" id="unmapped_count">0</span></button>
 <button class="tab" data-tab="storni" onclick="showTab(event,'storni')">Storni <span class="badge" id="cntStorni">0</span></button>
@@ -716,15 +731,14 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 <div class="tab-panel active" id="tab_sp"></div>
 <div class="tab-panel" id="tab_ce"></div>
+<div class="tab-panel" id="tab_deposito"></div>
 <div class="tab-panel" id="tab_raw"></div>
 <div class="tab-panel" id="tab_unmapped"></div>
 <div class="tab-panel" id="tab_storni"></div>
 <div class="tab-panel" id="tab_rettifiche"></div>
 <div class="tab-panel" id="tab_checks"></div>
 <div class="btn-row" style="margin-top:24px; padding-top:20px; border-top:1px solid var(--g2);">
-<button class="btn" onclick="openPdfModes()">Esporta PDF…</button>
-<button class="btn secondary" onclick="exportExcel()">Esporta working paper (Excel)</button>
-<button class="btn ghost" onclick="openBlankSchema()">Schema vuoto (PDF)</button>
+<button class="btn" onclick="fsShowView('export')">Vai a Esporta</button>
 <button class="btn ghost" onclick="clearAll()">Nuova elaborazione</button>
 </div>
 </div>
@@ -755,14 +769,121 @@ footer a:hover{color:#F7F7F5!important}
 <div id="fs_client_detail"><p class="bd" style="margin:0">Nessun cliente selezionato.</p></div>
 </div>
 </div>
+</section>
+
+<!-- ESPORTA -->
+<section class="block fs-view" id="view-export">
+<h2 class="bt"><span class="num">Esporta</span>Prospetto di deposito, working paper e istanza XBRL</h2>
+<div class="rule"></div>
+<div class="empty-state" id="empty_export">
+<h3>Nessun bilancio da esportare</h3>
+<p>Carica un bilancio, oppure parti dai dati dimostrativi, per abilitare gli export.</p>
+<button class="btn" onclick="fsShowView('import')">Vai a Importa da Excel</button>
+</div>
+<div id="export_content" style="display:none">
 <div class="panel">
-<h3>Backup dell'archivio</h3>
+<h3>Bilancio civilistico — formato di deposito</h3>
+<p>Stato patrimoniale e conto economico con i totali intermedi previsti dagli artt. 2424 e 2425 c.c. (o 2435-bis), intestazione e dati anagrafici nella forma del prospetto depositato al Registro delle imprese. È l'anteprima visibile nella scheda <b>Prospetto di deposito</b>.</p>
+<div class="btn-row">
+<button class="btn" onclick="exportOfficialPDF()">Scarica bilancio (PDF)</button>
+<button class="btn secondary" onclick="exportOfficialExcel()">Scarica bilancio (Excel)</button>
+</div>
+</div>
+<div class="panel">
+<h3>Istanza XBRL</h3>
+<p>Genera il file <span class="cell-code">.xbrl</span> dello stato patrimoniale e del conto economico secondo la tassonomia dei Principi Contabili Italiani.</p>
+<div class="callout" id="xbrl_notice"></div>
+<div class="btn-row">
+<button class="btn" onclick="exportXBRL()">Genera istanza XBRL</button>
+<button class="btn ghost" onclick="openXbrlMapping()">Verifica corrispondenza voci ↔ tassonomia</button>
+</div>
+</div>
+<div class="panel">
+<h3>Carte di lavoro</h3>
+<p>Il fascicolo di lavoro completo: riclassifica per conto, conti non mappati, storni, rettifiche IAS→OIC e prospetti, per la documentazione dell'incarico.</p>
+<div class="btn-row">
+<button class="btn secondary" onclick="exportExcel()">Working paper (Excel)</button>
+<button class="btn ghost" onclick="openPdfModes()">Prospetto di lavoro (PDF)…</button>
+</div>
+</div>
+<div class="panel">
+<h3>Schema vuoto</h3>
+<p>Lo schema civilistico senza importi, nella forma selezionata in Anagrafica. Utile come carta di lavoro da compilare a mano.</p>
+<div class="btn-row">
+<button class="btn ghost" onclick="openBlankSchema()">Schema vuoto (PDF)</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- DATI E BACKUP -->
+<section class="block fs-view" id="view-data">
+<h2 class="bt"><span class="num">Dati e backup</span>Mappature, archivio clienti, esportazione e reimportazione</h2>
+<div class="rule"></div>
+<p class="bd">Tutto è salvato nel browser di questo dispositivo. Nulla viene inviato a un server: se cambi computer o svuoti i dati del browser, l'archivio si perde. Esporta un backup periodicamente.</p>
+<div class="panel">
+<h3>Archivio clienti e annualità</h3>
 <p>Esporta o reimporta l’intero archivio (tutti i clienti e le annualità) come file JSON.</p>
 <div class="btn-row">
 <button class="btn secondary" id="fs_export_all" type="button">Esporta archivio (JSON)</button>
 <label class="btn ghost" for="fs_import_all">Importa archivio (JSON)</label>
 <input accept=".json" id="fs_import_all" style="display:none" type="file"/>
+<button class="btn ghost" onclick="fsShowView('archive')">Vai a Clienti</button>
 </div>
+</div>
+<div class="panel">
+<h3>Mappature conto → voce civilistica</h3>
+<p>Una mappatura per P.IVA, riapplicata automaticamente ai file successivi della stessa società. Storni e rettifiche non vengono mai riportati da un esercizio all'altro: restano nel fascicolo dell'anno.</p>
+<div class="btn-row">
+<button class="btn secondary" onclick="saveCurrentMapping()">Salva la mappatura corrente</button>
+<button class="btn ghost" onclick="openMappingManager()">Gestisci mappature</button>
+</div>
+<div class="saved-list" id="saved_list"></div>
+</div>
+<div class="panel">
+<h3>Cancellazione</h3>
+<p>Rimuove dal browser la sessione di lavoro non salvata. I fascicoli già archiviati restano.</p>
+<div class="btn-row">
+<button class="btn ghost" onclick="clearAll()">Nuova elaborazione</button>
+</div>
+</div>
+</section>
+
+<!-- COME SI USA -->
+<section class="block fs-view" id="view-help">
+<h2 class="bt"><span class="num">Come si usa</span>Il percorso completo, dal file gestionale al bilancio depositabile</h2>
+<div class="rule"></div>
+<div class="panel">
+<h3>1. Anagrafica</h3>
+<p>Compila denominazione, codice fiscale e partita IVA, il periodo dell'esercizio e lo schema (abbreviato ex art. 2435-bis oppure ordinario ex artt. 2424 e 2425). La P.IVA — o in mancanza il codice fiscale — è la chiave con cui il tool riconosce la società: da lì dipendono la mappatura salvata e l'archivio delle annualità. I <i>Dati anagrafici del prospetto di deposito</i> compaiono nell'intestazione del bilancio e nell'istanza XBRL.</p>
+</div>
+<div class="panel">
+<h3>2. Importa da Excel</h3>
+<p>Scarica il template: contiene i fogli <b>Stato Patrimoniale</b> e <b>Conto Economico</b>, l'elenco dei codici delle voci civilistiche e un esempio già quadrato da sostituire con i tuoi conti. Una riga per conto: codice, descrizione, importo corrente, importo precedente, codice della voce civilistica.</p>
+<p><b>Convenzione dei segni</b>, quella tipica degli export gestionali: attivo positivo (fondi ammortamento negativi), passivo e patrimonio netto negativi, costi positivi, ricavi negativi. Il tool presenta poi i valori con il segno civilistico.</p>
+<p>Se lasci vuota la colonna della voce, il conto resta da mappare e lo assegni dall'interfaccia — dalla scheda <b>Non mappati</b> oppure trascinandolo tra le voci dello schema.</p>
+</div>
+<div class="panel">
+<h3>3. Bilancio riclassificato</h3>
+<p>Le schede seguono l'ordine del lavoro: <b>Stato Patrimoniale</b> e <b>Conto Economico</b> con i conti sottostanti a ciascuna voce, <b>Prospetto di deposito</b> con l'anteprima del documento finale, <b>Riclassifica per conto</b> per il controllo riga per riga, <b>Non mappati</b>, <b>Storni</b>, <b>Rettifiche IAS→OIC</b> e <b>Verifiche</b>.</p>
+<p><b>Storni</b>: spostano un importo tra due voci civilistiche senza toccare i conti importati. <b>Rettifiche</b>: scritture in partita doppia Dare/Avere, gestibili separatamente per esercizio corrente e precedente, per allineare un bilancio IAS/IFRS agli schemi OIC.</p>
+</div>
+<div class="panel">
+<h3>4. Il risultato d'esercizio</h3>
+<p>Molti export gestionali non contengono il risultato d'esercizio come conto patrimoniale. Se lo stato patrimoniale e il conto economico si riconciliano, il tool propone una riga tecnica separata <span class="cell-code">TAL_AIX</span> da confermare nella scheda <b>Verifiche</b>: le righe originali non vengono mai modificate. La riga tecnica si aggiorna da sola quando storni e rettifiche cambiano il risultato.</p>
+<p>Se la differenza non coincide con il risultato del conto economico, il tool lo dichiara e <b>non forza nessuna quadratura</b>.</p>
+</div>
+<div class="panel">
+<h3>5. Verifiche ed export</h3>
+<p>L'export è consentito solo con lo stato patrimoniale quadrato e la voce tecnica confermata: è un blocco voluto. Le <b>Verifiche</b> segnalano quadrature, coerenza tra conto economico e patrimonio netto, conti non mappati, mappature incompatibili, codici duplicati e anomalie di segno.</p>
+</div>
+<div class="panel">
+<h3>6. Clienti e annualità</h3>
+<p>Ogni cliente conserva più esercizi. <b>Crea nuovo anno</b> riporta la configurazione (anagrafica, mappatura, schema) ma non i numeri: carichi il nuovo Excel e la mappatura si riapplica. Il lavoro in corso viene salvato in bozza automaticamente.</p>
+</div>
+<div class="panel">
+<h3>Limiti e responsabilità</h3>
+<p>Il tool produce prospetti di stato patrimoniale e conto economico. <b>Non</b> produce la nota integrativa, la relazione sulla gestione né il rendiconto finanziario. La classificazione dei conti, l'applicazione degli schemi e le scritture di rettifica restano responsabilità del professionista che firma il bilancio.</p>
 </div>
 </section>
 </main>
@@ -2988,7 +3109,7 @@ renderSavedList();
 (function(){
   'use strict';
   var ARCH_KEY='fs_archive_v1', DRAFT_KEY='fs_draft_v1', LEGACY_KEY='riclass_open_v2';
-  var AN_IDS=['an_denom','an_forma','an_schema','an_cf','an_piva','an_capitale','an_costituzione','an_indirizzo','an_cap','an_comune','an_provincia','an_rea_prov','an_rea_num','an_pec','an_periodo_da','an_periodo_a','an_valuta','an_redattore'];
+  var AN_IDS=['an_denom','an_forma','an_schema','an_cf','an_piva','an_capitale','an_costituzione','an_indirizzo','an_cap','an_comune','an_provincia','an_rea_prov','an_rea_num','an_pec','an_periodo_da','an_periodo_a','an_valuta','an_redattore','an_capitale_versato','an_ateco','an_liquidazione','an_socio_unico','an_direzione_coord','an_gruppo','an_direzione_denom'];
   var selectedClient=null, fsReady=false, saveYearTouched=false;
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function $id(id){return document.getElementById(id);}
@@ -3194,7 +3315,7 @@ if(STATE.accounts&&STATE.accounts.length)refreshAll();
 })();
 </script><script id="tal-publication-i18n">
 (function(){
- const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.3.6","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.3.6","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.3.6","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
+ const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio · v1.4.0","title":"Riclassificazione IAS/IFRS negli schemi civilistici italiani","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mapping e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Financial statements · v1.4.0","title":"IAS/IFRS reclassification into Italian statutory formats","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros · v1.4.0","title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
  const seo={"it":{"title":"Tool riclassificazione bilancio IAS/IFRS in IV Direttiva | Tax Automation Lab","description":"Tool gratuito per riclassificare trial balance e bilanci IAS/IFRS secondo gli schemi civilistici italiani, con mapping dei conti, rettifiche, quadrature, archivio clienti ed esportazione Excel e PDF."},"en":{"title":"IAS/IFRS reclassification into Italian statutory formats | Tax Automation Lab","description":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail."},"es":{"title":"Reclasificación IAS/IFRS en los esquemas estatutarios italianos | Tax Automation Lab","description":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta."}};
  const buttons=[...document.querySelectorAll('[data-tal-lang]')];
  function setLang(lang,persist=true){
@@ -3374,6 +3495,1190 @@ function installCommandBar(){
 function version(){document.documentElement.dataset.toolVersion=VERSION;document.querySelectorAll('.tal-publication-label').forEach(x=>x.textContent=x.textContent.replace(/v\d+\.\d+\.\d+/,'v'+VERSION));}
 function install(){version();installCommandBar();assignUids(STATE.accounts||[]);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
+
+<script id="tal-fs-v140-navigation-and-integrity">
+/* ====================================================================
+   Bilancio civilistico v1.4.0 — navigazione condivisa, integrità del
+   risultato d'esercizio, isolamento dell'anagrafica, reset unico.
+   ==================================================================== */
+(function(){
+'use strict';
+var VERSION='1.4.0';
+var VIEWS=['archive','anagrafica','import','results','export','data','help'];
+var HASH={archive:'clienti',anagrafica:'anagrafica',import:'importa',results:'bilancio',export:'esporta',data:'dati',help:'aiuto'};
+var FROM_HASH={};Object.keys(HASH).forEach(function(k){FROM_HASH[HASH[k]]=k;});
+/* Campi che identificano la società: si azzerano quando cambia il cliente. */
+var IDENTITY_IDS=['an_denom','an_forma','an_cf','an_piva','an_capitale','an_costituzione','an_indirizzo','an_cap','an_comune','an_provincia','an_rea_prov','an_rea_num','an_pec','an_periodo_da','an_periodo_a','an_redattore','an_ateco','an_direzione_denom'];
+var CHOICE_DEFAULTS={an_capitale_versato:'si',an_liquidazione:'no',an_socio_unico:'no',an_direzione_coord:'no',an_gruppo:'no'};
+
+function num(v){var x=Number(v||0);return Number.isFinite(x)?x:0;}
+function g(id){var e=document.getElementById(id);return e?e.value:'';}
+function T(m,e){if(window.toast)window.toast(m,e);}
+
+/* ---------------------------------------------------------------- *
+ * 1. Navigazione: sette viste, indirizzo per sezione, tasto Indietro
+ * ---------------------------------------------------------------- */
+function syncExportView(){
+  /* STATE e RESULT sono dichiarati con let nello script principale:
+     non sono proprietà di window, vanno letti senza qualificatore. */
+  var has=!!(typeof STATE!=='undefined'&&STATE.accounts&&STATE.accounts.length);
+  var e=document.getElementById('empty_export'),c=document.getElementById('export_content');
+  if(e)e.style.display=has?'none':'block';
+  if(c)c.style.display=has?'block':'none';
+}
+window.fsSyncExportView=syncExportView;
+
+function showView(name,opts){
+  if(VIEWS.indexOf(name)<0)name='archive';
+  document.querySelectorAll('.fs-view').forEach(function(v){v.classList.toggle('active',v.id==='view-'+name);});
+  document.querySelectorAll('.fs-link').forEach(function(l){l.classList.toggle('active',l.dataset.fsview===name);});
+  if(name==='archive'&&window.fsArchRefreshUI){try{window.fsArchRefreshUI();}catch(_){}}
+  if(name==='export')syncExportView();
+  if(name==='data'&&window.renderSavedList){try{window.renderSavedList();}catch(_){}}
+  var want='#/'+HASH[name];
+  if(!(opts&&opts.fromHash)&&location.hash!==want){
+    try{history.pushState(null,'',want);}catch(_){location.hash=want;}
+  }
+  try{window.scrollTo({top:0,behavior:'smooth'});}catch(_){window.scrollTo(0,0);}
+  if(window.innerWidth<=980){
+    var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
+    var bd=document.querySelector('.sb-backdrop');if(bd)bd.classList.remove('show');
+  }
+}
+window.fsShowView=showView;
+
+/* La sidebar era agganciata alla vecchia funzione a quattro viste:
+   intercetto in fase di cattura, prima che il vecchio handler risponda. */
+var sidebar=document.getElementById('sidebar');
+if(sidebar)sidebar.addEventListener('click',function(e){
+  var link=e.target.closest('[data-fsview]');
+  if(!link)return;
+  e.stopPropagation();
+  showView(link.dataset.fsview);
+},true);
+
+function viewFromLocation(){
+  var m=/^#\/([a-z]+)/.exec(location.hash||'');
+  return m&&FROM_HASH[m[1]]?FROM_HASH[m[1]]:null;
+}
+function onLocationChange(){var v=viewFromLocation();if(v)showView(v,{fromHash:true});}
+window.addEventListener('popstate',onLocationChange);
+window.addEventListener('hashchange',onLocationChange);
+
+/* ---------------------------------------------------------------- *
+ * 2. Il risultato d'esercizio segue storni e rettifiche
+ *
+ * La riga tecnica TAL_AIX viene creata all'import con il risultato di
+ * quel momento. Storni e rettifiche cambiano il conto economico ma non
+ * la riga: il patrimonio netto restava indietro e lo stato patrimoniale
+ * si sbilanciava esattamente dell'effetto sul risultato, bloccando
+ * l'export. La riga tecnica è del tool, quindi la riallineiamo. I conti
+ * A.IX importati dall'ERP non si toccano: lo scarto lo segnala la
+ * verifica "CE <-> Patrimonio netto".
+ * ---------------------------------------------------------------- */
+function realignResult(r){
+  if(!r||!r.sp_pas)return r;
+  var pn=r.sp_pas.nodes.find(function(x){return x.code==='A';});if(!pn)return r;
+  var aix=(pn.children||[]).find(function(c){return c.code==='AIX';});if(!aix)return r;
+  var tech=(aix.detail||[]).filter(function(d){return d&&d.technicalResult;});
+  if(!tech.length)return r;
+  var techCur=tech.reduce(function(s,d){return s+num(d.presented);},0);
+  var techPrev=tech.reduce(function(s,d){return s+num(d.presentedPrev);},0);
+  var otherCur=num(aix.amount)-techCur, otherPrev=num(aix.amountPrev)-techPrev;
+  var needCur=round2(num(r.ceResult)-otherCur), needPrev=round2(num(r.ceResultPrev)-otherPrev);
+  if(Math.abs(needCur-techCur)<0.005&&Math.abs(needPrev-techPrev)<0.005)return r;
+  tech.forEach(function(d,i){d.presented=i===0?needCur:0;d.presentedPrev=i===0?needPrev:0;});
+  aix.amount=round2(otherCur+needCur);aix.amountPrev=round2(otherPrev+needPrev);
+  pn.amount=round2(sumChildren(pn));pn.amountPrev=round2(sumChildren(pn,'amountPrev'));
+  r.totPas=round2(sumNodes(r.sp_pas.nodes));r.totPasPrev=round2(sumNodes(r.sp_pas.nodes,'amountPrev'));
+  r.pnAix=round2(aix.amount);r.pnAixPrev=round2(aix.amountPrev);
+  r.pnCeDelta=round2(r.pnAix-num(r.ceResult));r.pnCeDeltaPrev=round2(r.pnAixPrev-num(r.ceResultPrev));
+  r.resultRealigned=true;
+  /* Lo stato deve dire la stessa cosa dei prospetti: archivio ed export
+     leggono da qui. */
+  var row=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult;});
+  row.forEach(function(a,i){a.importo=i===0?round2(-needCur):0;a.importo_prev=i===0?round2(-needPrev):0;});
+  return r;
+}
+var baseCompute=window.computeFrom;
+window.computeFrom=function(){return realignResult(baseCompute.apply(this,arguments));};
+try{computeFrom=window.computeFrom;}catch(_){}
+
+/* ---------------------------------------------------------------- *
+ * 3. Anagrafica: un file nuovo non eredita la società precedente
+ * ---------------------------------------------------------------- */
+function warningHost(){
+  var el=document.getElementById('fs-anag-warning');
+  if(el)return el;
+  var anchor=document.getElementById('tal-fs-commandbar')||document.querySelector('.tal-global-header');
+  if(!anchor)return null;
+  el=document.createElement('div');el.id='fs-anag-warning';
+  el.style.cssText='display:none;margin:12px clamp(18px,3.5vw,44px) 0;padding:11px 14px;border-radius:10px;border-left:4px solid #b06a00;background:#fff5d9;color:#5c4306;font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif';
+  el.setAttribute('role','status');
+  anchor.insertAdjacentElement('afterend',el);
+  return el;
+}
+function anagWarning(msg){
+  var el=warningHost();if(!el)return;
+  if(!msg){el.style.display='none';el.textContent='';return;}
+  el.textContent=msg;el.style.display='block';
+}
+window.fsAnagWarning=anagWarning;
+
+function clearIdentity(){
+  IDENTITY_IDS.forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  Object.keys(CHOICE_DEFAULTS).forEach(function(id){var e=document.getElementById(id);if(e)e.value=CHOICE_DEFAULTS[id];});
+}
+function identityKey(){return String(g('an_piva')||g('an_cf')||'').trim().toUpperCase();}
+function incomingKey(wb){
+  try{
+    var s=window.V13&&V13.findSheet?V13.findSheet(wb,'Anagrafica'):null;if(!s)return null;
+    var rows=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:true}),m={};
+    rows.forEach(function(r){if(r&&r[0]&&r[1]!==undefined&&r[1]!=='')m[String(r[0]).trim()]=r[1];});
+    return String(m['Partita IVA']||m['Codice fiscale']||'').trim().toUpperCase();
+  }catch(_){return null;}
+}
+var baseParse=window.parseWorkbook;
+window.parseWorkbook=function(wb){
+  var before=identityKey(), incoming=incomingKey(wb), switched=false;
+  if(incoming&&before&&incoming!==before){clearIdentity();switched=true;}
+  var out=baseParse.call(this,wb);
+  var after=identityKey();
+  if(!after){
+    anagWarning(before
+      ? 'Il file importato non contiene partita IVA o codice fiscale: sullo schermo resta l’anagrafica di '+(g('an_denom')||before)+'. Verificala prima di salvare o esportare.'
+      : 'Il file importato non contiene i dati anagrafici: compila l’Anagrafica prima di salvare o esportare.');
+  }else if(switched){
+    anagWarning('Il file appartiene a una società diversa ('+after+'): l’anagrafica precedente è stata azzerata. Controlla i dati del prospetto di deposito.');
+  }else anagWarning('');
+  syncExportView();
+  return out;
+};
+try{parseWorkbook=window.parseWorkbook;}catch(_){}
+
+/* fillAnagrafica deve conoscere anche i campi del prospetto di deposito. */
+var EXTRA_ANAG={'Capitale sociale interamente versato':'an_capitale_versato','Settore di attività prevalente (ATECO)':'an_ateco','Società in liquidazione':'an_liquidazione','Società con socio unico':'an_socio_unico','Soggetta a direzione e coordinamento':'an_direzione_coord','Appartenenza a un gruppo':'an_gruppo','Denominazione della società che esercita la direzione e il coordinamento':'an_direzione_denom'};
+var baseFill=window.fillAnagrafica;
+window.fillAnagrafica=function(m){
+  baseFill.call(this,m);
+  Object.keys(EXTRA_ANAG).forEach(function(label){
+    var v=m[label];if(v===undefined||v==='')return;
+    var el=document.getElementById(EXTRA_ANAG[label]);if(!el)return;
+    if(el.tagName==='SELECT'){
+      var s=String(v).trim().toLowerCase();
+      el.value=(s==='si'||s==='sì'||s==='s'||s==='yes'||s==='true'||s==='1')?'si':'no';
+    }else el.value=v;
+  });
+};
+try{fillAnagrafica=window.fillAnagrafica;}catch(_){}
+
+/* ---------------------------------------------------------------- *
+ * 4. Un solo reset. Prima "Nuova elaborazione" lasciava la bozza in
+ *    localStorage: al reload i dati cancellati tornavano.
+ * ---------------------------------------------------------------- */
+function resetAll(){
+  if(!confirm('Creare una nuova elaborazione? I dati non salvati andranno persi. I fascicoli già archiviati restano.'))return;
+  clearIdentity();
+  var sc=document.getElementById('an_schema');if(sc)sc.value='abbrev';
+  var vl=document.getElementById('an_valuta');if(vl)vl.value='EUR';
+  STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];
+  delete STATE.comparativeColumnPresent;delete STATE.comparativeHasValues;
+  RESULT=null;
+  try{localStorage.removeItem('fs_draft_v1');}catch(_){}
+  var e=document.getElementById('empty_results'),c=document.getElementById('results_content');
+  if(e)e.style.display='block';if(c)c.style.display='none';
+  var m=document.getElementById('upload_meta');if(m)m.textContent='Nessun file selezionato';
+  anagWarning('');syncExportView();
+  if(window.fsResetSaveYear)window.fsResetSaveYear();
+  if(window.fsUpdateContext)window.fsUpdateContext();
+  showView('anagrafica');
+  T('Nuova elaborazione pronta.');
+}
+window.clearAll=resetAll;try{clearAll=window.clearAll;}catch(_){}
+
+/* ---------------------------------------------------------------- *
+ * 5. Dataset dimostrativo unico, condiviso da template ed esempio.
+ *    Il template usciva con righe che non riconciliavano: chi lo
+ *    scaricava e lo ricaricava per provarlo vedeva Δ 122.000.
+ * ---------------------------------------------------------------- */
+var DEMO_ANAG={an_denom:'Alfa Industriale S.r.l.',an_forma:'S.r.l.',an_cf:'01234567890',an_piva:'IT01234567890',an_capitale:'50.000,00 €',an_indirizzo:'Via dell\'Industria, 12',an_cap:'20100',an_comune:'Milano',an_provincia:'MI',an_rea_prov:'MI',an_rea_num:'1234567',an_periodo_da:'2025-01-01',an_periodo_a:'2025-12-31',an_valuta:'EUR',an_schema:'abbrev',an_redattore:'',an_capitale_versato:'si',an_ateco:'25.62.00',an_liquidazione:'no',an_socio_unico:'no',an_direzione_coord:'no',an_gruppo:'no',an_direzione_denom:''};
+var DEMO_ACCOUNTS=[
+  {code:'200002',desc:'Costi di impianto',importo:5000,importo_prev:6000,voce:'BI',source:'sp'},
+  {code:'211000',desc:'Fabbricati',importo:350000,importo_prev:340000,voce:'BII',source:'sp'},
+  {code:'281000',desc:'F.do amm.to fabbricati',importo:-85000,importo_prev:-70000,voce:'BII',source:'sp'},
+  {code:'213000',desc:'Impianti e macchinari',importo:180000,importo_prev:170000,voce:'BII',source:'sp'},
+  {code:'283000',desc:'F.do amm.to impianti',importo:-60000,importo_prev:-45000,voce:'BII',source:'sp'},
+  {code:'300000',desc:'Rimanenze materie prime',importo:42000,importo_prev:38000,voce:'CI',source:'sp'},
+  {code:'430000',desc:'Crediti v/clienti',importo:195000,importo_prev:185000,voce:'CIIE',source:'sp'},
+  {code:'470000',desc:'Crediti tributari',importo:12000,importo_prev:10000,voce:'CIIE',source:'sp'},
+  {code:'572000',desc:'Banca c/c',importo:45000,importo_prev:38000,voce:'CIV',source:'sp'},
+  {code:'480000',desc:'Risconti attivi',importo:3200,importo_prev:2800,voce:'D',source:'sp'},
+  {code:'100000',desc:'Capitale sociale',importo:-50000,importo_prev:-50000,voce:'AI',source:'sp'},
+  {code:'112000',desc:'Riserva legale',importo:-10000,importo_prev:-8000,voce:'AVI',source:'sp'},
+  {code:'129000',desc:'Utili portati a nuovo',importo:-85000,importo_prev:-84800,voce:'AVIII',source:'sp'},
+  {code:'141000',desc:'Fondo TFR',importo:-35000,importo_prev:-30000,voce:'C',source:'sp'},
+  {code:'170000',desc:'Mutui bancari oltre 12m',importo:-220000,importo_prev:-240000,voce:'DO',source:'sp'},
+  {code:'400000',desc:'Debiti v/fornitori',importo:-145000,importo_prev:-130000,voce:'DE',source:'sp'},
+  {code:'475000',desc:'Debiti tributari',importo:-9900,importo_prev:-8500,voce:'DE',source:'sp'},
+  {code:'476000',desc:'Debiti previdenziali',importo:-12000,importo_prev:-11000,voce:'DE',source:'sp'},
+  {code:'485000',desc:'Risconti passivi',importo:-2200,importo_prev:-1800,voce:'E',source:'sp'},
+  {code:'700000',desc:'Ricavi delle vendite',importo:-680000,importo_prev:-640000,voce:'A1',source:'ce'},
+  {code:'778000',desc:'Altri ricavi',importo:-8500,importo_prev:-7200,voce:'A5B',source:'ce'},
+  {code:'601000',desc:'Materie prime',importo:195000,importo_prev:180000,voce:'B6',source:'ce'},
+  {code:'623000',desc:'Consulenze e prestazioni',importo:62000,importo_prev:58000,voce:'B7',source:'ce'},
+  {code:'625000',desc:'Assicurazioni',importo:8200,importo_prev:7800,voce:'B7',source:'ce'},
+  {code:'621000',desc:'Canoni locazione',importo:28000,importo_prev:28000,voce:'B8',source:'ce'},
+  {code:'640000',desc:'Salari e stipendi',importo:135000,importo_prev:128000,voce:'B9A',source:'ce'},
+  {code:'642000',desc:'Oneri sociali',importo:42000,importo_prev:40000,voce:'B9B',source:'ce'},
+  {code:'641000',desc:'TFR maturato',importo:8500,importo_prev:8000,voce:'B9C',source:'ce'},
+  {code:'680000',desc:'Ammortamento imm.li immateriali',importo:3200,importo_prev:3000,voce:'B10A',source:'ce'},
+  {code:'681000',desc:'Ammortamento imm.li materiali',importo:30000,importo_prev:28000,voce:'B10B',source:'ce'},
+  {code:'631000',desc:'Altre imposte',importo:4500,importo_prev:4200,voce:'B14',source:'ce'},
+  {code:'662000',desc:'Interessi passivi bancari',importo:12000,importo_prev:13500,voce:'C17E',source:'ce'},
+  {code:'630000',desc:'IRES e IRAP',importo:42000,importo_prev:38000,voce:'20A',source:'ce'}
+];
+window.FS_DEMO_ACCOUNTS=DEMO_ACCOUNTS;
+
+window.loadSampleData=function(){
+  clearIdentity();
+  Object.keys(DEMO_ANAG).forEach(function(id){var e=document.getElementById(id);if(e)e.value=DEMO_ANAG[id];});
+  STATE.accounts=JSON.parse(JSON.stringify(DEMO_ACCOUNTS));
+  STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];
+  STATE.comparativeColumnPresent=true;
+  STATE.comparativeHasValues=STATE.accounts.some(function(a){return Math.abs(num(a.importo_prev))>=0.005;});
+  var rec=window.fsPostLoadReconcile?window.fsPostLoadReconcile('demo'):null;
+  anagWarning('');
+  window.refreshAll(true);
+  if(typeof showResultsUI==='function')showResultsUI();
+  syncExportView();
+  if(window.fsUpdateContext)window.fsUpdateContext();
+  T(rec&&rec.added?'Esempio dimostrativo caricato: conferma la voce tecnica A.IX prima dell’export.':'Esempio dimostrativo caricato');
+};
+try{loadSampleData=window.loadSampleData;}catch(_){}
+
+window.downloadTemplate=function(){
+  try{
+    if(window.V13&&V13.sheetGuard)V13.sheetGuard();
+    var wb=XLSX.utils.book_new();
+    var istr=[['TEMPLATE — BILANCIO CIVILISTICO · Tax Automation Lab'],[''],
+      ['Come si compila'],[''],
+      ['1. Foglio "Anagrafica": i dati della societa. Compila anche i campi del prospetto di deposito.'],
+      ['2. Foglio "Stato Patrimoniale": una riga per ogni conto patrimoniale.'],
+      ['3. Foglio "Conto Economico": una riga per ogni conto di costo o ricavo.'],
+      ['4. Colonna "Voce IV Direttiva": il codice della voce civilistica, dal foglio "Voci IV Direttiva".'],
+      ['   Lasciandola vuota il conto resta da mappare: lo assegni dopo il caricamento.'],
+      [''],
+      ['Convenzione dei segni — la stessa degli export gestionali'],[''],
+      ['   Attivo: positivo. I fondi ammortamento in negativo.'],
+      ['   Passivo e patrimonio netto: negativo.'],
+      ['   Costi: positivo. Ricavi: negativo.'],
+      ['   Il tool presenta poi i valori con il segno civilistico.'],
+      [''],
+      ['Risultato d\'esercizio'],[''],
+      ['   Se il tuo export non contiene il risultato come conto patrimoniale, non aggiungerlo a mano:'],
+      ['   se stato patrimoniale e conto economico si riconciliano il tool propone una riga tecnica'],
+      ['   separata da confermare, senza toccare le righe originali.'],
+      [''],
+      ['I fogli contengono un esempio completo e gia quadrato: sostituisci le righe con i tuoi conti.'],
+      [''],
+      ['Strumento didattico. La responsabilita della classificazione resta del professionista.']];
+    var wsI=XLSX.utils.aoa_to_sheet(istr);wsI['!cols']=[{wch:104}];
+    XLSX.utils.book_append_sheet(wb,wsI,'Istruzioni');
+
+    var anag=[['ANAGRAFICA SOCIETA',''],['',''],
+      ['Denominazione',''],['Forma giuridica',''],['Codice fiscale',''],['Partita IVA',''],
+      ['Capitale sociale',''],['Data costituzione',''],['Sede legale — indirizzo',''],['CAP',''],
+      ['Comune',''],['Provincia',''],['Iscrizione REA — sigla',''],['Numero REA',''],['PEC',''],
+      ['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio','abbreviato'],['Redatto da',''],
+      ['',''],['DATI DEL PROSPETTO DI DEPOSITO',''],['',''],
+      ['Capitale sociale interamente versato','si'],
+      ['Settore di attività prevalente (ATECO)',''],
+      ['Società in liquidazione','no'],
+      ['Società con socio unico','no'],
+      ['Soggetta a direzione e coordinamento','no'],
+      ['Appartenenza a un gruppo','no'],
+      ['Denominazione della società che esercita la direzione e il coordinamento','']];
+    var wsA=XLSX.utils.aoa_to_sheet(anag);wsA['!cols']=[{wch:66},{wch:44}];
+    XLSX.utils.book_append_sheet(wb,wsA,'Anagrafica');
+
+    var voci=[['CODICE','SEZIONE','DESCRIZIONE VOCE — schema abbreviato (art. 2435-bis)']];
+    VOCI_ABBR.forEach(function(v){voci.push([v.code,SECLABEL[v.sec],v.label]);});
+    voci.push([]);voci.push(['CODICE','SEZIONE','DESCRIZIONE VOCE — schema ordinario (artt. 2424 e 2425)']);
+    VOCI_ORD.forEach(function(v){voci.push([v.code,SECLABEL[v.sec],v.label]);});
+    var wsV=XLSX.utils.aoa_to_sheet(voci);wsV['!cols']=[{wch:14},{wch:32},{wch:104}];
+    XLSX.utils.book_append_sheet(wb,wsV,'Voci IV Direttiva');
+
+    var head=['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva'];
+    ['sp','ce'].forEach(function(src){
+      var rows=[head];
+      DEMO_ACCOUNTS.filter(function(a){return a.source===src;}).forEach(function(a){rows.push([a.code,a.desc,a.importo,a.importo_prev,a.voce]);});
+      var ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:16},{wch:42},{wch:26},{wch:26},{wch:18}];
+      XLSX.utils.book_append_sheet(wb,ws,src==='sp'?'Stato Patrimoniale':'Conto Economico');
+    });
+    XLSX.writeFile(wb,'Template_Bilancio_TaxAutomationLab.xlsx');
+    T('Template scaricato: contiene un esempio già quadrato da sostituire');
+  }catch(e){console.error(e);T('Errore nella creazione del template: '+e.message,true);}
+};
+try{downloadTemplate=window.downloadTemplate;}catch(_){}
+
+/* ---------------------------------------------------------------- *
+ * 6. Aggancio finale
+ * ---------------------------------------------------------------- */
+function install(){
+  document.documentElement.dataset.toolVersion=VERSION;
+  document.querySelectorAll('.tal-publication-label').forEach(function(x){x.textContent=String(x.textContent||'').replace(/v\d+\.\d+\.\d+/,'v'+VERSION);});
+  var nb=document.getElementById('tal-fs-new');if(nb)nb.onclick=resetAll;
+  warningHost();
+  syncExportView();
+  var v=viewFromLocation();
+  if(v)showView(v,{fromHash:true});
+  else{
+    var active=Array.prototype.filter.call(document.querySelectorAll('.fs-view'),function(x){return x.classList.contains('active');})[0];
+    var name=active?active.id.replace('view-',''):'archive';
+    try{history.replaceState(null,'','#/'+(HASH[name]||'clienti'));}catch(_){}
+  }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(install,0);},{once:true});
+else setTimeout(install,0);
+})();
+</script>
+
+<script id="tal-fs-v140-deposit-format">
+/* ====================================================================
+   Bilancio civilistico v1.4.0 — prospetto in formato di deposito.
+
+   Il prospetto precedente stampava la voce di gruppo con il suo importo
+   e poi le voci figlie: l'inverso del bilancio depositato, dove il
+   gruppo è un'intestazione senza numero e il totale chiude il blocco.
+   Qui l'ordine è quello degli artt. 2424 e 2425 c.c., con tutti i
+   totali intermedi previsti dalla tassonomia.
+   ==================================================================== */
+(function(){
+'use strict';
+
+/* Etichette ufficiali dei totali intermedi, per codice di nodo. */
+var TOTALS={
+  sp_attivo:{
+    'B':'Totale immobilizzazioni (B)',
+    'BI':'Totale immobilizzazioni immateriali',
+    'BII':'Totale immobilizzazioni materiali',
+    'BIII':'Totale immobilizzazioni finanziarie',
+    'BIII1':'Totale partecipazioni',
+    'BIII2':'Totale crediti',
+    'C':'Totale attivo circolante (C)',
+    'CI':'Totale rimanenze',
+    'CII':'Totale crediti',
+    'CIII':'Totale attività finanziarie che non costituiscono immobilizzazioni',
+    'CIV':'Totale disponibilità liquide'
+  },
+  sp_passivo:{
+    'A':'Totale patrimonio netto',
+    'B':'Totale fondi per rischi ed oneri',
+    'D':'Totale debiti'
+  },
+  ce:{
+    'A':'Totale valore della produzione',
+    'A5':'Totale altri ricavi e proventi',
+    'B':'Totale costi della produzione',
+    'B9':'Totale costi per il personale',
+    'B10':'Totale ammortamenti e svalutazioni',
+    'C':'Totale proventi e oneri finanziari (15 + 16 - 17 + - 17-bis)',
+    'C15':'Totale proventi da partecipazioni',
+    'C16':'Totale altri proventi finanziari',
+    'C16D':'Totale proventi diversi dai precedenti',
+    'C17':'Totale interessi e altri oneri finanziari',
+    'D':'Totale delle rettifiche di valore di attività e passività finanziarie',
+    'D18':'Totale rivalutazioni',
+    'D19':'Totale svalutazioni',
+    'IMP':'Totale delle imposte sul reddito dell\'esercizio, correnti, differite e anticipate'
+  }
+};
+
+function num(v){var x=Number(v||0);return Number.isFinite(x)?x:0;}
+function g(id){return String((document.getElementById(id)||{}).value||'').trim();}
+function zero(a,b){return Math.abs(num(a))<0.005&&Math.abs(num(b))<0.005;}
+function disp(kind,code,v){return window.V13&&V13.display?V13.display(kind,code,v):num(v);}
+function siNo(id){return g(id)==='si'?'sì':'no';}
+
+/* Righe di una sezione nella forma del prospetto depositato. */
+function sectionRows(section,secKey,kind,showAll){
+  var rows=[],map=TOTALS[secKey]||{};
+  function walk(node,lvl){
+    if(!showAll&&zero(node.amount,node.amountPrev))return;
+    var kids=(node.children||[]).length;
+    if(kids){
+      rows.push({label:node.label,lvl:lvl,group:true});
+      node.children.forEach(function(c){walk(c,lvl+1);});
+      rows.push({
+        label:map[node.code]||('Totale '+String(node.label).replace(/^[A-Z0-9)\-\s]*\)\s*/,'').toLowerCase()),
+        lvl:lvl,total:true,
+        amount:disp(kind,node.code,node.amount),
+        amountPrev:disp(kind,node.code,node.amountPrev)
+      });
+    }else{
+      rows.push({label:node.label,lvl:lvl,amount:disp(kind,node.code,node.amount),amountPrev:disp(kind,node.code,node.amountPrev)});
+    }
+  }
+  section.nodes.forEach(function(n){walk(n,0);});
+  return rows;
+}
+
+function itDate(iso){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||'').trim());
+  return m?(m[3]+'-'+m[2]+'-'+m[1]):'';
+}
+function priorDate(iso){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||'').trim());
+  return m?(m[3]+'-'+m[2]+'-'+(Number(m[1])-1)):'';
+}
+
+/* Blocco "Dati anagrafici" dell'intestazione del bilancio depositato. */
+var FORMA_UFFICIALE=window.FS_FORMA_UFFICIALE={
+  'S.r.l.':'SOCIETA\' A RESPONSABILITA\' LIMITATA',
+  'S.r.l.s.':'SOCIETA\' A RESPONSABILITA\' LIMITATA SEMPLIFICATA',
+  'S.p.A.':'SOCIETA\' PER AZIONI',
+  'S.a.p.A.':'SOCIETA\' IN ACCOMANDITA PER AZIONI',
+  'S.n.c.':'SOCIETA\' IN NOME COLLETTIVO',
+  'S.a.s.':'SOCIETA\' IN ACCOMANDITA SEMPLICE',
+  'Società cooperativa':'SOCIETA\' COOPERATIVA'
+};
+function anagraficaRows(){
+  var citta=[g('an_cap'),g('an_comune')].filter(Boolean).join(' ');
+  if(g('an_provincia'))citta=(citta?citta+' ':'')+'('+g('an_provincia')+')';
+  var sede=[g('an_indirizzo'),citta].filter(Boolean).join(' - ');
+  /* Il valore è già etichettato in Euro: la valuta nel numero è di troppo. */
+  var cap=g('an_capitale').replace(/[€$£\s]+$/,'').replace(/^[€$£\s]+/,'').trim();
+  if(cap&&g('an_capitale_versato')==='si')cap=cap+' i.v.';
+  var out=[
+    ['Sede in',sede],
+    ['Codice Fiscale',g('an_cf')],
+    ['Numero Rea',[g('an_rea_prov'),g('an_rea_num')].filter(Boolean).join(' ')],
+    ['P.I.',g('an_piva')],
+    ['Capitale Sociale Euro',cap],
+    ['Forma Giuridica',FORMA_UFFICIALE[g('an_forma')]||g('an_forma')],
+    ['Settore di attività prevalente (ATECO)',g('an_ateco')],
+    ['Società in liquidazione',siNo('an_liquidazione')],
+    ['Società con socio unico',siNo('an_socio_unico')],
+    ['Società sottoposta ad altrui attività di direzione e coordinamento',siNo('an_direzione_coord')],
+    ['Denominazione della società o ente che esercita l\'attività di direzione e coordinamento',g('an_direzione_denom')],
+    ['Appartenenza a un gruppo',siNo('an_gruppo')]
+  ];
+  return out.filter(function(r){return r[1]!==''||/liquidazione|socio unico|direzione e coordinamento|gruppo/.test(r[0]);});
+}
+
+/* Prospetto completo: attivo, passivo, conto economico con i subtotali
+   di legge interposti nell'ordine dell'art. 2425 c.c. */
+function buildDeposit(showAll){
+  var r=(typeof RESULT!=='undefined')?RESULT:null;if(!r)return null;
+  var att=sectionRows(r.sp_att,'sp_attivo','sp',showAll);
+  att.push({label:'Totale attivo',lvl:0,total:true,grand:true,amount:r.totAtt,amountPrev:r.totAttPrev});
+  var pas=sectionRows(r.sp_pas,'sp_passivo','sp',showAll);
+  pas.push({label:'Totale passivo',lvl:0,total:true,grand:true,amount:r.totPas,amountPrev:r.totPasPrev});
+
+  var map={};r.ce.nodes.forEach(function(n){map[n.code]=n;});
+  function block(codes){return sectionRows({nodes:codes.map(function(c){return map[c];}).filter(Boolean)},'ce','ce',showAll);}
+  var T=r.ceTotals,P=r.ceTotalsPrev,ce=[];
+  ce=ce.concat(block(['A','B']));
+  ce.push({label:'Differenza tra valore e costi della produzione (A - B)',lvl:0,total:true,amount:T.diffAB,amountPrev:P.diffAB});
+  ce=ce.concat(block(['C','D']));
+  ce.push({label:'Risultato prima delle imposte (A - B + - C + - D)',lvl:0,total:true,amount:T.utileAnteImposte,amountPrev:P.utileAnteImposte});
+  ce=ce.concat(block(['IMP']));
+  ce.push({label:'21) Utile (perdita) dell\'esercizio',lvl:0,total:true,grand:true,amount:T.utileEsercizio,amountPrev:P.utileEsercizio});
+
+  return {
+    denom:g('an_denom')||'Società',
+    closing:itDate(g('an_periodo_a')),
+    prior:priorDate(g('an_periodo_a')),
+    schema:r.mode==='ordinary'?'Schema ordinario — artt. 2424 e 2425 c.c.':'Schema abbreviato — art. 2435-bis c.c.',
+    anag:anagraficaRows(),
+    attivo:att,passivo:pas,ce:ce
+  };
+}
+window.fsBuildDeposit=buildDeposit;
+
+/* ---------------- Anteprima a schermo ---------------- */
+function renderDeposit(){
+  var host=document.getElementById('tab_deposito');if(!host)return;
+  var d=buildDeposit(false);
+  if(!d){host.innerHTML='<div class="all-done">Carica un bilancio per vedere il prospetto.</div>';return;}
+  function tbl(title,rows){
+    var h='<table class="xr xr-deposit"><thead><tr><th style="width:62%">'+escapeHtml(title)+'</th><th class="r">'+escapeHtml(d.closing||'Corrente')+'</th><th class="r">'+escapeHtml(d.prior||'Precedente')+'</th></tr></thead><tbody>';
+    rows.forEach(function(x){
+      var cls=x.grand?'xr-grand':(x.total?'xr-sub':(x.group?'xr-group':'xr-lvl'+x.lvl));
+      h+='<tr class="'+cls+'" style="--ind:'+x.lvl+'"><td style="padding-left:'+(10+x.lvl*16)+'px">'+escapeHtml(x.label)+'</td>'+
+         '<td class="r">'+(x.group?'':fmtX(x.amount))+'</td><td class="r">'+(x.group?'':fmtX(x.amountPrev))+'</td></tr>';
+    });
+    return h+'</tbody></table>';
+  }
+  var anag='<table class="xr xr-deposit"><tbody>'+d.anag.map(function(r){
+    return '<tr><td style="width:62%">'+escapeHtml(r[0])+'</td><td colspan="2">'+escapeHtml(r[1])+'</td></tr>';}).join('')+'</tbody></table>';
+  var head='<div class="fs-deposit-head"><h3>Bilancio di esercizio al '+escapeHtml(d.closing||'—')+'</h3>'+
+    '<p>'+escapeHtml(d.denom)+' · '+escapeHtml(d.schema)+'</p>'+
+    '<p class="bd">Questa è l\'anteprima esatta del PDF e dell\'Excel scaricabili da <b>Esporta</b>. Le voci con valore nullo in entrambi gli esercizi sono omesse, come nel bilancio depositato.</p></div>';
+  host.innerHTML=head+
+    '<h4 class="fs-deposit-cap">Dati anagrafici</h4>'+V13.tableWrap(anag)+
+    '<h4 class="fs-deposit-cap">Stato patrimoniale — Attivo</h4>'+V13.tableWrap(tbl('Voce',d.attivo))+
+    '<h4 class="fs-deposit-cap">Stato patrimoniale — Passivo</h4>'+V13.tableWrap(tbl('Voce',d.passivo))+
+    '<h4 class="fs-deposit-cap">Conto economico</h4>'+V13.tableWrap(tbl('Voce',d.ce));
+}
+window.fsRenderDeposit=renderDeposit;
+var baseRefresh=window.refreshAll;
+window.refreshAll=function(){var out=baseRefresh.apply(this,arguments);try{renderDeposit();}catch(e){console.error(e);}return out;};
+try{refreshAll=window.refreshAll;}catch(_){}
+
+/* ---------------- PDF in formato di deposito ---------------- */
+var BAND=[202,223,240];
+function safe(s){return window.V13&&V13.pdfSafeText?V13.pdfSafeText(s):String(s==null?'':s);}
+
+window.exportOfficialPDF=function(){
+  try{
+    if(window.V13&&V13.pdfGuard)V13.pdfGuard();
+    var d=buildDeposit(false);
+    if(!d){if(window.toast)toast('Nessun bilancio da esportare',true);return;}
+    var jsPDF=window.jspdf.jsPDF,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+
+    doc.setFont('times','bold');doc.setFontSize(16);doc.setTextColor(20);
+    doc.text(safe(d.denom),14,18);
+    doc.setFont('times','normal');doc.setFontSize(12);
+    doc.text(safe('Bilancio di esercizio al '+(d.closing||'—')),14,25);
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90);
+    doc.text(safe(d.schema),14,30.5);doc.setTextColor(20);
+
+    doc.autoTable({
+      startY:35,head:[[{content:safe('Dati anagrafici'),colSpan:2,styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold'}}]],
+      body:d.anag.map(function(r){return [safe(r[0]),safe(r[1])];}),
+      theme:'striped',styles:{font:'helvetica',fontSize:7.2,cellPadding:1.3,textColor:[20,20,20],lineWidth:0},
+      bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:[246,248,250]},
+      columnStyles:{0:{cellWidth:110},1:{cellWidth:72}},margin:{left:14,right:14,bottom:16}
+    });
+
+    function table(caption,rows,startY){
+      doc.autoTable({
+        startY:startY,
+        head:[[
+          {content:safe(caption),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'left'}},
+          {content:safe(d.closing||'Corrente'),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'right'}},
+          {content:safe(d.prior||'Precedente'),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'right'}}
+        ]],
+        body:rows.map(function(x){
+          var st=x.grand?{fontStyle:'bold',fillColor:BAND,textColor:[20,20,20]}
+                :(x.total?{fontStyle:'bold'}
+                :(x.group?{fontStyle:'bold',textColor:[40,40,40]}:{}));
+          return [
+            {content:safe('   '.repeat(x.lvl)+x.label),styles:st},
+            {content:x.group?'':safe(fmtX(x.amount)),styles:Object.assign({halign:'right'},st)},
+            {content:x.group?'':safe(fmtX(x.amountPrev)),styles:Object.assign({halign:'right'},st)}
+          ];
+        }),
+        theme:'striped',
+        styles:{font:'helvetica',fontSize:7.3,cellPadding:1.35,textColor:[20,20,20],lineWidth:0},
+        bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:[246,248,250]},
+        columnStyles:{0:{cellWidth:126},1:{cellWidth:28,halign:'right'},2:{cellWidth:28,halign:'right'}},
+        margin:{left:14,right:14,bottom:16}
+      });
+      return doc.lastAutoTable.finalY;
+    }
+
+    var y=table('Stato patrimoniale — Attivo',d.attivo,doc.lastAutoTable.finalY+5);
+    table('Stato patrimoniale — Passivo',d.passivo,y+4);
+    doc.addPage();
+    table('Conto economico',d.ce,18);
+
+    var pages=doc.getNumberOfPages();
+    for(var i=1;i<=pages;i++){
+      doc.setPage(i);doc.setFontSize(6.8);doc.setTextColor(120);
+      doc.text(safe(d.denom+' · Bilancio al '+(d.closing||'—')),14,291);
+      doc.text(safe('Pag. '+i+' di '+pages),196,291,{align:'right'});
+    }
+    var name=(d.denom||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);
+    doc.save('Bilancio_'+name+'_'+String(d.closing||'').replace(/-/g,'')+'.pdf');
+    if(window.toast)toast('Bilancio in formato di deposito esportato');
+  }catch(e){console.error(e);if(window.toast)toast('Errore export bilancio: '+e.message,true);}
+};
+
+/* ---------------- Excel in formato di deposito ---------------- */
+window.exportOfficialExcel=function(){
+  try{
+    if(window.V13&&V13.sheetGuard)V13.sheetGuard();
+    var d=buildDeposit(false);
+    if(!d){if(window.toast)toast('Nessun bilancio da esportare',true);return;}
+    var wb=XLSX.utils.book_new();
+    function sheet(rows,name,caption){
+      var aoa=[[d.denom,'',''],['Bilancio di esercizio al '+(d.closing||'—'),'',''],[d.schema,'',''],['','',''],
+               [caption,d.closing||'Corrente',d.prior||'Precedente']];
+      rows.forEach(function(x){
+        aoa.push(['    '.repeat(x.lvl)+x.label,
+                  x.group?'':round2(num(x.amount)),
+                  x.group?'':round2(num(x.amountPrev))]);
+      });
+      var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:84},{wch:20},{wch:20}];
+      XLSX.utils.book_append_sheet(wb,ws,name);
+    }
+    var anag=[['Bilancio di esercizio al '+(d.closing||'—'),''],['',''],['Dati anagrafici','']]
+      .concat(d.anag.map(function(r){return [r[0],r[1]];}));
+    var wsA=XLSX.utils.aoa_to_sheet(anag);wsA['!cols']=[{wch:84},{wch:44}];
+    XLSX.utils.book_append_sheet(wb,wsA,'Dati anagrafici');
+    sheet(d.attivo,'SP Attivo','Stato patrimoniale — Attivo');
+    sheet(d.passivo,'SP Passivo','Stato patrimoniale — Passivo');
+    sheet(d.ce,'Conto economico','Conto economico');
+    var name=(d.denom||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);
+    XLSX.writeFile(wb,'Bilancio_'+name+'_'+String(d.closing||'').replace(/-/g,'')+'.xlsx');
+    if(window.toast)toast('Bilancio in formato di deposito esportato');
+  }catch(e){console.error(e);if(window.toast)toast('Errore export bilancio: '+e.message,true);}
+};
+
+/* Gli export ufficiali passano dallo stesso blocco di sicurezza degli altri. */
+setTimeout(function(){
+  ['exportOfficialPDF','exportOfficialExcel'].forEach(function(name){
+    var fn=window[name];if(typeof fn!=='function'||fn.__talGate)return;
+    var w=function(){
+      var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
+      if(pending.length){if(window.toast)toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);
+        window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
+      if(typeof RESULT==='undefined'||!RESULT){if(window.toast)toast('Export bloccato: risultati non disponibili.',true);return;}
+      if(Math.abs(num(RESULT.totAtt)-num(RESULT.totPas))>0.5){
+        if(window.toast)toast('Export bloccato: Stato Patrimoniale non quadrato.',true);
+        window.fsShowView('results');var c=document.querySelector('[data-tab="checks"]');if(c)c.click();return;}
+      if(!document.getElementById('an_periodo_a').value){
+        if(window.toast)toast('Indica la data di chiusura dell’esercizio in Anagrafica: è l’intestazione del bilancio.',true);
+        window.fsShowView('anagrafica');return;}
+      return fn.apply(this,arguments);
+    };
+    w.__talGate=true;window[name]=w;
+  });
+},0);
+
+var css=document.createElement('style');
+css.textContent='.xr-deposit tr.xr-group td{font-weight:700;background:#f2f6f8}'+
+  '.xr-deposit tr.xr-sub td{font-weight:700}'+
+  '.fs-deposit-head h3{margin:0 0 4px;font-size:17px}'+
+  '.fs-deposit-head p{margin:0 0 6px;font-size:13px}'+
+  '.fs-deposit-cap{margin:22px 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#145368}';
+document.head.appendChild(css);
+})();
+</script>
+
+<script id="tal-fs-v140-xbrl">
+/* ====================================================================
+   Bilancio civilistico v1.4.0 — istanza XBRL.
+
+   I nomi degli elementi sono quelli della Tassonomia Principi Contabili
+   Italiani PCI 2018-11-04 (XBRL Italia), namespace
+   http://www.infocamere.it/itnn/fr/itcc/ci/2018-11-04, prefisso itcc-ci.
+   L'istanza copre stato patrimoniale e conto economico: non contiene
+   nota integrativa, quindi da sola non è un fascicolo di deposito
+   completo.
+   ==================================================================== */
+(function(){
+'use strict';
+
+var NS='http://www.infocamere.it/itnn/fr/itcc/ci/2018-11-04';
+/* Struttura ricavata da un'istanza realmente depositata (Registro delle
+   imprese, esercizio 2025, schema abbreviato). Tre cose non si deducono
+   dalla tassonomia e sono state prese da lì:
+   · lo schemaRef è un riferimento RELATIVO al file della tassonomia;
+   · lo scheme dell'identificativo è http://www.infocamere.it e il valore
+     è il codice fiscale numerico, senza il prefisso IT;
+   · ogni contesto porta uno <scenario> con <scen>itcc-ci:depositato</scen>.
+     L'elemento "scen" non esiste nella tassonomia PCI: lo aggiunge il
+     software di deposito, ed è il marcatore che distingue il bilancio
+     depositato. Senza quel blocco l'istanza non è quella che il Registro
+     si aspetta.
+   Il prefisso dello scenario dipende dallo schema: itcc-ci-abb per
+   l'abbreviato (confermato), itcc-ci-ese per l'ordinario (per simmetria,
+   non verificato su un'istanza reale). */
+var CFG=window.FS_XBRL_CONFIG={
+  entryPoint:{abbrev:'itcc-ci-abb-2018-11-04.xsd',ordinary:'itcc-ci-ese-2018-11-04.xsd'},
+  scenarioNs:{
+    abbrev:{prefix:'itcc-ci-abb',uri:'http://www.infocamere.it/itnn/fr/itcc/ci/abb/2018-11-04'},
+    ordinary:{prefix:'itcc-ci-ese',uri:'http://www.infocamere.it/itnn/fr/itcc/ci/ese/2018-11-04'}
+  },
+  scenarioValue:'itcc-ci:depositato',
+  identifierScheme:'http://www.infocamere.it',
+  taxonomy:'PCI 2018-11-04',
+  ordinaryScenarioVerified:false
+};
+
+/* ---- Conto economico: identico nei due schemi ---- */
+var CE_LEAF={
+  A1:'ValoreProduzioneRicaviVenditePrestazioni',
+  A2:'ValoreProduzioneVariazioniRimanenzeProdottiCorsoLavorazioneSemilavoratiFiniti',
+  A3:'ValoreProduzioneVariazioniLavoriCorsoOrdinazione',
+  A4:'ValoreProduzioneIncrementiImmobilizzazioniLavoriInterni',
+  A5A:'ValoreProduzioneAltriRicaviProventiContributiContoEsercizio',
+  A5B:'ValoreProduzioneAltriRicaviProventiAltri',
+  B6:'CostiProduzioneMateriePrimeSussidiarieConsumoMerci',
+  B7:'CostiProduzioneServizi',
+  B8:'CostiProduzioneGodimentoBeniTerzi',
+  B9A:'CostiProduzionePersonaleSalariStipendi',
+  B9B:'CostiProduzionePersonaleOneriSociali',
+  B9C:'CostiProduzionePersonaleTrattamentoFineRapporto',
+  B9D:'CostiProduzionePersonaleTrattamentoQuiescenzaSimili',
+  B9E:'CostiProduzionePersonaleAltriCosti',
+  B10A:'CostiProduzioneAmmortamentiSvalutazioniAmmortamentoImmobilizzazioniImmateriali',
+  B10B:'CostiProduzioneAmmortamentiSvalutazioniAmmortamentoImmobilizzazioniMateriali',
+  B10C:'CostiProduzioneAmmortamentiSvalutazioniAltreSvalutazioniImmobilizzazioni',
+  B10D:'CostiProduzioneAmmortamentiSvalutazioniSvalutazioniCreditiCompresiAttivoCircolanteDisponibilitaLiquide',
+  B11:'CostiProduzioneVariazioniRimanenzeMateriePrimeSussidiarieConsumoMerci',
+  B12:'CostiProduzioneAccantonamentiRischi',
+  B13:'CostiProduzioneAltriAccantonamenti',
+  B14:'CostiProduzioneOneriDiversiGestione',
+  C15A:'ProventiOneriFinanziariProventiPartecipazioniImpreseControllate',
+  C15B:'ProventiOneriFinanziariProventiPartecipazioniImpreseCollegate',
+  C15C:'ProventiOneriFinanziariProventiPartecipazioniImpreseControllanti',
+  C15D:'ProventiOneriFinanziariProventiPartecipazioniImpreseSottoposteControlloControllanti',
+  C15E:'ProventiOneriFinanziariProventiPartecipazioniAltri',
+  C16A:'ProventiOneriFinanziariAltriProventiFinanziariCreditiIscrittiImmobilizzazioniTotaleProventiFinanziariCreditiIscrittiImmobilizzazioni',
+  C16B:'ProventiOneriFinanziariAltriProventiFinanziariTitoliIscrittiImmobilizzazioniNonCostituisconoPartecipazioni',
+  C16C:'ProventiOneriFinanziariAltriProventiFinanziariTitoliIscrittiAttivoCircolanteNonCostituisconoPartecipazioni',
+  C16D1:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiImpreseControllate',
+  C16D2:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiImpreseCollegate',
+  C16D3:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiImpreseControllanti',
+  C16D4:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiImpreseSottoposteControlloControllanti',
+  C16D5:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiAltri',
+  C17A:'ProventiOneriFinanziariInteressiAltriOneriFinanziariVersoImpreseControllate',
+  C17B:'ProventiOneriFinanziariInteressiAltriOneriFinanziariVersoImpreseCollegate',
+  C17C:'ProventiOneriFinanziariInteressiAltriOneriFinanziariVersoImpreseControllanti',
+  C17D:'ProventiOneriFinanziariInteressiAltriOneriFinanziariVersoImpreseSottoposteControlloControllanti',
+  C17E:'ProventiOneriFinanziariInteressiAltriOneriFinanziariAltri',
+  C17BIS:'ProventiOneriFinanziariUtiliPerditeCambi',
+  D18A:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniPartecipazioni',
+  D18B:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniImmobilizzazioniFinanziarieNonCostituisconoPartecipazioni',
+  D18C:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniTitoliIscrittiAttivoCircolanteNonCostituisconoPartecipazioni',
+  D18D:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniStrumentiFinanziariDerivati',
+  D19A:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniPartecipazioni',
+  D19B:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniImmobilizzazioniFinanziarieNonCostituisconoPartecipazioni',
+  D19C:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniTitoliIscrittiAttivoCircolanteNonCostituisconoPartecipazioni',
+  D19D:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniStrumentiFinanziariDerivati',
+  '20A':'ImposteRedditoEsercizioCorrentiDifferiteAnticipateImposteCorrenti',
+  '20B':'ImposteRedditoEsercizioCorrentiDifferiteAnticipateImposteRelativeEserciziPrecedenti',
+  '20C':'ImposteRedditoEsercizioCorrentiDifferiteAnticipateImposteDifferiteAnticipate',
+  '20D':'ImposteRedditoEsercizioCorrentiDifferiteAnticipateProventiOneriAdesioneRegimeConsolidatoFiscaleTrasparenzaFiscale',
+  /* Nello schema abbreviato queste quattro sono voci-foglia che
+     aggregano più codici (art. 2435-bis), non totali di sottovoci:
+     nell'ordinario gli stessi codici sono nodi con figli e li trova
+     CE_TOT. Stare in entrambe le mappe è corretto. */
+  A2A3:'ValoreProduzioneVariazioniRimanenzeProdottiCorsoLavorazioneSemilavoratiFinitiLavoriCorsoOrdinazione',
+  C16BC:'ProventiOneriFinanziariAltriProventiFinanziariTitoliIscrittiImmobilizzazioniNonCostituisconoPartecipazioniTitoliIscrittiAttivoCircolanteNonCostituisconoPartecipazioni',
+  D18:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniTotaleRivalutazioni',
+  D19:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniTotaleSvalutazioni'
+};
+var CE_TOT={
+  A2A3:'ValoreProduzioneVariazioniRimanenzeProdottiCorsoLavorazioneSemilavoratiFinitiLavoriCorsoOrdinazione',
+  A5:'ValoreProduzioneAltriRicaviProventiTotaleAltriRicaviProventi',
+  A:'TotaleValoreProduzione',
+  B9:'CostiProduzionePersonaleTotaleCostiPersonale',
+  B10:'CostiProduzioneAmmortamentiSvalutazioniTotaleAmmortamentiSvalutazioni',
+  B:'TotaleCostiProduzione',
+  C15:'ProventiOneriFinanziariProventiPartecipazioniTotaleProventiPartecipazioni',
+  C16BC:'ProventiOneriFinanziariAltriProventiFinanziariTitoliIscrittiImmobilizzazioniNonCostituisconoPartecipazioniTitoliIscrittiAttivoCircolanteNonCostituisconoPartecipazioni',
+  C16D:'ProventiOneriFinanziariAltriProventiFinanziariProventiDiversiPrecedentiTotaleProventiDiversiPrecedenti',
+  C16:'ProventiOneriFinanziariAltriProventiFinanziariTotaleAltriProventiFinanziari',
+  C17:'ProventiOneriFinanziariInteressiAltriOneriFinanziariTotaleInteressiAltriOneriFinanziari',
+  C:'TotaleProventiOneriFinanziari',
+  D18:'RettificheValoreAttivitaPassivitaFinanziarieRivalutazioniTotaleRivalutazioni',
+  D19:'RettificheValoreAttivitaPassivitaFinanziarieSvalutazioniTotaleSvalutazioni',
+  D:'TotaleRettificheValoreAttivitaPassivitaFinanziarie',
+  IMP:'ImposteRedditoEsercizioCorrentiDifferiteAnticipateTotaleImposteRedditoEsercizioCorrentiDifferiteAnticipate'
+};
+
+/* ---- Stato patrimoniale, schema abbreviato ---- */
+var SP_ABBR_LEAF={
+  'att:A':'TotaleCreditiVersoSociVersamentiAncoraDovuti',
+  A_ATT:'TotaleCreditiVersoSociVersamentiAncoraDovuti',
+  'pas:B':'TotaleFondiRischiOneri', 'pas:C':'TrattamentoFineRapportoLavoroSubordinato',
+  'att:D':'AttivoRateiRisconti', 'pas:E':'PassivoRateiRisconti',
+  BI:'TotaleImmobilizzazioniImmateriali',
+  BII:'TotaleImmobilizzazioniMateriali',
+  BIII:'TotaleImmobilizzazioniFinanziarie',
+  CI:'TotaleRimanenze',
+  CIIE:'CreditiEsigibiliEntroEsercizioSuccessivo',
+  CIIO:'CreditiEsigibiliOltreEsercizioSuccessivo',
+  CIIIA:'CreditiImposteAnticipateTotaleImposteAnticipate',
+  CIII:'TotaleAttivitaFinanziarieNonCostituisconoImmobilizzazioni',
+  CIV:'TotaleDisponibilitaLiquide',
+  D_ATT:'AttivoRateiRisconti', D:'AttivoRateiRisconti',
+  AI:'PatrimonioNettoCapitale',
+  AII:'PatrimonioNettoRiservaSoprapprezzoAzioni',
+  AIII:'PatrimonioNettoRiserveRivalutazione',
+  AIV:'PatrimonioNettoRiservaLegale',
+  AV:'PatrimonioNettoRiserveStatutarie',
+  AVI:'PatrimonioNettoAltreRiserveDistintamenteIndicateTotaleAltreRiserve',
+  AVII:'PatrimonioNettoRiservaOperazioniCoperturaFlussiFinanziariAttesi',
+  AVIII:'PatrimonioNettoUtiliPerditePortatiNuovo',
+  AIX:'PatrimonioNettoUtilePerditaEsercizio',
+  AX:'PatrimonioNettoRiservaNegativaAzioniPropriePortafoglio',
+  B_PAS:'TotaleFondiRischiOneri', B:'TotaleFondiRischiOneri',
+  C:'TrattamentoFineRapportoLavoroSubordinato',
+  DE:'DebitiEsigibiliEntroEsercizioSuccessivo',
+  DO:'DebitiEsigibiliOltreEsercizioSuccessivo',
+  E:'PassivoRateiRisconti'
+};
+/* I codici dei nodi si ripetono fra attivo e passivo — B è
+   Immobilizzazioni nell'attivo e Fondi per rischi e oneri nel passivo —
+   quindi le voci ambigue sono qualificate con la sezione. */
+var SP_TOT={
+  'att:A':'TotaleCreditiVersoSociVersamentiAncoraDovuti',
+  'att:B':'TotaleImmobilizzazioni', CII:'TotaleCrediti', 'att:C':'TotaleAttivoCircolante',
+  'pas:A':'TotalePatrimonioNetto', 'pas:B':'TotaleFondiRischiOneri', 'pas:D':'TotaleDebiti'
+};
+
+/* ---- Stato patrimoniale, schema ordinario ---- *
+ * Le voci con dettaglio "entro / oltre l'esercizio" nella tassonomia
+ * puntano al totale della voce: il tool non gestisce quella distinzione
+ * per singola controparte e non inventa la ripartizione. La schermata di
+ * verifica lo dichiara.                                               */
+var SP_ORD_LEAF={
+  'att:A':'TotaleCreditiVersoSociVersamentiAncoraDovuti',
+  A_ATT:'TotaleCreditiVersoSociVersamentiAncoraDovuti',
+  'pas:C':'TrattamentoFineRapportoLavoroSubordinato',
+  'att:D':'AttivoRateiRisconti', 'pas:E':'PassivoRateiRisconti',
+  BI1:'ImmobilizzazioniImmaterialiCostiImpiantoAmpliamento',
+  BI2:'ImmobilizzazioniImmaterialiCostiSviluppo',
+  BI3:'ImmobilizzazioniImmaterialiDirittiBrevettoIndustrialeDirittiUtilizzazioneOpereIngegno',
+  BI4:'ImmobilizzazioniImmaterialiConcessioniLicenzeMarchiDirittiSimili',
+  BI5:'ImmobilizzazioniImmaterialiAvviamento',
+  BI6:'ImmobilizzazioniImmaterialiImmobilizzazioniCorsoAcconti',
+  BI7:'ImmobilizzazioniImmaterialiAltre', BI:'ImmobilizzazioniImmaterialiAltre',
+  BII1:'ImmobilizzazioniMaterialiTerreniFabbricati',
+  BII2:'ImmobilizzazioniMaterialiImpiantiMacchinario',
+  BII3:'ImmobilizzazioniMaterialiAttrezzatureIndustrialiCommerciali',
+  BII4:'ImmobilizzazioniMaterialiAltriBeni',
+  BII5:'ImmobilizzazioniMaterialiImmobilizzazioniCorsoAcconti', BII:'ImmobilizzazioniMaterialiImmobilizzazioniCorsoAcconti',
+  BIII1a:'ImmobilizzazioniFinanziariePartecipazioniImpreseControllate',
+  BIII1b:'ImmobilizzazioniFinanziariePartecipazioniImpreseCollegate',
+  BIII1c:'ImmobilizzazioniFinanziariePartecipazioniImpreseControllanti',
+  BIII1d:'ImmobilizzazioniFinanziariePartecipazioniAltreImprese',
+  BIII2a:'ImmobilizzazioniFinanziarieCreditiVersoImpreseControllateTotaleCreditiVersoImpreseControllate',
+  BIII2b:'ImmobilizzazioniFinanziarieCreditiVersoImpreseCollegateTotaleCreditiVersoImpreseCollegate',
+  BIII2c:'ImmobilizzazioniFinanziarieCreditiVersoControllantiTotaleCreditiVersoControllanti',
+  BIII2d:'ImmobilizzazioniFinanziarieCreditiVersoAltriTotaleCreditiVersoAltri', BIII:'ImmobilizzazioniFinanziarieCreditiVersoAltriTotaleCreditiVersoAltri',
+  BIII3:'ImmobilizzazioniFinanziarieAltriTitoli',
+  CI1:'RimanenzeMateriePrimeSussidiarieConsumo',
+  CI2:'RimanenzeProdottiCorsoLavorazioneSemilavorati',
+  CI3:'RimanenzeLavoriCorsoOrdinazione',
+  CI4:'RimanenzeProdottiFinitiMerci', CI:'RimanenzeProdottiFinitiMerci',
+  CI5:'RimanenzeAcconti',
+  CII1:'CreditiVersoClientiTotaleCreditiVersoClienti',
+  CII2:'CreditiVersoImpreseControllateTotaleCreditiVersoImpreseControllate',
+  CII3:'CreditiVersoImpreseCollegateTotaleCreditiVersoImpreseCollegate',
+  CII4:'CreditiVersoControllantiTotaleCreditiVersoControllanti',
+  CII5:'CreditiVersoImpreseSottoposteControlloControllantiTotaleCreditiVersoImpreseSottoposteControlloControllanti',
+  CII5bis:'CreditiCreditiTributariTotaleCreditiTributari',
+  CII5ter:'CreditiImposteAnticipateTotaleImposteAnticipate', CIIIA:'CreditiImposteAnticipateTotaleImposteAnticipate',
+  CII5quater:'CreditiVersoAltriTotaleCreditiVersoAltri', CIIE:'CreditiVersoAltriTotaleCreditiVersoAltri', CIIO:'CreditiVersoAltriTotaleCreditiVersoAltri',
+  CIII1:'AttivitaFinanziarieNonCostituisconoImmobilizzazioniPartecipazioniImpreseControllate',
+  CIII4:'AttivitaFinanziarieNonCostituisconoImmobilizzazioniAltrePartecipazioni',
+  CIII6:'AttivitaFinanziarieNonCostituisconoImmobilizzazioniAltriTitoli', CIII:'AttivitaFinanziarieNonCostituisconoImmobilizzazioniAltriTitoli',
+  CIV1:'DisponibilitaLiquideDepositiBancariPostali', CIV:'DisponibilitaLiquideDepositiBancariPostali',
+  CIV3:'DisponibilitaLiquideDanaroValoriCassa',
+  D_ATT:'AttivoRateiRisconti', D:'AttivoRateiRisconti',
+  AI:'PatrimonioNettoCapitale',
+  AII:'PatrimonioNettoRiservaSoprapprezzoAzioni',
+  AIII:'PatrimonioNettoRiserveRivalutazione',
+  AIV:'PatrimonioNettoRiservaLegale',
+  AV:'PatrimonioNettoRiserveStatutarie',
+  AVI:'PatrimonioNettoAltreRiserveDistintamenteIndicateTotaleAltreRiserve',
+  AVII:'PatrimonioNettoRiservaOperazioniCoperturaFlussiFinanziariAttesi',
+  AVIII:'PatrimonioNettoUtiliPerditePortatiNuovo',
+  AIX:'PatrimonioNettoUtilePerditaEsercizio',
+  AX:'PatrimonioNettoRiservaNegativaAzioniPropriePortafoglio',
+  B1:'FondiRischiOneriTrattamentoQuiescenzaObblighiSimili',
+  B2:'FondiRischiOneriImposteAncheDifferite',
+  B3:'FondiRischiOneriStrumentiFinanziariDerivatiPassivi',
+  B4:'FondiRischiOneriAltri', B_PAS:'FondiRischiOneriAltri', B:'FondiRischiOneriAltri',
+  C:'TrattamentoFineRapportoLavoroSubordinato',
+  D1:'DebitiObbligazioniTotaleObbligazioni',
+  D3:'DebitiDebitiVersoSociFinanziamentiTotaleDebitiVersoSociFinanziamenti',
+  D4:'DebitiDebitiVersoBancheTotaleDebitiVersoBanche',
+  D5:'DebitiDebitiVersoAltriFinanziatoriTotaleDebitiVersoAltriFinanziatori',
+  D6:'DebitiAccontiTotaleAcconti',
+  D7:'DebitiDebitiVersoFornitoriTotaleDebitiVersoFornitori',
+  D9:'DebitiDebitiVersoImpreseControllateTotaleDebitiVersoImpreseControllate',
+  D10:'DebitiDebitiVersoImpreseCollegateTotaleDebitiVersoImpreseCollegate',
+  D11:'DebitiDebitiVersoControllantiTotaleDebitiVersoControllanti',
+  D11bis:'DebitiDebitiVersoImpreseSottoposteControlloControllantiTotaleDebitiVersoImpreseSottoposteControlloControllanti',
+  D12:'DebitiDebitiTributariTotaleDebitiTributari',
+  D13:'DebitiDebitiVersoIstitutiPrevidenzaSicurezzaSocialeTotaleDebitiVersoIstitutiPrevidenzaSicurezzaSociale',
+  D14:'DebitiAltriDebitiTotaleAltriDebiti', DE:'DebitiAltriDebitiTotaleAltriDebiti', DO:'DebitiAltriDebitiTotaleAltriDebiti',
+  E:'PassivoRateiRisconti'
+};
+var SP_ORD_TOT={
+  BI:'TotaleImmobilizzazioniImmateriali', BII:'TotaleImmobilizzazioniMateriali',
+  BIII1:'ImmobilizzazioniFinanziariePartecipazioniTotalePartecipazioni',
+  BIII2:'ImmobilizzazioniFinanziarieCreditiTotaleCrediti',
+  BIII:'TotaleImmobilizzazioniFinanziarie', 'att:B':'TotaleImmobilizzazioni',
+  CI:'TotaleRimanenze', CII:'TotaleCrediti',
+  CIII:'TotaleAttivitaFinanziarieNonCostituisconoImmobilizzazioni',
+  CIV:'TotaleDisponibilitaLiquide', 'att:C':'TotaleAttivoCircolante',
+  'pas:A':'TotalePatrimonioNetto', 'pas:B':'TotaleFondiRischiOneri', 'pas:D':'TotaleDebiti'
+};
+/* Voci ordinarie il cui elemento è il totale di una voce che la
+   tassonomia articola per scadenza: da verificare prima del deposito. */
+var ORD_AGGREGATED=['BIII2a','BIII2b','BIII2c','BIII2d','BIII','CII1','CII2','CII3','CII4','CII5','CII5bis','CII5quater','CIIE','CIIO','D1','D3','D4','D5','D6','D7','D9','D10','D11','D11bis','D12','D13','D14','DE','DO','C16A'];
+
+function num(v){var x=Number(v||0);return Number.isFinite(x)?x:0;}
+function gv(id){return String((document.getElementById(id)||{}).value||'').trim();}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function money(v){return (Math.round(num(v)*100)/100).toFixed(2);}
+/* Il bilancio depositato è in unità di euro. */
+function euro(v){return String(Math.round(num(v)));}
+function digits(s){return String(s==null?'':s).replace(/\D+/g,'');}
+function parseAmount(s){return (window.V13&&V13.parseAmount)?V13.parseAmount(s):num(String(s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.'));}
+/* Formato della sede come nel depositato: senza punteggiatura, maiuscolo. */
+function sede(){
+  return [gv('an_indirizzo'),gv('an_comune'),gv('an_provincia')]
+    .filter(Boolean).join(' ').replace(/[.,;]/g,'').replace(/\s+/g,' ').trim().toUpperCase();
+}
+
+/* Percorre l'albero e raccoglie i fact: foglie sui codici mappati,
+   nodi sui totali. Registra quello che non riesce a mappare. */
+function collect(section,leafMap,totMap,kind,facts,skipped,sec){
+  /* La chiave qualificata con la sezione vince su quella nuda: serve
+     perché lo stesso codice di nodo ha significati diversi in attivo e
+     passivo. */
+  function pick(map,code){return (sec&&map[sec+':'+code]!==undefined)?map[sec+':'+code]:map[code];}
+  function walk(node){
+    var kids=(node.children||[]).length;
+    if(kids){
+      node.children.forEach(walk);
+      var t=pick(totMap,node.code);
+      if(t)facts.push({el:t,cur:disp(kind,node.code,node.amount),prev:disp(kind,node.code,node.amountPrev),src:node.label});
+      else if(!zeroBoth(node))skipped.push({code:node.code,label:node.label,kind:'totale',cur:node.amount});
+    }else{
+      var e=pick(leafMap,node.code);
+      if(e)facts.push({el:e,cur:disp(kind,node.code,node.amount),prev:disp(kind,node.code,node.amountPrev),src:node.label});
+      else if(!zeroBoth(node))skipped.push({code:node.code,label:node.label,kind:'voce',cur:node.amount});
+    }
+  }
+  section.nodes.forEach(walk);
+}
+function zeroBoth(n){return Math.abs(num(n.amount))<0.005&&Math.abs(num(n.amountPrev))<0.005;}
+/* Somma alcuni figli di un nodo in un elemento aggregato della tassonomia. */
+function aggregate(section,parentCode,childCodes,el,label,facts){
+  var parent=null;
+  (function walk(nodes){(nodes||[]).some(function(n){
+    if(n.code===parentCode){parent=n;return true;} return walk(n.children||[]);});})(section.nodes);
+  if(!parent)return;
+  var cur=0,prev=0,found=false;
+  (parent.children||[]).forEach(function(c){
+    if(childCodes.indexOf(c.code)<0)return;
+    found=true;
+    cur+=disp('ce',c.code,c.amount); prev+=disp('ce',c.code,c.amountPrev);
+  });
+  /* dur: sono voci di conto economico, vanno nei contesti di durata. */
+  if(found)facts.push({el:el,cur:round2(cur),prev:round2(prev),src:label,dur:true});
+}
+function disp(kind,code,v){return window.V13&&V13.display?V13.display(kind,code,v):num(v);}
+
+function buildFacts(){
+  var r=(typeof RESULT!=='undefined')?RESULT:null;if(!r)return null;
+  var ord=r.mode==='ordinary';
+  var spLeaf=ord?SP_ORD_LEAF:SP_ABBR_LEAF, spTot=ord?SP_ORD_TOT:SP_TOT;
+  var facts=[],skipped=[];
+  collect(r.sp_att,spLeaf,spTot,'sp',facts,skipped,'att');
+  facts.push({el:'TotaleAttivo',cur:r.totAtt,prev:r.totAttPrev,src:'Totale attivo'});
+  collect(r.sp_pas,spLeaf,spTot,'sp',facts,skipped,'pas');
+  facts.push({el:'TotalePassivo',cur:r.totPas,prev:r.totPasPrev,src:'Totale passivo'});
+  collect(r.ce,CE_LEAF,CE_TOT,'ce',facts,skipped,'ce');
+  /* Nello schema abbreviato il linkbase di calcolo non somma le voci di
+     dettaglio direttamente nel totale: passa da due elementi aggregati
+     intermedi. Senza di loro «Totale costi per il personale» e «Totale
+     ammortamenti e svalutazioni» risultano incoerenti in validazione. */
+  if(!ord){
+    aggregate(r.ce,'B9',['B9C','B9D','B9E'],
+      'CostiProduzionePersonaleTrattamentoFineRapportoTrattamentoQuiescenzaAltriCostiPersonale',
+      'c), d), e) trattamento di fine rapporto, quiescenza e altri costi',facts);
+    aggregate(r.ce,'B10',['B10A','B10B','B10C'],
+      'CostiProduzioneAmmortamentiSvalutazioniAmmortamentoImmobilizzazioniImmaterialiMaterialiAltreSvalutazioniImmobilizzazioni',
+      'a), b), c) ammortamenti delle immobilizzazioni e altre svalutazioni',facts);
+  }
+  facts.push({el:'DifferenzaValoreCostiProduzione',cur:r.ceTotals.diffAB,prev:r.ceTotalsPrev.diffAB,src:'Differenza (A - B)'});
+  facts.push({el:'RisultatoPrimaImposte',cur:r.ceTotals.utileAnteImposte,prev:r.ceTotalsPrev.utileAnteImposte,src:'Risultato prima delle imposte'});
+  facts.push({el:'UtilePerditaEsercizio',cur:r.ceTotals.utileEsercizio,prev:r.ceTotalsPrev.utileEsercizio,src:"21) Utile (perdita) dell'esercizio"});
+  /* Le voci nulle in entrambi gli esercizi non entrano nell'istanza, come
+     non entrano nel prospetto stampato: i due documenti devono dire la
+     stessa cosa. Restano sempre i totali portanti. */
+  var ALWAYS={TotaleAttivo:1,TotalePassivo:1,TotalePatrimonioNetto:1,TotaleValoreProduzione:1,
+    TotaleCostiProduzione:1,DifferenzaValoreCostiProduzione:1,RisultatoPrimaImposte:1,UtilePerditaEsercizio:1};
+  facts=facts.filter(function(f){
+    return ALWAYS[f.el]||Math.abs(num(f.cur))>=0.005||Math.abs(num(f.prev))>=0.005;
+  });
+  /* Un elemento una volta sola: vince l'ultima occorrenza dell'albero. */
+  var seen={},unique=[];
+  facts.forEach(function(f){if(seen[f.el]!==undefined)unique[seen[f.el]]=f;else{seen[f.el]=unique.length;unique.push(f);}});
+  var aggregated=[];
+  if(ord)ORD_AGGREGATED.forEach(function(c){
+    var e=spLeaf[c]||CE_LEAF[c];if(e&&seen[e]!==undefined)aggregated.push(c+' → '+e);
+  });
+  return {facts:unique,skipped:skipped,aggregated:aggregated,ord:ord,result:r};
+}
+window.fsXbrlFacts=buildFacts;
+
+function periods(){
+  var to=gv('an_periodo_a'), from=gv('an_periodo_da');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(to))return null;
+  var y=Number(to.slice(0,4));
+  var priorTo=(y-1)+to.slice(4);
+  var priorFrom=/^\d{4}-\d{2}-\d{2}$/.test(from)?(Number(from.slice(0,4))-1)+from.slice(4):(y-1)+'-01-01';
+  return {from:/^\d{4}-\d{2}-\d{2}$/.test(from)?from:y+'-01-01',to:to,priorFrom:priorFrom,priorTo:priorTo};
+}
+
+window.exportXBRL=function(){
+  try{
+    var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
+    if(pending.length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
+    var d=buildFacts();
+    if(!d){toast('Nessun bilancio da esportare',true);return;}
+    if(Math.abs(num(d.result.totAtt)-num(d.result.totPas))>0.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);return;}
+    var p=periods();
+    if(!p){toast('Indica il periodo dell’esercizio in Anagrafica: serve per i contesti XBRL.',true);window.fsShowView('anagrafica');return;}
+    /* L'identificativo dell'entità è il codice fiscale numerico: nel file
+       depositato non porta il prefisso IT della partita IVA. */
+    var id=digits(gv('an_cf'))||digits(gv('an_piva'));
+    if(!id){toast('Indica partita IVA o codice fiscale: è l’identificativo dell’entità XBRL.',true);window.fsShowView('anagrafica');return;}
+    var entry=d.ord?CFG.entryPoint.ordinary:CFG.entryPoint.abbrev;
+    var scn=d.ord?CFG.scenarioNs.ordinary:CFG.scenarioNs.abbrev;
+
+    var x=[];
+    x.push('<?xml version="1.0" encoding="UTF-8"?>');
+    x.push('<!-- Generato da Tax Automation Lab - Bilancio civilistico v1.4.0 -->');
+    x.push('<!-- Tassonomia '+CFG.taxonomy+'. Istanza limitata a dati anagrafici, stato patrimoniale e conto economico: non contiene la nota integrativa. -->');
+    x.push('<xbrl xmlns="http://www.xbrl.org/2003/instance"');
+    x.push('      xmlns:xbrli="http://www.xbrl.org/2003/instance"');
+    x.push('      xmlns:link="http://www.xbrl.org/2003/linkbase"');
+    x.push('      xmlns:xlink="http://www.w3.org/1999/xlink"');
+    x.push('      xmlns:iso4217="http://www.xbrl.org/2003/iso4217"');
+    x.push('      xmlns:itcc-ci="'+NS+'"');
+    x.push('      xmlns:'+scn.prefix+'="'+scn.uri+'">');
+    x.push('  <link:schemaRef xlink:type="simple" xlink:href="'+esc(entry)+'" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"/>');
+    function context(cid,periodXml){
+      x.push('  <context id="'+cid+'">');
+      x.push('    <entity><identifier scheme="'+esc(CFG.identifierScheme)+'">'+esc(id)+'</identifier></entity>');
+      x.push('    <period>'+periodXml+'</period>');
+      x.push('    <scenario><'+scn.prefix+':scen>'+esc(CFG.scenarioValue)+'</'+scn.prefix+':scen></scenario>');
+      x.push('  </context>');
+    }
+    context('c0_i','<instant>'+p.to+'</instant>');
+    context('c0_d','<startDate>'+p.from+'</startDate><endDate>'+p.to+'</endDate>');
+    context('c1_i','<instant>'+p.priorTo+'</instant>');
+    context('c1_d','<startDate>'+p.priorFrom+'</startDate><endDate>'+p.priorTo+'</endDate>');
+    x.push('  <unit id="EUR"><measure>iso4217:EUR</measure></unit>');
+
+    /* Dati anagrafici: nel bilancio depositato fanno parte dell'istanza. */
+    var nFacts=0;
+    function fact(el,value,ctx,attrs){
+      x.push('  <itcc-ci:'+el+' contextRef="'+ctx+'"'+(attrs||'')+'>'+esc(value)+'</itcc-ci:'+el+'>');
+      nFacts++;
+    }
+    function txt(el,value){if(String(value||'').trim())fact(el,String(value).trim(),'c0_i');}
+    function bool(el,idAttr){fact(el,gv(idAttr)==='si'?'true':'false','c0_i');}
+    var forma=(window.FS_FORMA_UFFICIALE&&window.FS_FORMA_UFFICIALE[gv('an_forma')])||gv('an_forma');
+    txt('DatiAnagraficiDenominazione',gv('an_denom'));
+    txt('DatiAnagraficiSede',sede());
+    if(digits(gv('an_capitale')))fact('DatiAnagraficiCapitaleSociale',euro(parseAmount(gv('an_capitale'))),'c0_i',' unitRef="EUR" decimals="0"');
+    bool('DatiAnagraficiCapitaleSocialeInteramenteVersato','an_capitale_versato');
+    txt('DatiAnagraficiCodiceCciaa',gv('an_rea_prov').toUpperCase());
+    txt('DatiAnagraficiPartitaIva',digits(gv('an_piva')));
+    txt('DatiAnagraficiCodiceFiscale',digits(gv('an_cf'))||id);
+    txt('DatiAnagraficiNumeroRea',digits(gv('an_rea_num')));
+    txt('DatiAnagraficiFormaGiuridica',forma);
+    txt('DatiAnagraficiSettoreAttivitaPrevalenteAteco',digits(gv('an_ateco')));
+    bool('DatiAnagraficiSocietaLiquidazione','an_liquidazione');
+    bool('DatiAnagraficiSocietaSocioUnico','an_socio_unico');
+    bool('DatiAnagraficiSocietaSottopostaAltruiAttivitaDirezioneCoordinamento','an_direzione_coord');
+    if(gv('an_direzione_coord')==='si')txt('DatiAnagraficiDenominazioneSocietaEnteEsercitaAttivitaDirezioneCoordinamento',gv('an_direzione_denom'));
+    bool('DatiAnagraficiAppartenenzaGruppo','an_gruppo');
+
+    /* Il periodType dell'elemento decide il contesto: le voci
+       patrimoniali sono istantanee, quelle di conto economico durata. */
+    var CE_ALL={};Object.keys(CE_LEAF).forEach(function(k){CE_ALL[CE_LEAF[k]]=1;});Object.keys(CE_TOT).forEach(function(k){CE_ALL[CE_TOT[k]]=1;});
+    ['DifferenzaValoreCostiProduzione','RisultatoPrimaImposte','UtilePerditaEsercizio'].forEach(function(e){CE_ALL[e]=1;});
+    /* Il bilancio si deposita in unità di euro. */
+    var rounded={};
+    d.facts.forEach(function(f){
+      var dur=(f.dur!==undefined)?f.dur:!!CE_ALL[f.el];
+      [['cur',dur?'c0_d':'c0_i'],['prev',dur?'c1_d':'c1_i']].forEach(function(pair){
+        var v=f[pair[0]];
+        if(v===undefined||v===null)return;
+        var r=euro(v);
+        rounded[f.el+'@'+pair[1]]=Number(r);
+        fact(f.el,r,pair[1],' unitRef="EUR" decimals="0"');
+      });
+    });
+    x.push('</xbrl>');
+
+    /* L'arrotondamento all'unità di euro può spostare una quadratura di
+       qualche euro: se accade va detto, non nascosto. */
+    var drift=[];
+    [['c0_i','corrente'],['c1_i','precedente']].forEach(function(c){
+      var a=rounded['TotaleAttivo@'+c[0]],b=rounded['TotalePassivo@'+c[0]];
+      if(a!==undefined&&b!==undefined&&a!==b)drift.push('attivo ≠ passivo '+c[1]+' di '+(a-b)+' €');
+    });
+    [['c0_d','c0_i','corrente'],['c1_d','c1_i','precedente']].forEach(function(c){
+      var u=rounded['UtilePerditaEsercizio@'+c[0]],pn=rounded['PatrimonioNettoUtilePerditaEsercizio@'+c[1]];
+      if(u!==undefined&&pn!==undefined&&u!==pn)drift.push('utile ≠ A.IX '+c[2]+' di '+(u-pn)+' €');
+    });
+    window.__fsXbrlDrift=drift;
+
+    var blob=new Blob([x.join('\n')],{type:'application/xml'});
+    var name=(gv('an_denom')||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);
+    triggerDownload(blob,'Bilancio_'+name+'_'+p.to.replace(/-/g,'')+'.xbrl');
+    var msg='Istanza XBRL generata: '+nFacts+' fact.';
+    if(d.skipped.length)msg+=' '+d.skipped.length+' voci con valore non mappate: apri Verifica corrispondenza.';
+    if(drift.length)msg+=' Arrotondamento all’unità di euro: '+drift.join(', ')+'.';
+    toast(msg,d.skipped.length>0||drift.length>0);
+  }catch(e){console.error(e);toast('Errore generazione XBRL: '+e.message,true);}
+};
+
+window.openXbrlMapping=function(){
+  var d=buildFacts();
+  var ov=document.createElement('div');ov.className='modal-ov open';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  var h='<div class="modal" style="max-width:900px"><button class="close-btn" aria-label="Chiudi">&times;</button>'+
+    '<h3>Corrispondenza voci ↔ tassonomia XBRL</h3>'+
+    '<p class="sub">Tassonomia '+esc(CFG.taxonomy)+' · namespace <span class="cell-code">'+esc(NS)+'</span></p>';
+  var ord=d&&d.ord;
+  h+='<div class="callout"><b>Struttura allineata a un\'istanza realmente depositata</b> (schema abbreviato, esercizio 2025).<br>'+
+     '· <span class="cell-code">schemaRef</span> relativo: <span class="cell-code">'+esc(ord?CFG.entryPoint.ordinary:CFG.entryPoint.abbrev)+'</span><br>'+
+     '· identificativo entità: scheme <span class="cell-code">'+esc(CFG.identifierScheme)+'</span>, valore = codice fiscale numerico<br>'+
+     '· ogni contesto porta <span class="cell-code">&lt;scenario&gt;&lt;'+esc((ord?CFG.scenarioNs.ordinary:CFG.scenarioNs.abbrev).prefix)+':scen&gt;'+esc(CFG.scenarioValue)+'&lt;/scen&gt;&lt;/scenario&gt;</span><br>'+
+     '· contesti <span class="cell-code">c0_i · c0_d · c1_i · c1_d</span>, importi in unità di euro con <span class="cell-code">decimals="0"</span></div>';
+  h+='<div class="callout warn"><b>Cosa manca per un deposito completo.</b> L\'istanza contiene dati anagrafici, stato patrimoniale e conto economico. '+
+     '<b>Non</b> contiene la nota integrativa (i blocchi <span class="cell-code">Introduzione*</span> e <span class="cell-code">Commento*</span>) né la dichiarazione di conformità: '+
+     'va completata con il software di deposito o con la nota integrativa redatta a parte.'+
+     (ord&&!CFG.ordinaryScenarioVerified?'<br><br><b>Schema ordinario:</b> il prefisso dello scenario (<span class="cell-code">'+esc(CFG.scenarioNs.ordinary.prefix)+'</span>) è stato dedotto per simmetria dall\'abbreviato e non è stato confrontato con un\'istanza ordinaria reale. Verificalo al primo deposito.':'')+
+     '</div>';
+  if(window.__fsXbrlDrift&&window.__fsXbrlDrift.length)
+    h+='<div class="callout bad"><b>Arrotondamento all\'unità di euro:</b> '+esc(window.__fsXbrlDrift.join(' · '))+'. Nel prospetto in centesimi la quadratura è esatta; nell\'istanza in euro resta questo scarto, da sistemare sui valori di origine.</div>';
+  if(!d)h+='<p class="bd">Carica un bilancio per vedere la corrispondenza.</p>';
+  else{
+    if(d.skipped.length)h+='<div class="callout bad"><b>'+d.skipped.length+' voci con valore non hanno un elemento corrispondente</b> e non entrano nell\'istanza: '+
+      d.skipped.map(function(s){return esc(s.code+' — '+s.label);}).join('; ')+'</div>';
+    if(d.aggregated.length)h+='<div class="callout warn"><b>'+d.aggregated.length+' voci dello schema ordinario</b> sono riportate sul totale della voce perché la tassonomia le articola per scadenza (entro / oltre l\'esercizio) e il tool non gestisce quella ripartizione: '+
+      d.aggregated.map(esc).join('; ')+'</div>';
+    h+='<div class="table-scroll"><table class="xr"><thead><tr><th>Voce del prospetto</th><th>Elemento XBRL</th><th class="r">Corrente</th><th class="r">Precedente</th></tr></thead><tbody>'+
+      d.facts.map(function(f){return '<tr><td>'+esc(f.src)+'</td><td class="cell-code" style="font-size:10px">'+esc(f.el)+'</td><td class="r">'+fmtX(f.cur)+'</td><td class="r">'+fmtX(f.prev)+'</td></tr>';}).join('')+
+      '</tbody></table></div>';
+  }
+  h+='</div>';
+  ov.innerHTML=h;document.body.appendChild(ov);
+  var close=function(){ov.remove();};
+  ov.querySelector('.close-btn').onclick=close;
+  ov.onclick=function(e){if(e.target===ov)close();};
+};
+
+/* Nota permanente nel pannello Esporta. */
+function notice(){
+  var el=document.getElementById('xbrl_notice');if(!el)return;
+  el.innerHTML='Tassonomia <b>'+esc(CFG.taxonomy)+'</b>, struttura allineata a un\'istanza realmente depositata: '+
+    'dati anagrafici, stato patrimoniale e conto economico dei due esercizi, importi in unità di euro. '+
+    '<b>Non contiene la nota integrativa</b>, quindi da sola non è un fascicolo di deposito completo: '+
+    'va completata prima dell\'invio al Registro delle imprese.';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(notice,0);},{once:true});
+else setTimeout(notice,0);
 })();
 </script>
 

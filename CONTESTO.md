@@ -66,23 +66,34 @@ RISULTATI E DATI   Esporta · Dati e backup · Come si usa
 Tutti **aprono su Clienti**, e in cima a quella schermata trovano le stesse tre
 strade: Importa da Excel, Inizia a mano, Prova con i dati dimostrativi.
 
-**Stato reale della struttura (12 agosto 2026).** Solo il Bilancio civilistico e
-il Fascicolo cliente hanno i tre gruppi completi. Da allineare:
+**Stato reale della struttura (12 agosto 2026).**
 
-| Tool | Gruppo «Risultati e dati» |
-|---|---|
-| `financial-statement` | completo: Esporta · Dati e backup · Come si usa |
-| `tfa-client-file` | completo (è il riferimento originario) |
-| `lipe` | ha solo «Esporta e storico»: mancano Dati e backup e Come si usa |
-| `financial-analysis` | gruppi diversi (Flusso di lavoro · Analisi integrative · Analisi avanzate · Gestione) |
+| Tool | Gruppo «Risultati e dati» | Deep link |
+|---|---|---|
+| `financial-statement` | completo: Esporta · Dati e backup · Come si usa | sì |
+| `financial-analysis` | completo dalla 2.1.0 | sì |
+| `tfa-client-file` | completo (è il riferimento originario) | sì (`#/profilo/tax`) |
+| `lipe` | ha solo «Esporta e storico»: mancano Dati e backup e Come si usa | no |
 
-**Indirizzi di sezione.** Il Bilancio ora ha i deep link (`#/clienti`,
-`#/anagrafica`, `#/importa`, `#/bilancio`, `#/esporta`, `#/dati`, `#/aiuto`) con
-`pushState` e `popstate`: il tasto Indietro cammina fra le sezioni invece di
-uscire dal tool. Da replicare in LIPE e Analisi.
+**Attenzione a come si legge la sidebar di `financial-analysis`.** Un `grep` sul
+sorgente restituisce i gruppi «Flusso di lavoro» e «Gestione»: appartengono alle
+definizioni morte di `renderSidebar` (trappola 1) e **non** sono quello che
+l'utente vede. La sidebar reale ha cinque gruppi. Va guardata renderizzata nel
+browser, non nel sorgente — è lo stesso errore in cui sono già caduto una volta.
+
+**Indirizzi di sezione.** Bilancio e Analisi hanno i deep link con `pushState` e
+`popstate`: il tasto Indietro cammina fra le sezioni invece di uscire dal tool.
+Resta da fare in LIPE.
+
+**Banda nera.** `footer.foot` (fondo `#0b0b0b`) è stata rimossa da tutti e tre i
+tool che la avevano; il Fascicolo non la ha mai avuta. Il disclaimer specifico
+del tool non è andato perso: è stato unito al paragrafo di `.tal-site-footer`.
+La CSS di `.foot` è rimasta lì di proposito — la stringa «foot» compare anche in
+jsPDF minificato (`n.foot.length`, `showFoot`) e una sostituzione larga
+romperebbe il motore PDF.
 
 Versioni reali (allineate ovunque, anche nei dati strutturati):
-`1.4.0` Bilancio civilistico · `2.0.6` Analisi di bilancio · `2.3.2` Fascicolo
+`1.4.0` Bilancio civilistico · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
 cliente · `3.4.1→3.4.3` LIPE.
 
 ## Trappole verificate sul campo
@@ -222,6 +233,58 @@ Cosa **resta aperto**:
 
 Tutto ciò che è configurabile sta in `window.FS_XBRL_CONFIG`.
 
+## Analisi di bilancio — cosa è cambiato con la 2.1.0
+
+Audit del 12 agosto 2026, eseguito sulla pagina viva.
+
+**Quello che già funzionava** (vale registrarlo, per non rifare il lavoro): tutte
+e 20 le viste rendono senza errori JavaScript; gli 11 export producono file veri;
+l'import funziona e il gate di validazione è severo e corretto — ha colto con
+precisione due errori nei dati di prova che avevo costruito male, prima
+sull'esercizio corrente e poi sul precedente. La ricostruzione della voce tecnica
+A.IX viene proposta su entrambi gli esercizi.
+
+**Il bug del Bilancio qui non esiste.** Le rettifiche di `financial-analysis`
+sono normalizzazioni a una sola gamba (`currentEffect`, `previousEffect`,
+`category`) per l'EBITDA normalizzato, non scritture in partita doppia: non
+toccano lo stato patrimoniale e non possono sbilanciarlo. Progetto diverso e
+appropriato al tool.
+
+**Allineamento.** Le funzioni del concept condiviso c'erano tutte: erano nominate
+e collocate diversamente. «Report Center» era di fatto la sezione Esporta, e i
+due backup erano separati (quello della società nel Report Center, l'archivio
+clienti dentro Clienti). Quindi:
+
+- «Report Center» → **«Esporta»**;
+- nuova vista **«Dati e backup»** che raccoglie archivio clienti e
+  configurazione della singola società, più «Nuova elaborazione»;
+- Configurazione riordinata: **Clienti · Anagrafica · Importa da Excel ·
+  Mappatura conti · Configura con AI**;
+- **deep link** per tutte le 21 sezioni.
+
+I due gruppi in più — «Analisi integrative» e «Analisi avanzate» — sono rimasti:
+sono voci di lavoro proprie del tool, che è più grande degli altri, e il concept
+prevede esplicitamente `<lavoro>` come sezione libera.
+
+**Correzioni sostanziali.** Il template usciva con i fogli Stato Patrimoniale e
+Conto Economico **vuoti**: scaricarlo e ricaricarlo per capire come funziona
+restituiva «Il file non contiene uno Stato Patrimoniale utilizzabile», che si
+legge come un difetto del file e non come «non l'hai ancora compilato». Ora
+contiene un esempio completo e quadrato (SP +70.000 / CE −70.000), come il
+Bilancio. E la diagnostica di un import rifiutato non sopravvive più al tentativo
+successivo: si vedevano messaggi di run diverse mescolati, anche in
+contraddizione fra loro.
+
+**Non toccati** `VIEW_DEFS` e `renderSidebar`: la sidebar si ritocca sul DOM dopo
+il rendering, come già fa la patch v2.0.3. Vedi le trappole 1, 2 e 10.
+
+**Resta aperto, ed è una divergenza vera di concept:** i sei report PDF di
+`financial-analysis` aprono una finestra con `window.open` e la stampa del
+browser, mentre il Bilancio genera il PDF con jsPDF e lo scarica. Sono due
+esperienze diverse per la stessa azione, e la finestra può essere bloccata dal
+popup blocker. Uniformarle vuol dire riscrivere sei generatori: è un lavoro a sé,
+non una correzione di audit.
+
 ## Aperto
 
 - **XBRL**: validare un'istanza con lo strumento del Registro delle imprese, e
@@ -232,8 +295,11 @@ Tutto ciò che è configurabile sta in `window.FS_XBRL_CONFIG`.
 - **Ripartizione entro/oltre esercizio** per singola controparte nello schema
   ordinario: serve per un XBRL ordinario pienamente analitico.
 - **Nota integrativa e rendiconto finanziario**: fuori perimetro oggi.
-- **Concept condiviso**: portare in LIPE e Analisi il gruppo «Risultati e dati»
-  completo e i deep link. Vedi la tabella sopra.
+- **Concept condiviso**: resta **LIPE** — gruppo «Risultati e dati» completo
+  (mancano Dati e backup e Come si usa) e deep link. Vedi la tabella sopra.
+- **PDF uniformi**: i report di `financial-analysis` passano da `window.open` e
+  dalla stampa del browser, il Bilancio scarica con jsPDF. Da decidere quale dei
+  due è il comportamento canonico, poi uniformare.
 - **Indirizzi delle sezioni** (deep link) negli altri tre tool: il Fascicolo li
   ha (`#/profilo/tax`), il Bilancio ora anche, gli altri due no.
 - **Stato «Non salvato»** della barra comandi: il ramo di codice esiste ma non è

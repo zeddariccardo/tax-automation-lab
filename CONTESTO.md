@@ -473,6 +473,48 @@ home, LIPE, il Fascicolo e ora F24; **`financial-statement` e
 `financial-analysis` no**, quindi su quei due la navigazione del sito è
 irraggiungibile da telefono. È un difetto vero e aperto, non una scelta.
 
+## F24 — audit d'uso e cinque correzioni, 13 agosto 2026
+
+Segnalazione dell'utente: «se creo un F24 per IMU o INPS non si vedono i
+dettagli dei campi, e se premo + per entrarci non posso scorrere». Due sintomi,
+due cause distinte, più altre tre emerse ripercorrendo il tool a mano.
+
+1. **Tutte le finestre tagliavano il contenuto, senza barra di scorrimento.**
+   `tal-app.css` dichiara `html.tal-tool-page .modal{overflow:hidden}`, che per
+   specificità batteva `.modal{overflow:auto}` del foglio di pagina. Il
+   dettaglio di una riga IMU perdeva **414px**, quello di una riga **Erario
+   226px**: il pulsante «Salva dettagli» non era raggiungibile per nessuna
+   riga, quindi la funzione era inutilizzabile in blocco. Colpiva anche
+   l'anagrafica (232px) e la configurazione telematica (153px). Ora
+   `overflow-y:auto !important` e i pulsanti in `position:sticky` in fondo,
+   così in una finestra lunga non si va a caccia del salvataggio.
+2. **La compilazione guidata mostrava gli stessi cinque campi per tutte e sei
+   le sezioni** (codice, periodo, anno, debito, credito). I flag IMU, la
+   matricola INPS, il codice ditta INAIL, il codice ente degli altri enti e il
+   codice regione non erano esposti da nessuna parte se non dalla finestra di
+   cui sopra — cioè da nessuna parte. Ora ogni sezione ha i suoi campi,
+   descritti in `SECTION_FIELDS`, con le caselle raggruppate su una riga
+   propria come la fila di quadratini sul modello. È quello che chiedeva il
+   §10 del brief e che la 0.9.0 non aveva mai fatto.
+3. **Cambiando sezione a una riga restavano i campi della sezione lasciata**
+   (numero immobili, flag, codice ditta…), e finivano nel PDF e nel tracciato
+   telematico di una sezione che non li prevede. Ora vengono azzerati e il
+   tool dice quanti campi ha toccato. L'elenco è in `SECTION_ONLY_FIELDS`.
+4. **La ricerca diceva «Cerca nel progetto» ma guardava solo l'F24 aperto**:
+   chi cercava un codice presente in un altro modello concludeva che non
+   c'era. Ora le corrispondenze fuori dall'F24 corrente vengono elencate sotto
+   la barra, con il collegamento per raggiungerle.
+5. **Le finestre si impilavano**: la richiesta di ripristino del salvataggio
+   automatico poteva aprirsi sopra a un modulo già compilato, ed Escape le
+   chiudeva tutte insieme facendo perdere il lavoro. Ora il ripristino non
+   compare se c'è una finestra aperta o se il lavoro è già avviato, ed Escape
+   chiude solo quella in primo piano.
+
+**Lezione di metodo, la stessa della volta prima.** Tutti e cinque i difetti
+erano invisibili ai controlli automatici che avevo scritto: gli elementi
+esistevano, rispondevano, il contrasto era a posto, non c'erano errori in
+console. Un tool si verifica **usandolo**, non interrogandolo.
+
 ## Contrasto — due correzioni nel layer condiviso, 13 agosto 2026
 
 L'audit di contrasto precedente dichiarava «nessun fallimento su 4 tool», ma

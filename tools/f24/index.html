@@ -470,6 +470,13 @@ body{margin:0;overflow-x:hidden}
 .segmented button.active{background:var(--f24-accent);color:#fff}
 .row-search{min-height:38px;padding:8px 11px;border:1px solid var(--f24-line-2);border-radius:var(--f24-r);min-width:180px}
 
+.search-elsewhere{
+  margin:0 0 10px;padding:9px 13px;border-radius:var(--f24-r);
+  background:var(--f24-accent-soft);border:1px solid rgba(20,83,104,.2);
+  font-size:12.5px;line-height:1.6;color:var(--f24-ink-2);
+}
+.search-elsewhere b{margin-right:4px}
+
 .bulk-bar{
   display:none;align-items:center;gap:9px;flex-wrap:wrap;padding:10px 14px;margin-bottom:10px;
   border-radius:var(--f24-r);background:var(--tal-ink,#1D1B16);color:#fff;
@@ -525,9 +532,15 @@ body{margin:0;overflow-x:hidden}
 .visual-section-tabs button.active{background:var(--f24-accent);border-color:var(--f24-accent);color:#fff}
 .visual-section-tabs button .cnt{opacity:.7;margin-left:4px}
 .visual-row{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr)) auto;gap:9px;align-items:end;
-  padding:11px;margin-bottom:8px;border:1px solid var(--f24-line);border-radius:var(--f24-r);background:var(--f24-paper);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;align-items:end;
+  padding:11px 11px 44px;margin-bottom:8px;position:relative;
+  border:1px solid var(--f24-line);border-radius:var(--f24-r);background:var(--f24-paper);
 }
+/* Le caselle occupano una cella intera e restano leggibili anche quando la
+   sezione ne porta quattro, come IMU. */
+.visual-flags{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:7px}
+.visual-row .flag-box{padding:7px 10px;font-size:12px;background:var(--f24-card)}
+.visual-row .small-action{position:absolute;right:11px;bottom:9px;width:auto;padding:0 12px;height:28px}
 .small-action{
   width:30px;height:34px;display:grid;place-items:center;border:1px solid var(--f24-line-2);
   border-radius:7px;background:var(--f24-card);cursor:pointer;color:var(--f24-ink-2);
@@ -732,8 +745,25 @@ body{margin:0;overflow-x:hidden}
   padding:20px;background:rgba(11,47,61,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
 }
 .modal-ov.open{display:flex}
+/* tal-app.css dichiara `html.tal-tool-page .modal{overflow:hidden}`, che per
+   specificita' batteva `.modal{overflow:auto}`: ogni finestra piu' alta della
+   pagina veniva tagliata **senza barra di scorrimento**, e con lei il pulsante
+   di salvataggio. Il dettaglio di una riga IMU perdeva 414px, quello di una
+   riga Erario 226px: la funzione era inutilizzabile in blocco. Qui la
+   specificita' e' pari e l'ordine ci fa vincere, ma teniamo `!important` per
+   non dipendere dall'ordine di caricamento dei fogli. */
 .modal{
-  position:relative;width:min(640px,100%);max-height:90vh;overflow:auto;padding:24px 26px;background:#fff;
+  position:relative;width:min(640px,100%);max-height:90vh;
+  overflow-y:auto !important;overflow-x:hidden !important;
+  padding:24px 26px 0;background:#fff;
+  overscroll-behavior:contain;
+}
+/* I pulsanti restano agganciati in fondo mentre il contenuto scorre: in una
+   finestra lunga non si va a caccia del salvataggio. */
+.modal .modal-actions{
+  position:sticky;bottom:0;z-index:2;
+  margin:20px -26px 0;padding:14px 26px;
+  background:#fff;border-top:1px solid var(--f24-line);
 }
 .modal.small{width:min(440px,100%)}
 .modal.large,.modal.modal-wide{width:min(880px,100%)}
@@ -1020,6 +1050,7 @@ body.modal-open{overflow:hidden}
 <button class="btn danger" data-action="bulk-delete" type="button">Elimina</button>
 </div>
 
+<p class="search-elsewhere" hidden id="searchElsewhere"></p>
 <div id="tableWorkView">
 <div class="table-wrap">
 <table class="edit-table">
@@ -2321,6 +2352,83 @@ function lookupCode(code) {
 /* ---------- Sezioni ------------------------------------------------------- */
 
 const SECTIONS = ['Erario', 'INPS', 'Regioni', 'IMU e altri tributi locali', 'INAIL', 'Altri enti previdenziali e assicurativi'];
+
+/* I campi che ogni sezione porta davvero sul modello ministeriale. Servono
+   alla compilazione guidata: prima mostrava per tutte e sei le sezioni gli
+   stessi cinque campi (codice, periodo, anno, debito, credito), quindi i flag
+   IMU, la matricola INPS, il codice ditta INAIL e il codice ente degli altri
+   enti non erano raggiungibili da li'. `t` è il tipo del controllo:
+   testo, importo o casella. */
+const SECTION_FIELDS = {
+    erario: [
+        { k: 'taxCode',    l: 'Codice tributo' },
+        { k: 'period',     l: 'Rateazione / periodo' },
+        { k: 'year',       l: 'Anno di riferimento' },
+        { k: 'debit',      l: 'Importo a debito', t: 'money' },
+        { k: 'credit',     l: 'Importo a credito', t: 'money' }
+    ],
+    inps: [
+        { k: 'officeCode', l: 'Codice sede' },
+        { k: 'taxCode',    l: 'Causale contributo' },
+        { k: 'reference',  l: 'Matricola / codice posizione' },
+        { k: 'periodFrom', l: 'Periodo da (MM/AAAA)' },
+        { k: 'periodTo',   l: 'Periodo a (MM/AAAA)' },
+        { k: 'debit',      l: 'Importo a debito', t: 'money' },
+        { k: 'credit',     l: 'Importo a credito', t: 'money' }
+    ],
+    regioni: [
+        { k: 'officeCode', l: 'Codice regione' },
+        { k: 'taxCode',    l: 'Codice tributo' },
+        { k: 'period',     l: 'Rateazione / periodo' },
+        { k: 'year',       l: 'Anno di riferimento' },
+        { k: 'debit',      l: 'Importo a debito', t: 'money' },
+        { k: 'credit',     l: 'Importo a credito', t: 'money' }
+    ],
+    imu: [
+        { k: 'officeCode',      l: 'Codice ente / Comune' },
+        { k: 'taxCode',         l: 'Codice tributo' },
+        { k: 'year',            l: 'Anno di riferimento' },
+        { k: 'numImmobili',     l: 'Numero immobili' },
+        { k: 'detrazione',      l: 'Detrazione', t: 'money' },
+        { k: 'ravvedimento',    l: 'Ravvedimento', t: 'flag' },
+        { k: 'immobiliVariati', l: 'Immobili variati', t: 'flag' },
+        { k: 'acconto',         l: 'Acconto', t: 'flag' },
+        { k: 'saldo',           l: 'Saldo', t: 'flag' },
+        { k: 'debit',           l: 'Importo a debito', t: 'money' },
+        { k: 'credit',          l: 'Importo a credito', t: 'money' }
+    ],
+    inail: [
+        { k: 'officeCode',       l: 'Codice sede' },
+        { k: 'inailCompanyCode', l: 'Codice ditta' },
+        { k: 'inailCc',          l: 'C.C.' },
+        { k: 'reference',        l: 'Numero di riferimento' },
+        { k: 'taxCode',          l: 'Causale' },
+        { k: 'debit',            l: 'Importo a debito', t: 'money' },
+        { k: 'credit',           l: 'Importo a credito', t: 'money' }
+    ],
+    altri: [
+        { k: 'entityCode',   l: 'Codice ente' },
+        { k: 'officeCode',   l: 'Codice sede' },
+        { k: 'taxCode',      l: 'Causale contributo' },
+        { k: 'positionCode', l: 'Codice posizione' },
+        { k: 'periodFrom',   l: 'Periodo da (MM/AAAA)' },
+        { k: 'periodTo',     l: 'Periodo a (MM/AAAA)' },
+        { k: 'debit',        l: 'Importo a debito', t: 'money' },
+        { k: 'credit',       l: 'Importo a credito', t: 'money' }
+    ]
+};
+
+/* Campi che appartengono a una sezione sola. Cambiando sezione a una riga
+   vanno azzerati, altrimenti restano attaccati al dato e finiscono nel PDF e
+   nel tracciato telematico di una sezione che non li prevede. */
+const SECTION_ONLY_FIELDS = {
+    imu:   ['numImmobili', 'detrazione', 'ravvedimento', 'immobiliVariati', 'acconto', 'saldo', 'operationId'],
+    inail: ['inailCompanyCode', 'inailCc'],
+    altri: ['entityCode', 'positionCode'],
+    erario: ['taxOfficeCode', 'actCode', 'certificationNo'],
+    inps: [],
+    regioni: []
+};
 
 const SECTION_UI = {
     erario:  { label: 'Erario',              section: 'Erario',                                    cap: 6, top: 27.2, height: 11.6, help: 'Imposte, IVA, ritenute e altri tributi erariali.' },
@@ -4363,22 +4471,51 @@ function currentGroup() {
 function setRow(id, key, value) {
     const r = state.rows.find(x => x.id === id);
     if (!r) return;
-    if (key === 'period') r[key] = normalizePeriodField(value);
+    if (key === 'section') {
+        /* I campi propri della sezione che si lascia non possono restare
+           attaccati alla riga: finirebbero nel PDF e nel tracciato telematico
+           di una sezione che non li prevede, senza che nulla lo segnali. */
+        const prima = sectionKey(r.section), dopo = sectionKey(value);
+        if (prima !== dopo) {
+            const puliti = (SECTION_ONLY_FIELDS[prima] || []).filter(k => {
+                const v = r[k];
+                return v !== '' && v !== false && v !== 0 && v !== undefined && v !== null;
+            });
+            puliti.forEach(k => { r[k] = typeof r[k] === 'boolean' ? false : (typeof r[k] === 'number' ? 0 : ''); });
+            if (puliti.length) {
+                toast(`Sezione cambiata: ${puliti.length} ${puliti.length === 1 ? 'campo specifico azzerato' : 'campi specifici azzerati'} di ${SECTION_UI[prima].label}`);
+            }
+        }
+        r.section = value;
+    } else if (key === 'period') r[key] = normalizePeriodField(value);
     else if (key === 'flow') r[key] = sanitizeFlow(value);
     else r[key] = value;
     touchState();
     renderAll();
 }
 
+function setFlag(id, key, value) {
+    const r = state.rows.find(x => x.id === id);
+    if (!r) return;
+    r[key] = !!value;
+    touchState();
+    renderAll();
+}
+
+const MONEY_LABELS = { debit: 'a debito', credit: 'a credito', detrazione: 'della detrazione' };
+
 function setMoney(id, key, value) {
     const r = state.rows.find(x => x.id === id);
     if (!r) return;
     const parsed = parseAmount(value);
     r[key] = parsed.value;
-    const word = key === 'debit' ? 'debito' : 'credito';
-    r.importIssues = (r.importIssues || []).filter(x => !x.toLowerCase().includes(word));
-    if (parsed.invalid) r.importIssues.push(`Importo a ${word} non interpretabile: «${parsed.raw}»`);
-    if (parsed.negative) r.importIssues.push(`Importo a ${word} negativo: usa un valore positivo nella colonna corretta`);
+    const word = MONEY_LABELS[key] || key;
+    /* I rilievi si marcano con il campo, non con una parola del testo: prima
+       filtrare per «debito»/«credito» cancellava anche il rilievo dell'altro
+       campo quando i due messaggi si somigliavano. */
+    r.importIssues = (r.importIssues || []).filter(x => x.field !== key && !(typeof x === 'string' && x.toLowerCase().includes(word)));
+    if (parsed.invalid) r.importIssues.push(`Importo ${word} non interpretabile: «${parsed.raw}»`);
+    if (parsed.negative) r.importIssues.push(`Importo ${word} negativo: indica un valore positivo nel campo corretto`);
     touchState();
     renderAll();
 }
@@ -4450,13 +4587,39 @@ function toggleSelectAll(v) {
     renderEditor();
 }
 
+function rowMatches(r, q) {
+    return [r.taxCode, r.note, r.flow, r.flowDesc, r.section, r.reference, r.officeCode, r.year]
+        .some(v => String(v || '').toLowerCase().includes(q));
+}
+
 function displayedRows() {
     const q = (val('rowSearch') || '').toLowerCase();
     let rows = state.activeGroup === 'draft'
         ? state.rows.filter(r => !meaningfulRow(r))
         : (currentGroup() ? currentGroup().rows : []);
-    if (q) rows = rows.filter(r => [r.taxCode, r.note, r.flow, r.flowDesc, r.section].some(v => String(v).toLowerCase().includes(q)));
+    if (q) rows = rows.filter(r => rowMatches(r, q));
     return rows;
+}
+
+/* Il campo dichiarava «Cerca nel progetto» ma guardava solo dentro l'F24
+   aperto: chi cercava un codice presente altrove concludeva che non c'era.
+   Ora le corrispondenze fuori dall'F24 corrente vengono elencate, con il
+   collegamento per raggiungerle. */
+function renderSearchElsewhere() {
+    const host = $('searchElsewhere');
+    if (!host) return;
+    const q = (val('rowSearch') || '').toLowerCase();
+    if (!q) { host.hidden = true; host.innerHTML = ''; return; }
+    const altrove = groupF24()
+        .filter(g => g.key !== state.activeGroup)
+        .map(g => ({ g, n: g.rows.filter(r => rowMatches(r, q)).length }))
+        .filter(x => x.n > 0);
+    if (!altrove.length) { host.hidden = true; host.innerHTML = ''; return; }
+    const totale = altrove.reduce((s, x) => s + x.n, 0);
+    host.hidden = false;
+    host.innerHTML = `<b>${totale} ${totale === 1 ? 'riga corrisponde' : 'righe corrispondono'} in altri F24:</b> ` +
+        altrove.map(x => `<button class="text-button" data-action="select-group" data-key="${esc(x.g.key)}" type="button">` +
+            `${esc((x.g.client.name || 'Contribuente') + ' · ' + x.g.label)} (${x.n})</button>`).join(' · ');
 }
 
 async function deleteSelectedRows() {
@@ -4725,6 +4888,7 @@ function renderEditor() {
     }).join('') || '<tr><td colspan="10"><p class="help" style="padding:14px">Nessuna riga corrisponde alla ricerca.</p></td></tr>';
 
     updateBulkBar();
+    renderSearchElsewhere();
     applyWorkView();
 }
 
@@ -4775,15 +4939,32 @@ function renderVisualEditor() {
     setText('visualSectionTitle', SECTION_TITLES[state.visualSection]);
     setText('visualSectionHelp', `${meta.help} Il modello ne prevede ${meta.cap} righe.`);
 
+    /* Ogni sezione mostra i propri campi. Prima ne mostrava cinque uguali per
+       tutte, quindi i flag IMU, la matricola INPS o il codice ditta INAIL si
+       raggiungevano solo dal «•••» — e quella finestra era tagliata. */
     const rows = g ? g.rows.filter(r => sectionKey(r.section) === state.visualSection) : [];
+    const fields = SECTION_FIELDS[state.visualSection] || SECTION_FIELDS.erario;
     $('visualRows').innerHTML = rows.length ? rows.map((r, i) => {
         const n = i + 1;
-        return `<div class="visual-row">` +
-            `<div class="field"><label>Codice / causale</label><input aria-label="Codice riga ${n}" data-action="visual-set" data-field="taxCode" data-id="${esc(r.id)}" value="${esc(r.taxCode)}">${codeHintHtml(r)}</div>` +
-            `<div class="field"><label>Periodo</label><input aria-label="Periodo riga ${n}" data-action="visual-set" data-field="period" data-id="${esc(r.id)}" value="${esc(r.period)}"></div>` +
-            `<div class="field"><label>Anno</label><input aria-label="Anno riga ${n}" data-action="visual-set" data-field="year" data-id="${esc(r.id)}" value="${esc(r.year)}"></div>` +
-            `<div class="field"><label>Debito</label><input aria-label="Debito riga ${n}" data-action="visual-money" data-field="debit" data-id="${esc(r.id)}" inputmode="decimal" value="${r.debit ? esc(String(r.debit).replace('.', ',')) : ''}"></div>` +
-            `<div class="field"><label>Credito</label><input aria-label="Credito riga ${n}" data-action="visual-money" data-field="credit" data-id="${esc(r.id)}" inputmode="decimal" value="${r.credit ? esc(String(r.credit).replace('.', ',')) : ''}"></div>` +
+        const id = esc(r.id);
+        const campo = f => {
+            const label = esc(f.l);
+            if (f.t === 'money') {
+                const v = r[f.k] ? esc(String(r[f.k]).replace('.', ',')) : '';
+                return `<div class="field"><label>${label}</label><input aria-label="${label} riga ${n}" data-action="visual-money" data-field="${f.k}" data-id="${id}" inputmode="decimal" value="${v}"></div>`;
+            }
+            const hint = f.k === 'taxCode' ? codeHintHtml(r) : '';
+            return `<div class="field"><label>${label}</label><input aria-label="${label} riga ${n}" data-action="visual-set" data-field="${f.k}" data-id="${id}" value="${esc(r[f.k] || '')}">${hint}</div>`;
+        };
+        /* Le caselle stanno insieme su una riga propria, come la fila di
+           quadratini sul modello: sparse fra i campi si leggevano male e
+           l'accostamento con il campo accanto era casuale. */
+        const flags = fields.filter(f => f.t === 'flag');
+        const body = fields.filter(f => f.t !== 'flag').map(campo).join('')
+            + (flags.length ? `<div class="visual-flags">` + flags.map(f =>
+                `<label class="flag-box"><input data-action="visual-flag" data-field="${f.k}" data-id="${id}" type="checkbox"${r[f.k] ? ' checked' : ''}> ${esc(f.l)}</label>`
+              ).join('') + '</div>' : '');
+        return `<div class="visual-row">${body}` +
             `<button aria-label="Altri campi riga ${n}" class="small-action" data-action="open-row" data-id="${esc(r.id)}" title="Altri campi" type="button">•••</button></div>`;
     }).join('') : '<div class="visual-empty">Nessuna riga in questa sezione. Usa «Aggiungi riga nella sezione».</div>';
 
@@ -5232,6 +5413,11 @@ function scheduleAutosave() {
 function restoreAutosavePrompt() {
     const p = readStore(KEY_AUTOSAVE, null) || readStore('tal_f24_autosave_v09', null) || readStore('tal_f24_autosave_v07', null);
     if (!p || !Array.isArray(p.rows) || !p.rows.length) return;
+    /* Non si apre sopra a una finestra gia' aperta né su un lavoro gia'
+       avviato: comparire a metà di un modulo, o dopo che l'utente ha
+       ricominciato da capo, e' peggio che non comparire. */
+    if (document.querySelector('.modal-ov.open')) return;
+    if (state.rows.length) return;
     window.__pendingAutosave = p;
     const when = p.savedAt ? new Date(p.savedAt).toLocaleString('it-IT') : 'data non disponibile';
     setText('restoreText', `È stato trovato un lavoro salvato automaticamente il ${when}, con ${p.rows.length} righe.`);
@@ -5508,6 +5694,7 @@ document.addEventListener('change', e => {
         if (a === 'row-money') return setMoney(el.dataset.id, el.dataset.field, el.value);
         if (a === 'visual-set') { setRow(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
         if (a === 'visual-money') { setMoney(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
+        if (a === 'visual-flag') { setFlag(el.dataset.id, el.dataset.field, el.checked); return renderVisualEditor(); }
         if (a === 'row-select') {
             const r = state.rows.find(x => x.id === el.dataset.id);
             if (r) { r.selected = el.checked; updateBulkBar(); }
@@ -5571,11 +5758,15 @@ function setupDropzone(zoneId, labelId) {
     });
 }
 
+/* Escape chiude solo la finestra in primo piano, non tutte quelle aperte:
+   con una conferma sopra a un modulo, chiuderle insieme faceva perdere il
+   lavoro del modulo per un tasto premuto una volta sola. */
 window.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if ($('modalConfirm').classList.contains('open')) return settleConfirm(false);
     if ($('modalPrompt').classList.contains('open')) return settlePrompt(null);
-    document.querySelectorAll('.modal-ov.open').forEach(m => closeModal(m.id));
+    const aperte = [...document.querySelectorAll('.modal-ov.open')];
+    if (aperte.length) closeModal(aperte[aperte.length - 1].id);
 });
 
 window.addEventListener('popstate', e => {

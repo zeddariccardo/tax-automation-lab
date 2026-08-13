@@ -432,7 +432,89 @@ compito e' preparare una base di lavoro tracciabile, non un fascicolo definitivo
 <article class="upload-card surface"><span class="label">01 · FINANCIAL STATEMENT</span><h3>Financial Statement</h3><div class="path">Financial Statement → menu laterale “2 Import bilancio” → sezione “2. Carica il file compilato” → “Carica Excel compilato” o trascinamento del file.</div><div class="screen-pair"><figure class="screen"><img alt="Financial Statement import tab" loading="lazy" src="/resources/images/ai-onboarding/financial-statement-import-tab.png"/><figcaption>1. Individua nel menu laterale la funzione “Import bilancio”.</figcaption></figure><figure class="screen"><img alt="Financial Statement upload button" loading="lazy" src="/resources/images/ai-onboarding/financial-statement-import-button.png"/><figcaption>2. Carica il file compilato dal pulsante evidenziato.</figcaption></figure></div></article><article class="upload-card surface" id="financial-analysis-upload"><span class="label">02 · ANALISI DI BILANCIO</span><h3>Analisi di bilancio</h3><div class="path">Analisi di bilancio → menu laterale “2 Import bilancio” → sezione “2. Carica il file compilato” → seleziona il template Excel. Dopo l’importazione la Dashboard resta sempre accessibile dal menu laterale.</div><div class="screen-pair"><figure class="screen"><img alt="Financial Analysis import tab" loading="lazy" src="/resources/images/ai-onboarding/financial-analysis-import-tab.png"/><figcaption>1. Individua nel menu laterale la funzione “Import file unico”.</figcaption></figure><figure class="screen"><img alt="Financial Analysis upload area" loading="lazy" src="/resources/images/ai-onboarding/financial-analysis-import-button.png"/><figcaption>2. Seleziona il file dall’area di caricamento evidenziata.</figcaption></figure></div></article>
 <article class="upload-card surface"><span class="label">03 · LIPE — SETUP</span><h3>Codiciario LIPE</h3><div class="path">Generatore LIPE → “Gestione clienti” → pannello “Codiciario IVA” → “Importa Excel codiciario”. Dopo il controllo, salva la configurazione del cliente.</div><figure class="screen"><img alt="LIPE VAT code mapping import" loading="lazy" src="/resources/images/ai-onboarding/lipe-codiciario-import.png"/><figcaption>Pannello di importazione del codiciario IVA.</figcaption></figure></article>
 <article class="upload-card surface"><span class="label">04 · LIPE — PERIODO</span><h3>E gli importi periodici della LIPE?</h3><div class="path">Generatore LIPE → “Elaborazione periodica” → seleziona cliente, anno e trimestre → “Carica Excel importi”. Questo file contiene i numeri del periodo e resta separato dal codiciario.</div><figure class="screen"><img alt="LIPE period amounts import" loading="lazy" src="/resources/images/ai-onboarding/lipe-importi-periodici.png"/><figcaption>Caricamento successivo degli importi del periodo.</figcaption></figure></article>
-<article class="upload-card surface tfa-upload-card"><span class="label">05 · TFA CLIENT FILE</span><h3>TFA Client File</h3><div class="path">TFA Client File → barra comandi superiore → “Importa Excel” → verifica l’anteprima → scegli “Nuovo fascicolo” oppure “Aggiorna corrente” → controlla Analitica, Commentary e Altro → “Salva nell’archivio”. Per mettere al sicuro tutti i clienti usa Azioni → “Esporta archivio completo”.</div><div class="tfa-screen-grid"><figure class="screen"><img alt="TFA Client File: barra comandi unica con stato archivio, ricerca e import Excel" loading="lazy" src="/resources/images/ai-onboarding/tfa-import-sidebar.png"/><figcaption>Una sola barra comandi: stato di salvataggio, ricerca, importazione, archivio e backup completo.</figcaption></figure><figure class="screen"><img alt="TFA Client File: anteprima protetta dell’importazione Excel" loading="lazy" src="/resources/images/ai-onboarding/tfa-import-preview.png"/><figcaption>Anteprima obbligatoria con conteggi separati per Anagrafica, Analitica, Commentary e Altro.</figcaption></figure></div></article></div></div></section>
+<article class="upload-card surface tfa-upload-card"><span class="label">05 · TFA CLIENT FILE</span><h3>TFA Client File</h3><div class="path">TFA Client File → barra comandi superiore → “Importa Excel” → verifica l’anteprima → scegli “Nuovo fascicolo” oppure “Aggiorna corrente” → controlla Analitica, Commentary e Altro → “Salva nell’archivio”. Per mettere al sicuro tutti i clienti usa Azioni → “Esporta archivio completo”.</div><div class="tfa-screen-grid"><figure class="screen"><img alt="TFA Client File: barra comandi unica con stato archivio, ricerca e import Excel" loading="lazy" src="/resources/images/ai-onboarding/tfa-import-sidebar.png"/><figcaption>Una sola barra comandi: stato di salvataggio, ricerca, importazione, archivio e backup completo.</figcaption></figure><figure class="screen"><img alt="TFA Client File: anteprima protetta dell’importazione Excel" loading="lazy" src="/resources/images/ai-onboarding/tfa-import-preview.png"/><figcaption>Anteprima obbligatoria con conteggi separati per Anagrafica, Analitica, Commentary e Altro.</figcaption></figure></div></article><article class="tool-card surface" id="f24"><span class="label">GENERATORE F24</span><h2>Generatore F24</h2><p>Il template raccoglie i versamenti riga per riga: contribuente, flusso di pagamento, data, sezione, codice tributo, periodo, anno e importo. Ogni combinazione di contribuente, data e flusso diventa un F24 distinto, quindi il modo in cui l’AI assegna i flussi decide quanti modelli otterrai.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Prospetti di calcolo delle ritenute e riepiloghi dei cedolini</li><li>DM10, estratti UniEmens e prospetti del cassetto previdenziale</li><li>Liquidazioni IVA, calcoli IMU e avvisi degli enti locali</li><li>Autoliquidazioni INAIL, prospetti di ravvedimento, estratti da ERP o gestionale payroll</li></ul></div><div class="callout"><strong>L’anagrafica può restare fuori.</strong> Se il contribuente è già nell’archivio del tool, le colonne con denominazione, codice fiscale e partita IVA possono restare vuote: servono soltanto quando lo stesso file contiene più società. Il tool riconosce da sé se il file è singolo o massivo e non attribuisce mai a una società righe che potrebbero essere di un’altra.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_F24_Configura_AI_v1.0.xlsx">Scarica il template ↓</a><button class="button secondary copy-btn" data-copy="f24-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/f24/">Apri il tool →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="f24-prompt">Agisci come assistente di data preparation fiscale per Tax Automation Lab.
+
+OBIETTIVO
+Compilare il foglio PAGAMENTI del file "Template_F24_Configura_AI_v1.0.xlsx" per
+predisporre uno o piu' modelli F24, per uno o piu' contribuenti. Il file non deve
+contenere nessun identificativo interno al tool: solo dati che si trovano nei
+documenti allegati.
+
+MATERIALI DISPONIBILI
+Ti allego il template e uno o piu' documenti: possono essere prospetti di calcolo
+delle ritenute, cedolini riepilogativi, DM10 o estratti UniEmens, liquidazioni
+IVA, calcoli IMU, avvisi di enti locali, autoliquidazioni INAIL, prospetti di
+ravvedimento, estratti da gestionale o da ERP. Usa quello che c'e'. Se un
+documento e' illeggibile o ambiguo, non tentare di indovinarne il contenuto.
+
+REGOLE ASSOLUTE
+1. Non inventare. Compila solo cio' che e' sostenuto da un documento allegato.
+2. Non correggere e non "aggiustare" codici fiscali, partite IVA, codici tributo
+   o causali. Se un identificativo ha una lunghezza anomala, riportalo com'e' e
+   segnalalo nel riepilogo finale: sara' il tool a rifiutarlo, ed e' giusto cosi'.
+3. Non compilare Importo debito e Importo credito sulla stessa riga. Se un
+   documento espone un saldo netto, riporta le due gambe su righe distinte solo
+   se il documento le distingue; altrimenti riporta il dato come lo trovi e
+   segnalalo.
+4. Non modificare l'intestazione del foglio, non aggiungere colonne, non
+   riordinarle e non rinominarle: il tool le riconosce per nome.
+5. Non arrotondare. Riporta gli importi con i centesimi cosi' come stanno nel
+   documento di origine.
+
+COME COMPILARE LE COLONNE
+- Denominazione, Codice fiscale, Partita IVA: servono quando il file contiene
+  piu' societa'. Se lavori su una sola societa' gia' selezionata nel tool,
+  lasciale vuote: le righe verranno attribuite a quella societa'.
+- Flusso e Descrizione flusso: il tipo di versamento (Dipendenti, Autonomi, IVA,
+  Imposte, IMU, Ravvedimenti). Righe con lo stesso contribuente, la stessa Data
+  pagamento e lo stesso Flusso finiscono nello stesso F24. Usa flussi diversi per
+  separare pagamenti che devono restare su modelli distinti.
+- Data pagamento: la scadenza del versamento, in formato GG/MM/AAAA.
+- Sezione: una tra Erario, INPS, Regioni, IMU e altri tributi locali, INAIL,
+  Altri enti previdenziali e assicurativi. Scrivila per esteso.
+- Codice tributo / causale: il codice cosi' come compare nelle istruzioni del
+  tributo o nel documento di origine.
+- Periodo / rateazione: quattro cifre. 0008 per il mese di agosto; 0101 quando le
+  istruzioni del tributo prevedono il pagamento in unica soluzione. Per i tributi
+  che non lo richiedono, lascia vuoto.
+- Anno: l'anno di riferimento del tributo, non l'anno del pagamento.
+- Importo debito / Importo credito: valori positivi, in una sola delle due
+  colonne.
+- Codice ente / sede / regione / comune: codice sede INPS, codice regione, codice
+  catastale del Comune per IMU, codice sede INAIL, a seconda della sezione.
+- Matricola / posizione / riferimento: matricola INPS, codice posizione, numero
+  di riferimento INAIL.
+- Periodo da / Periodo a: solo per le sezioni che li prevedono (tipicamente INPS
+  e Altri enti), in formato MM/AAAA.
+- Le restanti colonne (codice ufficio, codice atto, flag IMU, numero immobili,
+  detrazione, dati INAIL, coobbligato, note) vanno compilate solo quando il
+  documento le sostiene. Vuote e' un risultato accettabile.
+
+CAPIENZA DEL MODELLO
+Un singolo F24 ha un numero fisso di righe per sezione: Erario 6, INPS 4,
+Regioni 4, IMU e tributi locali 4, INAIL 3, Altri enti 2. Se per un contribuente
+e una data superi il limite di una sezione, distribuisci le righe su piu' flussi:
+ogni flusso diventa un F24 distinto. Segnala nel riepilogo quando lo hai fatto.
+
+COMPENSAZIONI
+Se un documento espone un credito da utilizzare in compensazione, riportalo nella
+colonna Importo credito con il suo codice tributo e il suo anno. Non verificare
+la spettanza, la disponibilita' residua, il visto di conformita' o i limiti
+annuali: non e' un giudizio che puoi dare dai documenti allegati. Elencali invece
+nel riepilogo come punti da verificare.
+
+RIEPILOGO FINALE
+Dopo il file, produci un elenco puntato con:
+- i contribuenti e il numero di F24 previsti per ciascuno;
+- i totali a debito, a credito e il saldo per ogni F24;
+- le righe per cui hai dovuto interpretare un documento ambiguo;
+- gli identificativi che ti sono sembrati anomali;
+- i crediti riportati, con la loro origine documentale;
+- cio' che nei documenti non hai trovato e che il professionista deve aggiungere.
+
+Il file sara' controllato dal professionista prima dell'importazione e il tool
+eseguira' i propri controlli formali su saldi, capienza, codici e identificativi.
+</pre></details><p class="prompt-note">Il prompt vieta all’AI di correggere codici fiscali e codici tributo dall’aspetto anomalo: devono arrivare al tool come stanno, perché sia il controllo formale a rifiutarli invece di una correzione arbitraria a monte.</p></div></article></div></div></section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/approfondimenti/">Casi e metodo</a><a href="/privacy/">Privacy</a><a href="/security/">Sicurezza</a><a href="/terms/">Termini e disclaimer</a><a href="/licenses/">Licenze</a></nav><p>Progetto personale e indipendente. I contenuti non costituiscono consulenza professionale e il progetto non è approvato, sponsorizzato o affiliato a datori di lavoro o terze parti.</p></div></footer><a aria-label="Back to top" class="back-top" href="#top">↑</a>
 <script>document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',async function(){var text=document.getElementById(btn.dataset.copy).textContent;var status=btn.parentElement.querySelector('.copy-status'),ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch(e){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{ok=!!document.execCommand('copy')}catch(_){ok=false}ta.remove()}status.textContent=ok?"Prompt copiato":"Copia non riuscita";status.style.color=ok?'':'#ffb4a8';setTimeout(function(){status.textContent='';status.style.color=''},2400)})});</script><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script defer src="/assets/site-shell.js"></script>
 </body></html>

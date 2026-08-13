@@ -1,6 +1,6 @@
 # Contesto per la prossima sessione
 
-Stato al 12 agosto 2026. Questo file serve a ripartire senza rileggere tutto.
+Stato al 13 agosto 2026. Questo file serve a ripartire senza rileggere tutto.
 
 ## Cos'è questo repository
 
@@ -12,7 +12,7 @@ un file e si modifica. Per provarlo in locale:
 python -m http.server 4173 --directory <cartella del repo>
 ```
 
-**60 pagine HTML**: 56 editoriali (italiano, inglese, spagnolo) e 4 applicazioni.
+**63 pagine HTML**: 58 editoriali (italiano, inglese, spagnolo) e 5 applicazioni.
 
 ## I due layer di stile
 
@@ -21,12 +21,12 @@ Sono mutuamente esclusivi e non possono contaminarsi:
 
 | File | Si applica a | Aggancio |
 |---|---|---|
-| `assets/tal-design.css` | 56 pagine editoriali | `html:not(.tal-tool-page)` |
+| `assets/tal-design.css` | 58 pagine editoriali | `html:not(.tal-tool-page)` |
 | `assets/tal-experience.js` | idem | sfondo animato, comparsa allo scroll |
-| `assets/tal-app.css` | 4 applicazioni | `html.tal-tool-page` |
+| `assets/tal-app.css` | 5 applicazioni | `html.tal-tool-page` |
 | `assets/tal-app.js` | idem | barra comandi condivisa |
 
-Gli indirizzi portano `?v=20260812`: **va incrementato a ogni modifica dei
+Gli indirizzi portano `?v=20260812` (`?v=20260813` sulle pagine nuove): **va incrementato a ogni modifica dei
 fogli**, altrimenti i browser di chi ha già visitato il sito servono la versione
 vecchia.
 
@@ -44,10 +44,10 @@ Documentazione di dettaglio: `assets/tal-design.README.md`.
 - **Sidebar dei tool**: petrolio, stato attivo in pastiglia bianca.
 - Tutto il movimento rispetta `prefers-reduced-motion`.
 
-## I quattro tool
+## I cinque tool
 
 `/tools/financial-statement/` · `/tools/financial-analysis/` · `/tools/lipe/` ·
-`/tools/tfa-client-file/`
+`/tools/tfa-client-file/` · `/tools/f24/`
 
 Sono **solo in italiano**. Le pagine `/en/tools/<slug>/` e `/es/tools/<slug>/`
 sono pagine di avviso in `noindex` che spiegano perché e rimandano alla versione
@@ -55,7 +55,8 @@ italiana. Scelta deliberata: mantenere tre copie tradotte di applicazioni che
 cambiano ogni settimana significa correggere una lingua e lasciare indietro le
 altre due.
 
-Struttura comune della sidebar, uguale nei quattro:
+Struttura comune della sidebar, uguale nei primi quattro (per il quinto vedi
+più sotto: il Generatore F24 tiene di proposito un percorso numerato):
 
 ```
 CONFIGURAZIONE     Clienti · Importa da Excel · Configura con AI
@@ -74,6 +75,7 @@ strade: Importa da Excel, Inizia a mano, Prova con i dati dimostrativi.
 | `financial-analysis` | completo dalla 2.1.0 | sì |
 | `tfa-client-file` | completo (è il riferimento originario) | sì (`#/profilo/tax`) |
 | `lipe` | ha solo «Esporta e storico»: mancano Dati e backup e Come si usa | no |
+| `f24` | completo, ma sotto al percorso a quattro passi | sì (`#/verifica`) |
 
 **Attenzione a come si legge la sidebar di `financial-analysis`.** Un `grep` sul
 sorgente restituisce i gruppi «Flusso di lavoro» e «Gestione»: appartengono alle
@@ -92,9 +94,18 @@ La CSS di `.foot` è rimasta lì di proposito — la stringa «foot» compare an
 jsPDF minificato (`n.foot.length`, `showFoot`) e una sostituzione larga
 romperebbe il motore PDF.
 
+**Il Generatore F24 non ha la sidebar comune, ed è una scelta.** È l'unico tool
+con un percorso numerato a quattro passi (Contribuente · Pagamenti · Verifica ·
+Scarica), perché quello che l'utente prepara non è un documento ma un
+versamento con una scadenza, e l'ordine dei passi è vincolante. Sotto al
+percorso ci sono comunque le voci comuni — Archivio contribuenti, Archivio
+crediti, Configura con AI, Dati e backup, Come si usa — e tutto il resto
+(colori, controlli, tabelle, finestre, barra comandi) viene da `tal-app.css`.
+Se in futuro si uniformasse, il lavoro è sostituire la sola `.workspace-nav`.
+
 Versioni reali (allineate ovunque, anche nei dati strutturati):
 `1.4.0` Bilancio civilistico · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
-cliente · `3.4.1→3.4.3` LIPE.
+cliente · `3.4.1→3.4.3` LIPE · `1.0.0` Generatore F24.
 
 ## Trappole verificate sul campo
 
@@ -342,6 +353,126 @@ sequenza. 16 controlli sul flusso completo, tutti passati.
 **«Dati e backup»** e **«Come si usa»**, deep link su tutte e sette le sezioni.
 LIPE era l'ultimo tool non allineato.
 
+## Generatore F24 — nuovo, 1.0.0
+
+Integrato il 13 agosto 2026 partendo dallo standalone `F24_Massivo_v0.9.0`.
+Non è un travaso: il codice applicativo è stato riscritto in un blocco solo.
+
+**Perché la riscrittura non era rimandabile.** La 0.9.0 **si rompeva
+all'avvio**: `renderOutputSummary` scriveva su `#telematicNotice`, un elemento
+che nel markup non è mai esistito. L'eccezione partiva da `setMode('single')` e
+fermava la riga di boot, quindi `renderAll()`, `goStage()` e
+`restoreAutosavePrompt()` non venivano mai eseguiti. Il blocco telematico più
+avanti ridefiniva `renderOutputSummary` e nascondeva il sintomo *dopo* il boot:
+il difetto era invisibile guardando la pagina, ma **il ripristino del
+salvataggio automatico era morto** — verificato piantando un progetto in
+`localStorage`, la finestra «Riprendere il lavoro?» non compariva mai.
+
+Gli altri tre difetti chiusi: `addRow`, `duplicateRow`, `deleteRow` e
+`toggleSelectAll` non chiamavano `touchState()`, quindi la memoizzazione non si
+invalidava e **cancellare una riga non toglieva l'F24 corrispondente** né
+dall'elenco né dai totali né dallo ZIP; `importClientsFile` chiamava
+`excelDate()`, funzione inesistente, quindi ogni import di anagrafiche da Excel
+terminava con un'eccezione; nella sezione INAIL il saldo era scritto a Y 229,4
+mentre gli importi della stessa riga stanno a 228,0.
+
+**Un difetto emerso solo sotto carico**, con 50 società da 40 righe: la
+capienza delle sezioni veniva calcolata in `groupF24()` ma non arrivava a
+`validateProject()`. Il pulsante dichiarava «pronto» e l'esportazione poi si
+rifiutava. Ora i rilievi del modello nel suo insieme stanno in `g.ownIssues` e
+sono errori bloccanti a tutti gli effetti.
+
+**Struttura.** Quattro blocchi in sequenza, nessuna funzione ridefinita:
+`core` (stato, utilità, codici tributo, modello, validazione) · `io`
+(importazione, template, PDF, esportazioni) · `telematic` · `ui`. Nessun
+`onclick` inline: tutto passa da `data-action` con delega sul documento, che
+toglie alla radice la classe di problemi dell'audit della 0.7.0 invece di
+filtrarla. `confirm`, `prompt` e `alert` nativi sostituiti da finestre proprie.
+
+**Coordinate del PDF: non toccarle.** Sono calibrate sul modello ministeriale
+in millimetri, tre copie, e sono il risultato di più iterazioni di confronto
+con la stampa. Il file incorpora le tre PNG del modello ufficiale (≈600 KB in
+totale), quindi **ogni PDF pesa circa 0,6 MB**: cento modelli fanno una
+sessantina di megabyte e una ventina di secondi. La generazione dello ZIP
+mostra l'avanzamento e restituisce il thread fra un modello e l'altro, e la
+schermata di download dichiara il peso previsto prima di partire.
+
+**Funzioni nuove rispetto allo standalone:** libreria di ~70 codici tributo con
+descrizione e sezione attesa, estendibile con codici propri dell'utente (codice
+sconosciuto o in sezione errata = avviso, mai blocco); «Riprendi dal mese
+precedente» (copia struttura, sposta data e periodo, azzera gli importi e **non
+copia le compensazioni**); regole ricorrenti per contribuente (codice → flusso,
+matricola e sede predefinite), applicate solo dove il dato manca; archivio
+crediti; sezioni «Dati e backup» e «Come si usa», che nella 0.9.0 erano
+`<section>` vuote; percorso «Prova con i dati dimostrativi»; deep link su tutte
+e nove le sezioni.
+
+**L'archivio crediti è dichiarativo, e lo dice.** Il residuo nasce da quello che
+l'utente annota meno gli utilizzi che il tool riconosce nei progetti. Non è il
+cassetto fiscale: il pannello lo scrive in chiaro. Rileva due cose che il
+singolo modello non mostra — l'utilizzo oltre il dichiarato e lo stesso importo
+a credito che compare in due F24 della stessa elaborazione.
+
+**Il telematico è dietro una conferma esplicita.** Il tracciato A/M/V/Z non è
+mai passato dal modulo di controllo dell'Agenzia: finché non lo fa è una bozza
+tecnica. La generazione è disabilitata finché l'utente non spunta di aver letto
+l'avviso. È l'unico varco di questo tipo nella suite, ed è voluto.
+
+**Verificato sulla pagina viva:** zero errori JavaScript; import singolo e
+massivo; template scaricato e riletto dal parser del tool senza rilievi (stessa
+trappola del Bilancio e dell'Analisi); PDF a tre pagine; ZIP di 20 modelli in
+4,4 s per 12 MB; 50 società × 40 righe = 2.000 righe e 200 modelli con
+`renderAll` in 16 ms; autosalvataggio scritto e **ripristinato**; nessuno
+scorrimento orizzontale a 375, 768 e desktop; audit statico del sito 63 pagine,
+1.036 link, 0 problemi.
+
+**Attenzione ai dati di esempio.** La P.IVA dimostrativa `01234567894` non
+supera il controllo di validità: la cifra corretta è `01234567897`. È lo stesso
+inciampo dei template di Bilancio e Analisi — un esempio che non funziona fa
+sembrare rotto il tool. Ora l'esempio del template, i dati dimostrativi e il
+file di «Configura con AI» usano gli stessi identificativi validi, e il
+template pubblicato è **generato dagli stessi header del tool** (`make_template`
+legge `TEMPLATE_HEADERS` dal sorgente) proprio per non poter divergere.
+
+## Contrasto — due correzioni nel layer condiviso, 13 agosto 2026
+
+L'audit di contrasto precedente dichiarava «nessun fallimento su 4 tool», ma
+**non risolveva i gradienti**: quando il fondo era un `background-image` e non
+un `background-color`, risaliva la catena dei genitori fino alla carta chiara e
+misurava il rapporto contro quella. Due difetti veri erano invisibili a quel
+metodo. Il misuratore corretto prende, di un gradiente, **il colore più scuro
+fra gli stop**, cioè il caso peggiore.
+
+1. **`.sb-logo`** (il monogramma della sidebar, tutti e cinque i tool): testo
+   `#08252F` su `#4FCBE4 → #1D6A7F`. Angolo chiaro 8,35:1, angolo scuro
+   **2,60:1**. Secondo stop portato a `#3FA6C0` → **5,64:1**, e resta più scuro
+   del primo, quindi il rilievo del gradiente non si perde. Non è stata toccata
+   `--tal-accent-2`: serve altrove su fondi chiari.
+2. **`.badge.dark`** (solo LIPE, tre occorrenze): stava nello stesso elenco
+   delle pastiglie che vivono dentro `#sidebar`, `.summary-bar` e simili, ma
+   **per il nome, non per il contesto**. In LIPE sta dentro `.panel-heading`,
+   cioè su una scheda bianca: testo `#F7F7F5` su una velatura chiara sopra il
+   bianco, **1,07:1**, di fatto invisibile. Ora ha un fondo `var(--tal-ink)`
+   vero → **16,04:1**.
+
+Esito dopo le correzioni, con il misuratore che risolve i gradienti:
+
+| Tool | Elementi con testo | Fallimenti |
+|---|---:|---:|
+| Bilancio civilistico | 74 | 0 |
+| Analisi di bilancio | 103 | 0 |
+| Generatore LIPE | 113 | 0 |
+| Fascicolo cliente | 91 | 3 (`.chev`, decorativo — vedi Aperto) |
+| Generatore F24 | 608 | 0 |
+
+**Attenzione al `?v=` durante lo sviluppo.** Il numero è stato portato a
+`20260813` su tutte e cinque le applicazioni. In produzione basta: nessun
+visitatore ha mai scaricato quella versione. In locale invece la pagina F24
+usava già `?v=20260813` prima che il foglio cambiasse, quindi il browser
+serviva il contenuto vecchio sotto lo stesso indirizzo e le misure risultavano
+invariate. Per verificare una modifica al foglio condiviso, sostituire il
+`<link>` con uno che porti una query casuale, altrimenti si misura la cache.
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia
@@ -366,6 +497,20 @@ LIPE era l'ultimo tool non allineato.
   ha (`#/profilo/tax`), il Bilancio ora anche, gli altri due no.
 - **Stato «Non salvato»** della barra comandi: il ramo di codice esiste ma non è
   stato possibile provarlo (non si riesce a esaurire la quota del browser).
+- **F24, file telematico**: farlo passare dal **modulo di controllo F24A0
+  dell'Agenzia**. È il gate di rilascio della funzione: finché non è fatto la
+  generazione resta dietro la conferma esplicita. Stessa natura del punto aperto
+  su LIPE, e converrebbe farli nello stesso giro.
+- **F24, codici tributo**: l'elenco incorporato è di riferimento e non
+  esaustivo, con INPS e INAIL volutamente più stretti dell'Erario. Un codice
+  fuori elenco produce un avviso, non un blocco, e l'utente può aggiungerlo.
+  Vale la pena allargarlo con un elenco ufficiale, non a memoria.
+- **Contrasto delle freccette `.chev` nel Fascicolo**: il glifo «›» a 22px sta a
+  **2,40:1**. È decorativo — l'etichetta accanto porta il significato — quindi
+  non è testo informativo, ma resta sotto anche la soglia 3:1 dei componenti non
+  testuali. Sta nella CSS propria del Fascicolo, non nel layer condiviso: si
+  chiude portando il glifo a un grigio più scuro o dandogli `aria-hidden` e
+  trattandolo come pura decorazione.
 - **Traduzioni dei tool** in inglese e spagnolo, quando smetteranno di cambiare.
 - **Etichetta di release della suite**: per ora ogni tool tiene il suo numero
   reale, senza numerazione unica.

@@ -187,8 +187,16 @@ html.tal-tool-page :is(.fs-link,.lipe-link):hover{
   background:rgba(247,247,245,.10) !important;
   color:#fff !important;
 }
+/* Il monogramma è testo scuro su un gradiente: conta l'estremo più scuro, non
+   la media. Con `var(--tal-accent-2)` (#1D6A7F) in coda l'angolo in basso a
+   destra stava a 2,60:1, sotto la soglia, mentre l'angolo chiaro era a 8,35:1 —
+   per questo l'audit di contrasto non lo aveva mai visto: risolveva il colore
+   di fondo e non i gradienti. Il secondo stop si ferma ora a #3FA6C0 (5,64:1):
+   resta più scuro del primo, quindi il rilievo del gradiente non si perde.
+   Non usare qui --tal-accent-2: quella variabile serve altrove su fondi chiari
+   e non va spostata per un caso che riguarda solo questa pastiglia. */
 html.tal-tool-page .sb-logo{
-  background:linear-gradient(135deg,#4FCBE4 0%,var(--tal-accent-2) 100%) !important;
+  background:linear-gradient(135deg,#4FCBE4 0%,#3FA6C0 100%) !important;
   border:1px solid rgba(247,247,245,.26) !important;
   color:#08252F !important;
   border-radius:11px !important;
@@ -396,8 +404,20 @@ html.tal-tool-page .badge{
 html.tal-tool-page :is(.badge.ok,.badge.saved){background:var(--tal-ok-bg) !important;color:var(--tal-ok) !important}
 html.tal-tool-page :is(.badge.warn,.badge.danger){background:var(--tal-warn-bg) !important;color:var(--tal-warn) !important}
 html.tal-tool-page .badge.info{background:var(--tal-info-bg) !important;color:var(--tal-info) !important}
-html.tal-tool-page :is(.badge.dark,.tab.active .badge,:is(#sidebar,.sidebar,.summary-bar,.tal-publication,header.top) .badge){
+/* Queste pastiglie vivono dentro superfici scure: la velatura chiara al 14%
+   basta a staccarle dal fondo e il testo chiaro ci si legge sopra. */
+html.tal-tool-page :is(.tab.active .badge,:is(#sidebar,.sidebar,.summary-bar,.tal-publication,header.top) .badge){
   background:rgba(247,247,245,.14) !important;
+  color:#F7F7F5 !important;
+}
+
+/* `.badge.dark` invece era nello stesso elenco solo per il nome, ma la usa il
+   LIPE dentro `.panel-heading`, cioè su una scheda **bianca**: il risultato era
+   testo #F7F7F5 su una velatura chiara sopra il bianco, 1,07:1, di fatto
+   invisibile. Il nome della classe prometteva una pastiglia scura: ora lo è
+   davvero, e il contrasto non dipende più dal fondo su cui capita. */
+html.tal-tool-page .badge.dark{
+  background:var(--tal-ink) !important;
   color:#F7F7F5 !important;
 }
 

@@ -446,12 +446,29 @@ body{margin:0;overflow-x:hidden}
 
 .editor-main{min-width:0}
 .f24-head-card{
-  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;
   padding:15px 18px;margin-bottom:12px;border:1px solid var(--f24-line-2);
   border-left:4px solid var(--f24-accent);border-radius:var(--f24-r-lg);background:var(--f24-card);
 }
 .f24-head-card h2{margin:0 !important;font-size:17px !important}
 .f24-head-card p{margin:3px 0 0;font-size:12.5px;color:var(--f24-ink-3)}
+.f24-head-main{min-width:260px;flex:1}
+.f24-head-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px;max-width:420px}
+.pending-tag{
+  display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;vertical-align:middle;
+  background:var(--f24-gold-bg);border:1px solid var(--f24-gold-line);color:var(--f24-gold);
+  font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.group-item.pending{border-style:dashed;border-color:var(--f24-gold-line)}
+
+.demo-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin:12px clamp(18px,3.5vw,44px) 0;padding:11px 16px;
+  border:1px solid var(--f24-gold-line);border-left:4px solid var(--f24-gold);
+  border-radius:var(--f24-r);background:var(--f24-gold-bg);
+  font-size:12.5px;line-height:1.5;color:#6d5411;
+}
+.demo-banner b{color:var(--f24-gold)}
 .f24-metrics{display:flex;gap:8px;flex-wrap:wrap}
 .metric-pill{
   display:flex;flex-direction:column;gap:1px;padding:7px 13px;border-radius:var(--f24-r);
@@ -698,6 +715,7 @@ body{margin:0;overflow-x:hidden}
 .telematic-gate p{margin:0 0 10px;font-size:12.5px;line-height:1.55;color:#6d5411}
 .telematic-gate label{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;cursor:pointer;color:#4d3c0c}
 .telematic-gate a{color:inherit}
+.telematic-spec{margin:0 0 10px !important;font-size:11.5px !important;line-height:1.5;color:#6d5411 !important;border-top:1px dashed var(--f24-gold-line);padding-top:9px}
 .telematic-format-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;margin:12px 0}
 .telematic-format{
   display:flex;flex-direction:column;gap:2px;padding:12px 14px;text-align:left;
@@ -740,8 +758,11 @@ body{margin:0;overflow-x:hidden}
 
 /* ---------- Finestre e messaggi ------------------------------------------ */
 
+/* L'intestazione globale di site-shell.css sta a z-index 5000: con l'overlay
+   a 120 le finestre finivano **sotto** la barra del sito, che ne copriva il
+   titolo e a volte il comando di chiusura. Da qui in su non c'è nient'altro. */
 .modal-ov{
-  position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
   padding:20px;background:rgba(11,47,61,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
 }
 .modal-ov.open{display:flex}
@@ -882,6 +903,11 @@ body.modal-open{overflow:hidden}
 </div>
 </details>
 </section>
+
+<div class="demo-banner no-print" hidden id="demoBanner" role="status">
+<span><b>Stai usando i dati dimostrativi.</b> Niente di quello che fai qui viene salvato: il tuo archivio contribuenti, i crediti e il progetto restano intatti.</span>
+<button class="btn secondary" data-action="exit-demo" type="button">Esci dalla demo</button>
+</div>
 
 <main class="stage-area">
 
@@ -1405,6 +1431,21 @@ body.modal-open{overflow:hidden}
 <div class="modal-actions">
 <button class="btn secondary" data-action="close-modal" data-modal="modalRowDetail" type="button">Annulla</button>
 <button class="btn" data-action="save-row-detail" type="button">Salva dettagli</button>
+</div></div></div>
+
+<div aria-labelledby="newF24Title" aria-modal="true" class="modal-ov" id="modalNewF24" role="dialog">
+<div class="modal small"><button aria-label="Chiudi finestra" class="x" data-action="close-modal" data-modal="modalNewF24" type="button">×</button>
+<h3 id="newF24Title">Imposta il modello</h3>
+<div class="sub">Contribuente, data di pagamento e flusso definiscono l’F24. Puoi cambiarli in qualunque momento dall’intestazione del modello.</div>
+<div class="grid">
+<div class="field full"><label for="nfClient">Contribuente</label><select id="nfClient"></select></div>
+<div class="field"><label for="nfDate">Data di pagamento</label><input id="nfDate" type="date"/></div>
+<div class="field"><label for="nfFlow">Flusso</label><input id="nfFlow" placeholder="Dipendenti, IVA, IMU…"/></div>
+</div>
+<p class="help" style="margin-top:10px">Righe con stesso contribuente, stessa data e stesso flusso confluiscono in questo modello. Se lasci vuoto il flusso ne viene assegnato uno progressivo.</p>
+<div class="modal-actions">
+<button class="btn secondary" data-action="close-modal" data-modal="modalNewF24" type="button">Annulla</button>
+<button class="btn" data-action="confirm-new-f24" type="button">Crea F24 e aggiungi la prima riga</button>
 </div></div></div>
 
 <div aria-labelledby="carryTitle" aria-modal="true" class="modal-ov" id="modalCarry" role="dialog">
@@ -1989,7 +2030,17 @@ const state = {
     dirty: false,
     autosaveFailed: false,
     telematic: null,
-    telematicAcknowledged: false
+    telematicAcknowledged: false,
+    /* Sessione dimostrativa: finché è attiva nulla viene scritto negli
+       archivi del browser. Prima i dati di prova li **sostituivano** — chi
+       aveva cinquanta anagrafiche e premeva «Prova con i dati dimostrativi»
+       per curiosità le perdeva. */
+    demo: false,
+    /* F24 appena impostato e non ancora riempito. Non entra in groupF24(),
+       che resta la sola verità su totali, controlli e output, ma esiste per
+       la rail e per la compilazione guidata: senza, le righe create a mano
+       non comparivano da nessuna parte. */
+    pendingGroup: null
 };
 
 const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
@@ -2049,6 +2100,11 @@ function sanitizeFlow(v) {
         .replace(/[^A-Za-z0-9À-ÖØ-öø-ÿ _.-]/g, '')
         .replace(/\s+/g, ' ').slice(0, 30);
     return cleaned || '1';
+}
+
+/* «1 righe» in un prodotto per professionisti si nota. */
+function plurale(n, singolare, plurale_) {
+    return n + ' ' + (n === 1 ? singolare : plurale_);
 }
 
 function roundMoney(v) { return Math.round((Number(v) || 0) * 100) / 100; }
@@ -2134,6 +2190,17 @@ function isValidItalianIban(v) {
         for (const d of part) rem = (rem * 10 + Number(d)) % 97;
     }
     return rem === 1;
+}
+
+/* 31/02 non esiste. Prima diventava «2026-02-31» e da lì entrava nel PDF e
+   nel tracciato telematico: una data che nessun calendario riconosce. */
+function isRealDate(iso) {
+    const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return false;
+    const y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1) return false;
+    const giorni = [31, (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return d <= giorni[mo - 1];
 }
 
 function dateISO(v) {
@@ -2466,7 +2533,11 @@ function readStore(key, fallback) {
     } catch (e) { return fallback; }
 }
 
+/* In sessione dimostrativa ogni scrittura viene ignorata: è il punto in cui
+   la demo diventa incapace di toccare i dati veri, invece che semplicemente
+   poco propensa a farlo. */
 function writeStore(key, value) {
+    if (state.demo) return true;
     try { localStorage.setItem(key, JSON.stringify(value)); return true; }
     catch (e) { return false; }
 }
@@ -2606,17 +2677,50 @@ function meaningfulRow(r) {
 
 const F24_CAPACITY = { erario: 6, inps: 4, regioni: 4, imu: 4, inail: 3, altri: 2 };
 
+/* Campi che il modello ministeriale richiede in quella sezione, a
+   prescindere dal singolo codice. Prima esisteva un solo controllo generico
+   e una riga INPS DM10 senza periodo di riferimento risultava «Pronta»: il
+   semaforo verde diceva una cosa che non era vera.
+
+   Deliberatamente si fermano alla sezione e non pretendono di conoscere le
+   regole del singolo tributo: quelle stanno sulle istruzioni dell'Agenzia e
+   il tool non le ha verificate. Dove il campo dipende dal codice la
+   segnalazione resta un avviso. */
+const SECTION_REQUIRED = {
+    erario:  [['taxCode', 'Codice tributo'], ['year', 'Anno di riferimento']],
+    inps:    [['officeCode', 'Codice sede'], ['taxCode', 'Causale contributo'],
+              ['reference', 'Matricola o codice posizione'], ['periodFrom', 'Periodo di riferimento «da»']],
+    regioni: [['officeCode', 'Codice regione'], ['taxCode', 'Codice tributo'], ['year', 'Anno di riferimento']],
+    imu:     [['officeCode', 'Codice ente / Comune'], ['taxCode', 'Codice tributo'], ['year', 'Anno di riferimento']],
+    inail:   [['officeCode', 'Codice sede'], ['inailCompanyCode', 'Codice ditta'],
+              ['inailCc', 'C.C.'], ['reference', 'Numero di riferimento'], ['taxCode', 'Causale']],
+    altri:   [['entityCode', 'Codice ente'], ['taxCode', 'Causale contributo'], ['positionCode', 'Codice posizione']]
+};
+
 function rowIssues(r) {
     const issues = [...(r.importIssues || [])];
     if (!r.clientId) issues.push('Contribuente non associato');
     if (!r.paymentDate) issues.push('Data di pagamento mancante');
-    if (!r.taxCode) issues.push('Codice tributo o causale mancante');
+    else if (!isRealDate(r.paymentDate)) issues.push(`Data di pagamento inesistente nel calendario: ${dateIT(r.paymentDate)}`);
+
     const sk = sectionKey(r.section);
-    if (!r.year && !['inps', 'inail', 'altri'].includes(sk)) issues.push('Anno di riferimento mancante');
+    (SECTION_REQUIRED[sk] || []).forEach(([campo, etichetta]) => {
+        if (!String(r[campo] ?? '').trim()) {
+            issues.push(`${etichetta}: obbligatorio nella sezione ${SECTION_UI[sk].label}`);
+        }
+    });
+
     if (r.debit > 0 && r.credit > 0) issues.push('Debito e credito indicati sulla stessa riga');
     if (r.debit <= 0 && r.credit <= 0) issues.push('Importo non indicato');
+    if (r.year && !/^\d{4}$/.test(String(r.year).trim())) issues.push('Anno di riferimento: servono quattro cifre');
     if (sk === 'imu' && r.numImmobili && !/^\d{1,3}$/.test(String(r.numImmobili))) issues.push('Numero immobili non valido');
     if (r.coobligorCf && !isValidTaxCode(r.coobligorCf)) issues.push('Codice fiscale del coobbligato non valido');
+    ['periodFrom', 'periodTo'].forEach(k => {
+        const v = String(r[k] ?? '').trim();
+        if (v && !/^(0[1-9]|1[0-2])\/\d{4}$/.test(v)) {
+            issues.push(`${k === 'periodFrom' ? 'Periodo «da»' : 'Periodo «a»'}: usa il formato MM/AAAA`);
+        }
+    });
     return [...new Set(issues)];
 }
 
@@ -2630,6 +2734,12 @@ function rowWarnings(r) {
         out.push(`Codice ${code} non presente nell’elenco di riferimento: verifica le istruzioni del tributo`);
     } else if (known.s !== sectionKey(r.section)) {
         out.push(`Il codice ${code} (${known.l}) è previsto nella sezione ${SECTION_UI[known.s].label}, non in ${SECTION_UI[sectionKey(r.section)].label}`);
+    }
+    /* Il periodo «a» dipende dal contributo: su alcune causali INPS si
+       compila, su altre no. Avviso, non blocco: il tool non conosce la
+       regola del singolo codice e non deve fingere di conoscerla. */
+    if (sectionKey(r.section) === 'inps' && r.periodFrom && !r.periodTo) {
+        out.push('Periodo «a» non indicato: verifica se questa causale lo richiede');
     }
     return out;
 }
@@ -3028,16 +3138,20 @@ function buildTemplateSheet(mass) {
     const ent  = mass ? ['ALFA S.R.L.', '01234567897', '01234567897'] : ['', '', ''];
     const ent2 = mass ? ['BETA S.P.A.', '09876543217', '09876543217'] : ['', '', ''];
     const blank = () => Array(TEMPLATE_HEADERS.length).fill('');
-    const make = (company, flow, desc, date, section, tax, period, year, debit, credit, office, ref, note) => {
+    const make = (company, flow, desc, date, section, tax, period, year, debit, credit, office, ref, note, pf, pt) => {
         const r = blank();
         r[0] = company[0]; r[1] = company[1]; r[2] = company[2];
         r[3] = flow; r[4] = desc; r[5] = date; r[6] = section; r[7] = tax; r[8] = period; r[9] = year;
-        r[10] = debit; r[11] = credit; r[12] = office || ''; r[13] = ref || ''; r[29] = note || '';
+        r[10] = debit; r[11] = credit; r[12] = office || ''; r[13] = ref || '';
+        r[14] = pf || ''; r[15] = pt || ''; r[29] = note || '';
         return r;
     };
     const sample = [
         make(ent, '1', 'Dipendenti', '16/09/2026', 'Erario', '1001', '0008', '2026', 12000, '', '', '', 'Ritenute lavoro dipendente'),
-        make(ent, '1', 'Dipendenti', '16/09/2026', 'INPS', 'DM10', '', '2026', 28000, '', '1234', 'ABC123', 'Contributi dipendenti'),
+        /* La riga INPS porta i periodi: senza, l'esempio del template
+           produrrebbe un modello con un errore bloccante, e chi lo scarica
+           per capire come funziona vedrebbe il tool «rotto». */
+        make(ent, '1', 'Dipendenti', '16/09/2026', 'INPS', 'DM10', '', '2026', 28000, '', '1234', 'ABC123', 'Contributi dipendenti', '08/2026', '08/2026'),
         make(ent, '2', 'Autonomi', '16/09/2026', 'Erario', '1040', '0008', '2026', 5500, '', '', '', 'Ritenute lavoro autonomo'),
         make(ent, '2', 'Autonomi', '16/09/2026', 'Erario', '6099', '', '2025', '', 2000, '', '', 'Credito IVA in compensazione')
     ];
@@ -3532,6 +3646,17 @@ function downloadPrimaryOutput() {
 const TELEMAT_RECORD_LENGTH = 1900;
 const TELEMAT_CONTENT_LENGTH = 1898;
 const TELEMAT_MAX_CUMULATIVE_MODELS = 99;
+
+/* Dire rispetto a cosa e' allineato il tracciato serve a sapere quando e'
+   invecchiato: l'Agenzia aggiorna il modulo di controllo e l'elenco dei
+   codici piu' volte l'anno, e un file costruito su specifiche vecchie viene
+   scartato senza che il tool possa accorgersene da solo. */
+const TELEMAT_SPEC = {
+    tracciato: 'F24A0',
+    provvedimento: 'Provvedimento Agenzia delle Entrate 2015/33665',
+    allineatoAl: 'agosto 2026',
+    validatoConModuloUfficiale: false
+};
 
 function defaultTelematicConfig() {
     return {
@@ -4114,11 +4239,12 @@ function renderTelematicPanel() {
 
     host.innerHTML =
         `<div class="telematic-head"><div><span class="stage-kicker">File telematico</span>` +
-        `<h3>Tracciato F24A0</h3><p>Record A/M/V/Z a lunghezza fissa di 1.900 caratteri.</p></div>` +
+        `<h3>Tracciato ${esc(TELEMAT_SPEC.tracciato)}</h3><p>Record A/M/V/Z a lunghezza fissa di 1.900 caratteri.</p></div>` +
         `<span class="telematic-version">Da validare</span></div>` +
 
         `<div class="telematic-gate"><b>Questo tracciato non è ancora stato validato dal modulo di controllo dell’Agenzia delle Entrate.</b>` +
-        `<p>La generazione qui dentro non sostituisce quel controllo: il file va aperto in Desktop Telematico con il modulo F24A0, corretto se il modulo segnala rilievi, quindi autenticato e inviato. Il software di controllo è gratuito e scaricabile dal sito dell’Agenzia. Finché non lo hai fatto, trattalo come una bozza tecnica e non come un file pronto alla trasmissione.</p>` +
+        `<p>La generazione qui dentro non sostituisce quel controllo: il file va aperto in Desktop Telematico con il modulo ${esc(TELEMAT_SPEC.tracciato)}, corretto se il modulo segnala rilievi, quindi autenticato e inviato. Il software di controllo è gratuito e scaricabile dal sito dell’Agenzia. Finché non lo hai fatto, trattalo come una bozza tecnica e non come un file pronto alla trasmissione.</p>` +
+        `<p class="telematic-spec">Costruito su: ${esc(TELEMAT_SPEC.provvedimento)} · allineato ad ${esc(TELEMAT_SPEC.allineatoAl)}. L’Agenzia aggiorna modulo di controllo ed elenco dei codici più volte l’anno: se la tua versione di Desktop Telematico è più recente, verifica che non siano cambiati campi o codici che usi.</p>` +
         `<label for="telematicAck"><input id="telematicAck" type="checkbox"${state.telematicAcknowledged ? ' checked' : ''}> Ho capito: controllerò il file con il software dell’Agenzia prima di trasmetterlo.</label></div>` +
 
         `<div class="telematic-format-grid">` +
@@ -4460,12 +4586,68 @@ function confirmMassReview() {
 
 /* ---------- Righe --------------------------------------------------------- */
 
+function groupKeyOf(clientId, date, flow) {
+    return [clientId, date || '', sanitizeFlow(flow)].join('|');
+}
+
+/* L'F24 appena impostato non ha ancora righe complete, quindi non compare in
+   groupF24(). Qui viene ricostruito con la stessa chiave che avrà quando la
+   prima riga sarà completa: nel momento in cui lo diventa, il gruppo vero
+   prende il suo posto senza che l'utente veda nulla cambiare. */
+function pendingGroupView() {
+    const p = state.pendingGroup;
+    if (!p) return null;
+    const rows = state.rows.filter(r => groupKeyOf(r.clientId, r.paymentDate, r.flow) === p.key);
+    return {
+        key: p.key, clientId: p.clientId, date: p.date, flow: p.flow, flowDesc: p.flowDesc,
+        client: clientById(p.clientId) || {},
+        rows, issues: [], ownIssues: [],
+        debit: 0, credit: 0, balance: 0, debitCents: 0, creditCents: 0, balanceCents: 0,
+        label: `${dateIT(p.date) || 'Data da indicare'} · ${p.flowDesc || 'Flusso ' + p.flow}`,
+        pending: true
+    };
+}
+
 function currentGroup() {
     const groups = groupF24();
     let g = groups.find(x => x.key === state.activeGroup);
+    if (!g && state.pendingGroup && state.pendingGroup.key === state.activeGroup) return pendingGroupView();
     if (!g && state.activeGroup !== 'draft' && groups.length) g = groups[0];
     if (g) state.activeGroup = g.key;
     return g || null;
+}
+
+/* Data, flusso e descrizione si cambiano dall'intestazione del modello e
+   valgono per tutte le sue righe: prima non c'era un solo punto
+   dell'interfaccia in cui impostarli, quindi un F24 creato a mano restava
+   bloccato su «Data di pagamento mancante» per sempre. */
+function setGroupField(key, field, value) {
+    const g = groupF24().find(x => x.key === key) || (state.pendingGroup && state.pendingGroup.key === key ? pendingGroupView() : null);
+    if (!g) return;
+    const righe = g.rows.slice();
+    let nuovaChiave = key;
+    if (field === 'date') {
+        const iso = dateISO(value) || value;
+        if (iso && !isRealDate(iso)) return toast('Data inesistente nel calendario', true);
+        righe.forEach(r => { r.paymentDate = iso; });
+        nuovaChiave = groupKeyOf(g.clientId, iso, g.flow);
+    } else if (field === 'flowDesc') {
+        righe.forEach(r => { r.flowDesc = value; });
+        if (state.pendingGroup && state.pendingGroup.key === key) state.pendingGroup.flowDesc = value;
+    } else if (field === 'flow') {
+        const f = sanitizeFlow(value);
+        righe.forEach(r => { r.flow = f; });
+        nuovaChiave = groupKeyOf(g.clientId, g.date, f);
+    }
+    if (state.pendingGroup && state.pendingGroup.key === key) {
+        if (field === 'date') state.pendingGroup.date = righe.length ? righe[0].paymentDate : dateISO(value);
+        if (field === 'flow') state.pendingGroup.flow = sanitizeFlow(value);
+        state.pendingGroup.key = groupKeyOf(state.pendingGroup.clientId, state.pendingGroup.date, state.pendingGroup.flow);
+        nuovaChiave = state.pendingGroup.key;
+    }
+    state.activeGroup = nuovaChiave;
+    touchState();
+    renderAll();
 }
 
 function setRow(id, key, value) {
@@ -4532,19 +4714,6 @@ function addRowToCurrentGroup() {
     renderAll();
 }
 
-function addManualGroup() {
-    let clientId = state.selectedClientId || (state.rows[0] && state.rows[0].clientId) || '';
-    if (state.mode === 'mass' && !clientId) {
-        clientId = [...new Set(state.rows.map(r => r.clientId).filter(Boolean))][0] || '';
-    }
-    if (!clientId) return toast('Seleziona prima un contribuente', true);
-    const flows = state.rows.filter(r => r.clientId === clientId).map(r => parseInt(r.flow, 10)).filter(Number.isFinite);
-    const flow = String((flows.length ? Math.max(...flows) : 0) + 1);
-    state.rows.push(blankRow({ clientId, flow }));
-    state.activeGroup = 'draft';
-    touchState();
-    renderAll();
-}
 
 function duplicateRow(id) {
     const r = state.rows.find(x => x.id === id);
@@ -4594,9 +4763,14 @@ function rowMatches(r, q) {
 
 function displayedRows() {
     const q = (val('rowSearch') || '').toLowerCase();
-    let rows = state.activeGroup === 'draft'
-        ? state.rows.filter(r => !meaningfulRow(r))
-        : (currentGroup() ? currentGroup().rows : []);
+    const pending = pendingGroupView();
+    let rows;
+    if (state.activeGroup === 'draft') {
+        rows = state.rows.filter(r => !meaningfulRow(r) && (!pending || groupKeyOf(r.clientId, r.paymentDate, r.flow) !== pending.key));
+    } else {
+        const g = currentGroup();
+        rows = g ? g.rows : [];
+    }
     if (q) rows = rows.filter(r => rowMatches(r, q));
     return rows;
 }
@@ -4804,17 +4978,25 @@ function renderGroupRail(groups) {
         if (!by.has(g.clientId)) by.set(g.clientId, { client: g.client, groups: [] });
         by.get(g.clientId).groups.push(g);
     });
+    /* L'F24 appena impostato compare qui accanto agli altri: prima si creava
+       e restava invisibile finché non conteneva una riga completa. */
+    const pending = pendingGroupView();
+    if (pending && !groups.some(g => g.key === pending.key)) {
+        if (!by.has(pending.clientId)) by.set(pending.clientId, { client: pending.client, groups: [] });
+        by.get(pending.clientId).groups.push(pending);
+    }
     let html = [...by.values()].map(x =>
         `<div class="group-client"><div class="group-client-title">${esc(x.client.name || 'Contribuente')}</div>` +
         x.groups.map(g =>
-            `<button class="group-item${g.key === state.activeGroup ? ' active' : ''}" data-action="select-group" data-key="${esc(g.key)}" type="button">` +
-            `<b>${esc(g.label)}</b><small><span>${g.rows.length} righe · ${esc(fmt.format(g.balance))}</span>` +
-            `<span class="${g.issues.length ? 'group-error' : 'group-ok'}">${g.issues.length ? g.issues.length + (g.issues.length === 1 ? ' errore' : ' errori') : 'Pronto'}</span></small></button>`
+            `<button class="group-item${g.key === state.activeGroup ? ' active' : ''}${g.pending ? ' pending' : ''}" data-action="select-group" data-key="${esc(g.key)}" type="button">` +
+            `<b>${esc(g.label)}</b><small><span>${plurale(g.rows.length, 'riga', 'righe')} · ${esc(fmt.format(g.balance))}</span>` +
+            `<span class="${g.pending ? '' : g.issues.length ? 'group-error' : 'group-ok'}">` +
+            `${g.pending ? 'Da compilare' : g.issues.length ? plurale(g.issues.length, 'errore', 'errori') : 'Pronto'}</span></small></button>`
         ).join('') + '</div>').join('');
-    const drafts = state.rows.filter(r => !meaningfulRow(r));
+    const drafts = state.rows.filter(r => !meaningfulRow(r) && (!pending || groupKeyOf(r.clientId, r.paymentDate, r.flow) !== pending.key));
     if (drafts.length) {
         html += `<div class="draft-group"><button class="group-item${state.activeGroup === 'draft' ? ' active' : ''}" data-action="select-group" data-key="draft" type="button">` +
-            `<b>Righe da completare</b><small><span>${drafts.length} ${drafts.length === 1 ? 'bozza' : 'bozze'}</span>` +
+            `<b>Righe da completare</b><small><span>${plurale(drafts.length, 'bozza', 'bozze')}</span>` +
             `<span class="group-error">Fuori dai totali</span></small></button></div>`;
     }
     host.innerHTML = html || '<div class="visual-empty">Nessun F24</div>';
@@ -4828,13 +5010,63 @@ function renderSelectedGroupHeader(g, rows) {
             '<p>Le bozze non entrano nei modelli, nei totali né negli output finché non indichi codice e importo.</p></div></div>';
         return;
     }
-    host.innerHTML = `<div class="f24-head-card"><div><h2>${esc(g.client.name || 'Contribuente')}</h2>` +
-        `<p>${esc(g.label)}</p></div><div class="f24-metrics">` +
+    const k = esc(g.key);
+    host.innerHTML = `<div class="f24-head-card"><div class="f24-head-main">` +
+        `<h2>${esc(g.client.name || 'Contribuente')}${g.pending ? ' <span class="pending-tag">in preparazione</span>' : ''}</h2>` +
+        `<div class="f24-head-fields">` +
+        `<div class="field"><label for="ghDate">Data di pagamento</label>` +
+        `<input data-action="group-set" data-field="date" data-key="${k}" id="ghDate" type="date" value="${esc(g.date || '')}"></div>` +
+        `<div class="field"><label for="ghFlowDesc">Flusso</label>` +
+        `<input data-action="group-set" data-field="flowDesc" data-key="${k}" id="ghFlowDesc" placeholder="Dipendenti, IVA, IMU…" value="${esc(g.flowDesc || '')}"></div>` +
+        `</div></div><div class="f24-metrics">` +
         `<div class="metric-pill"><span>Righe</span><b>${rows.length}</b></div>` +
         `<div class="metric-pill"><span>Debiti</span><b>${esc(fmt.format(g.debit))}</b></div>` +
         `<div class="metric-pill"><span>Crediti</span><b>${esc(fmt.format(g.credit))}</b></div>` +
         `<div class="metric-pill${g.balanceCents < 0 ? ' neg' : ''}"><span>Saldo</span><b>${esc(fmt.format(g.balance))}</b></div>` +
         `</div></div>`;
+}
+
+/* ---------- Impostazione di un nuovo F24 ---------------------------------- */
+
+function openNewF24Modal() {
+    const sorted = state.clients.slice().sort((a, b) => a.name.localeCompare(b.name));
+    if (!sorted.length) {
+        toast('Crea prima un contribuente', true);
+        return goStage(state.mode === 'mass' ? 'import' : 'setup');
+    }
+    $('nfClient').innerHTML = sorted.map(c => `<option value="${esc(c.id)}">${esc(clientDisplay(c))}</option>`).join('');
+    const preferito = state.selectedClientId || (state.rows[0] && state.rows[0].clientId) || sorted[0].id;
+    setVal('nfClient', state.clients.some(c => c.id === preferito) ? preferito : sorted[0].id);
+    const oggi = new Date();
+    const scadenza = new Date(oggi.getFullYear(), oggi.getMonth() + (oggi.getDate() > 16 ? 1 : 0), 16);
+    setVal('nfDate', `${scadenza.getFullYear()}-${String(scadenza.getMonth() + 1).padStart(2, '0')}-16`);
+    setVal('nfFlow', '');
+    openModal('modalNewF24');
+}
+
+function confirmNewF24() {
+    const clientId = val('nfClient');
+    const date = val('nfDate');
+    const desc = val('nfFlow').trim();
+    if (!clientId) return toast('Scegli il contribuente', true);
+    if (!date) return toast('Indica la data di pagamento', true);
+    if (!isRealDate(date)) return toast('Data inesistente nel calendario', true);
+    const flow = sanitizeFlow(desc || String(
+        Math.max(0, ...state.rows.filter(r => r.clientId === clientId).map(r => parseInt(r.flow, 10)).filter(Number.isFinite)) + 1));
+    const key = groupKeyOf(clientId, date, flow);
+    state.pendingGroup = { key, clientId, date, flow, flowDesc: desc || flow };
+    state.selectedClientId = clientId;
+    const row = blankRow({ clientId, flow, flowDesc: desc || flow, date });
+    applyClientRules(row);
+    state.rows.push(row);
+    state.activeGroup = key;
+    state.workView = 'visual';
+    state.visualSection = 'erario';
+    touchState();
+    closeModal('modalNewF24');
+    renderAll();
+    goStage('editor');
+    toast('F24 impostato: inserisci la prima riga');
 }
 
 function codeHintHtml(r) {
@@ -4853,7 +5085,8 @@ function renderEditor() {
     if (empty) return;
 
     const groups = groupF24();
-    if (state.activeGroup !== 'draft' && !groups.some(g => g.key === state.activeGroup)) {
+    const inPreparazione = state.pendingGroup && state.pendingGroup.key === state.activeGroup;
+    if (state.activeGroup !== 'draft' && !inPreparazione && !groups.some(g => g.key === state.activeGroup)) {
         state.activeGroup = groups.length ? groups[0].key : (state.rows.some(r => !meaningfulRow(r)) ? 'draft' : '');
     }
     const g = state.activeGroup === 'draft' ? null : currentGroup();
@@ -5066,7 +5299,11 @@ function renderOutputSummary() {
 
     const btn = $('downloadZipBtn');
     if (btn) {
-        btn.disabled = !groups.length || errors.length > 0;
+        /* Il pulsante resta attivo quando ci sono errori: si chiama «Correggi
+           gli errori» e prima era disabilitato proprio in quel caso, cioè
+           l'unico invito all'azione moriva nel momento in cui serviva. */
+        btn.disabled = !groups.length;
+        btn.dataset.action = errors.length ? 'go-first-error' : 'download-primary';
         if (!groups.length) {
             setText('outputCtaTitle', 'Nessun modello disponibile');
             setText('outputCtaText', 'Inserisci almeno una riga di pagamento.');
@@ -5442,12 +5679,38 @@ function discardAutosave() {
 
 /* ---------- Dati dimostrativi ---------------------------------------------- */
 
+/* La demo entra in una sessione a parte: `state.demo` blocca ogni scrittura
+   in writeStore(), quindi archivio contribuenti, crediti, codici personali e
+   progetto automatico restano esattamente come erano. All'uscita si
+   rileggono dal browser. */
+function exitDemo() {
+    state.demo = false;
+    state.rows = [];
+    state.pendingGroup = null;
+    state.selectedClientId = '';
+    state.activeGroup = '';
+    state.mode = 'single';
+    state.dirty = false;
+    loadArchives();
+    touchState();
+    renderAll();
+    goStage('mode');
+    toast('Uscito dai dati dimostrativi: il tuo archivio è intatto');
+}
+
+function renderDemoBanner() {
+    const b = $('demoBanner');
+    if (b) b.hidden = !state.demo;
+}
+
 function loadDemoData() {
+    state.demo = true;
     const today = new Date();
     const pay = new Date(today.getFullYear(), today.getMonth() + 1, 16);
     const date = `${pay.getFullYear()}-${String(pay.getMonth() + 1).padStart(2, '0')}-16`;
     const month = String(today.getMonth() + 1).padStart(4, '0');
     const year = String(today.getFullYear());
+    const mmAAAA = `${String(today.getMonth() + 1).padStart(2, '0')}/${year}`;
 
     const demoClients = [
         { name: 'ALFA S.R.L.', cf: '01234567897', vat: '01234567897', address: 'Via Roma 12', cap: '20121', city: 'Milano', province: 'MI', iban: '', holder: '' },
@@ -5457,7 +5720,7 @@ function loadDemoData() {
     const alfa = demoClients[0].id, beta = demoClients[1].id;
     const rows = [
         { clientId: alfa, flow: 'Dipendenti', flowDesc: 'Dipendenti', paymentDate: date, section: 'Erario', taxCode: '1001', period: month, year, debit: 12480.55, credit: 0 },
-        { clientId: alfa, flow: 'Dipendenti', flowDesc: 'Dipendenti', paymentDate: date, section: 'INPS', taxCode: 'DM10', period: '', year, debit: 28140.00, credit: 0, officeCode: '1234', reference: '1234567890' },
+        { clientId: alfa, flow: 'Dipendenti', flowDesc: 'Dipendenti', paymentDate: date, section: 'INPS', taxCode: 'DM10', period: '', year, debit: 28140.00, credit: 0, officeCode: '1234', reference: '1234567890', periodFrom: mmAAAA, periodTo: mmAAAA },
         { clientId: alfa, flow: 'Autonomi', flowDesc: 'Autonomi', paymentDate: date, section: 'Erario', taxCode: '1040', period: month, year, debit: 5500.00, credit: 0 },
         { clientId: alfa, flow: 'Autonomi', flowDesc: 'Autonomi', paymentDate: date, section: 'Erario', taxCode: '6099', period: '', year: String(today.getFullYear() - 1), debit: 0, credit: 2000.00 },
         { clientId: beta, flow: 'Dipendenti', flowDesc: 'Dipendenti', paymentDate: date, section: 'Erario', taxCode: '1001', period: month, year, debit: 9012.40, credit: 0 },
@@ -5474,11 +5737,11 @@ function loadDemoData() {
     state.mode = 'mass';
     state.selectedClientId = '';
     state.activeGroup = '';
+    state.pendingGroup = null;
     touchState();
-    persistClients(); persistCredits();
     renderAll();
     goStage('editor');
-    toast('Dati dimostrativi caricati: due società, quattro F24 e un credito');
+    toast('Dati dimostrativi caricati. Il tuo archivio non viene toccato.');
 }
 
 /* ---------- Rendering complessivo ------------------------------------------ */
@@ -5487,10 +5750,19 @@ function renderBadges() {
     const groups = groupF24();
     const issues = validateProject();
     const hasError = issues.some(x => x.type === 'error');
-    setText('stateEditor', state.rows.filter(meaningfulRow).length);
-    setText('stateOutput', groups.length);
-    setText('stateClients', state.clients.length);
-    setText('stateCredits', state.credits.length);
+    /* Il numero da solo non dice se sono righe, modelli o contribuenti:
+       l'unità sta nel titolo e nel nome accessibile. */
+    const badge = (id, n, singolare, plurale_) => {
+        const e = $(id);
+        if (!e) return;
+        e.textContent = n;
+        e.title = plurale(n, singolare, plurale_);
+        e.setAttribute('aria-label', e.title);
+    };
+    badge('stateEditor', state.rows.filter(meaningfulRow).length, 'riga', 'righe');
+    badge('stateOutput', groups.length, 'modello F24', 'modelli F24');
+    badge('stateClients', state.clients.length, 'contribuente', 'contribuenti');
+    badge('stateCredits', state.credits.length, 'credito', 'crediti');
     const setup = state.mode === 'mass' || !!state.selectedClientId;
     const imported = state.rows.length > 0;
     setText('stateSetup', setup ? '✓' : '·');
@@ -5532,12 +5804,28 @@ function renderAll() {
     renderCredits();
     renderBadges();
     renderContext();
+    renderDemoBanner();
     renderCarryCard();
     if (state.activeStage === 'data') renderDataPanel();
     scheduleAutosave();
 }
 
 /* ---------- Navigazione fra righe ------------------------------------------ */
+
+/* Porta al primo errore invece di limitarsi a dire che ce ne sono. */
+function goToFirstError() {
+    const errori = blockingErrors();
+    if (!errori.length) return downloadPrimaryOutput();
+    const primo = errori.find(x => x.rowId) || errori[0];
+    if (primo.rowId) return goToRow(primo.rowId);
+    if (primo.groupKey) {
+        state.activeGroup = primo.groupKey;
+        goStage('editor');
+        return toast(primo.msg, true);
+    }
+    goStage('editor');
+    toast(`${primo.label}: ${primo.msg}`, true);
+}
 
 function goToRow(id) {
     state.workView = 'table';
@@ -5594,7 +5882,11 @@ const CLICK_ACTIONS = {
     'template-clients': () => downloadClientsTemplate(),
     'pick-payment-file': () => $('paymentImport').click(),
     'pick-mass-file': () => $('massPaymentImport').click(),
-    'start-manual': () => startManualF24(),
+    'start-manual': () => openNewF24Modal(),
+    'new-f24': () => openNewF24Modal(),
+    'confirm-new-f24': () => confirmNewF24(),
+    'go-first-error': () => goToFirstError(),
+    'exit-demo': () => exitDemo(),
     'open-carry': () => openCarryModal(),
     'confirm-carry': () => confirmCarry(),
     'confirm-mass': () => { const p = state.pending; closeModal('modalMass'); if (p) { setMode('mass'); importMassRows(p.rows, p.entities); } },
@@ -5613,7 +5905,7 @@ const CLICK_ACTIONS = {
     },
     'confirm-mass-review': () => confirmMassReview(),
     'select-group': el => { state.activeGroup = el.dataset.key; renderEditor(); },
-    'add-group': () => addManualGroup(),
+    'add-group': () => openNewF24Modal(),
     'add-row': () => addRowToCurrentGroup(),
     'add-visual-row': () => addVisualRow(),
     'duplicate-group': () => duplicateCurrentGroup(),
@@ -5660,22 +5952,6 @@ const CLICK_ACTIONS = {
     'download-telematic': () => downloadTelematicOutput()
 };
 
-function startManualF24() {
-    if (state.mode === 'single' && !state.selectedClientId) {
-        toast('Seleziona prima il contribuente', true);
-        return goStage('setup');
-    }
-    if (!state.rows.length) {
-        const row = blankRow({ clientId: state.selectedClientId });
-        applyClientRules(row);
-        state.rows.push(row);
-        touchState();
-    }
-    state.activeGroup = 'draft';
-    state.workView = 'visual';
-    renderAll();
-    goStage('editor');
-}
 
 document.addEventListener('click', e => {
     const stageEl = e.target.closest('[data-stage]');
@@ -5695,6 +5971,7 @@ document.addEventListener('change', e => {
         if (a === 'visual-set') { setRow(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
         if (a === 'visual-money') { setMoney(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
         if (a === 'visual-flag') { setFlag(el.dataset.id, el.dataset.field, el.checked); return renderVisualEditor(); }
+        if (a === 'group-set') return setGroupField(el.dataset.key, el.dataset.field, el.value);
         if (a === 'row-select') {
             const r = state.rows.find(x => x.id === el.dataset.id);
             if (r) { r.selected = el.checked; updateBulkBar(); }

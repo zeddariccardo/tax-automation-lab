@@ -575,6 +575,77 @@ home, LIPE, il Fascicolo e ora F24; **`financial-statement` e
 `financial-analysis` no**, quindi su quei due la navigazione del sito è
 irraggiungibile da telefono. È un difetto vero e aperto, non una scelta.
 
+## F24 — audit esterno, sette correzioni, 13 agosto 2026
+
+Audit indipendente commissionato da Riccardo. Verificato punto per punto sul
+tool in esecuzione prima di intervenire: i quattro P0 sono **tutti
+confermati**, uno era più grave di come lo descriveva, e due rilievi si sono
+rivelati **infondati**.
+
+**Il difetto peggiore l'audit lo classificava come minore.** Diceva «la demo
+contamina gli archivi persistenti». Misurato: li **sovrascriveva**. Un cliente
+reale in archivio, un clic su «Prova con i dati dimostrativi», e in
+`localStorage` restavano solo ALFA e BETA. Chi aveva cinquanta anagrafiche le
+perdeva per curiosità. Ora la demo gira in una sessione isolata: `state.demo`
+blocca ogni scrittura dentro `writeStore()`, una fascia dichiara che nulla
+viene salvato, e all'uscita gli archivi si rileggono dal browser intatti. Il
+blocco sta nella funzione di scrittura, non nei punti che la chiamano: così la
+demo è **incapace** di toccare i dati veri, non solo poco propensa a farlo.
+
+**«Compila a mano» non portava da nessuna parte.** Due cause sovrapposte: le
+righe create finivano in `activeGroup='draft'`, ma la compilazione guidata
+legge `currentGroup()`, che per le bozze è `null` — quindi diceva «Nessuna riga
+in questa sezione» mentre le righe esistevano; e **non c'era un solo punto
+dell'interfaccia in cui impostare data di pagamento e flusso**, né campo, né
+colonna, né voce nei dettagli riga. Un F24 creato a mano restava per sempre su
+«Data di pagamento mancante». Riccardo ha scelto entrambe le soluzioni
+proposte: una finestra «Imposta il modello» all'ingresso del percorso manuale e
+del «＋» della rail, **più** data e flusso modificabili dall'intestazione del
+modello, che servono anche a correggere un F24 importato.
+
+Il pezzo tecnico è `state.pendingGroup`: l'F24 impostato ma non ancora
+riempito non entra in `groupF24()` — che resta la sola verità su totali,
+controlli e output — ma viene ricostruito per la rail e per la guidata **con la
+stessa chiave** che avrà da completo. Quando la prima riga diventa completa il
+gruppo vero prende il suo posto senza che l'utente veda nulla cambiare.
+Attenzione: `renderEditor()` riportava il gruppo attivo a «bozza» perché la
+chiave in preparazione non è fra i gruppi; l'eccezione va mantenuta.
+
+**«Pronto» non significava completo.** Mancava il concetto di campo
+obbligatorio per sezione, e una riga INPS DM10 senza periodo di riferimento
+risultava pronta — nei *nostri* dati dimostrativi. Ora c'è `SECTION_REQUIRED`:
+INPS vuole sede, causale, matricola e periodo «da»; IMU codice ente e anno;
+INAIL sede, ditta, C.C., riferimento e causale; Regioni il codice regione;
+Erario codice e anno. Si ferma **alla sezione** per scelta di Riccardo: le
+regole del singolo tributo stanno sulle istruzioni dell'Agenzia e il tool non
+le ha verificate, quindi dove il campo dipende dal codice resta un avviso (per
+esempio il periodo «a» dell'INPS).
+
+**Le altre tre.** Le date impossibili passavano: `31/02/2026` diventava
+`2026-02-31` e finiva nel PDF e nel telematico; ora `isRealDate()` le rifiuta.
+Il pulsante «Correggi gli errori» era **disabilitato proprio quando c'erano
+errori**: ora è attivo e porta al primo errore. Le finestre stavano a
+`z-index` 120 contro i 5000 dell'intestazione di `site-shell.css`, che ne
+copriva il titolo: ora 9000.
+
+Più i due dettagli veri: «1 righe» (c'è `plurale()`) e i badge della sidebar
+che mostravano numeri senza dire di cosa (ora l'unità sta nel `title` e nel
+nome accessibile).
+
+**Cosa non è stato fatto, e perché.** L'audit chiede di spezzare la pagina e
+caricare le librerie a richiesta: tutti e cinque i tool sono file unici senza
+build su GitHub Pages, e cambiare architettura a uno solo lo scollegherebbe
+dagli altri quattro. Chiede di togliere il telematico dalle promesse del
+catalogo: il varco con conferma esplicita era già una decisione presa, e
+Riccardo ha scelto di aggiungere solo la **dichiarazione delle specifiche**
+(`TELEMAT_SPEC`), non il declassamento. Segnala il nome del sito troncato: è
+l'ellissi voluta in `tal-app.css`, condivisa dai cinque tool.
+
+**Due rilievi erano sbagliati**, verificati: l'IBAN dell'intermediario **non**
+resta visibile quando l'addebito è sui conti dei contribuenti, e i campi
+persona fisica e persona giuridica **non** compaiono insieme —
+`updateTelematicConfigFields()` viene chiamata all'apertura della finestra.
+
 ## F24 — audit d'uso e cinque correzioni, 13 agosto 2026
 
 Segnalazione dell'utente: «se creo un F24 per IMU o INPS non si vedono i

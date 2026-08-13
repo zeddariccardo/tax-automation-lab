@@ -646,6 +646,56 @@ resta visibile quando l'addebito è sui conti dei contribuenti, e i campi
 persona fisica e persona giuridica **non** compaiono insieme —
 `updateTelematicConfigFields()` viene chiamata all'apertura della finestra.
 
+## F24 — il modello compilabile e la mappa dei riquadri, 13 agosto 2026
+
+Segnalazione: «la compilazione guidata è pietosa, se metto un codice tributo e
+poi ne voglio mettere un altro con aggiungi riga non funziona; il PDF ha i
+numeri piccoli e sfasati».
+
+**«Aggiungi riga» non funzionava per una ragione strutturale.** `groupF24()`
+filtrava le righe complete **prima** di raggruppare, quindi ogni riga appena
+creata nasceva orfana: veniva scritta nello stato e non apparteneva a nessun
+F24, perciò non compariva da nessuna parte. È la stessa radice per cui le
+righe della compilazione a mano erano invisibili. Ora il gruppo contiene
+**tutte** le sue righe e sono totali, controlli, capienza e output a guardare
+solo `g.filled`. Il concetto di «bozza» resta, ma vale per le righe **senza
+contribuente**, che sono le uniche davvero orfane.
+
+**Il PDF era sfasato per un errore di convenzione.** Le coordinate erano
+ricavate a occhio e usate come **linea di base** del testo: per la prima riga
+Erario la linea di base stava a 89,20 mm mentre il riquadro finisce a 88,76,
+quindi i caratteri cadevano sotto il bordo. E il corpo era 5,7 pt fisso, alto
+poco più di un millimetro dentro riquadri da 4,1 mm.
+
+**La soluzione è una mappa misurata, non stimata.** `f24_map.js` contiene i
+riquadri in millimetri su A4, ricavati dall'immagine ufficiale del modello
+(2481 × 3508 px) isolando le caselle bianche sul fondo azzurro. Da quella
+mappa nascono **sia il PDF sia il modello compilabile**: dove l'utente scrive
+è, per costruzione, dove il dato verrà stampato. Il corpo si calcola
+sull'altezza del riquadro (circa 9 pt invece di 5,7) e si riduce da solo
+quando il contenuto è più largo dello spazio; la linea di base centra il testo
+verticalmente. Verifica: `verifica_mappa.py` ridisegna i riquadri e il testo
+sull'immagine del modello e conta quanti escono — zero su 163.
+
+**Le due viste sono cambiate di nome e di ruolo.** «Righe» è diventata
+**«Compila riga per riga»** ed è la vista predefinita. «Compilazione guidata»
+è stata **eliminata** e sostituita da **«Compila sul Modello F24»**: il modello
+ministeriale con un campo sopra ogni riquadro reale, in cui si clicca e si
+scrive. Nessuna tabella o pannello di sezione accanto — solo il modello e, a
+lato, i rilievi agganciati alla riga. Le righe si creano scrivendo nel
+riquadro successivo: «Aggiungi riga» lì non serve più. Anagrafica, totali e
+saldi sono calcolati e non scrivibili, per non avere due verità sullo stesso
+dato.
+
+Con la vista guidata sono usciti anche `SECTION_FIELDS`, `visualSection` e
+`previewScale`: codice morto, rimosso.
+
+**Attenzione al rientro in percentuale su elementi in posizione assoluta.**
+`padding-right:20%` sui campi importo si calcolava sulla larghezza del
+**foglio**, non del campo: 101 px su un campo da 67 px. In `em` segue il corpo
+del testo ed è corretto. Stesso inciampo su `.mf-static`, che senza
+`box-sizing:border-box` sbordava.
+
 ## F24 — audit d'uso e cinque correzioni, 13 agosto 2026
 
 Segnalazione dell'utente: «se creo un F24 per IMU o INPS non si vedono i

@@ -532,7 +532,78 @@ body{margin:0;overflow-x:hidden}
 .code-hint.unknown{color:var(--f24-gold)}
 .code-hint.mismatch{color:var(--f24-warn);font-weight:650}
 
-/* ---------- Compilazione guidata ----------------------------------------- */
+/* ---------- Modello F24 compilabile --------------------------------------- */
+/* Il foglio è un contenitore a proporzione A4 con l'immagine del modello come
+   sfondo; ogni campo è posizionato in percentuale, così zoom e larghezza dello
+   schermo non spostano nulla rispetto ai riquadri stampati. */
+
+.model-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.model-toolbar .help{margin:0;max-width:640px}
+.model-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px;align-items:start}
+@media(max-width:1180px){.model-layout{grid-template-columns:1fr}}
+
+.model-canvas{
+  overflow:auto;max-height:calc(100vh - 210px);padding:14px;
+  background:#2b2f36;border-radius:var(--f24-r-lg);
+}
+.model-sheet{
+  position:relative;width:140%;margin:0 auto;aspect-ratio:210/297;
+  background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.model-sheet .mf-bg{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;pointer-events:none}
+
+.mf-field{
+  position:absolute;margin:0;padding:0 1px !important;min-height:0 !important;
+  border:1px solid transparent !important;border-radius:2px !important;
+  background:transparent !important;color:#111 !important;
+  font:600 clamp(7px,0.78vw,12px)/1 var(--f24-mono) !important;
+  text-align:center;box-sizing:border-box;
+}
+.mf-field:hover{background:rgba(20,83,104,.10) !important;border-color:rgba(20,83,104,.35) !important}
+.mf-field:focus{
+  outline:none !important;background:#fff !important;
+  border-color:var(--f24-accent) !important;
+  box-shadow:0 0 0 2px rgba(20,83,104,.35) !important;z-index:3;
+}
+/* Il rientro lascia libere le due caselle dei centesimi. In `em` segue il
+   corpo del testo; in percentuale si calcolerebbe sulla larghezza del foglio
+   e mangerebbe quasi tutto il campo. */
+.mf-field.mf-money{text-align:right;padding-right:2.6em !important}
+.mf-field.mf-code{font-weight:700}
+
+.mf-flag{position:absolute;display:grid;place-items:center;margin:0;padding:0;border:0;background:transparent;cursor:pointer}
+.mf-flag:hover{background:rgba(20,83,104,.12)}
+.mf-flag input{width:74%;height:74%;margin:0;accent-color:var(--f24-accent)}
+
+.mf-static{
+  position:absolute;display:flex;align-items:center;justify-content:center;
+  box-sizing:border-box;
+  color:#111;font:600 clamp(7px,0.78vw,12px)/1 var(--f24-mono);
+  white-space:nowrap;overflow:hidden;pointer-events:none;
+}
+.mf-static.mf-left{justify-content:flex-start;padding-left:2px}
+.mf-static.mf-cell{font-weight:700}
+/* Totali e saldi calcolati: gli euro finiscono sulla virgola stampata, i
+   centesimi nelle due caselle successive, come sulla carta. */
+.mf-static.mf-euro{justify-content:flex-end;color:#0b3a49;font-weight:700}
+.mf-static.mf-cent{color:#0b3a49;font-weight:700}
+.mf-static.mf-segno{color:#0b3a49;font-weight:700}
+
+.model-side{
+  position:sticky;top:16px;padding:14px 16px;max-height:calc(100vh - 210px);overflow:auto;
+  border:1px solid var(--f24-line-2);border-radius:var(--f24-r-lg);background:var(--f24-card);
+}
+.model-side h3{margin-top:0}
+.mf-issue{
+  display:flex;flex-direction:column;gap:2px;padding:9px 11px;margin-bottom:7px;
+  border-radius:var(--f24-r);font-size:12px;line-height:1.45;
+}
+.mf-issue b{font-size:11px}
+.mf-issue.error{background:var(--f24-warn-bg);border-left:3px solid var(--f24-warn);color:var(--f24-warn)}
+.mf-issue.warn{background:var(--f24-gold-bg);border-left:3px solid var(--f24-gold);color:var(--f24-gold)}
+.mf-ok{padding:10px 12px;border-radius:var(--f24-r);background:var(--f24-ok-bg);color:var(--f24-ok);font-size:12.5px}
+
+/* ---------- Compilazione guidata (rimossa) -------------------------------- */
 
 .visual-layout{display:grid;grid-template-columns:minmax(340px,.9fr) minmax(440px,1.1fr);gap:14px}
 @media(max-width:1180px){.visual-layout{grid-template-columns:1fr}}
@@ -1059,8 +1130,8 @@ body.modal-open{overflow:hidden}
 <div id="selectedGroupHeader"></div>
 <div class="editor-toolbar">
 <div class="segmented" role="group" aria-label="Modo di lavoro">
-<button class="active" data-action="work-view" data-view="table" id="viewTableBtn" type="button">Righe</button>
-<button data-action="work-view" data-view="visual" id="viewVisualBtn" type="button">Compilazione guidata</button>
+<button class="active" data-action="work-view" data-view="table" id="viewTableBtn" type="button">Compila riga per riga</button>
+<button data-action="work-view" data-view="model" id="viewModelBtn" type="button">Compila sul Modello F24</button>
 </div>
 <button class="btn add" data-action="add-row" type="button">Aggiungi riga</button>
 <button class="btn ghost" data-action="duplicate-group" type="button">Duplica F24</button>
@@ -1090,32 +1161,18 @@ body.modal-open{overflow:hidden}
 </div>
 </div>
 
-<div hidden id="visualWorkView">
-<div class="visual-layout">
-<div class="visual-form">
-<div class="visual-section-tabs" id="visualSectionTabs"></div>
-<h3 id="visualSectionTitle">Sezione Erario</h3>
-<p class="help" id="visualSectionHelp">Inserisci i dati della sezione selezionata.</p>
-<div id="visualRows"></div>
-<div class="btn-row" style="margin-top:10px"><button class="btn add" data-action="add-visual-row" type="button">Aggiungi riga nella sezione</button></div>
-</div>
-<div class="visual-preview-card">
-<div class="visual-preview-toolbar">
-<b>Anteprima del modello</b>
-<div class="preview-zoom" role="group" aria-label="Ingrandimento">
-<button data-action="preview-scale" data-scale="0.82" type="button">Adatta</button>
-<button class="active" data-action="preview-scale" data-scale="1" type="button">100%</button>
-<button data-action="preview-scale" data-scale="1.2" type="button">120%</button>
+<div hidden id="modelWorkView">
+<div class="model-toolbar">
+<p class="help">Scrivi direttamente nei riquadri del modello: sono gli stessi in cui verrà stampato il dato. Anagrafica, totali e saldi sono calcolati e non si modificano da qui.</p>
+<div class="preview-zoom" role="group" aria-label="Ingrandimento del modello">
+<button data-action="model-zoom" data-zoom="1" type="button">Adatta</button>
+<button class="active" data-action="model-zoom" data-zoom="1.4" type="button">140%</button>
+<button data-action="model-zoom" data-zoom="1.9" type="button">190%</button>
 </div>
 </div>
-<div class="ministerial-canvas">
-<div class="ministerial-sheet" id="ministerialSheet">
-<img alt="Modello F24 ministeriale" id="ministerialPreview"/>
-<div class="section-highlight" id="sectionHighlight"></div>
-<div id="previewOverlay"></div>
-</div>
-</div>
-</div>
+<div class="model-layout">
+<div class="model-canvas"><div class="model-sheet" id="modelSheet"></div></div>
+<aside class="model-side"><h3>Rilievi</h3><div id="modelIssues"></div></aside>
 </div>
 </div>
 </div>
@@ -2024,8 +2081,7 @@ const state = {
     activeStage: 'mode',
     activeGroup: '',
     workView: 'table',
-    visualSection: 'erario',
-    previewScale: 1,
+    modelZoom: 1.4,
     rev: 0,
     dirty: false,
     autosaveFailed: false,
@@ -2426,64 +2482,6 @@ const SECTIONS = ['Erario', 'INPS', 'Regioni', 'IMU e altri tributi locali', 'IN
    IMU, la matricola INPS, il codice ditta INAIL e il codice ente degli altri
    enti non erano raggiungibili da li'. `t` è il tipo del controllo:
    testo, importo o casella. */
-const SECTION_FIELDS = {
-    erario: [
-        { k: 'taxCode',    l: 'Codice tributo' },
-        { k: 'period',     l: 'Rateazione / periodo' },
-        { k: 'year',       l: 'Anno di riferimento' },
-        { k: 'debit',      l: 'Importo a debito', t: 'money' },
-        { k: 'credit',     l: 'Importo a credito', t: 'money' }
-    ],
-    inps: [
-        { k: 'officeCode', l: 'Codice sede' },
-        { k: 'taxCode',    l: 'Causale contributo' },
-        { k: 'reference',  l: 'Matricola / codice posizione' },
-        { k: 'periodFrom', l: 'Periodo da (MM/AAAA)' },
-        { k: 'periodTo',   l: 'Periodo a (MM/AAAA)' },
-        { k: 'debit',      l: 'Importo a debito', t: 'money' },
-        { k: 'credit',     l: 'Importo a credito', t: 'money' }
-    ],
-    regioni: [
-        { k: 'officeCode', l: 'Codice regione' },
-        { k: 'taxCode',    l: 'Codice tributo' },
-        { k: 'period',     l: 'Rateazione / periodo' },
-        { k: 'year',       l: 'Anno di riferimento' },
-        { k: 'debit',      l: 'Importo a debito', t: 'money' },
-        { k: 'credit',     l: 'Importo a credito', t: 'money' }
-    ],
-    imu: [
-        { k: 'officeCode',      l: 'Codice ente / Comune' },
-        { k: 'taxCode',         l: 'Codice tributo' },
-        { k: 'year',            l: 'Anno di riferimento' },
-        { k: 'numImmobili',     l: 'Numero immobili' },
-        { k: 'detrazione',      l: 'Detrazione', t: 'money' },
-        { k: 'ravvedimento',    l: 'Ravvedimento', t: 'flag' },
-        { k: 'immobiliVariati', l: 'Immobili variati', t: 'flag' },
-        { k: 'acconto',         l: 'Acconto', t: 'flag' },
-        { k: 'saldo',           l: 'Saldo', t: 'flag' },
-        { k: 'debit',           l: 'Importo a debito', t: 'money' },
-        { k: 'credit',          l: 'Importo a credito', t: 'money' }
-    ],
-    inail: [
-        { k: 'officeCode',       l: 'Codice sede' },
-        { k: 'inailCompanyCode', l: 'Codice ditta' },
-        { k: 'inailCc',          l: 'C.C.' },
-        { k: 'reference',        l: 'Numero di riferimento' },
-        { k: 'taxCode',          l: 'Causale' },
-        { k: 'debit',            l: 'Importo a debito', t: 'money' },
-        { k: 'credit',           l: 'Importo a credito', t: 'money' }
-    ],
-    altri: [
-        { k: 'entityCode',   l: 'Codice ente' },
-        { k: 'officeCode',   l: 'Codice sede' },
-        { k: 'taxCode',      l: 'Causale contributo' },
-        { k: 'positionCode', l: 'Codice posizione' },
-        { k: 'periodFrom',   l: 'Periodo da (MM/AAAA)' },
-        { k: 'periodTo',     l: 'Periodo a (MM/AAAA)' },
-        { k: 'debit',        l: 'Importo a debito', t: 'money' },
-        { k: 'credit',       l: 'Importo a credito', t: 'money' }
-    ]
-};
 
 /* Campi che appartengono a una sezione sola. Cambiando sezione a una riga
    vanno azzerati, altrimenti restano attaccati al dato e finiscono nel PDF e
@@ -2747,7 +2745,16 @@ function rowWarnings(r) {
 function groupF24() {
     if (CACHE_GROUPS.rev === state.rev) return CACHE_GROUPS.value;
     const groups = new Map();
-    state.rows.filter(meaningfulRow).forEach(r => {
+    /* Il gruppo contiene **tutte** le righe che gli appartengono, comprese
+       quelle ancora vuote; totali, controlli, capienza e output guardano solo
+       quelle complete (`filled`).
+
+       Prima il filtro stava prima del raggruppamento, e ogni riga appena
+       creata nasceva orfana: «Aggiungi riga» la scriveva nello stato e poi
+       non la mostrava, perché non apparteneva a nessun F24. È lo stesso
+       motivo per cui le righe della compilazione a mano erano invisibili. */
+    state.rows.forEach(r => {
+        if (!r.clientId) return;
         r.flow = sanitizeFlow(r.flow);
         const key = [r.clientId, r.paymentDate || '', r.flow].join('|');
         if (!groups.has(key)) {
@@ -2757,10 +2764,16 @@ function groupF24() {
         if (!g.flowDesc && r.flowDesc) g.flowDesc = r.flowDesc;
         g.rows.push(r);
     });
-    const result = [...groups.values()].map(g => {
+    const result = [...groups.values()].filter(g =>
+        /* Un F24 esiste se ha almeno una riga completa, oppure se è quello
+           che l'utente sta impostando in questo momento. */
+        g.rows.some(meaningfulRow) || (state.pendingGroup && state.pendingGroup.key === g.key)
+    ).map(g => {
         g.client = clientById(g.clientId) || {};
-        g.debitCents = g.rows.reduce((s, r) => s + cents(r.debit), 0);
-        g.creditCents = g.rows.reduce((s, r) => s + cents(r.credit), 0);
+        g.filled = g.rows.filter(meaningfulRow);
+        g.drafts = g.rows.length - g.filled.length;
+        g.debitCents = g.filled.reduce((s, r) => s + cents(r.debit), 0);
+        g.creditCents = g.filled.reduce((s, r) => s + cents(r.credit), 0);
         g.debit = fromCents(g.debitCents);
         g.credit = fromCents(g.creditCents);
         g.balanceCents = g.debitCents - g.creditCents;
@@ -2773,13 +2786,13 @@ function groupF24() {
         g.ownIssues = [];
         if (g.balanceCents < 0) g.ownIssues.push('Il totale dei crediti supera i debiti: il saldo del modello non può essere negativo');
         const counts = {};
-        g.rows.forEach(r => { const k = sectionKey(r.section); counts[k] = (counts[k] || 0) + 1; });
+        g.filled.forEach(r => { const k = sectionKey(r.section); counts[k] = (counts[k] || 0) + 1; });
         Object.entries(counts).forEach(([k, n]) => {
             if (n > (F24_CAPACITY[k] || 99)) {
                 g.ownIssues.push(`${SECTION_TITLES[k]}: ${n} righe, il modello ne prevede ${F24_CAPACITY[k]}. Sposta le eccedenti in un nuovo flusso.`);
             }
         });
-        g.issues = [...new Set(g.rows.flatMap(rowIssues).concat(g.ownIssues))];
+        g.issues = [...new Set(g.filled.flatMap(rowIssues).concat(g.ownIssues))];
         g.label = `${dateIT(g.date) || 'Data da indicare'} · ${g.flowDesc || 'Flusso ' + g.flow}`;
         return g;
     }).sort((a, b) => (a.client.name || '').localeCompare(b.client.name || '')
@@ -2790,9 +2803,11 @@ function groupF24() {
     return result;
 }
 
+/* Solo le righe complete: quelle vuote esistono per l'editor, non per il
+   modello stampato né per il tracciato telematico. */
 function sectionedRows(g) {
     const m = {};
-    g.rows.forEach(r => { const k = sectionKey(r.section); (m[k] || (m[k] = [])).push(r); });
+    (g.filled || g.rows).forEach(r => { const k = sectionKey(r.section); (m[k] || (m[k] = [])).push(r); });
     return m;
 }
 
@@ -2898,6 +2913,216 @@ function validateProject() {
 }
 
 function blockingErrors() { return validateProject().filter(x => x.type === 'error'); }
+
+/* ==========================================================================
+   Mappa dei riquadri del modello F24
+   --------------------------------------------------------------------------
+   Un solo elenco, in millimetri sul foglio A4 (210 × 297), usato sia dal
+   generatore PDF sia dal modello compilabile. Quello che l'utente vede sullo
+   schermo e il punto in cui il dato viene stampato non possono divergere,
+   perché sono lo stesso numero.
+
+   Le coordinate NON sono stimate: sono misurate sull'immagine ufficiale del
+   modello (2481 × 3508 px, 300 dpi) isolando le caselle bianche sul fondo
+   azzurro e convertendo in millimetri. La versione precedente le aveva
+   ricavate a occhio e sbagliava di circa un millimetro e mezzo in verticale:
+   il testo finiva a cavallo del bordo inferiore del riquadro invece che
+   dentro, ed è la ragione per cui il PDF risultava «sfasato».
+
+   Convenzioni:
+   - x, y  = angolo superiore sinistro del riquadro
+   - w, h  = larghezza e altezza del riquadro
+   - t     = tipo: 'text' | 'money' | 'flag' | 'cells'
+   - n, step = per i campi a caselle (codice fiscale, IBAN, date)
+   ========================================================================== */
+
+const F24_PAGE = { w: 210, h: 297 };
+
+/* Gli importi hanno la virgola stampata dentro al riquadro: gli euro si
+   allineano a destra prima della virgola, i centesimi occupano le due
+   caselle dopo. Gli scostamenti sono uguali per debito, credito e saldo. */
+const MONEY_OFFSET = { euroRight: 21.42, cent1: 24.14, cent2: 26.64 };
+
+const COL_DEBIT  = { x: 113.68, w: 27.93, t: 'money' };
+const COL_CREDIT = { x: 144.15, w: 27.93, t: 'money' };
+const COL_SALDO  = { x: 174.62, w: 27.76, t: 'money' };
+
+const F24_MAP = {
+    contribuente: {
+        cf:              { t: 'cells', x: 40.04, y: 37.25, w: 81.26, h: 5.08, n: 16, step: 5.08, label: 'Codice fiscale', size: 10 },
+        nonCalendarYear: { t: 'flag',  x: 194.93, y: 38.10, w: 5.08, h: 4.23, label: 'Anno d’imposta non coincidente con l’anno solare' },
+        name:            { t: 'text',  x: 40.04, y: 45.72, w: 104.11, h: 5.08, label: 'Cognome, denominazione o ragione sociale', size: 10 },
+        firstName:       { t: 'text',  x: 146.69, y: 45.72, w: 53.33, h: 5.08, label: 'Nome', size: 10 },
+        birthDay:        { t: 'text',  x: 40.04, y: 54.18, w: 10.07, h: 5.08, label: 'Data di nascita — giorno', align: 'center' },
+        birthMonth:      { t: 'text',  x: 50.28, y: 54.18, w: 9.99, h: 5.08, label: 'Data di nascita — mese', align: 'center' },
+        birthYear:       { t: 'text',  x: 60.44, y: 54.18, w: 20.23, h: 5.08, label: 'Data di nascita — anno', align: 'center' },
+        sex:             { t: 'text',  x: 85.74, y: 54.18, w: 5.08, h: 5.08, label: 'Sesso (M o F)', align: 'center' },
+        birthCity:       { t: 'text',  x: 95.90, y: 54.18, w: 91.08, h: 5.08, label: 'Comune (o Stato estero) di nascita' },
+        birthProvince:   { t: 'text',  x: 189.77, y: 54.18, w: 10.16, h: 5.08, label: 'Provincia di nascita', align: 'center' },
+        city:            { t: 'text',  x: 40.04, y: 62.65, w: 73.64, h: 5.08, label: 'Domicilio fiscale — comune' },
+        province:        { t: 'text',  x: 116.22, y: 62.65, w: 10.16, h: 5.08, label: 'Domicilio fiscale — provincia', align: 'center' },
+        address:         { t: 'text',  x: 128.91, y: 62.65, w: 71.10, h: 5.08, label: 'Domicilio fiscale — via e numero civico' },
+        coobligorCf:     { t: 'cells', x: 65.43, y: 71.12, w: 81.26, h: 5.08, n: 16, step: 5.08, label: 'Codice fiscale del coobbligato, erede, genitore, tutore o curatore fallimentare', size: 10 },
+        coobligorCode:   { t: 'text',  x: 189.77, y: 71.12, w: 10.16, h: 5.08, label: 'Codice identificativo del coobbligato', align: 'center' }
+    },
+
+    sezioni: {
+        erario: {
+            titolo: 'SEZIONE ERARIO',
+            rows: [84.66, 88.98, 93.21, 97.45, 101.68, 105.91],
+            h: 4.10,
+            cols: {
+                taxCode: { x: 55.27, w: 20.31, label: 'codice tributo', align: 'center' },
+                period:  { x: 78.13, w: 15.24, label: 'rateazione/regione/prov./mese rif.', align: 'center' },
+                year:    { x: 95.90, w: 15.24, label: 'anno di riferimento', align: 'center' },
+                debit:   { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:  { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            extra: {
+                taxOfficeCode: { t: 'text', x: 7.11, y: 110.23, w: 15.15, h: 4.15, label: 'codice ufficio', align: 'center' },
+                actCode:       { t: 'text', x: 27.34, y: 110.23, w: 56.03, h: 4.15, label: 'codice atto', align: 'center' }
+            },
+            totali: { y: 110.23, h: 4.06, saldo: true, etichetta: 'SALDO (A−B)' }
+        },
+        inps: {
+            titolo: 'SEZIONE INPS',
+            rows: [122.85, 127.16, 131.40, 135.63],
+            h: 4.10,
+            cols: {
+                officeCode: { x: 7.11, w: 10.07, label: 'codice sede', align: 'center' },
+                taxCode:    { x: 19.72, w: 10.16, label: 'causale contributo', align: 'center' },
+                reference:  { x: 30.50, w: 45.50, label: 'matricola INPS/codice INPS/filiale azienda', align: 'center' },
+                periodFrom: { x: 78.13, w: 15.24, label: 'periodo di riferimento: da mm/aaaa', align: 'center' },
+                periodTo:   { x: 95.90, w: 15.24, label: 'periodo di riferimento: a mm/aaaa', align: 'center' },
+                debit:      { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:     { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            totali: { y: 140.03, h: 3.98, saldo: true, etichetta: 'SALDO (C−D)' }
+        },
+        regioni: {
+            titolo: 'SEZIONE REGIONI',
+            rows: [152.39, 156.71, 160.95, 165.18],
+            h: 4.10,
+            cols: {
+                officeCode: { x: 7.11, w: 10.07, label: 'codice regione', align: 'center' },
+                taxCode:    { x: 55.27, w: 20.31, label: 'codice tributo', align: 'center' },
+                period:     { x: 78.13, w: 15.24, label: 'rateazione/mese rif.', align: 'center' },
+                year:       { x: 95.90, w: 15.24, label: 'anno di riferimento', align: 'center' },
+                debit:      { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:     { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            totali: { y: 169.50, h: 4.06, saldo: true, etichetta: 'SALDO (E−F)' }
+        },
+        imu: {
+            titolo: 'SEZIONE IMU E ALTRI TRIBUTI LOCALI',
+            rows: [182.03, 186.34, 190.58, 194.81],
+            h: 4.10,
+            cols: {
+                officeCode:      { x: 7.11, w: 15.24, label: 'codice ente/codice comune', align: 'center' },
+                ravvedimento:    { x: 25.99, w: 3.30, t: 'flag', label: 'ravv.' },
+                immobiliVariati: { x: 30.89, w: 3.30, t: 'flag', label: 'immob. variati' },
+                acconto:         { x: 35.97, w: 3.30, t: 'flag', label: 'acc.' },
+                saldo:           { x: 40.97, w: 3.30, t: 'flag', label: 'saldo' },
+                numImmobili:     { x: 46.22, w: 5.08, label: 'numero immobili', align: 'center' },
+                taxCode:         { x: 55.27, w: 20.31, label: 'codice tributo', align: 'center' },
+                period:          { x: 78.13, w: 15.24, label: 'rateazione/mese rif.', align: 'center' },
+                year:            { x: 95.90, w: 15.24, label: 'anno di riferimento', align: 'center' },
+                debit:           { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:          { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            extra: {
+                operationId: { t: 'cells', x: 111.14, y: 173.98, w: 91.25, h: 3.47, n: 18, step: 5.08, label: 'identificativo operazione', size: 8 },
+                detrazione:  { t: 'money', x: 25.99, y: 199.13, w: 27.93, h: 4.23, label: 'detrazione' }
+            },
+            totali: { y: 199.13, h: 4.06, saldo: true, etichetta: 'SALDO (G−H)' }
+        },
+        inail: {
+            titolo: 'SEZIONE INAIL',
+            rows: [211.66, 215.98, 220.21],
+            h: 4.10,
+            cols: {
+                officeCode:       { x: 34.96, w: 12.70, label: 'codice sede', align: 'center' },
+                inailCompanyCode: { x: 50.19, w: 20.31, label: 'codice ditta', align: 'center' },
+                inailCc:          { x: 73.05, w: 5.08, label: 'c.c.', align: 'center' },
+                reference:        { x: 83.20, w: 15.24, label: 'numero di riferimento', align: 'center' },
+                taxCode:          { x: 100.98, w: 5.08, label: 'causale', align: 'center' },
+                debit:            { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:           { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            totali: { y: 224.53, h: 3.89, saldo: true, etichetta: 'SALDO (I−L)' }
+        },
+        altri: {
+            titolo: 'SEZIONE ALTRI ENTI PREVIDENZIALI E ASSICURATIVI',
+            rows: [232.82, 237.14],
+            h: 4.10,
+            cols: {
+                entityCode:   { x: 7.03, w: 15.15, label: 'codice ente', align: 'center', soloPrimaRiga: true },
+                officeCode:   { x: 22.26, w: 12.70, label: 'codice sede', align: 'center' },
+                taxCode:      { x: 37.50, w: 10.16, label: 'causale contributo', align: 'center' },
+                positionCode: { x: 50.19, w: 25.39, label: 'codice posizione', align: 'center' },
+                periodFrom:   { x: 78.13, w: 15.24, label: 'periodo di riferimento: da mm/aaaa', align: 'center' },
+                periodTo:     { x: 95.90, w: 15.24, label: 'periodo di riferimento: a mm/aaaa', align: 'center' },
+                debit:        { ...COL_DEBIT, label: 'importi a debito versati' },
+                credit:       { ...COL_CREDIT, label: 'importi a credito compensati' }
+            },
+            totali: { y: 241.46, h: 4.06, saldo: true, etichetta: 'SALDO (M−N)' }
+        }
+    },
+
+    saldoFinale: { ...COL_SALDO, t: 'money', y: 249.76, h: 4.23, label: 'SALDO FINALE' },
+
+    versamento: {
+        day:   { t: 'cells', x: 9.56, y: 274.65, w: 10.33, h: 4.57, n: 2, step: 5.16, label: 'Data del versamento — giorno', size: 9 },
+        month: { t: 'cells', x: 19.89, y: 274.65, w: 9.82, h: 4.57, n: 2, step: 5.08, label: 'Data del versamento — mese', size: 9 },
+        year:  { t: 'cells', x: 30.05, y: 274.65, w: 20.06, h: 4.57, n: 4, step: 5.015, label: 'Data del versamento — anno', size: 9 },
+        iban:  { t: 'cells', x: 49.56, y: 285.4, w: 63.5, h: 3.4, n: 25, step: 2.54, label: 'Codice IBAN del conto di addebito', size: 6.5, soloPrimaCopia: true }
+    }
+};
+
+/* Altezza delle maiuscole: serve a centrare il testo dentro al riquadro
+   invece di appoggiarlo sul bordo. Per i caratteri usati vale circa il 72%
+   del corpo. */
+function capHeightMm(sizePt) { return sizePt * 0.72 * 25.4 / 72; }
+
+/* La linea di base che centra verticalmente un testo dentro al riquadro. */
+function baselineFor(box, sizePt) {
+    return box.y + box.h / 2 + capHeightMm(sizePt) / 2;
+}
+
+/* Corpo che riempie il riquadro senza toccarne i bordi: le maiuscole
+   occupano circa i tre quarti dell'altezza utile, lasciando un margine
+   sopra e sotto. In un riquadro da 4,1 mm significa circa 9 pt, contro i
+   5,7 pt fissi della versione precedente — che dentro a quel riquadro
+   lasciavano il testo alto poco più di un millimetro. Si riduce soltanto
+   quando il contenuto è più largo dello spazio disponibile. */
+function fitSize(box, testo, base) {
+    let size = base || Math.min(10.5, Math.max(7, (box.h * 72 / 25.4) * 0.78));
+    const larghezzaCarattere = s => s * 0.6 * 25.4 / 72;      // Courier: 0.6 em
+    const lunghezza = String(testo || '').length;
+    if (lunghezza) {
+        const disponibile = box.w - 1.2;
+        while (size > 5 && lunghezza * larghezzaCarattere(size) > disponibile) size -= 0.25;
+    }
+    return size;
+}
+
+/* Elenco piatto dei riquadri di una sezione, riga per riga: lo consumano sia
+   il PDF sia il modello compilabile. */
+function boxesForSection(key) {
+    const s = F24_MAP.sezioni[key];
+    const out = [];
+    s.rows.forEach((top, i) => {
+        Object.entries(s.cols).forEach(([campo, c]) => {
+            if (c.soloPrimaRiga && i > 0) return;
+            out.push({
+                sezione: key, riga: i, campo,
+                x: c.x, y: top, w: c.w, h: s.h,
+                t: c.t || 'text', align: c.align || 'left', label: c.label
+            });
+        });
+    });
+    return out;
+}
 
 /* ==========================================================================
    Importazione, template e modello PDF
@@ -3295,191 +3520,172 @@ function mergeClients(arr) {
    con il modello stampato: non vanno toccate senza rifare quel confronto.
    ========================================================================== */
 
+/* ==========================================================================
+   PDF ministeriale
+   --------------------------------------------------------------------------
+   Costruito sulla mappa misurata (f24_map.js), la stessa che disegna il
+   modello compilabile: la posizione sullo schermo e quella sulla carta sono
+   lo stesso numero.
+
+   Due difetti della versione precedente, entrambi visibili a occhio:
+   - il testo veniva scritto **appoggiando la linea di base** sulla coordinata
+     del riquadro, quindi i caratteri finivano sopra il bordo inferiore invece
+     che dentro. Ora la linea di base si calcola per centrare verticalmente.
+   - il corpo era 5,7 pt, cioè alto poco più di un millimetro dentro riquadri
+     da 4,1 mm. Ora è calcolato sull'altezza del riquadro e si riduce solo se
+     il contenuto è più largo dello spazio.
+   ========================================================================== */
+
 function pdfDocForGroup(g) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
     const sections = sectionedRows(g);
 
-    const text = (v, x, y, size, style, align) => {
-        if (v === undefined || v === null || v === '') return;
-        doc.setFont('courier', style || 'normal');
-        doc.setFontSize(size || 5.7);
-        doc.setTextColor(20, 20, 20);
-        doc.text(String(v), x, y, { align: align || 'left' });
+    /* Scrive un valore centrato dentro al riquadro indicato. */
+    const put = (box, valore, opzioni) => {
+        const o = opzioni || {};
+        const testo = String(valore ?? '').trim();
+        if (!testo) return;
+        const size = fitSize(box, testo, o.size);
+        doc.setFont('courier', o.bold ? 'bold' : 'normal');
+        doc.setFontSize(size);
+        doc.setTextColor(17, 17, 17);
+        const y = baselineFor(box, size);
+        const align = o.align || box.align || 'center';
+        const x = align === 'left' ? box.x + 0.6
+                : align === 'right' ? box.x + box.w - 0.6
+                : box.x + box.w / 2;
+        doc.text(testo, x, y, { align });
     };
-    const fit = (v, x, y, maxWidth, size, style, align) => {
-        const s = String(v ?? '');
-        if (!s) return;
-        doc.setFont('courier', style || 'normal');
-        let fs = size || 5.7;
-        doc.setFontSize(fs);
-        while (fs > 4.2 && doc.getTextWidth(s) > maxWidth) { fs -= 0.2; doc.setFontSize(fs); }
-        text(s, x, y, fs, style, align);
+
+    /* Campi a caselle: una lettera per casella, centrata nella sua. */
+    const putCells = (box, valore) => {
+        const v = normalizeId(valore).slice(0, box.n);
+        if (!v) return;
+        const size = box.size || 10;
+        doc.setFont('courier', 'bold');
+        doc.setFontSize(size);
+        doc.setTextColor(17, 17, 17);
+        const y = baselineFor(box, size);
+        for (let i = 0; i < v.length; i++) {
+            doc.text(v[i], box.x + box.step * i + box.step / 2, y, { align: 'center' });
+        }
     };
-    const chars = (v, x, y, count, step, size) => {
-        const value = normalizeId(v).slice(0, count);
-        for (let i = 0; i < value.length; i++) text(value[i], x + i * step, y, size || 5.7, 'bold', 'center');
-    };
-    const money = (v, euroRight, cent1, cent2, y, size) => {
-        const n = cents(v);
+
+    /* Importi: euro allineati a destra prima della virgola stampata sul
+       modello, centesimi nelle due caselle successive. */
+    const putMoney = (box, valore, sizeBase) => {
+        const n = cents(valore);
         if (n <= 0) return;
-        const eur = String(Math.floor(n / 100));
+        const euro = String(Math.floor(n / 100));
         const cc = String(n % 100).padStart(2, '0');
-        text(eur, euroRight, y, size || 5.7, 'normal', 'right');
-        text(cc[0], cent1, y, size || 5.7, 'normal', 'center');
-        text(cc[1], cent2, y, size || 5.7, 'normal', 'center');
+        const size = Math.min(sizeBase || 9.5, fitSize({ w: MONEY_OFFSET.euroRight - 1.5, h: box.h }, euro, sizeBase || 9.5));
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(size);
+        doc.setTextColor(17, 17, 17);
+        const y = baselineFor(box, size);
+        doc.text(euro, box.x + MONEY_OFFSET.euroRight, y, { align: 'right' });
+        doc.text(cc[0], box.x + MONEY_OFFSET.cent1, y, { align: 'center' });
+        doc.text(cc[1], box.x + MONEY_OFFSET.cent2, y, { align: 'center' });
     };
-    const mark = (v, x, y) => { if (v) text('X', x, y, 6.4, 'bold', 'center'); };
-    const sums = k => {
-        const rr = sections[k] || [];
-        return [fromCents(rr.reduce((a, r) => a + cents(r.debit), 0)), fromCents(rr.reduce((a, r) => a + cents(r.credit), 0))];
+
+    const putFlag = (box, attivo) => {
+        if (!attivo) return;
+        const size = 9;
+        doc.setFont('courier', 'bold');
+        doc.setFontSize(size);
+        doc.setTextColor(17, 17, 17);
+        doc.text('X', box.x + box.w / 2, baselineFor(box, size), { align: 'center' });
     };
-    const secBalance = (debit, credit, y) => {
-        const bal = cents(debit) - cents(credit);
-        if (bal !== 0) {
-            text(bal < 0 ? '-' : '+', 173.30, y, 5.5, 'bold', 'center');
-            money(fromCents(Math.abs(bal)), 196.10, 198.82, 201.27, y);
+
+    const totali = (key, sezione) => {
+        const rr = sections[key] || [];
+        const d = rr.reduce((a, r) => a + cents(r.debit), 0);
+        const c = rr.reduce((a, r) => a + cents(r.credit), 0);
+        const t = sezione.totali;
+        putMoney({ ...COL_DEBIT, y: t.y, h: t.h }, fromCents(d));
+        putMoney({ ...COL_CREDIT, y: t.y, h: t.h }, fromCents(c));
+        if (t.saldo && rr.length) {
+            const saldo = d - c;
+            put({ x: 172.0, y: t.y, w: 3.0, h: t.h }, saldo < 0 ? '−' : '+', { size: 9, bold: true });
+            putMoney({ ...COL_SALDO, y: t.y, h: t.h }, fromCents(Math.abs(saldo)));
         }
     };
 
-    const first = g.rows[0] || {};
-    const date = (g.date || '').split('-');
-    const iban = normalizeId(g.client.iban || '');
+    const first = g.filled && g.filled.length ? g.filled[0] : (g.rows[0] || {});
+    const c = g.client || {};
+    const data = (g.date || '').split('-');
+    const iban = normalizeId(c.iban || '');
+    const M = F24_MAP;
 
-    for (let page = 0; page < 3; page++) {
-        if (page) doc.addPage();
-        doc.addImage(F24_MINISTERIAL_TEMPLATES[page], 'PNG', 0, 0, 210, 297, `f24-official-${page}`, 'FAST');
+    for (let pagina = 0; pagina < 3; pagina++) {
+        if (pagina) doc.addPage();
+        doc.addImage(F24_MINISTERIAL_TEMPLATES[pagina], 'PNG', 0, 0, 210, 297, 'f24-' + pagina, 'FAST');
 
-        chars(g.client.cf || '', 42.55, 41.9, 16, 5.08, 6.4);
-        fit(g.client.name || '', 40.3, 49.7, 103.5, 6.6, 'bold');
-        fit(g.client.city || '', 40.3, 66.4, 72.6, 5.8);
-        fit(g.client.province || '', 118.0, 66.4, 8.0, 5.8, 'normal', 'center');
-        fit(g.client.address || '', 129.5, 66.4, 71.0, 5.7);
-        chars(first.coobligorCf || '', 67.35, 74.9, 16, 5.08, 6.1);
-        chars(first.coobligorCode || '', 191.5, 74.9, 2, 5.0, 6.1);
-
-        /* Erario */
-        const erY = [89.2, 93.4, 97.6, 101.8, 106.0, 110.2];
-        (sections.erario || []).slice(0, 6).forEach((r, i) => {
-            const y = erY[i];
-            fit(r.taxCode, 62.2, y, 27.0, 6.0, 'bold', 'center');
-            fit(r.period, 85.7, y, 17.0, 5.8, 'normal', 'center');
-            fit(r.year, 103.5, y, 14.0, 5.8, 'normal', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        const er0 = (sections.erario || [])[0] || {};
-        chars(er0.taxOfficeCode || '', 8.6, 114.0, 3, 5.0, 5.7);
-        chars(er0.actCode || '', 27.5, 114.0, 11, 5.0, 5.7);
-        let [a, b] = sums('erario');
-        money(a, 135.10, 137.82, 140.32, 114.0);
-        money(b, 165.60, 168.32, 170.80, 114.0);
-        secBalance(a, b, 114.0);
-
-        /* INPS */
-        const inpsY = [127.1, 131.3, 135.5, 139.7];
-        (sections.inps || []).slice(0, 4).forEach((r, i) => {
-            const y = inpsY[i];
-            fit(r.officeCode, 12.7, y, 8, 5.2, 'normal', 'center');
-            fit(r.taxCode, 24.8, y, 10, 5.2, 'bold', 'center');
-            fit(r.reference, 51, y, 39, 5, 'normal', 'center');
-            fit(r.periodFrom || r.period, 88, y, 15.5, 4.9, 'normal', 'center');
-            fit(r.periodTo, 105, y, 15.5, 4.9, 'normal', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        [a, b] = sums('inps');
-        money(a, 135.10, 137.82, 140.32, 143.3);
-        money(b, 165.60, 168.32, 170.80, 143.3);
-        secBalance(a, b, 143.3);
-
-        /* Regioni */
-        const regY = [156.7, 160.9, 165.1, 169.3];
-        (sections.regioni || []).slice(0, 4).forEach((r, i) => {
-            const y = regY[i];
-            chars(r.officeCode, 10.15, y, 2, 5.08, 5.2);
-            fit(r.taxCode, 62.2, y, 27, 5.8, 'bold', 'center');
-            fit(r.period, 85.7, y, 17, 5.5, 'normal', 'center');
-            fit(r.year, 103.5, y, 14, 5.5, 'normal', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        [a, b] = sums('regioni');
-        money(a, 135.10, 137.82, 140.32, 173.0);
-        money(b, 165.60, 168.32, 170.80, 173.0);
-        secBalance(a, b, 173.0);
-
-        /* IMU e tributi locali */
-        const imuY = [187.0, 191.2, 195.4, 199.6];
-        (sections.imu || []).slice(0, 4).forEach((r, i) => {
-            const y = imuY[i];
-            chars(r.officeCode, 8.65, y, 4, 5.08, 5.1);
-            mark(r.ravvedimento, 27, y);
-            mark(r.immobiliVariati, 32.6, y);
-            mark(r.acconto, 38.2, y);
-            mark(r.saldo, 43.7, y);
-            fit(r.numImmobili, 50.5, y, 5.5, 5, 'normal', 'center');
-            fit(r.taxCode, 66, y, 20, 5.7, 'bold', 'center');
-            fit(r.period, 85.7, y, 17, 5.4, 'normal', 'center');
-            fit(r.year, 103.5, y, 14, 5.4, 'normal', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        const imu0 = (sections.imu || [])[0] || {};
-        money(imu0.detrazione, 47.40, 50.10, 52.62, 203.2, 5.5);
-        [a, b] = sums('imu');
-        money(a, 135.10, 137.82, 140.32, 203.2);
-        money(b, 165.60, 168.32, 170.80, 203.2);
-        secBalance(a, b, 203.2);
-
-        /* INAIL — il saldo di sezione stava a 229.4 mentre i totali della
-           stessa riga stanno a 228.0: era disallineato di 1,4 mm. */
-        const inailY = [215.8, 220.0, 224.2];
-        (sections.inail || []).slice(0, 3).forEach((r, i) => {
-            const y = inailY[i];
-            fit(r.officeCode, 42.5, y, 14, 4.9, 'normal', 'center');
-            fit(r.inailCompanyCode || r.reference, 62, y, 18, 4.8, 'normal', 'center');
-            fit(r.inailCc, 76, y, 6, 4.8, 'normal', 'center');
-            fit(r.reference, 93, y, 23, 4.6, 'normal', 'center');
-            fit(r.taxCode, 108, y, 6, 4.6, 'bold', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        [a, b] = sums('inail');
-        money(a, 135.10, 137.82, 140.32, 228.0);
-        money(b, 165.60, 168.32, 170.80, 228.0);
-        secBalance(a, b, 228.0);
-
-        /* Altri enti */
-        const altY = [236.6, 240.8];
-        (sections.altri || []).slice(0, 2).forEach((r, i) => {
-            const y = altY[i];
-            fit(r.officeCode || r.entityCode, 13, y, 11, 4.9, 'normal', 'center');
-            fit(r.reference, 28, y, 10, 4.8, 'normal', 'center');
-            fit(r.taxCode, 43, y, 10, 4.8, 'bold', 'center');
-            fit(r.positionCode, 65, y, 26, 4.6, 'normal', 'center');
-            fit(r.periodFrom || r.period, 88, y, 15, 4.6, 'normal', 'center');
-            fit(r.periodTo, 105, y, 15, 4.6, 'normal', 'center');
-            money(r.debit, 135.10, 137.82, 140.32, y);
-            money(r.credit, 165.60, 168.32, 170.80, y);
-        });
-        [a, b] = sums('altri');
-        money(a, 135.10, 137.82, 140.32, 246.9);
-        money(b, 165.60, 168.32, 170.80, 246.9);
-        secBalance(a, b, 246.9);
-
-        /* Saldo finale, data e IBAN (l'IBAN solo sulla copia per la banca) */
-        money(Math.abs(g.balance), 196.10, 198.82, 201.27, 255.1, 6.1);
-        if (date.length === 3) {
-            chars(date[2], 12.5, 278.4, 2, 5, 5.7);
-            chars(date[1], 22.5, 278.4, 2, 5, 5.7);
-            chars(date[0], 34, 278.4, 4, 5, 5.7);
+        /* Contribuente */
+        putCells(M.contribuente.cf, c.cf || '');
+        put(M.contribuente.name, c.name || '', { align: 'left' });
+        put(M.contribuente.city, c.city || '', { align: 'left' });
+        put(M.contribuente.province, c.province || '');
+        put(M.contribuente.address, c.address || '', { align: 'left' });
+        putFlag(M.contribuente.nonCalendarYear, first.nonCalendarYear);
+        putCells(M.contribuente.coobligorCf, first.coobligorCf || '');
+        put(M.contribuente.coobligorCode, first.coobligorCode || '');
+        if (c.surname || c.firstName) {
+            put(M.contribuente.firstName, c.firstName || '', { align: 'left' });
+            const nascita = String(c.birthDate || '').split('-');
+            if (nascita.length === 3) {
+                put(M.contribuente.birthDay, nascita[2]);
+                put(M.contribuente.birthMonth, nascita[1]);
+                put(M.contribuente.birthYear, nascita[0]);
+            }
+            put(M.contribuente.sex, c.sex || '');
+            put(M.contribuente.birthCity, c.birthCity || '', { align: 'left' });
+            put(M.contribuente.birthProvince, c.birthProvince || '');
         }
-        if (page === 0 && iban) {
-            const rest = iban.startsWith('IT') ? iban.slice(2) : iban;
-            chars(rest, 49.56, 287.2, 25, 2.54, 5.0);
+
+        /* Sezioni */
+        Object.entries(M.sezioni).forEach(([key, sezione]) => {
+            const righeSezione = (sections[key] || []).slice(0, sezione.rows.length);
+            righeSezione.forEach((r, i) => {
+                const top = sezione.rows[i];
+                Object.entries(sezione.cols).forEach(([campo, col]) => {
+                    if (col.soloPrimaRiga && i > 0) return;
+                    const box = { x: col.x, y: top, w: col.w, h: sezione.h, align: col.align };
+                    if (col.t === 'money') putMoney(box, r[campo]);
+                    else if (col.t === 'flag') putFlag(box, r[campo]);
+                    else if (campo === 'periodFrom' || campo === 'periodTo') put(box, r[campo] || (campo === 'periodFrom' ? r.period : ''));
+                    else put(box, r[campo], { bold: campo === 'taxCode' });
+                });
+            });
+            if (sezione.extra) {
+                const prima = righeSezione[0] || {};
+                Object.entries(sezione.extra).forEach(([campo, box]) => {
+                    const valore = campo === 'operationId'
+                        ? (righeSezione.find(r => r.operationId) || {}).operationId
+                        : campo === 'detrazione'
+                            ? righeSezione.reduce((s, r) => s + cents(r.detrazione), 0) / 100
+                            : prima[campo];
+                    if (box.t === 'cells') putCells(box, valore || '');
+                    else if (box.t === 'money') putMoney(box, valore);
+                    else put(box, valore);
+                });
+            }
+            totali(key, sezione);
+        });
+
+        /* Saldo finale, data e IBAN */
+        putMoney(M.saldoFinale, Math.abs(g.balance), 10);
+        if (data.length === 3) {
+            putCells(M.versamento.day, data[2]);
+            putCells(M.versamento.month, data[1]);
+            putCells(M.versamento.year, data[0]);
+        }
+        if (pagina === 0 && iban) {
+            putCells(M.versamento.iban, iban.startsWith('IT') ? iban.slice(2) : iban);
         }
     }
+
 
     doc.setProperties({
         title: `Modello F24 — ${g.client.name || 'Contribuente'} — ${g.date || ''} — Flusso ${g.flow}`,
@@ -4590,28 +4796,15 @@ function groupKeyOf(clientId, date, flow) {
     return [clientId, date || '', sanitizeFlow(flow)].join('|');
 }
 
-/* L'F24 appena impostato non ha ancora righe complete, quindi non compare in
-   groupF24(). Qui viene ricostruito con la stessa chiave che avrà quando la
-   prima riga sarà completa: nel momento in cui lo diventa, il gruppo vero
-   prende il suo posto senza che l'utente veda nulla cambiare. */
-function pendingGroupView() {
-    const p = state.pendingGroup;
-    if (!p) return null;
-    const rows = state.rows.filter(r => groupKeyOf(r.clientId, r.paymentDate, r.flow) === p.key);
-    return {
-        key: p.key, clientId: p.clientId, date: p.date, flow: p.flow, flowDesc: p.flowDesc,
-        client: clientById(p.clientId) || {},
-        rows, issues: [], ownIssues: [],
-        debit: 0, credit: 0, balance: 0, debitCents: 0, creditCents: 0, balanceCents: 0,
-        label: `${dateIT(p.date) || 'Data da indicare'} · ${p.flowDesc || 'Flusso ' + p.flow}`,
-        pending: true
-    };
+/* Da quando groupF24() raggruppa tutte le righe, l'F24 in preparazione è un
+   gruppo come gli altri: qui resta solo il segnalibro che dice quale lo è. */
+function isPending(g) {
+    return !!(g && state.pendingGroup && state.pendingGroup.key === g.key && !g.filled.length);
 }
 
 function currentGroup() {
     const groups = groupF24();
     let g = groups.find(x => x.key === state.activeGroup);
-    if (!g && state.pendingGroup && state.pendingGroup.key === state.activeGroup) return pendingGroupView();
     if (!g && state.activeGroup !== 'draft' && groups.length) g = groups[0];
     if (g) state.activeGroup = g.key;
     return g || null;
@@ -4622,7 +4815,7 @@ function currentGroup() {
    dell'interfaccia in cui impostarli, quindi un F24 creato a mano restava
    bloccato su «Data di pagamento mancante» per sempre. */
 function setGroupField(key, field, value) {
-    const g = groupF24().find(x => x.key === key) || (state.pendingGroup && state.pendingGroup.key === key ? pendingGroupView() : null);
+    const g = groupF24().find(x => x.key === key);
     if (!g) return;
     const righe = g.rows.slice();
     let nuovaChiave = key;
@@ -4761,13 +4954,17 @@ function rowMatches(r, q) {
         .some(v => String(v || '').toLowerCase().includes(q));
 }
 
+/* Righe orfane: senza contribuente non appartengono a nessun F24. Sono
+   l'unico contenuto rimasto del gruppo «da completare». */
+function orphanRows() {
+    return state.rows.filter(r => !r.clientId);
+}
+
 function displayedRows() {
     const q = (val('rowSearch') || '').toLowerCase();
-    const pending = pendingGroupView();
     let rows;
-    if (state.activeGroup === 'draft') {
-        rows = state.rows.filter(r => !meaningfulRow(r) && (!pending || groupKeyOf(r.clientId, r.paymentDate, r.flow) !== pending.key));
-    } else {
+    if (state.activeGroup === 'draft') rows = orphanRows();
+    else {
         const g = currentGroup();
         rows = g ? g.rows : [];
     }
@@ -4978,22 +5175,16 @@ function renderGroupRail(groups) {
         if (!by.has(g.clientId)) by.set(g.clientId, { client: g.client, groups: [] });
         by.get(g.clientId).groups.push(g);
     });
-    /* L'F24 appena impostato compare qui accanto agli altri: prima si creava
-       e restava invisibile finché non conteneva una riga completa. */
-    const pending = pendingGroupView();
-    if (pending && !groups.some(g => g.key === pending.key)) {
-        if (!by.has(pending.clientId)) by.set(pending.clientId, { client: pending.client, groups: [] });
-        by.get(pending.clientId).groups.push(pending);
-    }
     let html = [...by.values()].map(x =>
         `<div class="group-client"><div class="group-client-title">${esc(x.client.name || 'Contribuente')}</div>` +
-        x.groups.map(g =>
-            `<button class="group-item${g.key === state.activeGroup ? ' active' : ''}${g.pending ? ' pending' : ''}" data-action="select-group" data-key="${esc(g.key)}" type="button">` +
-            `<b>${esc(g.label)}</b><small><span>${plurale(g.rows.length, 'riga', 'righe')} · ${esc(fmt.format(g.balance))}</span>` +
-            `<span class="${g.pending ? '' : g.issues.length ? 'group-error' : 'group-ok'}">` +
-            `${g.pending ? 'Da compilare' : g.issues.length ? plurale(g.issues.length, 'errore', 'errori') : 'Pronto'}</span></small></button>`
-        ).join('') + '</div>').join('');
-    const drafts = state.rows.filter(r => !meaningfulRow(r) && (!pending || groupKeyOf(r.clientId, r.paymentDate, r.flow) !== pending.key));
+        x.groups.map(g => {
+            const attesa = isPending(g);
+            return `<button class="group-item${g.key === state.activeGroup ? ' active' : ''}${attesa ? ' pending' : ''}" data-action="select-group" data-key="${esc(g.key)}" type="button">` +
+            `<b>${esc(g.label)}</b><small><span>${plurale(g.filled.length, 'riga', 'righe')}${g.drafts ? ' +' + g.drafts : ''} · ${esc(fmt.format(g.balance))}</span>` +
+            `<span class="${attesa ? '' : g.issues.length ? 'group-error' : 'group-ok'}">` +
+            `${attesa ? 'Da compilare' : g.issues.length ? plurale(g.issues.length, 'errore', 'errori') : 'Pronto'}</span></small></button>`;
+        }).join('') + '</div>').join('');
+    const drafts = orphanRows();
     if (drafts.length) {
         html += `<div class="draft-group"><button class="group-item${state.activeGroup === 'draft' ? ' active' : ''}" data-action="select-group" data-key="draft" type="button">` +
             `<b>Righe da completare</b><small><span>${plurale(drafts.length, 'bozza', 'bozze')}</span>` +
@@ -5012,7 +5203,7 @@ function renderSelectedGroupHeader(g, rows) {
     }
     const k = esc(g.key);
     host.innerHTML = `<div class="f24-head-card"><div class="f24-head-main">` +
-        `<h2>${esc(g.client.name || 'Contribuente')}${g.pending ? ' <span class="pending-tag">in preparazione</span>' : ''}</h2>` +
+        `<h2>${esc(g.client.name || 'Contribuente')}${isPending(g) ? ' <span class="pending-tag">in preparazione</span>' : ''}</h2>` +
         `<div class="f24-head-fields">` +
         `<div class="field"><label for="ghDate">Data di pagamento</label>` +
         `<input data-action="group-set" data-field="date" data-key="${k}" id="ghDate" type="date" value="${esc(g.date || '')}"></div>` +
@@ -5060,8 +5251,7 @@ function confirmNewF24() {
     applyClientRules(row);
     state.rows.push(row);
     state.activeGroup = key;
-    state.workView = 'visual';
-    state.visualSection = 'erario';
+    state.workView = 'model';
     touchState();
     closeModal('modalNewF24');
     renderAll();
@@ -5126,125 +5316,207 @@ function renderEditor() {
 }
 
 function applyWorkView() {
-    const visual = state.workView === 'visual';
-    $('tableWorkView').hidden = visual;
-    $('visualWorkView').hidden = !visual;
-    $('viewTableBtn').classList.toggle('active', !visual);
-    $('viewVisualBtn').classList.toggle('active', visual);
-    if (visual) renderVisualEditor();
+    const modello = state.workView === 'model';
+    $('tableWorkView').hidden = modello;
+    $('modelWorkView').hidden = !modello;
+    $('viewTableBtn').classList.toggle('active', !modello);
+    $('viewModelBtn').classList.toggle('active', modello);
+    if (modello) renderInteractiveModel();
+}
+
+/* Scrittura diretta sul modello. Il riquadro può appartenere a una riga che
+   non esiste ancora: sul modello di carta la casella c'è comunque, quindi
+   scriverci dentro la crea. */
+function modelSet(el) {
+    const g = currentGroup();
+    if (!g) return;
+    const key = el.dataset.sezione;
+    const indice = Number(el.dataset.riga);
+    const campo = el.dataset.field;
+    const valore = el.value;
+    const vuoto = !String(valore).trim();
+    let r = rowsForSection(g, key)[indice];
+    if (!r) {
+        if (vuoto) return;
+        r = ensureRowAt(g, key, indice);
+    }
+    if (el.dataset.target === 'money') setMoney(r.id, campo, valore);
+    else setRow(r.id, campo, valore);
+    renderInteractiveModel();
+}
+
+function modelFlag(el) {
+    const g = currentGroup();
+    if (!g) return;
+    const r = rowsForSection(g, el.dataset.sezione)[Number(el.dataset.riga)]
+        || ensureRowAt(g, el.dataset.sezione, Number(el.dataset.riga));
+    setFlag(r.id, el.dataset.field, el.checked);
+    renderInteractiveModel();
 }
 
 function switchWorkView(view) {
-    state.workView = view === 'visual' ? 'visual' : 'table';
+    state.workView = view === 'model' ? 'model' : 'table';
     applyWorkView();
 }
 
-/* ---------- Compilazione guidata ------------------------------------------ */
+/* ==========================================================================
+   Modello F24 compilabile
+   --------------------------------------------------------------------------
+   Il modello ministeriale con un campo sopra ogni riquadro reale: si clicca
+   dentro e si scrive, come sulla carta. Niente tabelle né pannelli di
+   sezione accanto. Le posizioni vengono dalla stessa mappa misurata che
+   genera il PDF, quindi dove scrivi è dove verrà stampato.
+   ========================================================================== */
 
-function setVisualSection(key) {
-    state.visualSection = key;
-    renderVisualEditor();
+const PCT = { x: v => (v / F24_PAGE.w) * 100, y: v => (v / F24_PAGE.h) * 100 };
+
+function rowsForSection(g, key) {
+    return g.rows.filter(r => sectionKey(r.section) === key);
 }
 
-function addVisualRow() {
-    const g = currentGroup();
-    if (!g) return addRowToCurrentGroup();
-    const meta = SECTION_UI[state.visualSection];
-    const count = g.rows.filter(r => sectionKey(r.section) === state.visualSection).length;
-    if (count >= meta.cap) return toast(`La sezione ${meta.label} contiene al massimo ${meta.cap} righe sul modello`, true);
-    const row = blankRow({ clientId: g.clientId, flow: g.flow, flowDesc: g.flowDesc, date: g.date, section: meta.section });
+/* Sul modello di carta il riquadro esiste comunque: scriverci dentro deve
+   poter creare la riga corrispondente. */
+function ensureRowAt(g, key, indice) {
+    const esistenti = rowsForSection(g, key);
+    if (esistenti[indice]) return esistenti[indice];
+    const row = blankRow({ clientId: g.clientId, flow: g.flow, flowDesc: g.flowDesc, date: g.date, section: SECTION_UI[key].section });
     applyClientRules(row);
     state.rows.push(row);
     touchState();
-    renderAll();
+    return row;
 }
 
-function renderVisualEditor() {
-    const tabs = $('visualSectionTabs');
-    if (!tabs) return;
-    const g = currentGroup();
-    tabs.innerHTML = Object.entries(SECTION_UI).map(([k, m]) => {
-        const n = g ? g.rows.filter(r => sectionKey(r.section) === k).length : 0;
-        return `<button class="${k === state.visualSection ? 'active' : ''}" data-action="visual-section" data-key="${esc(k)}" type="button">` +
-            `${esc(m.label)}${n ? `<span class="cnt">${n}</span>` : ''}</button>`;
-    }).join('');
-    const meta = SECTION_UI[state.visualSection];
-    setText('visualSectionTitle', SECTION_TITLES[state.visualSection]);
-    setText('visualSectionHelp', `${meta.help} Il modello ne prevede ${meta.cap} righe.`);
-
-    /* Ogni sezione mostra i propri campi. Prima ne mostrava cinque uguali per
-       tutte, quindi i flag IMU, la matricola INPS o il codice ditta INAIL si
-       raggiungevano solo dal «•••» — e quella finestra era tagliata. */
-    const rows = g ? g.rows.filter(r => sectionKey(r.section) === state.visualSection) : [];
-    const fields = SECTION_FIELDS[state.visualSection] || SECTION_FIELDS.erario;
-    $('visualRows').innerHTML = rows.length ? rows.map((r, i) => {
-        const n = i + 1;
-        const id = esc(r.id);
-        const campo = f => {
-            const label = esc(f.l);
-            if (f.t === 'money') {
-                const v = r[f.k] ? esc(String(r[f.k]).replace('.', ',')) : '';
-                return `<div class="field"><label>${label}</label><input aria-label="${label} riga ${n}" data-action="visual-money" data-field="${f.k}" data-id="${id}" inputmode="decimal" value="${v}"></div>`;
-            }
-            const hint = f.k === 'taxCode' ? codeHintHtml(r) : '';
-            return `<div class="field"><label>${label}</label><input aria-label="${label} riga ${n}" data-action="visual-set" data-field="${f.k}" data-id="${id}" value="${esc(r[f.k] || '')}">${hint}</div>`;
-        };
-        /* Le caselle stanno insieme su una riga propria, come la fila di
-           quadratini sul modello: sparse fra i campi si leggevano male e
-           l'accostamento con il campo accanto era casuale. */
-        const flags = fields.filter(f => f.t === 'flag');
-        const body = fields.filter(f => f.t !== 'flag').map(campo).join('')
-            + (flags.length ? `<div class="visual-flags">` + flags.map(f =>
-                `<label class="flag-box"><input data-action="visual-flag" data-field="${f.k}" data-id="${id}" type="checkbox"${r[f.k] ? ' checked' : ''}> ${esc(f.l)}</label>`
-              ).join('') + '</div>' : '');
-        return `<div class="visual-row">${body}` +
-            `<button aria-label="Altri campi riga ${n}" class="small-action" data-action="open-row" data-id="${esc(r.id)}" title="Altri campi" type="button">•••</button></div>`;
-    }).join('') : '<div class="visual-empty">Nessuna riga in questa sezione. Usa «Aggiungi riga nella sezione».</div>';
-
-    $('ministerialPreview').src = F24_MINISTERIAL_TEMPLATES[0];
-    const hi = $('sectionHighlight');
-    hi.style.top = meta.top + '%';
-    hi.style.height = meta.height + '%';
-    renderPreviewOverlay(g);
-    setPreviewScale(state.previewScale);
+function fmtImporto(centesimi) {
+    if (!centesimi) return '';
+    return (centesimi / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function renderPreviewOverlay(g) {
-    const host = $('previewOverlay');
+function boxStyle(box) {
+    return `left:${PCT.x(box.x).toFixed(3)}%;top:${PCT.y(box.y).toFixed(3)}%;` +
+           `width:${PCT.x(box.w).toFixed(3)}%;height:${PCT.y(box.h).toFixed(3)}%`;
+}
+
+function renderInteractiveModel() {
+    const host = $('modelSheet');
     if (!host) return;
-    if (!g) { host.innerHTML = ''; return; }
+    const g = currentGroup();
+    if (!g) { host.innerHTML = '<p class="visual-empty">Nessun F24 selezionato.</p>'; return; }
     const c = g.client || {};
-    let h = '';
-    const put = (t, l, top, w, fs) => {
-        if (t) h += `<div class="preview-static" style="left:${l}%;top:${top}%;width:${w}%;font-size:${fs || 10}px">${esc(t)}</div>`;
+    const M = F24_MAP;
+    let h = `<img alt="Modello F24 ministeriale" class="mf-bg" src="${F24_MINISTERIAL_TEMPLATES[0]}">`;
+
+    /* Anagrafica, totali e saldi si leggono ma non si scrivono qui:
+       modificarli sul modello e non nell'archivio creerebbe due verità. */
+    const statico = (box, valore, cls) => {
+        if (!String(valore ?? '').trim()) return;
+        h += `<span class="mf-static${cls ? ' ' + cls : ''}" style="${boxStyle(box)}">${esc(valore)}</span>`;
     };
-    put(c.cf || c.vat, 20, 12.4, 38, 11);
-    put(c.name, 20, 14.9, 53, 10);
-    put(c.city, 20, 20.4, 35, 10);
-    put(c.province, 57, 20.4, 6, 10);
-    put(c.address, 64, 20.4, 31, 10);
-    const tops = { erario: 29.7, inps: 41.8, regioni: 52.2, imu: 62.1, inail: 73.2, altri: 80.7 };
-    Object.keys(tops).forEach(k => {
-        g.rows.filter(r => sectionKey(r.section) === k).slice(0, SECTION_UI[k].cap).forEach((r, i) => {
-            const t = tops[k] + i * 1.42;
-            put(r.taxCode, 27, t, 11, 9);
-            put(r.period, 40, t, 10, 9);
-            put(r.year, 51, t, 9, 9);
-            put(r.debit ? r.debit.toFixed(2).replace('.', ',') : '', 62, t, 13, 9);
-            put(r.credit ? r.credit.toFixed(2).replace('.', ',') : '', 76, t, 13, 9);
+    const celle = (box, valore) => {
+        const v = normalizeId(valore).slice(0, box.n);
+        for (let i = 0; i < v.length; i++) {
+            h += `<span class="mf-static mf-cell" style="${boxStyle({ x: box.x + box.step * i, y: box.y, w: box.step, h: box.h })}">${esc(v[i])}</span>`;
+        }
+    };
+    /* Gli importi calcolati seguono la geometria del modello: gli euro
+       finiscono sulla virgola stampata, i centesimi nelle due caselle dopo.
+       Un rientro in percentuale non andrebbe bene, perché su un elemento in
+       posizione assoluta si calcola sulla larghezza del foglio. */
+    const importoStatico = (base, centesimi) => {
+        if (!centesimi) return;
+        const euro = String(Math.floor(Math.abs(centesimi) / 100));
+        const cc = String(Math.abs(centesimi) % 100).padStart(2, '0');
+        h += `<span class="mf-static mf-euro" style="${boxStyle({ x: base.x, y: base.y, w: MONEY_OFFSET.euroRight, h: base.h })}">${esc(euro)}</span>`;
+        h += `<span class="mf-static mf-cent" style="${boxStyle({ x: base.x + MONEY_OFFSET.cent1 - 1.1, y: base.y, w: 2.2, h: base.h })}">${cc[0]}</span>`;
+        h += `<span class="mf-static mf-cent" style="${boxStyle({ x: base.x + MONEY_OFFSET.cent2 - 1.1, y: base.y, w: 2.2, h: base.h })}">${cc[1]}</span>`;
+    };
+
+    celle(M.contribuente.cf, c.cf || '');
+    statico(M.contribuente.name, c.name || '', 'mf-left');
+    statico(M.contribuente.city, c.city || '', 'mf-left');
+    statico(M.contribuente.province, c.province || '');
+    statico(M.contribuente.address, c.address || '', 'mf-left');
+    celle(M.contribuente.coobligorCf, (g.rows[0] || {}).coobligorCf || '');
+
+    Object.entries(M.sezioni).forEach(([key, sezione]) => {
+        const righe = rowsForSection(g, key);
+        sezione.rows.forEach((top, i) => {
+            const r = righe[i];
+            Object.entries(sezione.cols).forEach(([campo, col]) => {
+                if (col.soloPrimaRiga && i > 0) return;
+                const box = { x: col.x, y: top, w: col.w, h: sezione.h };
+                const etichetta = `${sezione.titolo} — ${col.label}, riga ${i + 1}`;
+                if (col.t === 'flag') {
+                    h += `<label class="mf-flag" style="${boxStyle(box)}" title="${esc(etichetta)}">` +
+                        `<input aria-label="${esc(etichetta)}" data-action="model-flag" data-sezione="${key}" data-riga="${i}" ` +
+                        `data-field="${campo}" type="checkbox"${r && r[campo] ? ' checked' : ''}></label>`;
+                    return;
+                }
+                const valore = !r ? '' : col.t === 'money'
+                    ? (r[campo] ? String(r[campo]).replace('.', ',') : '')
+                    : (r[campo] || '');
+                h += `<input class="mf-field${col.t === 'money' ? ' mf-money' : ''}${campo === 'taxCode' ? ' mf-code' : ''}" ` +
+                    `style="${boxStyle(box)}" aria-label="${esc(etichetta)}" title="${esc(etichetta)}" ` +
+                    `data-action="model-set" data-target="${col.t === 'money' ? 'money' : 'text'}" ` +
+                    `data-sezione="${key}" data-riga="${i}" data-field="${campo}" ` +
+                    (col.t === 'money' ? 'inputmode="decimal" ' : '') +
+                    `value="${esc(valore)}">`;
+            });
         });
+        const t = sezione.totali;
+        const rr = righe.filter(meaningfulRow);
+        if (rr.length) {
+            const d = rr.reduce((s, r) => s + cents(r.debit), 0);
+            const cr = rr.reduce((s, r) => s + cents(r.credit), 0);
+            importoStatico({ x: COL_DEBIT.x, y: t.y, h: t.h }, d);
+            importoStatico({ x: COL_CREDIT.x, y: t.y, h: t.h }, cr);
+            if (d - cr !== 0) {
+                statico({ x: 171.6, y: t.y, w: 2.6, h: t.h }, d - cr < 0 ? '−' : '+', 'mf-segno');
+                importoStatico({ x: COL_SALDO.x, y: t.y, h: t.h }, Math.abs(d - cr));
+            }
+        }
     });
+
+    importoStatico({ x: F24_MAP.saldoFinale.x, y: F24_MAP.saldoFinale.y, h: F24_MAP.saldoFinale.h }, g.balanceCents);
+    const data = (g.date || '').split('-');
+    if (data.length === 3) {
+        celle(M.versamento.day, data[2]);
+        celle(M.versamento.month, data[1]);
+        celle(M.versamento.year, data[0]);
+    }
+
     host.innerHTML = h;
+    setModelZoom(state.modelZoom || 1.4);
+    renderModelIssues(g);
 }
 
-function setPreviewScale(scale) {
-    state.previewScale = Number(scale) || 1;
-    const sheet = $('ministerialSheet');
+/* I rilievi restano accanto al modello e agganciati alla riga: un messaggio
+   che sparisce non aiuta chi sta compilando. */
+function renderModelIssues(g) {
+    const host = $('modelIssues');
+    if (!host) return;
+    const rilievi = [];
+    g.filled.forEach(r => {
+        rowIssues(r).forEach(m => rilievi.push({ tipo: 'error', r, msg: m }));
+        rowWarnings(r).forEach(m => rilievi.push({ tipo: 'warn', r, msg: m }));
+    });
+    (g.ownIssues || []).forEach(m => rilievi.push({ tipo: 'error', msg: m }));
+    host.innerHTML = rilievi.length
+        ? rilievi.map(x => `<div class="mf-issue ${x.tipo}">` +
+            (x.r ? `<b>${esc(x.r.section)}${x.r.taxCode ? ' · ' + esc(x.r.taxCode) : ''}</b>` : '<b>Modello</b>') +
+            `<span>${esc(x.msg)}</span></div>`).join('')
+        : '<div class="mf-ok">Nessun rilievo su questo modello.</div>';
+}
+
+/* Ingrandimento del modello: il foglio A4 a schermo pieno è illeggibile su
+   un portatile, ma zoomando i riquadri restano al loro posto perché la
+   posizione è in percentuale, non in pixel. */
+function setModelZoom(zoom) {
+    state.modelZoom = Number(zoom) || 1;
+    const sheet = $('modelSheet');
     if (!sheet) return;
-    sheet.style.transform = `scale(${state.previewScale})`;
-    sheet.style.marginBottom = `${(state.previewScale - 1) * 1100}px`;
-    document.querySelectorAll('[data-action="preview-scale"]').forEach(b => {
-        b.classList.toggle('active', Number(b.dataset.scale) === state.previewScale);
+    sheet.style.width = (100 * state.modelZoom).toFixed(2) + '%';
+    document.querySelectorAll('[data-action="model-zoom"]').forEach(b => {
+        b.classList.toggle('active', Number(b.dataset.zoom) === state.modelZoom);
     });
 }
 
@@ -5907,12 +6179,10 @@ const CLICK_ACTIONS = {
     'select-group': el => { state.activeGroup = el.dataset.key; renderEditor(); },
     'add-group': () => openNewF24Modal(),
     'add-row': () => addRowToCurrentGroup(),
-    'add-visual-row': () => addVisualRow(),
     'duplicate-group': () => duplicateCurrentGroup(),
     'preview-group': () => previewCurrentGroup(),
     'work-view': el => switchWorkView(el.dataset.view),
-    'visual-section': el => setVisualSection(el.dataset.key),
-    'preview-scale': el => setPreviewScale(el.dataset.scale),
+    'model-zoom': el => setModelZoom(el.dataset.zoom),
     'open-row': el => openRowDetail(el.dataset.id),
     'save-row-detail': () => saveRowDetail(),
     'duplicate-row': el => duplicateRow(el.dataset.id),
@@ -5968,9 +6238,8 @@ document.addEventListener('change', e => {
         const a = el.dataset.action;
         if (a === 'row-set') return setRow(el.dataset.id, el.dataset.field, el.value);
         if (a === 'row-money') return setMoney(el.dataset.id, el.dataset.field, el.value);
-        if (a === 'visual-set') { setRow(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
-        if (a === 'visual-money') { setMoney(el.dataset.id, el.dataset.field, el.value); return renderVisualEditor(); }
-        if (a === 'visual-flag') { setFlag(el.dataset.id, el.dataset.field, el.checked); return renderVisualEditor(); }
+        if (a === 'model-set') return modelSet(el);
+        if (a === 'model-flag') return modelFlag(el);
         if (a === 'group-set') return setGroupField(el.dataset.key, el.dataset.field, el.value);
         if (a === 'row-select') {
             const r = state.rows.find(x => x.id === el.dataset.id);

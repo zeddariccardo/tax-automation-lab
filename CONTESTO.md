@@ -136,6 +136,16 @@ Queste sono costate errori veri. Vale la pena leggerle prima di toccare i tool.
    nell'attivo e Fondi per rischi e oneri nel passivo, `C` e `D` altrettanto. Una
    mappa unica per codice di nodo mescola le due sezioni. Nell'export XBRL le
    chiavi ambigue sono qualificate (`att:B`, `pas:B`).
+11. **Anche `financial-statement` ha definizioni sovrapposte**, non solo
+   `financial-analysis`. `computeFrom`, `refreshAll`, `renderStorni`,
+   `renderAdjustments`, `renderChecks`, `loadMemory` e `downloadTemplate`
+   esistono in due o tre versioni: **vale l'ultima**. Modificare la prima non
+   produce alcun effetto e sembra che il tool ignori la correzione — mi è
+   successo il 13 agosto su tre funzioni di fila. Prima di toccare qualcosa,
+   chiedere al browser `String(nomeFunzione)` e cercare *quel* testo nel file.
+   `computeFrom` in più è avvolta da `realignResult`, quindi il suo `String()`
+   mostra il wrapper: la definizione vera è la terza, alla riga 3294 per il
+   loop degli storni.
 10. **Il vecchio `fsShowView` è chiuso dentro il suo IIFE** e la sidebar è
    agganciata a quello. Sostituire `window.fsShowView` non basta: serve un
    listener in fase di cattura su `#sidebar` che fermi la propagazione.
@@ -243,6 +253,98 @@ Cosa **resta aperto**:
   il generatore lo controlla e lo dichiara invece di lasciarlo passare.
 
 Tutto ciò che è configurabile sta in `window.FS_XBRL_CONFIG`.
+
+## Bilancio civilistico — audit esterno e nove correzioni, 13 agosto 2026
+
+Un audit fatto fare a ChatGPT ha alzato dodici rilievi. Verificati uno per uno
+sul sorgente e sulla pagina in esecuzione: **cinque veri, uno falso, gli altri
+fuori perimetro o già noti**. Vale registrare anche il falso, perché la sua
+smentita costa mezz'ora ogni volta che qualcuno rilegge il file.
+
+**I difetti veri, chiusi.**
+
+1. **Riserva legale mappata su `AVI` invece che su `AIV`.** Tre dataset gemelli
+   (righe di esempio del template, demo legacy, `FS_DEMO_ACCOUNTS`) portavano lo
+   stesso errore. La tassonomia interna distingueva già le due voci: era un
+   errore nei dati, e si propagava fino all'XBRL.
+2. **L'anno dell'archivio veniva dall'anno solare.** `defaultYear()` legge la
+   data di chiusura, ma demo e import riempiono l'Anagrafica **per
+   assegnazione diretta**: `input` e `change` non partono, il listener che
+   risincronizza non scattava e la scheda restava sull'anno calcolato al boot.
+   Un esercizio 2025 finiva sotto il 2026, e il tool proponeva poi il 2027 come
+   successivo. Ora `showResultsUI` richiama `fsResetSaveYear`, e `saveToYear`
+   pretende la data di chiusura e chiede conferma se l'anno diverge (serve per
+   gli esercizi a cavallo).
+3. **URL e voce attiva restavano indietro** dopo demo e import. Causa esatta:
+   il wrapper di `showResultsUI` nel blocco `fs-nav-v110` chiamava la
+   `fsShowView` **locale** — quella vecchia a quattro viste, che non spinge
+   l'indirizzo — invece di `window.fsShowView`, che al momento della chiamata è
+   la versione a sette viste. Una parola.
+4. **Gate di export incompleto.** Si fermava su A.IX, quadratura corrente e data
+   di chiusura; **mappature non valide** e **rettifiche non quadrate** restavano
+   FAIL rossi che non impedivano nulla e arrivavano fino all'istanza XBRL. Ora
+   c'è un gate unico, `window.fsExportGate`, da cui passano working paper,
+   prospetto di deposito e XBRL. Quadratura precedente e coerenza CE restano
+   avvisi: il comparativo può mancare per scelta.
+5. **Valute diverse dall'euro accettate** in Anagrafica mentre l'istanza XBRL
+   scrive sempre unità EUR. Il selettore ora offre solo EUR, e l'export XBRL si
+   ferma comunque se trova altro (fascicoli salvati prima).
+
+**Il falso positivo, da non riaprire.** L'audit sostiene che «Crea nuovo anno»
+riporta storni e rettifiche nell'esercizio successivo. **Non era vero**: la
+`loadMemory` viva (l'ultima delle tre definizioni) applica solo la mappatura.
+Il rilievo nasce dal leggere la `loadMemory` **morta** più in alto nel file, che
+invece li ripristinava. Verificato in pagina: creato il nuovo anno con riporto
+attivo e reimportato il file, storni e rettifiche non tornavano.
+
+Quello che c'era davvero era una **etichetta bugiarda** — la casella diceva
+«Riporta configurazione (anagrafica, mapping, storni, rettifiche)» — e una
+scrittura morta: `newYear` infilava storni e rettifiche nella memoria per
+P.IVA, dove nessuno li leggeva. Scelta presa: **farlo funzionare davvero**,
+perché le stesse scritture IAS→OIC (leasing, TFR) tornano ogni anno.
+
+Come funziona ora: `newYear` mette storni e rettifiche in `carryPending` dentro
+la memoria per P.IVA; `loadMemory` li rimette in campo al primo import
+**spenti** (`active:false`, `carried:true`, `carriedFrom`), li segnala con un
+avviso in cima alle schede Storni e Rettifiche e con la pastiglia «da
+riconfermare» su ogni riga; riattivarli è un clic e cancella il marchio.
+`carryPending` si consuma una volta sola. Nessun importo dell'esercizio
+precedente entra nei prospetti senza che qualcuno lo abbia riconfermato.
+Gli storni ora rispettano `active===false` come già facevano le rettifiche —
+il controllo va messo nel loop di `computeFrom` **alla riga 3294**, non in
+quello all'inizio del file, che è morto.
+
+**Altre quattro cose chiuse nello stesso giro.**
+
+- **Foglio «Esiti AI» finalmente importato.** I due template Excel erano
+  diversi: sei fogli quello di «Configura con AI», cinque quello scaricato dal
+  tool, e l'import ignorava il sesto. Fonti, assunzioni e dubbi restavano fuori
+  dalla sessione di lavoro. Ora `readAiFindings` lo legge (saltando la riga di
+  esempio e leggendo come chiuse le righe già marcate «risolto»), le eccezioni
+  compaiono nella scheda Verifiche come elenco da spuntare, il contatore sta
+  nella barra dell'import, e il template del tool ha lo stesso sesto foglio.
+  **Attenzione:** le intestazioni sono composte («Codice conto / campo»,
+  «Osservazione / assunzione») e `V13.findHeader` vuole la corrispondenza
+  esatta: qui serve il prefisso, per questo la ricerca è locale.
+- **Prospetto di deposito in unità di euro.** OIC 12 e il depositato non hanno
+  decimali; il working paper li tiene. Anteprima, PDF ed Excel di deposito ora
+  arrotondano, e lo scarto fra totale e somma delle righe arrotondate viene
+  **misurato e dichiarato** nell'anteprima, come già fa il generatore XBRL.
+- **Una sola costante di versione.** `window.FS_VERSION='1.4.0'`, letta dagli
+  altri due `VERSION` e dalla riscrittura dell'etichetta, che prima cercava
+  `1.1.3` e scriveva `1.3.6`. I commenti di blocco tengono la versione in cui
+  il blocco è nato: è storia, non stato corrente.
+- **Menu del sito su telefono**, il difetto già annotato in «Aperto»:
+  aggiunto `.tal-gh-menu-toggle` con il suo handler. Resta da fare in
+  `financial-analysis`.
+
+**Dove non ho seguito l'audit, e perché.** Separare bundle e librerie e
+caricare i moduli su richiesta contraddice l'architettura voluta (file unico,
+elaborazione locale, apribile da disco). PDF/A, font incorporati e tag di
+accessibilità costano molto su un documento che comunque non è il file
+depositato. Micro-impresa: gli schemi sono quelli dell'abbreviato, non serve
+una terza voce. XBRL ordinario: il pannello dichiara già `ordinaryScenarioVerified
+= false`.
 
 ## Analisi di bilancio — cosa è cambiato con la 2.1.0
 
@@ -571,6 +673,12 @@ invariate. Per verificare una modifica al foglio condiviso, sostituire il
 - **Nota integrativa e rendiconto finanziario**: fuori perimetro oggi.
 - **Concept condiviso**: resta **LIPE** — gruppo «Risultati e dati» completo
   (mancano Dati e backup e Come si usa) e deep link. Vedi la tabella sopra.
+- **Foglio «Esiti AI» negli altri tool**: il Bilancio ora lo importa e lo
+  trasforma in eccezioni da chiudere prima dell'export. Analisi, LIPE, F24 e
+  Fascicolo hanno lo stesso foglio nel template di «Configura con AI» e lo
+  ignorano ancora. È una decisione di concept, quindi va replicata.
+- **Gate di export unico negli altri tool**: stesso discorso. Nel Bilancio è
+  `window.fsExportGate` e da lì passano tutti e quattro gli export.
 - **PDF uniformi**: i report di `financial-analysis` passano da `window.open` e
   dalla stampa del browser, il Bilancio scarica con jsPDF. Da decidere quale dei
   due è il comportamento canonico, poi uniformare.
@@ -586,10 +694,11 @@ invariate. Per verificare una modifica al foglio condiviso, sostituire il
   esaustivo, con INPS e INAIL volutamente più stretti dell'Erario. Un codice
   fuori elenco produce un avviso, non un blocco, e l'utente può aggiungerlo.
   Vale la pena allargarlo con un elenco ufficiale, non a memoria.
-- **Navigazione del sito su telefono in `financial-statement` e
-  `financial-analysis`**: manca il pulsante `.tal-gh-menu-toggle`, quindi sotto
-  i 1080px le voci Home/Strumenti/… non sono raggiungibili. Si chiude copiando
-  il pulsante e le tre righe di gestione da `/tools/f24/`.
+- **Navigazione del sito su telefono in `financial-analysis`**: manca il
+  pulsante `.tal-gh-menu-toggle`, quindi sotto i 1080px le voci
+  Home/Strumenti/… non sono raggiungibili. Si chiude copiando il pulsante e le
+  tre righe di gestione da `/tools/f24/` o da `/tools/financial-statement/`,
+  che l'ha avuto il 13 agosto.
 - **Contrasto delle freccette `.chev` nel Fascicolo**: il glifo «›» a 22px sta a
   **2,40:1**. È decorativo — l'etichetta accanto porta il significato — quindi
   non è testo informativo, ma resta sotto anche la soglia 3:1 dei componenti non

@@ -152,6 +152,8 @@ Official source: https://taxautomationlab.com/tools/financial-statement/
   .adj-toolbar { display:flex; gap:10px; margin-bottom:16px; }
   .adj-card { border:1px solid var(--g2); margin-bottom:12px; background:#fff; }
   .adj-card.off { opacity:.5; }
+  .storno-row.off { opacity:.55; }
+  .storno-carried { font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:999px; background:var(--warn-bg); color:#72520b; border:1px solid var(--warn-line); }
   .adj-head { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--g2); background:var(--g1); flex-wrap:wrap; }
   .adj-toggle { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--g5); display:flex; align-items:center; gap:6px; }
   .adj-desc { font-weight:600; flex:1; }
@@ -619,7 +621,11 @@ footer a:hover{color:#F7F7F5!important}
 <header class="tal-global-header">
 <div class="tal-gh-frame">
 <a aria-label="Home" class="tal-gh-brand" href="/"><img alt="" aria-hidden="true" class="tal-gh-logo" src="data:image/png;base64,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"/><span class="tal-gh-brand-copy">Tax &amp; Accounting — Automation Lab</span></a>
-<nav aria-label="Navigazione principale" class="tal-gh-nav"><a href="/">Home</a><a href="/tools/" aria-current="page">Strumenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
+<!-- Sotto i 1080px site-shell.css nasconde le voci e le riapre solo con
+     `.tal-menu-open` sull'intestazione: senza questo pulsante la navigazione
+     del sito era irraggiungibile da telefono. Come in F24, LIPE e Fascicolo. -->
+<button aria-controls="talGhNav" aria-expanded="false" aria-label="Apri o chiudi la navigazione del sito" class="tal-gh-menu-toggle" type="button" id="talGhMenuToggle">Menu</button>
+<nav aria-label="Navigazione principale" class="tal-gh-nav" id="talGhNav"><a href="/">Home</a><a href="/tools/" aria-current="page">Strumenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
 <div aria-label="Lingua" class="tal-gh-lang"><a href="/tools/financial-statement/" hreflang="it" aria-current="page" class="active">ITA</a><a href="/en/tools/" hreflang="en">ENG</a><a href="/es/tools/" hreflang="es">ESP</a></div>
 </div>
 </header>
@@ -666,7 +672,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="field"><label>PEC</label><input id="an_pec" placeholder="societa@pec.it" type="email"/></div>
 <div class="field"><label>Periodo — da</label><input id="an_periodo_da" type="date"/></div>
 <div class="field"><label>Periodo — a</label><input id="an_periodo_a" type="date"/></div>
-<div class="field"><label>Valuta</label><select id="an_valuta"><option value="EUR">EUR — Euro</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>
+<div class="field"><label>Valuta</label><select id="an_valuta"><option value="EUR">EUR — Euro</option></select><small class="hint">Il bilancio civilistico e l’istanza XBRL sono in euro. Una conversione da altra valuta richiede tassi, data e criteri documentati: è un lavoro a sé, non un cambio di etichetta.</small></div>
 <div class="field"><label>Redatto da</label><input id="an_redattore" placeholder="Nome del professionista" type="text"/></div>
 </div>
 <h3 style="margin-top:26px">Dati anagrafici del prospetto di deposito</h3>
@@ -833,7 +839,7 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 <div class="panel">
 <h3>Mappature conto → voce civilistica</h3>
-<p>Una mappatura per P.IVA, riapplicata automaticamente ai file successivi della stessa società. Storni e rettifiche non vengono mai riportati da un esercizio all'altro: restano nel fascicolo dell'anno.</p>
+<p>Una mappatura per P.IVA, riapplicata automaticamente ai file successivi della stessa società. Storni e rettifiche restano nel fascicolo del loro esercizio: l'unico caso in cui rientrano è «Crea nuovo anno» con il riporto attivo, e rientrano comunque spenti, da riconfermare uno per uno.</p>
 <div class="btn-row">
 <button class="btn secondary" onclick="saveCurrentMapping()">Salva la mappatura corrente</button>
 <button class="btn ghost" onclick="openMappingManager()">Gestisci mappature</button>
@@ -879,7 +885,7 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 <div class="panel">
 <h3>6. Clienti e annualità</h3>
-<p>Ogni cliente conserva più esercizi. <b>Crea nuovo anno</b> riporta la configurazione (anagrafica, mappatura, schema) ma non i numeri: carichi il nuovo Excel e la mappatura si riapplica. Il lavoro in corso viene salvato in bozza automaticamente.</p>
+<p>Ogni cliente conserva più esercizi. <b>Crea nuovo anno</b> riporta la configurazione (anagrafica, mappatura, schema) ma non i numeri: carichi il nuovo Excel e la mappatura si riapplica. Storni e rettifiche dell'esercizio di partenza rientrano come traccia, <b>disattivati e marcati «da riconfermare»</b>: non toccano i prospetti finché non li riattivi tu, importo per importo. L'annualità dell'archivio la determina la data di chiusura in Anagrafica, non l'anno solare. Il lavoro in corso viene salvato in bozza automaticamente.</p>
 </div>
 <div class="panel">
 <h3>Limiti e responsabilità</h3>
@@ -1883,7 +1889,7 @@ function downloadTemplate(){
   const spH=[['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva']];
   const spEx=[
     ['100000','Capitale sociale',-50000,-50000,'AI'],
-    ['112000','Riserva legale',-10000,-8000,'AVI'],
+    ['112000','Riserva legale',-10000,-8000,'AIV'],
     ['211000','Fabbricati',350000,340000,'BII'],
     ['281000','F.do amm.to fabbricati',-85000,-70000,'BII'],
     ['300000','Rimanenze materie prime',42000,38000,'CI'],
@@ -2393,7 +2399,7 @@ function loadSampleData(){
     {code:'572000',desc:'Banca c/c',importo:45000,importo_prev:38000,voce:'CIV',source:'sp'},
     {code:'480000',desc:'Risconti attivi',importo:3200,importo_prev:2800,voce:'D',source:'sp'},
     {code:'100000',desc:'Capitale sociale',importo:-50000,importo_prev:-50000,voce:'AI',source:'sp'},
-    {code:'112000',desc:'Riserva legale',importo:-10000,importo_prev:-8000,voce:'AVI',source:'sp'},
+    {code:'112000',desc:'Riserva legale',importo:-10000,importo_prev:-8000,voce:'AIV',source:'sp'},
     {code:'129000',desc:'Utili portati a nuovo',importo:-85000,importo_prev:-84800,voce:'AVIII',source:'sp'},
     {code:'141000',desc:'Fondo TFR',importo:-35000,importo_prev:-30000,voce:'C',source:'sp'},
     {code:'170000',desc:'Mutui bancari oltre 12m',importo:-220000,importo_prev:-240000,voce:'DO',source:'sp'},
@@ -3040,7 +3046,7 @@ renderSavedList();
     }catch(e){console.error(e);toast('Errore schema PDF: '+e.message,true);}
   };
 
-  refreshAll = function(){RESULT=computeFrom();renderSummary();renderSP();renderCE();renderRaw();renderUnmapped();renderStorni();renderAdjustments();renderChecks();$('#cntStorni').textContent=STATE.storni.length;$('#cntAdj').textContent=(STATE.adjustments||[]).filter(function(a){return a.active!==false;}).length;$('#unmapped_count').textContent=RESULT.unmapped.length;};
+  refreshAll = function(){RESULT=computeFrom();renderSummary();renderSP();renderCE();renderRaw();renderUnmapped();renderStorni();renderAdjustments();renderChecks();$('#cntStorni').textContent=STATE.storni.filter(function(s){return s.active!==false;}).length;$('#cntAdj').textContent=(STATE.adjustments||[]).filter(function(a){return a.active!==false;}).length;$('#unmapped_count').textContent=RESULT.unmapped.length;};
 
   V13.enhanceUI=function(){
     document.documentElement.setAttribute('data-tool-version',V13.version);
@@ -3095,7 +3101,13 @@ renderSavedList();
   // Quando il bilancio viene mostrato, porta l'utente alla vista Risultati
   if(typeof window.showResultsUI==='function'){
     var _origSRU=window.showResultsUI;
-    window.showResultsUI=function(){var r=_origSRU.apply(this,arguments);fsShowView('results');markDone();return r;};
+    /* window.fsShowView, non la locale: al momento della chiamata è la versione
+       a sette viste che aggiorna anche indirizzo e voce attiva della sidebar.
+       Con la locale il contenuto passava al Bilancio e l'URL restava su #/clienti. */
+    /* Demo e import riempiono l'Anagrafica per assegnazione diretta: `input` e
+       `change` non partono, quindi l'anno della scheda di salvataggio restava
+       quello calcolato al boot (l'anno solare). Lo si ricalcola qui. */
+    window.showResultsUI=function(){var r=_origSRU.apply(this,arguments);(window.fsShowView||fsShowView)('results');if(window.fsResetSaveYear){try{window.fsResetSaveYear();}catch(_){}}markDone();return r;};
   }
   // Contesto cliente aggiornato in tempo reale
   ['an_denom','an_schema','an_piva'].forEach(function(id){var el=document.getElementById(id);if(el){el.addEventListener('input',updateContext);el.addEventListener('change',updateContext);}});
@@ -3120,15 +3132,23 @@ renderSavedList();
   function archLoad(){var a;try{a=JSON.parse(localStorage.getItem(ARCH_KEY)||'null');}catch(_){a=null;}if(!a||typeof a!=='object')a={clients:{},_migrated:false};if(!a.clients)a.clients={};if(!a._migrated){migrate(a);a._migrated=true;archSave(a);}return a;}
   function archSave(a){try{localStorage.setItem(ARCH_KEY,JSON.stringify(a));}catch(_){}}
 
-  function capture(){var an={};AN_IDS.forEach(function(id){var el=$id(id);an[id]=el?el.value:'';});return {an:an,schema:(window.schemaMode?window.schemaMode():an.an_schema),accounts:clone(STATE.accounts||[]),leafOverrides:clone(STATE.leafOverrides||{}),storni:clone(STATE.storni||[]),adjustments:clone(STATE.adjustments||[])};}
-  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);if(window.fsPostLoadReconcile)window.fsPostLoadReconcile('archive');if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
+  function capture(){var an={};AN_IDS.forEach(function(id){var el=$id(id);an[id]=el?el.value:'';});return {an:an,schema:(window.schemaMode?window.schemaMode():an.an_schema),accounts:clone(STATE.accounts||[]),leafOverrides:clone(STATE.leafOverrides||{}),storni:clone(STATE.storni||[]),adjustments:clone(STATE.adjustments||[]),aiFindings:clone(STATE.aiFindings||[])};}
+  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);STATE.aiFindings=clone(st.aiFindings||[]);if(window.fsPostLoadReconcile)window.fsPostLoadReconcile('archive');if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
 
   function saveDraft(){if(!fsReady)return;try{localStorage.setItem(DRAFT_KEY,JSON.stringify(capture()));}catch(_){}}
   function restoreDraft(){var d;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}catch(_){d=null;}if(d&&((d.accounts&&d.accounts.length)||(d.an&&d.an.an_denom))){restore(d,false);}}
 
   function defaultYear(){var pa=(($id('an_periodo_a')||{}).value||($id('an_periodo_da')||{}).value||'');var m=pa.match(/(\d{4})/);return (m&&m[1])||String(new Date().getFullYear());}
   function refreshSaveCard(forceYear){var ke=$id('fs_save_key');if(ke)ke.value=key()||'';var ye=$id('fs_save_year');if(ye&&(forceYear||!saveYearTouched))ye.value=defaultYear();}
-  function saveToYear(){var k=key();if(!k){T('Inserisci la P.IVA o il codice fiscale in Anagrafica',true);return;}var ye=$id('fs_save_year');var year=((ye&&ye.value)||'').trim()||defaultYear();if(!/^\d{4}$/.test(year)||Number(year)<1990||Number(year)>2100){T('Indica un anno / esercizio valido tra 1990 e 2100.',true);return;}var a=archLoad();var cl=a.clients[k]||{key:k,years:{}};cl.years=cl.years||{};if(cl.years[year]&&!confirm('Esiste già un fascicolo per l’anno '+year+'. Vuoi sovrascriverlo?'))return;cl.key=k;cl.piva=($id('an_piva')||{}).value||'';cl.cf=($id('an_cf')||{}).value||'';cl.denominazione=($id('an_denom')||{}).value||cl.denominazione||'';cl.updatedAt=now();var st=capture();cl.years[year]={savedAt:now(),state:st};cl.carryBase={an:st.an,schema:st.schema,leafOverrides:st.leafOverrides,storni:st.storni,adjustments:st.adjustments};a.clients[k]=cl;archSave(a);selectedClient=k;saveYearTouched=true;renderUI();T('Fascicolo salvato: '+(cl.denominazione||k)+' · anno '+year);}
+  function saveToYear(){var k=key();if(!k){T('Inserisci la P.IVA o il codice fiscale in Anagrafica',true);return;}var ye=$id('fs_save_year');var year=((ye&&ye.value)||'').trim()||defaultYear();if(!/^\d{4}$/.test(year)||Number(year)<1990||Number(year)>2100){T('Indica un anno / esercizio valido tra 1990 e 2100.',true);return;}
+    /* L'annualità dell'archivio la decide la data di chiusura, non l'anno solare:
+       senza questo controllo un esercizio 2025 finiva sotto il 2026 e il tool
+       proponeva poi il 2027 come esercizio successivo. */
+    var pa=(($id('an_periodo_a')||{}).value||'').trim();
+    if(!pa){T('Indica la data di chiusura dell’esercizio in Anagrafica: è lei a determinare l’annualità dell’archivio.',true);if(window.fsShowView)window.fsShowView('anagrafica');return;}
+    var pm=pa.match(/(\d{4})/);
+    if(pm&&pm[1]!==year&&!confirm('L’esercizio chiude il '+pa+', ma il fascicolo verrebbe archiviato sotto l’anno '+year+'.\n\nProcedere solo se è un esercizio a cavallo d’anno. Continuare?'))return;
+    var a=archLoad();var cl=a.clients[k]||{key:k,years:{}};cl.years=cl.years||{};if(cl.years[year]&&!confirm('Esiste già un fascicolo per l’anno '+year+'. Vuoi sovrascriverlo?'))return;cl.key=k;cl.piva=($id('an_piva')||{}).value||'';cl.cf=($id('an_cf')||{}).value||'';cl.denominazione=($id('an_denom')||{}).value||cl.denominazione||'';cl.updatedAt=now();var st=capture();cl.years[year]={savedAt:now(),state:st};cl.carryBase={an:st.an,schema:st.schema,leafOverrides:st.leafOverrides,storni:st.storni,adjustments:st.adjustments};a.clients[k]=cl;archSave(a);selectedClient=k;saveYearTouched=true;renderUI();T('Fascicolo salvato: '+(cl.denominazione||k)+' · anno '+year);}
 
   function clientArr(a){return Object.keys(a.clients).map(function(k){return a.clients[k];}).sort(function(x,y){return new Date(y.updatedAt||0)-new Date(x.updatedAt||0);});}
   function renderClients(){var a=archLoad();var host=$id('fs_client_list');if(!host)return;var arr=clientArr(a);if(!arr.length){host.innerHTML='<div style="font-size:12px;color:var(--g4);font-style:italic;margin-top:8px">Nessun cliente in archivio. Compila l’Anagrafica, elabora un bilancio e salvalo qui.</div>';return;}host.innerHTML=arr.map(function(c){var ny=Object.keys(c.years||{}).length;return '<div class="fs-cli '+(c.key===selectedClient?'active':'')+'" data-fscli="'+esc(c.key)+'"><div class="info"><b>'+esc(c.denominazione||c.key)+'</b><small>'+esc(c.key)+'</small></div><span class="cnt">'+ny+' '+(ny===1?'anno':'anni')+'</span></div>';}).join('');}
@@ -3138,7 +3158,7 @@ renderSavedList();
     var lastYear=years.length?Number(years[0]):Number(defaultYear())-1;var suggested=lastYear+1;
     host.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0">'+esc(c.denominazione||c.key)+'</h3><p class="bd" style="margin:2px 0 0">'+esc(c.key)+' · '+years.length+' annualità</p></div><button class="btn tiny danger" data-fsdelcli="1">Elimina cliente</button></div>'+
       '<div style="margin:14px 0 4px">'+rowsHtml+'</div>'+
-      '<div class="fs-newyear"><b style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--g5)">Nuovo esercizio</b><div class="row" style="margin-top:10px"><div class="field" style="max-width:130px"><label>Anno</label><input type="number" id="fs_ny_year" min="1990" max="2100" value="'+suggested+'"></div><label class="carry"><input type="checkbox" id="fs_ny_carry" checked> Riporta configurazione (anagrafica, mapping, storni, rettifiche)</label></div><div class="btn-row" style="margin-top:12px"><button class="btn" data-fsnewyear="1">Crea nuovo anno</button></div><div class="hint" style="margin-top:8px">I numeri non vengono riportati: carichi il nuovo Excel dell’anno e la configurazione si riapplica in automatico.</div></div>';
+      '<div class="fs-newyear"><b style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--g5)">Nuovo esercizio</b><div class="row" style="margin-top:10px"><div class="field" style="max-width:130px"><label>Anno</label><input type="number" id="fs_ny_year" min="1990" max="2100" value="'+suggested+'"></div><label class="carry"><input type="checkbox" id="fs_ny_carry" checked> Riporta configurazione (anagrafica, mapping, storni e rettifiche spenti)</label></div><div class="btn-row" style="margin-top:12px"><button class="btn" data-fsnewyear="1">Crea nuovo anno</button></div><div class="hint" style="margin-top:8px">I numeri non vengono riportati: carichi il nuovo Excel dell’anno e la configurazione si riapplica in automatico. Storni e rettifiche dell’esercizio precedente rientrano <b>disattivati</b>, marcati «da riconfermare»: nessun importo entra nei prospetti finché non li riattivi.</div></div>';
   }
   function renderUI(){refreshSaveCard();renderClients();renderDetail();}
   window.fsArchRefreshUI=renderUI;
@@ -3148,14 +3168,26 @@ renderSavedList();
   function newYear(){var a=archLoad();var c=a.clients[selectedClient];if(!c)return;var yEl=$id('fs_ny_year');var year=((yEl&&yEl.value)||'').trim();if(!year){T('Indica l’anno',true);return;}var carry=$id('fs_ny_carry')?$id('fs_ny_carry').checked:true;
     var years=Object.keys(c.years||{}).sort(function(x,y2){return Number(y2)-Number(x);});
     var base=years.length?c.years[years[0]].state:c.carryBase;
-    STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];
+    STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.aiFindings=[];
     if(carry&&base&&base.an){AN_IDS.forEach(function(id){var el=$id(id);if(el&&base.an[id]!==undefined)el.value=base.an[id];});}
     if($id('an_periodo_da'))$id('an_periodo_da').value='';if($id('an_periodo_a'))$id('an_periodo_a').value='';
     if($id('an_piva'))$id('an_piva').value=c.piva||c.key;if($id('an_cf')&&c.cf)$id('an_cf').value=c.cf;
     if($id('an_denom')&&c.denominazione)$id('an_denom').value=c.denominazione;
     if(carry&&base&&base.schema&&$id('an_schema'))$id('an_schema').value=base.schema;
     if($id('fs_save_year')){$id('fs_save_year').value=year;saveYearTouched=true;}
-    if(carry&&base){var lo=base.leafOverrides||{};var map={};Object.keys(lo).forEach(function(code){map[code]={d:'',v:lo[code]};});var leg;try{leg=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');}catch(_){leg={};}leg[c.key]={denominazione:c.denominazione||'',updated:now(),count:Object.keys(map).length,map:map,storni:clone(base.storni||[]),adjustments:clone(base.adjustments||[]),schema:base.schema||'abbrev'};try{localStorage.setItem(LEGACY_KEY,JSON.stringify(leg));}catch(_){}}
+    if(carry&&base){
+      var lo=base.leafOverrides||{};var map={};Object.keys(lo).forEach(function(code){map[code]={d:'',v:lo[code]};});
+      var leg;try{leg=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');}catch(_){leg={};}
+      /* La mappatura salvata a parte con «Salva mappatura» non va persa: si
+         sovrascrive solo se il fascicolo di partenza ne porta davvero una. */
+      var prev=leg[c.key]||{};var keepMap=Object.keys(map).length?map:(prev.map||{});
+      /* Storni e rettifiche viaggiano in `carryPending`, non fra i dati del
+         mapping: li rimette in campo `loadMemory` al primo import, spenti e
+         marcati da riconfermare. Una volta consumati sparisce. */
+      leg[c.key]={denominazione:c.denominazione||'',updated:now(),count:Object.keys(keepMap).length,map:keepMap,schema:base.schema||'abbrev',
+        carryPending:{from:(years.length?years[0]:''),storni:clone(base.storni||[]),adjustments:clone(base.adjustments||[])}};
+      try{localStorage.setItem(LEGACY_KEY,JSON.stringify(leg));}catch(_){}
+    }
     var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';
     if(window.fsUpdateContext)window.fsUpdateContext();
     if(window.fsShowView)window.fsShowView('import');
@@ -3194,7 +3226,10 @@ renderSavedList();
    ==================================================================== */
 (function(){
 'use strict';
-const FS_PATCH_VERSION='1.3.6';
+/* Sorgente unica del numero di versione: interfaccia, backup ed export
+   leggono tutti di qui. I commenti di blocco tengono la versione in cui il
+   blocco è nato — è storia, non lo stato corrente. */
+const FS_PATCH_VERSION=(window.FS_VERSION='1.4.0');
 const BAL_TOL=0.01;
 
 function fsAddVoce(list,code,label){if(!list.some(v=>v.code===code))list.push({code:code,label:label,sec:'ce'});window.CODE_SECTION[code]='ce';}
@@ -3258,9 +3293,45 @@ parseWorkbook=function(wb){
     }
   });
   if(missing.length)throw new Error('Fogli obbligatori mancanti: '+missing.join(', ')+'.');if(!accts.length)throw new Error('Nessun conto trovato nei fogli di bilancio.');
-  STATE.accounts=accts;STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.comparativeColumnPresent=allPrevColumns;STATE.comparativeHasValues=anyPrevValue;loadMemory();refreshAll();showResultsUI();
-  const meta=document.getElementById('upload_meta');if(meta)meta.textContent=accts.length+' conti importati · '+(allPrevColumns?(anyPrevValue?'comparativo rilevato':'comparativo presente ma non valorizzato'):'senza colonna comparativa')+' · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  STATE.accounts=accts;STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.aiFindings=readAiFindings(wb);STATE.comparativeColumnPresent=allPrevColumns;STATE.comparativeHasValues=anyPrevValue;loadMemory();refreshAll();showResultsUI();
+  const open=(STATE.aiFindings||[]).filter(f=>!f.closed).length;
+  const meta=document.getElementById('upload_meta');if(meta)meta.textContent=accts.length+' conti importati · '+(allPrevColumns?(anyPrevValue?'comparativo rilevato':'comparativo presente ma non valorizzato'):'senza colonna comparativa')+(open?' · '+open+(open===1?' eccezione AI da chiudere':' eccezioni AI da chiudere'):'')+' · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(open)toast(open+(open===1?' eccezione segnalata dall’AI':' eccezioni segnalate dall’AI')+' nel foglio «Esiti AI»: le trovi nella scheda Verifiche.');
 };
+
+/* Il foglio «Esiti AI» esiste solo nel template di «Configura con AI»: è il
+   posto dove il professionista si fa scrivere fonti, assunzioni e dubbi. Fino
+   alla 1.4.0 l'import lo ignorava, quindi quelle eccezioni restavano fuori
+   dalla sessione di lavoro. Ora entrano e vanno chiuse una per una. */
+function readAiFindings(wb){
+  const sh=V13.findSheet(wb,'Esiti AI');if(!sh)return [];
+  const data=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:''});
+  let head=-1;
+  for(let r=0;r<Math.min(data.length,15);r++){
+    const row=(data[r]||[]).map(x=>String(x||'').trim());
+    if(V13.findHeader(row,'Elemento da verificare')>=0){head=r;break;}
+  }
+  if(head<0)return [];
+  const H=(data[head]||[]).map(x=>String(x||'').trim());
+  /* Le intestazioni del template sono composte («Codice conto / campo»,
+     «Osservazione / assunzione»): V13.findHeader vuole la corrispondenza
+     esatta, qui serve il prefisso. */
+  const ix=n=>{const k=V13.norm(n);return H.findIndex(x=>V13.norm(x).indexOf(k)===0);};
+  const iTipo=ix('Tipo'),iRif=ix('Codice conto'),iEl=ix('Elemento da verificare'),iSt=ix('Stato'),iOss=ix('Osservazione'),iFonte=ix('Fonte');
+  const out=[];
+  for(let i=head+1;i<data.length;i++){
+    const r=data[i]||[];const g=j=>j>=0?String(r[j]||'').trim():'';
+    const el=g(iEl);if(!el)continue;
+    const tipo=g(iTipo);
+    /* La riga di esempio del template non è un'eccezione vera. */
+    if(V13.norm(tipo)==='esempio'||/non lasciare questa riga/i.test(el))continue;
+    const stato=g(iSt);
+    out.push({tipo:tipo,rif:g(iRif),elemento:el,stato:stato,osservazione:g(iOss),fonte:g(iFonte),
+      closed:/risolt|chius|verificat[oa]$|ok/i.test(stato)});
+  }
+  return out;
+}
+window.fsReadAiFindings=readAiFindings;
 
 function fsInternalDisplayMultiplier(leaf){return sectionOfLeaf(leaf)==='ce'?V13.ceSign(leaf):1;}
 computeFrom=function(){
@@ -3272,7 +3343,7 @@ computeFrom=function(){
   function signAnomaly(ac,leaf,value,period){if(Math.abs(value)<0.005)return;const sec=sectionOfLeaf(leaf),cost=V13.ceSign(leaf)===-1,desc=String(ac.desc||'').toLowerCase(),contra=/f\.?do|fondo|ammort|svalut|rettific|accanton/.test(desc);let bad=false,expected='';if(sec==='sp_attivo'){bad=value<0&&!contra;expected='positivo nell’attivo, salvo poste rettificative';}else if(sec==='sp_passivo'){bad=value>0;expected='negativo nel passivo';}else if(sec==='ce'){bad=cost?value<0:value>0;expected=cost?'positivo per costi/oneri':'negativo per ricavi/proventi';}if(bad)sideAnomalies.push({code:ac.code,desc:ac.desc,leaf:leaf,period:period,value:value,expected:expected});}
   STATE.accounts.forEach(ac=>{const key=V13.accountKey(ac);seen[key]=(seen[key]||0)+1;const ov=V13.getOverride(ac),manual=ov!==undefined&&ov!==null&&ov!=='',rawLeaf=manual?ov:ac.voce,leaf=V13.canonicalLeaf(rawLeaf,mode);if(!leaf||!V13.allowedLeaf(ac,leaf,mode)){const reason=!rawLeaf?'Voce non indicata':(!leaf?'Codice voce non previsto dallo schema selezionato':'Voce appartenente a una sezione non compatibile con il conto');const u=Object.assign({},ac,{invalid:!!rawLeaf,invalidLeaf:rawLeaf||'',reason:reason});unmapped.push(u);if(rawLeaf)invalidMappings.push(u);accountRows.push(Object.assign({},ac,{leaf:null,manual:manual,status:'unmapped',reason:reason}));return;}addTo(leaf,+ac.importo||0,+ac.importo_prev||0,Object.assign({},ac,{presented:+ac.importo||0,presentedPrev:+ac.importo_prev||0,accountKey:key}),'raw');signAnomaly(ac,leaf,+ac.importo||0,'corrente');if(STATE.comparativeColumnPresent)signAnomaly(ac,leaf,+ac.importo_prev||0,'precedente');accountRows.push(Object.assign({},ac,{leaf:leaf,manual:manual,status:'mapped',accountKey:key}));});
   Object.keys(seen).forEach(k=>{if(seen[k]>1)duplicates.push(k);});
-  (STATE.storni||[]).forEach(s=>{const amount=+s.amount||0,amountPrev=+s.amountPrev||0,from=V13.canonicalLeaf(s.fromLeaf,mode),to=V13.canonicalLeaf(s.toLeaf,mode);if(!to||(!amount&&!amountPrev)||from===to)return;if(from)addTo(from,-amount,-amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'verso '+to),importo:-amount,importo_prev:-amountPrev,presented:null,presentedPrev:null,storno:true},'storno');addTo(to,amount,amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'da '+(from||'esterno')),importo:amount,importo_prev:amountPrev,presented:null,presentedPrev:null,storno:true},'storno');});
+  (STATE.storni||[]).forEach(s=>{if(s.active===false)return;const amount=+s.amount||0,amountPrev=+s.amountPrev||0,from=V13.canonicalLeaf(s.fromLeaf,mode),to=V13.canonicalLeaf(s.toLeaf,mode);if(!to||(!amount&&!amountPrev)||from===to)return;if(from)addTo(from,-amount,-amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'verso '+to),importo:-amount,importo_prev:-amountPrev,presented:null,presentedPrev:null,storno:true},'storno');addTo(to,amount,amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'da '+(from||'esterno')),importo:amount,importo_prev:amountPrev,presented:null,presentedPrev:null,storno:true},'storno');});
   let adjAtt=0,adjPas=0,adjResult=0,adjAttPrev=0,adjPasPrev=0,adjResultPrev=0;const adjustmentRows=[];
   (STATE.adjustments||[]).forEach(adj=>{if(adj.active===false)return;(adj.lines||[]).forEach(ln=>{const leaf=V13.canonicalLeaf(ln.leaf,mode);if(!leaf)return;const dare=+ln.dare||0,avere=+ln.avere||0,darePrev=+ln.darePrev||0,averePrev=+ln.averePrev||0,sec=sectionOfLeaf(leaf);let natural=0,naturalPrev=0;if(sec==='sp_attivo'){natural=dare-avere;naturalPrev=darePrev-averePrev;adjAtt+=natural;adjAttPrev+=naturalPrev;}else if(sec==='sp_passivo'){natural=avere-dare;naturalPrev=averePrev-darePrev;adjPas+=natural;adjPasPrev+=naturalPrev;}else if(sec==='ce'){natural=avere-dare;naturalPrev=averePrev-darePrev;adjResult+=natural;adjResultPrev+=naturalPrev;}if(Math.abs(natural)>=0.005||Math.abs(naturalPrev)>=0.005||dare||avere||darePrev||averePrev)addTo(leaf,natural,naturalPrev,{code:'–',desc:'(rettifica IAS→OIC) '+(adj.desc||''),importo:natural,importo_prev:naturalPrev,presented:natural,presentedPrev:naturalPrev,adj:true},'adj');adjustmentRows.push({adj:adj.desc,leaf:leaf,dare:dare,avere:avere,darePrev:darePrev,averePrev:averePrev,sec:sec});});});
   function buildSection(secKey,flip){const def=SCH[secKey];function walk(node){const out={code:node.code,label:node.label,children:[],amount:0,amountPrev:0,detail:[]};let raw=0,rawPrev=0,storno=0,stornoPrev=0,adj=0,adjPrev=0;(node.children||[]).forEach(ch=>{const c=walk(ch);out.children.push(c);out.amount+=c.amount;out.amountPrev+=c.amountPrev;});(node.leaves||[]).forEach(lf=>{const b=byCode[lf];if(!b)return;raw+=b.sumRaw;rawPrev+=b.sumRawPrev;storno+=b.sumStornoRaw;stornoPrev+=b.sumStornoRawPrev;adj+=b.sumAdj;adjPrev+=b.sumAdjPrev;b.accounts.forEach(a=>{const cur=a.adj?(a.presented||0):a.storno?((+a.importo||0)*flip):((+a.importo||0)*flip);const prev=a.adj?(a.presentedPrev||0):a.storno?((+a.importo_prev||0)*flip):((+a.importo_prev||0)*flip);out.detail.push(Object.assign({},a,{leaf:lf,presented:cur,presentedPrev:prev}));});});out.amount+=(raw+storno)*flip+adj;out.amountPrev+=(rawPrev+stornoPrev)*flip+adjPrev;return out;}return{title:def.title,nodes:def.nodes.map(walk)};}
@@ -3282,19 +3353,41 @@ computeFrom=function(){
 };
 
 saveCurrentMapping=function(){const piva=currentPIVA();if(!piva){toast('Inserisci Partita IVA o Codice Fiscale',true);return;}if(!STATE.accounts.length){toast('Nessun bilancio caricato',true);return;}const map={};STATE.accounts.forEach(a=>{let leaf=V13.getOverride(a)||a.voce;leaf=V13.canonicalLeaf(leaf,schemaMode());if(leaf&&V13.allowedLeaf(a,leaf,schemaMode()))map[V13.accountKey(a)]={code:a.code,source:a.source,d:a.desc,v:leaf};});const all=loadAllMemory();all[piva]={denominazione:$('#an_denom').value,updated:new Date().toISOString(),count:Object.keys(map).length,map:map,format:4};if(writeAllMemory(all)){renderSavedList();toast('Mappatura salvata per '+piva+' ('+Object.keys(map).length+' conti). Storni e rettifiche restano nel fascicolo del singolo esercizio.');}};
-loadMemory=function(){const piva=currentPIVA();if(!piva)return;const saved=loadAllMemory()[piva];if(!saved)return;STATE.leafOverrides={};let applied=0;STATE.accounts.forEach(a=>{const e=V13.savedEntry(saved,a),leaf=e&&V13.canonicalLeaf(e.v,schemaMode());if(leaf&&V13.allowedLeaf(a,leaf,schemaMode())){V13.setOverride(a,leaf);applied++;}});toast('Mappatura applicata: '+applied+' conti. Nessuno storno o rettifica è stato riportato automaticamente.');};
+loadMemory=function(){const piva=currentPIVA();if(!piva)return;const saved=loadAllMemory()[piva];if(!saved)return;STATE.leafOverrides={};let applied=0;STATE.accounts.forEach(a=>{const e=V13.savedEntry(saved,a),leaf=e&&V13.canonicalLeaf(e.v,schemaMode());if(leaf&&V13.allowedLeaf(a,leaf,schemaMode())){V13.setOverride(a,leaf);applied++;}});
+  /* Riporto da «Crea nuovo anno»: storni e rettifiche rientrano SPENTI e
+     marcati, così nessun importo dell'esercizio precedente entra nei prospetti
+     senza che qualcuno lo abbia riconfermato. Si consuma una volta sola. */
+  let carried=0;
+  if(saved.carryPending){
+    const cp=saved.carryPending,tag=cp.from||'';
+    (cp.storni||[]).forEach((s,i)=>{const x=JSON.parse(JSON.stringify(s));x.id='sc'+Date.now()+'_'+i;x.active=false;x.carried=true;x.carriedFrom=tag;STATE.storni.push(x);carried++;});
+    (cp.adjustments||[]).forEach(a=>{const x=JSON.parse(JSON.stringify(a));x.active=false;x.carried=true;x.carriedFrom=tag;STATE.adjustments.push(x);carried++;});
+    const all=loadAllMemory();if(all[piva]){delete all[piva].carryPending;writeAllMemory(all);}
+  }
+  toast(carried?('Mappatura applicata: '+applied+' conti. '+carried+' fra storni e rettifiche riportati dall\'esercizio precedente: sono spenti, vanno riconfermati uno per uno.'):('Mappatura applicata: '+applied+' conti. Nessuno storno o rettifica è stato riportato automaticamente.'));};
 loadSpecificMemory=function(piva){const saved=loadAllMemory()[piva];if(!saved)return;$('#an_denom').value=saved.denominazione||'';$('#an_piva').value=piva;if(STATE.accounts.length){STATE.leafOverrides={};STATE.accounts.forEach(a=>{const e=V13.savedEntry(saved,a),leaf=e&&V13.canonicalLeaf(e.v,schemaMode());if(leaf&&V13.allowedLeaf(a,leaf,schemaMode()))V13.setOverride(a,leaf);});refreshAll();}toast('Mappatura '+piva+' caricata. Storni, rettifiche e schema non sono stati sovrascritti.');};
 renderSavedList=function(){const all=loadAllMemory(),keys=Object.keys(all),el=$('#saved_list');if(!keys.length){el.innerHTML='<div class="muted-empty">Nessuna mappatura salvata.</div>';return;}el.innerHTML=keys.map(k=>{const s=all[k];return '<div class="saved-item"><div class="info"><b>'+escapeHtml(s.denominazione||k)+'</b><small>'+escapeHtml(k)+' · '+(s.count||0)+' conti · '+V13.safeDate(s.updated)+' · solo mapping</small></div><button class="lk" onclick="loadSpecificMemory(\''+escapeHtml(k)+'\')">Carica mapping</button><button class="lk" onclick="exportSingleMemory(\''+escapeHtml(k)+'\')">Esporta</button><button class="lk del" onclick="deleteMemory(\''+escapeHtml(k)+'\')">Elimina</button></div>';}).join('');};
 
 stornoUnbalances=function(s){return !s.toLeaf||s.fromLeaf===s.toLeaf||!s.fromLeaf;};
-renderStorni=function(){const host=$('#tab_storni');host.innerHTML='<p class="bd">Gli storni trasferiscono importi fra voci utilizzando la convenzione dei segni del file origine. Sono ammessi importi con segno e valori distinti per esercizio corrente e precedente. I trasferimenti da o verso una voce esterna richiedono una verifica specifica.</p><div class="btn-row" style="margin-top:0"><button class="btn secondary" onclick="openStornoEditor()">+ Nuovo storno</button></div><div id="storniList" style="margin-top:16px"></div>';const list=$('#storniList');if(!STATE.storni.length){list.innerHTML='<div class="storni-empty">Nessuno storno.</div>';return;}list.innerHTML=STATE.storni.map(s=>{const warn=stornoUnbalances(s);return '<div class="storno-row '+(warn?'warn':'')+'"><div class="storno-main"><span class="storno-amt">Corrente '+fmt(round2(+s.amount||0))+' € · Precedente '+fmt(round2(+s.amountPrev||0))+' €</span><span class="storno-flow">'+(s.fromLeaf?'<b>'+s.fromLeaf+'</b> '+escapeHtml(labelForCode(s.fromLeaf)):'<i>esterno</i>')+' → <b>'+s.toLeaf+'</b> '+escapeHtml(labelForCode(s.toLeaf))+'</span>'+(s.note?'<span class="storno-note">'+escapeHtml(s.note)+'</span>':'')+'</div>'+(warn?'<div class="storno-warn">⚠ Origine esterna o dati incompleti: verifica la quadratura.</div>':'')+'<div class="storno-actions"><button class="lk" data-edit="'+s.id+'">Modifica</button><button class="lk del" data-del="'+s.id+'">Elimina</button></div></div>';}).join('');list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Eliminare questo storno?')){STATE.storni=STATE.storni.filter(x=>x.id!==b.getAttribute('data-del'));refreshAll();}}));list.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openStornoEditor(STATE.storni.find(x=>x.id===b.getAttribute('data-edit')))));};
+renderStorni=function(){const host=$('#tab_storni');const carried=(STATE.storni||[]).filter(s=>s.carried&&s.active===false);host.innerHTML=(carried.length?'<div class="callout warn"><b>'+carried.length+(carried.length===1?' storno riportato':' storni riportati')+' dall\'esercizio '+escapeHtml(String(carried[0].carriedFrom||'precedente'))+'.</b> '+(carried.length===1?'È spento e non entra nei prospetti: riattivalo':'Sono spenti e non entrano nei prospetti: riattivali')+' solo dopo aver verificato che l\'importo valga anche per questo esercizio.</div>':'')+'<p class="bd">Gli storni trasferiscono importi fra voci utilizzando la convenzione dei segni del file origine. Sono ammessi importi con segno e valori distinti per esercizio corrente e precedente. I trasferimenti da o verso una voce esterna richiedono una verifica specifica.</p><div class="btn-row" style="margin-top:0"><button class="btn secondary" onclick="openStornoEditor()">+ Nuovo storno</button></div><div id="storniList" style="margin-top:16px"></div>';const list=$('#storniList');if(!STATE.storni.length){list.innerHTML='<div class="storni-empty">Nessuno storno.</div>';return;}list.innerHTML=STATE.storni.map((s,i)=>{const off=s.active===false,warn=!off&&stornoUnbalances(s);return '<div class="storno-row '+(warn?'warn':'')+(off?' off':'')+'"><div class="storno-main"><label class="adj-toggle"><input type="checkbox" data-sttoggle="'+i+'" '+(off?'':'checked')+'> attivo</label>'+(s.carried&&off?'<span class="storno-carried">riportato dal '+escapeHtml(String(s.carriedFrom||'precedente'))+' · da riconfermare</span>':'')+'<span class="storno-amt">Corrente '+fmt(round2(+s.amount||0))+' € · Precedente '+fmt(round2(+s.amountPrev||0))+' €</span><span class="storno-flow">'+(s.fromLeaf?'<b>'+s.fromLeaf+'</b> '+escapeHtml(labelForCode(s.fromLeaf)):'<i>esterno</i>')+' → <b>'+s.toLeaf+'</b> '+escapeHtml(labelForCode(s.toLeaf))+'</span>'+(s.note?'<span class="storno-note">'+escapeHtml(s.note)+'</span>':'')+'</div>'+(warn?'<div class="storno-warn">⚠ Origine esterna o dati incompleti: verifica la quadratura.</div>':'')+'<div class="storno-actions"><button class="lk" data-edit="'+s.id+'">Modifica</button><button class="lk del" data-del="'+s.id+'">Elimina</button></div></div>';}).join('');list.querySelectorAll('[data-sttoggle]').forEach(cb=>cb.addEventListener('change',()=>{const s=STATE.storni[+cb.getAttribute('data-sttoggle')];if(!s)return;s.active=cb.checked;if(cb.checked)s.carried=false;refreshAll();}));list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Eliminare questo storno?')){STATE.storni=STATE.storni.filter(x=>x.id!==b.getAttribute('data-del'));refreshAll();}}));list.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openStornoEditor(STATE.storni.find(x=>x.id===b.getAttribute('data-edit')))));};
 openStornoEditor=function(existing){const voci=vociFor(schemaMode()),s=existing||{id:'s'+Date.now(),fromLeaf:'',toLeaf:'',amount:0,amountPrev:0,note:'',accCode:''},ov=document.createElement('div');ov.className='modal-ov open';ov.id='stornoModal';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.innerHTML='<div class="modal"><button class="close-btn" aria-label="Chiudi">&times;</button><h3>'+(existing?'Modifica storno':'Nuovo storno')+'</h3><p class="sub">Inserisci l’importo con il segno coerente con il bilancio di origine. Puoi gestire separatamente corrente e comparativo.</p><label class="fld" for="sAmt">Importo esercizio corrente €</label><input type="text" inputmode="decimal" id="sAmt" value="'+escapeHtml(s.amount||'')+'"><label class="fld" for="sAmtPrev">Importo esercizio precedente €</label><input type="text" inputmode="decimal" id="sAmtPrev" value="'+escapeHtml(s.amountPrev||'')+'"><label class="fld" for="sFrom">Da voce</label>'+leafSelectHtml('sFrom',s.fromLeaf,voci,true)+'<label class="fld" for="sTo">A voce</label>'+leafSelectHtml('sTo',s.toLeaf,voci,false)+'<label class="fld" for="sAcc">Conto di riferimento (facoltativo)</label><input type="text" id="sAcc" value="'+escapeHtml(s.accCode||'')+'"><label class="fld" for="sNote">Nota</label><input type="text" id="sNote" value="'+escapeHtml(s.note||'')+'"><div id="sWarn" class="modal-warn" style="display:none"></div><div class="modal-actions"><button class="btn ghost" id="sCancel">Annulla</button><button class="btn" id="sSave">Salva storno</button></div></div>';document.body.appendChild(ov);const close=()=>ov.remove();ov.querySelector('.close-btn').onclick=close;$('#sCancel').onclick=close;ov.onclick=e=>{if(e.target===ov)close();};function warn(){const from=$('#sFrom').value,to=$('#sTo').value,w=stornoUnbalances({fromLeaf:from,toLeaf:to}),el=$('#sWarn');el.style.display=w&&to?'block':'none';el.textContent=w&&to?'⚠ Origine esterna o dati incompleti: verifica quadratura e risultato.':'';}$('#sFrom').onchange=warn;$('#sTo').onchange=warn;warn();$('#sSave').onclick=()=>{const amt=V13.parseAmount($('#sAmt').value),amtPrev=V13.parseAmount($('#sAmtPrev').value),from=$('#sFrom').value,to=$('#sTo').value;if(!amt&&!amtPrev){toast('Inserisci almeno un importo diverso da zero',true);return;}if(!to){toast('Seleziona la voce di destinazione',true);return;}if(from===to){toast('Origine e destinazione devono essere diverse',true);return;}s.amount=amt;s.amountPrev=amtPrev;s.fromLeaf=from;s.toLeaf=to;s.accCode=$('#sAcc').value.trim();s.note=$('#sNote').value.trim();if(!existing)STATE.storni.push(s);close();refreshAll();};};
 
-renderAdjustments=function(){const adjs=STATE.adjustments||[],tot=RESULT.adjTotals;let h='<p class="bd">Scritture IAS/IFRS→OIC in partita doppia, gestibili separatamente per esercizio corrente e precedente. Le rettifiche non vengono mai riportate automaticamente in un nuovo esercizio.</p><div class="adj-summary"><div><span>Attivo corrente / precedente</span><b>'+fmt(tot.adjAtt)+' / '+fmt(tot.adjAttPrev)+'</b></div><div><span>Passivo corrente / precedente</span><b>'+fmt(tot.adjPas)+' / '+fmt(tot.adjPasPrev)+'</b></div><div><span>Risultato corrente / precedente</span><b>'+fmt(tot.adjResult)+' / '+fmt(tot.adjResultPrev)+'</b></div></div><div class="adj-toolbar"><button class="btn secondary" onclick="openAdjEditor(null)">+ Nuova rettifica</button><button class="btn ghost" onclick="openTemplatePicker()">Parti da un modello</button></div>';if(!adjs.length)h+='<div class="all-done">Nessuna rettifica.</div>';else adjs.forEach((adj,idx)=>{const D=(adj.lines||[]).reduce((s,l)=>s+(+l.dare||0),0),A=(adj.lines||[]).reduce((s,l)=>s+(+l.avere||0),0),DP=(adj.lines||[]).reduce((s,l)=>s+(+l.darePrev||0),0),AP=(adj.lines||[]).reduce((s,l)=>s+(+l.averePrev||0),0),bal=Math.abs(D-A)<0.005&&Math.abs(DP-AP)<0.005;h+='<div class="adj-card '+(adj.active===false?'off':'')+'"><div class="adj-head"><label class="adj-toggle"><input type="checkbox" data-adjtoggle="'+idx+'" '+(adj.active===false?'':'checked')+'> attiva</label><span class="adj-desc">'+escapeHtml(adj.desc||'(senza descrizione)')+'</span><span class="adj-bal '+(bal?'ok':'bad')+'">'+(bal?'✓ quadra':'✗ non quadra')+'</span><span><button class="lk" data-adjedit="'+idx+'">Modifica</button><button class="lk del" data-adjdel="'+idx+'">Elimina</button></span></div>'+(adj.note?'<div class="adj-note">'+escapeHtml(adj.note)+'</div>':'')+'<table class="adj-tbl"><thead><tr><th>Voce</th><th class="r">Dare corr.</th><th class="r">Avere corr.</th><th class="r">Dare prec.</th><th class="r">Avere prec.</th></tr></thead><tbody>'+(adj.lines||[]).map(l=>'<tr><td>'+(l.leaf?'<span class="cell-code">'+escapeHtml(l.leaf)+'</span> '+escapeHtml(labelForCode(l.leaf)):'<i>voce non indicata</i>')+'</td><td class="r">'+(l.dare?fmt(round2(l.dare)):'')+'</td><td class="r">'+(l.avere?fmt(round2(l.avere)):'')+'</td><td class="r">'+(l.darePrev?fmt(round2(l.darePrev)):'')+'</td><td class="r">'+(l.averePrev?fmt(round2(l.averePrev)):'')+'</td></tr>').join('')+'</tbody></table></div>';});$('#tab_rettifiche').innerHTML=h;document.querySelectorAll('[data-adjtoggle]').forEach(cb=>cb.addEventListener('change',()=>{STATE.adjustments[+cb.getAttribute('data-adjtoggle')].active=cb.checked;refreshAll();}));document.querySelectorAll('[data-adjedit]').forEach(b=>b.addEventListener('click',()=>openAdjEditor(+b.getAttribute('data-adjedit'))));document.querySelectorAll('[data-adjdel]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Eliminare questa rettifica?')){STATE.adjustments.splice(+b.getAttribute('data-adjdel'),1);refreshAll();}}));};
+renderAdjustments=function(){const adjs=STATE.adjustments||[],tot=RESULT.adjTotals;const carried=adjs.filter(a=>a.carried&&a.active===false);let h=(carried.length?'<div class="callout warn"><b>'+carried.length+(carried.length===1?' rettifica riportata':' rettifiche riportate')+' dall\'esercizio '+escapeHtml(String(carried[0].carriedFrom||'precedente'))+'.</b> '+(carried.length===1?'È spenta e non entra nei prospetti: riattivala':'Sono spente e non entrano nei prospetti: riattivale')+' solo dopo aver verificato che gli importi valgano anche per questo esercizio.</div>':'')+'<p class="bd">Scritture IAS/IFRS→OIC in partita doppia, gestibili separatamente per esercizio corrente e precedente. In un nuovo esercizio possono essere riportate come traccia, ma arrivano sempre spente e vanno riconfermate una per una.</p><div class="adj-summary"><div><span>Attivo corrente / precedente</span><b>'+fmt(tot.adjAtt)+' / '+fmt(tot.adjAttPrev)+'</b></div><div><span>Passivo corrente / precedente</span><b>'+fmt(tot.adjPas)+' / '+fmt(tot.adjPasPrev)+'</b></div><div><span>Risultato corrente / precedente</span><b>'+fmt(tot.adjResult)+' / '+fmt(tot.adjResultPrev)+'</b></div></div><div class="adj-toolbar"><button class="btn secondary" onclick="openAdjEditor(null)">+ Nuova rettifica</button><button class="btn ghost" onclick="openTemplatePicker()">Parti da un modello</button></div>';if(!adjs.length)h+='<div class="all-done">Nessuna rettifica.</div>';else adjs.forEach((adj,idx)=>{const D=(adj.lines||[]).reduce((s,l)=>s+(+l.dare||0),0),A=(adj.lines||[]).reduce((s,l)=>s+(+l.avere||0),0),DP=(adj.lines||[]).reduce((s,l)=>s+(+l.darePrev||0),0),AP=(adj.lines||[]).reduce((s,l)=>s+(+l.averePrev||0),0),bal=Math.abs(D-A)<0.005&&Math.abs(DP-AP)<0.005;h+='<div class="adj-card '+(adj.active===false?'off':'')+'"><div class="adj-head"><label class="adj-toggle"><input type="checkbox" data-adjtoggle="'+idx+'" '+(adj.active===false?'':'checked')+'> attiva</label><span class="adj-desc">'+escapeHtml(adj.desc||'(senza descrizione)')+'</span>'+(adj.carried&&adj.active===false?'<span class="storno-carried">riportata dal '+escapeHtml(String(adj.carriedFrom||'precedente'))+' · da riconfermare</span>':'')+'<span class="adj-bal '+(bal?'ok':'bad')+'">'+(bal?'✓ quadra':'✗ non quadra')+'</span><span><button class="lk" data-adjedit="'+idx+'">Modifica</button><button class="lk del" data-adjdel="'+idx+'">Elimina</button></span></div>'+(adj.note?'<div class="adj-note">'+escapeHtml(adj.note)+'</div>':'')+'<table class="adj-tbl"><thead><tr><th>Voce</th><th class="r">Dare corr.</th><th class="r">Avere corr.</th><th class="r">Dare prec.</th><th class="r">Avere prec.</th></tr></thead><tbody>'+(adj.lines||[]).map(l=>'<tr><td>'+(l.leaf?'<span class="cell-code">'+escapeHtml(l.leaf)+'</span> '+escapeHtml(labelForCode(l.leaf)):'<i>voce non indicata</i>')+'</td><td class="r">'+(l.dare?fmt(round2(l.dare)):'')+'</td><td class="r">'+(l.avere?fmt(round2(l.avere)):'')+'</td><td class="r">'+(l.darePrev?fmt(round2(l.darePrev)):'')+'</td><td class="r">'+(l.averePrev?fmt(round2(l.averePrev)):'')+'</td></tr>').join('')+'</tbody></table></div>';});$('#tab_rettifiche').innerHTML=h;document.querySelectorAll('[data-adjtoggle]').forEach(cb=>cb.addEventListener('change',()=>{const a=STATE.adjustments[+cb.getAttribute('data-adjtoggle')];if(!a)return;a.active=cb.checked;if(cb.checked)a.carried=false;refreshAll();}));document.querySelectorAll('[data-adjedit]').forEach(b=>b.addEventListener('click',()=>openAdjEditor(+b.getAttribute('data-adjedit'))));document.querySelectorAll('[data-adjdel]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Eliminare questa rettifica?')){STATE.adjustments.splice(+b.getAttribute('data-adjdel'),1);refreshAll();}}));};
 openAdjEditor=function(idx,seed){const editing=idx!=null,adj=editing?JSON.parse(JSON.stringify(STATE.adjustments[idx])):(seed||{desc:'',note:'',active:true,lines:[{leaf:'',dare:0,avere:0,darePrev:0,averePrev:0},{leaf:'',dare:0,avere:0,darePrev:0,averePrev:0}]});if(adj.active===undefined)adj.active=true;(adj.lines||[]).forEach(l=>{l.darePrev=l.darePrev||0;l.averePrev=l.averePrev||0;});const voci=vociFor(schemaMode()),ov=document.createElement('div');ov.className='modal-ov open';const lineRow=(l,i)=>'<tr><td>'+leafSelectHtml('adl'+i,l.leaf,voci,false)+'</td><td><input type="text" class="adn" data-d="'+i+'" value="'+(l.dare||'')+'"></td><td><input type="text" class="adn" data-a="'+i+'" value="'+(l.avere||'')+'"></td><td><input type="text" class="adn" data-dp="'+i+'" value="'+(l.darePrev||'')+'"></td><td><input type="text" class="adn" data-ap="'+i+'" value="'+(l.averePrev||'')+'"></td><td><button class="lk del" data-rm="'+i+'">✕</button></td></tr>';ov.innerHTML='<div class="modal" style="max-width:920px"><button class="close-btn">&times;</button><h3>'+(editing?'Modifica rettifica':'Nuova rettifica')+'</h3><label class="fld" for="adjDesc">Descrizione</label><input type="text" id="adjDesc" value="'+escapeHtml(adj.desc||'')+'"><label class="fld" for="adjNote">Nota</label><input type="text" id="adjNote" value="'+escapeHtml(adj.note||'')+'"><div class="table-scroll"><table class="adj-edit-tbl"><thead><tr><th>Voce</th><th>Dare corr.</th><th>Avere corr.</th><th>Dare prec.</th><th>Avere prec.</th><th></th></tr></thead><tbody id="adjLines">'+adj.lines.map(lineRow).join('')+'</tbody></table></div><button class="lk" id="adjAddLine">+ aggiungi riga</button><div class="adj-balance" id="adjBalMsg"></div><div class="modal-actions"><span id="adjErr" style="color:var(--warn);font-size:12px;flex:1"></span><button class="btn ghost" id="adjCancel">Annulla</button><button class="btn" id="adjSave">Salva rettifica</button></div></div>';document.body.appendChild(ov);function collect(){const lines=[];ov.querySelectorAll('#adjLines tr').forEach(tr=>lines.push({leaf:tr.querySelector('select').value,dare:V13.parseAmount(tr.querySelector('[data-d]').value)||0,avere:V13.parseAmount(tr.querySelector('[data-a]').value)||0,darePrev:V13.parseAmount(tr.querySelector('[data-dp]').value)||0,averePrev:V13.parseAmount(tr.querySelector('[data-ap]').value)||0}));return lines;}function recalc(){const lines=collect(),D=lines.reduce((s,l)=>s+l.dare,0),A=lines.reduce((s,l)=>s+l.avere,0),DP=lines.reduce((s,l)=>s+l.darePrev,0),AP=lines.reduce((s,l)=>s+l.averePrev,0),bal=Math.abs(D-A)<0.005&&Math.abs(DP-AP)<0.005,m=$('#adjBalMsg');m.className='adj-balance '+(bal?'ok':'bad');m.textContent=bal?'✓ Entrambi gli esercizi quadrano':'⚠ Corrente Δ '+fmt(round2(D-A))+' · Precedente Δ '+fmt(round2(DP-AP));return{lines,bal};}const close=()=>ov.remove();ov.querySelector('.close-btn').onclick=close;$('#adjCancel').onclick=close;ov.onclick=e=>{if(e.target===ov)close();};ov.addEventListener('input',e=>{if(e.target.classList.contains('adn'))recalc();});$('#adjAddLine').onclick=()=>{const tb=$('#adjLines'),i=tb.children.length,tr=document.createElement('tr');tr.innerHTML=lineRow({leaf:'',dare:0,avere:0,darePrev:0,averePrev:0},i);tb.appendChild(tr);recalc();};ov.addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(b){b.closest('tr').remove();recalc();}});$('#adjSave').onclick=()=>{const x=recalc(),real=x.lines.filter(l=>l.leaf&&(l.dare||l.avere||l.darePrev||l.averePrev));if(!real.length){$('#adjErr').textContent='Inserisci almeno una riga con voce e importo.';return;}if(!x.bal){$('#adjErr').textContent='La rettifica non quadra in almeno un esercizio.';return;}const obj={desc:$('#adjDesc').value.trim()||'Rettifica generica',note:$('#adjNote').value.trim(),active:adj.active!==false,lines:real};if(editing)STATE.adjustments[idx]=obj;else STATE.adjustments.push(obj);close();refreshAll();document.querySelector('[data-tab="rettifiche"]').click();};recalc();};
 
 renderSummary=function(){const r=RESULT,sp=r.totAtt-r.totPas,spp=r.totAttPrev-r.totPasPrev,bal=Math.abs(sp)<=BAL_TOL,priorAvailable=r.comparativeColumnPresent&&r.comparativeHasValues,balPrev=priorAvailable&&Math.abs(spp)<=BAL_TOL;$('#summary_bar').innerHTML='<div class="item"><span class="label">Società</span><span class="value">'+escapeHtml($('#an_denom').value||'—')+'</span></div><div class="item"><span class="label">P.IVA</span><span class="value">'+escapeHtml($('#an_piva').value||'—')+'</span></div><div class="item"><span class="label">Schema</span><span class="value">'+(r.mode==='ordinary'?'Ordinario':'Abbreviato')+'</span></div><div class="spacer"></div><div class="item"><span class="label">A = P corrente</span><span class="value '+(bal?'ok':'warn')+'">'+(bal?'✓ quadra · Δ '+fmt(sp):'Δ '+fmt(sp))+'</span></div><div class="item"><span class="label">A = P precedente</span><span class="value '+(balPrev?'ok':'warn')+'">'+(!priorAvailable?'comparativo non valorizzato':(balPrev?'✓ quadra · Δ '+fmt(spp):'Δ '+fmt(spp)))+'</span></div><div class="item"><span class="label">Risultato</span><span class="value">'+fmtX(r.ceResult)+'</span></div>';};
-renderChecks=function(){const r=RESULT,sp=r.totAtt-r.totPas,spp=r.totAttPrev-r.totPasPrev,unm=r.unmapped.length,priorAvailable=r.comparativeColumnPresent&&r.comparativeHasValues,stWarn=(STATE.storni||[]).filter(stornoUnbalances).length;const adjBad=(STATE.adjustments||[]).filter(a=>a.active!==false).filter(a=>{const D=(a.lines||[]).reduce((s,l)=>s+(+l.dare||0),0),A=(a.lines||[]).reduce((s,l)=>s+(+l.avere||0),0),DP=(a.lines||[]).reduce((s,l)=>s+(+l.darePrev||0),0),AP=(a.lines||[]).reduce((s,l)=>s+(+l.averePrev||0),0);return Math.abs(D-A)>=0.005||Math.abs(DP-AP)>=0.005;}).length;const checks=[{name:'Quadratura corrente',value:Math.abs(sp)<=BAL_TOL?'QUADRA · Δ '+fmt(sp):'Δ '+fmt(sp),desc:'Attivo '+fmt(r.totAtt)+' · Passivo e PN '+fmt(r.totPas),status:Math.abs(sp)<=BAL_TOL?'ok':'fail'},{name:'Quadratura precedente',value:!priorAvailable?'NON VALORIZZATO':(Math.abs(spp)<=BAL_TOL?'QUADRA · Δ '+fmt(spp):'Δ '+fmt(spp)),desc:!r.comparativeColumnPresent?'Colonna comparativa assente nel file importato.':(!r.comparativeHasValues?'Colonna presente ma senza valori significativi.':'Attivo '+fmt(r.totAttPrev)+' · Passivo e PN '+fmt(r.totPasPrev)),status:!priorAvailable?'warn':(Math.abs(spp)<=BAL_TOL?'ok':'fail')},{name:'Coerenza CE',value:Math.abs(r.ceTotals.utileEsercizio-r.ceResult)<=BAL_TOL?'COERENTE':'ERRORE',desc:'Risultato calcolato '+fmtX(r.ceResult),status:Math.abs(r.ceTotals.utileEsercizio-r.ceResult)<=BAL_TOL?'ok':'fail'},{name:'CE ↔ Patrimonio netto',value:Math.abs(r.pnCeDelta)<=BAL_TOL?'COERENTE · Δ '+fmt(r.pnCeDelta):'Δ '+fmt(r.pnCeDelta),desc:'AIX deve coincidere con il risultato del CE.',status:Math.abs(r.pnCeDelta)<=BAL_TOL?'ok':'fail'},{name:'Conti mappati',value:(r.accountRows.length-unm)+' / '+r.accountRows.length,desc:unm?unm+' conti da correggere.':'Tutti i conti sono classificati.',status:unm?'warn':'ok'},{name:'Segni contabili',value:r.sideAnomalies.length||'coerenti',desc:r.sideAnomalies.length?r.sideAnomalies.slice(0,3).map(x=>x.code+' '+x.period+' ('+x.expected+')').join(' · '):'Nessuna anomalia evidente rispetto alla convenzione del template.',status:r.sideAnomalies.length?'warn':'ok'},{name:'Mappature non valide',value:r.invalidMappings.length||'nessuna',desc:r.invalidMappings.length?'Codici inesistenti o sezione SP/CE non coerente.':'Nessuna anomalia.',status:r.invalidMappings.length?'fail':'ok'},{name:'Codici duplicati',value:r.duplicates.length||'nessuno',desc:r.duplicates.length?'Duplicati nella stessa sezione: verificare il file origine.':'Nessun duplicato.',status:r.duplicates.length?'warn':'ok'},{name:'Storni da verificare',value:stWarn||'nessuno',desc:'Origine esterna o configurazione incompleta.',status:stWarn?'warn':'ok'},{name:'Rettifiche non quadrate',value:adjBad||'nessuna',desc:'Dare e Avere devono coincidere in entrambi gli esercizi.',status:adjBad?'fail':'ok'}];$('#tab_checks').innerHTML='<div class="checks-grid">'+checks.map(c=>'<div class="check-item '+c.status+'"><div class="name">'+c.name+'</div><div class="value">'+c.value+'</div><div class="desc">'+c.desc+'</div></div>').join('')+'</div>';};
+renderChecks=function(){const r=RESULT,sp=r.totAtt-r.totPas,spp=r.totAttPrev-r.totPasPrev,unm=r.unmapped.length,priorAvailable=r.comparativeColumnPresent&&r.comparativeHasValues,stWarn=(STATE.storni||[]).filter(stornoUnbalances).length;const adjBad=(STATE.adjustments||[]).filter(a=>a.active!==false).filter(a=>{const D=(a.lines||[]).reduce((s,l)=>s+(+l.dare||0),0),A=(a.lines||[]).reduce((s,l)=>s+(+l.avere||0),0),DP=(a.lines||[]).reduce((s,l)=>s+(+l.darePrev||0),0),AP=(a.lines||[]).reduce((s,l)=>s+(+l.averePrev||0),0);return Math.abs(D-A)>=0.005||Math.abs(DP-AP)>=0.005;}).length;const checks=[{name:'Quadratura corrente',value:Math.abs(sp)<=BAL_TOL?'QUADRA · Δ '+fmt(sp):'Δ '+fmt(sp),desc:'Attivo '+fmt(r.totAtt)+' · Passivo e PN '+fmt(r.totPas),status:Math.abs(sp)<=BAL_TOL?'ok':'fail'},{name:'Quadratura precedente',value:!priorAvailable?'NON VALORIZZATO':(Math.abs(spp)<=BAL_TOL?'QUADRA · Δ '+fmt(spp):'Δ '+fmt(spp)),desc:!r.comparativeColumnPresent?'Colonna comparativa assente nel file importato.':(!r.comparativeHasValues?'Colonna presente ma senza valori significativi.':'Attivo '+fmt(r.totAttPrev)+' · Passivo e PN '+fmt(r.totPasPrev)),status:!priorAvailable?'warn':(Math.abs(spp)<=BAL_TOL?'ok':'fail')},{name:'Coerenza CE',value:Math.abs(r.ceTotals.utileEsercizio-r.ceResult)<=BAL_TOL?'COERENTE':'ERRORE',desc:'Risultato calcolato '+fmtX(r.ceResult),status:Math.abs(r.ceTotals.utileEsercizio-r.ceResult)<=BAL_TOL?'ok':'fail'},{name:'CE ↔ Patrimonio netto',value:Math.abs(r.pnCeDelta)<=BAL_TOL?'COERENTE · Δ '+fmt(r.pnCeDelta):'Δ '+fmt(r.pnCeDelta),desc:'AIX deve coincidere con il risultato del CE.',status:Math.abs(r.pnCeDelta)<=BAL_TOL?'ok':'fail'},{name:'Conti mappati',value:(r.accountRows.length-unm)+' / '+r.accountRows.length,desc:unm?unm+' conti da correggere.':'Tutti i conti sono classificati.',status:unm?'warn':'ok'},{name:'Segni contabili',value:r.sideAnomalies.length||'coerenti',desc:r.sideAnomalies.length?r.sideAnomalies.slice(0,3).map(x=>x.code+' '+x.period+' ('+x.expected+')').join(' · '):'Nessuna anomalia evidente rispetto alla convenzione del template.',status:r.sideAnomalies.length?'warn':'ok'},{name:'Mappature non valide',value:r.invalidMappings.length||'nessuna',desc:r.invalidMappings.length?'Codici inesistenti o sezione SP/CE non coerente.':'Nessuna anomalia.',status:r.invalidMappings.length?'fail':'ok'},{name:'Codici duplicati',value:r.duplicates.length||'nessuno',desc:r.duplicates.length?'Duplicati nella stessa sezione: verificare il file origine.':'Nessun duplicato.',status:r.duplicates.length?'warn':'ok'},{name:'Storni da verificare',value:stWarn||'nessuno',desc:'Origine esterna o configurazione incompleta.',status:stWarn?'warn':'ok'},{name:'Rettifiche non quadrate',value:adjBad||'nessuna',desc:'Dare e Avere devono coincidere in entrambi gli esercizi.',status:adjBad?'fail':'ok'}];
+  const findings=STATE.aiFindings||[],openF=findings.filter(f=>!f.closed);
+  if(findings.length)checks.push({name:'Eccezioni «Esiti AI»',value:openF.length||'tutte chiuse',desc:openF.length?'Dubbi, assunzioni e dati mancanti segnalati nel file importato.':findings.length+' segnalazioni, tutte marcate come risolte.',status:openF.length?'warn':'ok'});
+  let h='<div class="checks-grid">'+checks.map(c=>'<div class="check-item '+c.status+'"><div class="name">'+c.name+'</div><div class="value">'+c.value+'</div><div class="desc">'+c.desc+'</div></div>').join('')+'</div>';
+  /* Le eccezioni del foglio «Esiti AI» arrivano dal file e non sono un
+     controllo calcolato: vanno lette una per una e chiuse a mano. */
+  if(findings.length){
+    h+='<h3 style="margin:26px 0 6px;font-size:15px">Eccezioni segnalate dall’AI</h3><p class="bd" style="margin:0 0 12px">Vengono dal foglio «Esiti AI» del file importato. Non sono un controllo del tool: sono i dubbi, le assunzioni e le fonti dichiarate da chi ha preparato il file. Chiudile dopo averle verificate.</p>';
+    h+=findings.map((f,i)=>'<div class="storno-row '+(f.closed?'off':'warn')+'"><div class="storno-main"><label class="adj-toggle"><input type="checkbox" data-aiclose="'+i+'" '+(f.closed?'checked':'')+'> verificata</label>'+(f.tipo?'<span class="storno-carried">'+escapeHtml(f.tipo)+'</span>':'')+(f.rif?'<span class="cell-code">'+escapeHtml(f.rif)+'</span>':'')+'<span class="storno-flow"><b>'+escapeHtml(f.elemento)+'</b></span>'+(f.osservazione?'<span class="storno-note">'+escapeHtml(f.osservazione)+'</span>':'')+(f.fonte?'<span class="storno-note">Fonte: '+escapeHtml(f.fonte)+'</span>':'')+'</div>'+(f.stato&&!f.closed?'<div class="storno-warn">Stato dichiarato: '+escapeHtml(f.stato)+'</div>':'')+'</div>').join('');
+  }
+  $('#tab_checks').innerHTML=h;
+  document.querySelectorAll('[data-aiclose]').forEach(cb=>cb.addEventListener('change',()=>{const f=STATE.aiFindings[+cb.getAttribute('data-aiclose')];if(!f)return;f.closed=cb.checked;refreshAll();}));};
 
 // Export detail: current and comparative adjustments / reclassifications.
 const oldExportExcel=exportExcel;
@@ -3306,7 +3399,7 @@ loadSampleData=function(){fsOriginalLoadSampleData();STATE.comparativeColumnPres
 
 // Keep UI/version metadata aligned.
 V13.version=FS_PATCH_VERSION;document.documentElement.setAttribute('data-tool-version',FS_PATCH_VERSION);
-const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?1\.1\.3/g,'v1.3.6');
+const ver=document.querySelector('.tool-version,.version-chip');if(ver)ver.textContent=String(ver.textContent||'').replace(/v?\d+\.\d+\.\d+/g,'v'+FS_PATCH_VERSION);
 const style=document.createElement('style');style.textContent='.adj-tbl{font-size:11px}.adj-edit-tbl input{min-width:92px}.fs-comparative-note{padding:10px;border-radius:8px;background:#fff5d9;color:#72520b}';document.head.appendChild(style);
 if(STATE.accounts&&STATE.accounts.length)refreshAll();
 })();
@@ -3347,7 +3440,7 @@ document.addEventListener("click",function(event){
    Patch applicato sulla versione completa con sidebar, archivio, rettifiche e comparativi. */
 (function(){
 'use strict';
-const VERSION='1.3.6', TECH_CODE='TAL_AIX';
+const VERSION=window.FS_VERSION||'1.4.0', TECH_CODE='TAL_AIX';
 function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
 function norm(v){return String(v==null?'':v).trim().toLowerCase().replace(/\s+/g,' ');}
 function normLeaf(v){return String(v==null?'':v).toUpperCase().replace(/[^A-Z0-9]/g,'');}
@@ -3451,13 +3544,33 @@ window.confirmFsTechnicalResult=function(){
   rows.forEach(a=>a.resultStatus='confirmed');window.refreshAll(true);toast('Voce tecnica A.IX confermata. Salva il fascicolo per conservarla nell’Archivio.');
 };
 
+function goChecks(){const b=document.querySelector('[data-tab="checks"]');if(b)b.click();if(window.fsShowView)window.fsShowView('results');}
+function unbalancedAdjustments(){
+  return (STATE.adjustments||[]).filter(a=>a.active!==false).filter(a=>{
+    const L=a.lines||[],D=L.reduce((s,l)=>s+(+l.dare||0),0),A=L.reduce((s,l)=>s+(+l.avere||0),0),
+          DP=L.reduce((s,l)=>s+(+l.darePrev||0),0),AP=L.reduce((s,l)=>s+(+l.averePrev||0),0);
+    return Math.abs(D-A)>=.005||Math.abs(DP-AP)>=.005;
+  }).length;
+}
+/* Gate unico di tutti gli export. Oltre ad A.IX e alla quadratura corrente
+   ferma i due controlli che prima restavano FAIL rossi senza impedire niente:
+   una mappatura non valida porta un conto in una voce civilistica sbagliata e
+   una rettifica non quadrata sbilancia lo stato patrimoniale — entrambi
+   arrivavano fino al PDF, all'Excel e all'istanza XBRL.
+   Quadratura precedente e coerenza CE restano avvisi: il comparativo può
+   mancare per scelta, e non è materia di un blocco. */
 function exportGate(){
-  if(pendingRows().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);const b=document.querySelector('[data-tab="checks"]');if(b)b.click();if(window.fsShowView)window.fsShowView('results');return false;}
+  if(pendingRows().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);goChecks();return false;}
   const r=(typeof RESULT!=='undefined'&&RESULT)?RESULT:null;
   if(!r){toast('Export bloccato: risultati non disponibili o non aggiornati.',true);return false;}
-  if(Math.abs(n(r.totAtt)-n(r.totPas))>.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);const b=document.querySelector('[data-tab="checks"]');if(b)b.click();if(window.fsShowView)window.fsShowView('results');return false;}
+  if(Math.abs(n(r.totAtt)-n(r.totPas))>.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);goChecks();return false;}
+  const inv=(r.invalidMappings||[]).length;
+  if(inv){toast('Export bloccato: '+inv+(inv===1?' mappatura non valida. Correggila':' mappature non valide. Correggile')+' nella scheda Verifiche.',true);goChecks();return false;}
+  const bad=unbalancedAdjustments();
+  if(bad){toast('Export bloccato: '+bad+(bad===1?' rettifica non quadrata (Dare ≠ Avere). Correggila o disattivala.':' rettifiche non quadrate (Dare ≠ Avere). Correggile o disattivale.'),true);goChecks();return false;}
   return true;
 }
+window.fsExportGate=exportGate;
 ['exportExcel','exportPDF'].forEach(name=>{
   const fn=window[name];if(typeof fn!=='function'||fn.__talGate)return;
   const w=function(){if(!exportGate())return;return fn.apply(this,arguments);};w.__talGate=true;window[name]=w;try{eval(name+'=window[name]');}catch(_){ }
@@ -3502,7 +3615,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
    ==================================================================== */
 (function(){
 'use strict';
-var VERSION='1.4.0';
+var VERSION=window.FS_VERSION||'1.4.0';
 var VIEWS=['archive','anagrafica','import','results','export','data','help'];
 var HASH={archive:'clienti',anagrafica:'anagrafica',import:'importa',results:'bilancio',export:'esporta',data:'dati',help:'aiuto'};
 var FROM_HASH={};Object.keys(HASH).forEach(function(k){FROM_HASH[HASH[k]]=k;});
@@ -3680,7 +3793,7 @@ function resetAll(){
   clearIdentity();
   var sc=document.getElementById('an_schema');if(sc)sc.value='abbrev';
   var vl=document.getElementById('an_valuta');if(vl)vl.value='EUR';
-  STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];
+  STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.aiFindings=[];
   delete STATE.comparativeColumnPresent;delete STATE.comparativeHasValues;
   RESULT=null;
   try{localStorage.removeItem('fs_draft_v1');}catch(_){}
@@ -3713,7 +3826,7 @@ var DEMO_ACCOUNTS=[
   {code:'572000',desc:'Banca c/c',importo:45000,importo_prev:38000,voce:'CIV',source:'sp'},
   {code:'480000',desc:'Risconti attivi',importo:3200,importo_prev:2800,voce:'D',source:'sp'},
   {code:'100000',desc:'Capitale sociale',importo:-50000,importo_prev:-50000,voce:'AI',source:'sp'},
-  {code:'112000',desc:'Riserva legale',importo:-10000,importo_prev:-8000,voce:'AVI',source:'sp'},
+  {code:'112000',desc:'Riserva legale',importo:-10000,importo_prev:-8000,voce:'AIV',source:'sp'},
   {code:'129000',desc:'Utili portati a nuovo',importo:-85000,importo_prev:-84800,voce:'AVIII',source:'sp'},
   {code:'141000',desc:'Fondo TFR',importo:-35000,importo_prev:-30000,voce:'C',source:'sp'},
   {code:'170000',desc:'Mutui bancari oltre 12m',importo:-220000,importo_prev:-240000,voce:'DO',source:'sp'},
@@ -3780,6 +3893,10 @@ window.downloadTemplate=function(){
       [''],
       ['I fogli contengono un esempio completo e gia quadrato: sostituisci le righe con i tuoi conti.'],
       [''],
+      ['Foglio "Esiti AI"'],[''],
+      ['   Dubbi, dati mancanti, assunzioni e fonti. Il tool lo legge all\'import e li elenca nella'],
+      ['   scheda Verifiche come eccezioni da chiudere una per una. Togli la riga di esempio.'],
+      [''],
       ['Strumento didattico. La responsabilita della classificazione resta del professionista.']];
     var wsI=XLSX.utils.aoa_to_sheet(istr);wsI['!cols']=[{wch:104}];
     XLSX.utils.book_append_sheet(wb,wsI,'Istruzioni');
@@ -3814,6 +3931,15 @@ window.downloadTemplate=function(){
       var ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:16},{wch:42},{wch:26},{wch:26},{wch:18}];
       XLSX.utils.book_append_sheet(wb,ws,src==='sp'?'Stato Patrimoniale':'Conto Economico');
     });
+
+    /* Sesto foglio, lo stesso del template di «Configura con AI»: i due
+       contratti Excel erano diversi e le eccezioni dichiarate dall'AI non
+       entravano mai nella sessione di lavoro. Ora il tool le legge. */
+    var esiti=[['Tipo','Codice conto / campo','Elemento da verificare','Stato','Osservazione / assunzione','Fonte utilizzata'],
+      ['Esempio','','Non lasciare questa riga nel file finale','Da verificare','Descrivi qui ogni dubbio, dato mancante o classificazione non supportata','Indica documento, foglio o pagina']];
+    var wsE=XLSX.utils.aoa_to_sheet(esiti);wsE['!cols']=[{wch:18},{wch:24},{wch:52},{wch:16},{wch:64},{wch:34}];
+    XLSX.utils.book_append_sheet(wb,wsE,'Esiti AI');
+
     XLSX.writeFile(wb,'Template_Bilancio_TaxAutomationLab.xlsx');
     T('Template scaricato: contiene un esempio già quadrato da sostituire');
   }catch(e){console.error(e);T('Errore nella creazione del template: '+e.message,true);}
@@ -3984,15 +4110,42 @@ function buildDeposit(showAll){
   ce=ce.concat(block(['IMP']));
   ce.push({label:'21) Utile (perdita) dell\'esercizio',lvl:0,total:true,grand:true,amount:T.utileEsercizio,amountPrev:P.utileEsercizio});
 
+  /* Il bilancio depositato è in unità di euro senza decimali (OIC 12, e così
+     esce dal software di deposito). Il working paper tiene i centesimi: sono
+     due documenti diversi e questo è quello civilistico. L'arrotondamento può
+     spostare un totale di qualche euro rispetto alla somma delle righe: viene
+     misurato e dichiarato, come già fa il generatore XBRL. */
+  [att,pas,ce].forEach(function(rows){rows.forEach(function(x){x.amount=Math.round(num(x.amount));x.amountPrev=Math.round(num(x.amountPrev));});});
+
   return {
     denom:g('an_denom')||'Società',
     closing:itDate(g('an_periodo_a')),
     prior:priorDate(g('an_periodo_a')),
     schema:r.mode==='ordinary'?'Schema ordinario — artt. 2424 e 2425 c.c.':'Schema abbreviato — art. 2435-bis c.c.',
     anag:anagraficaRows(),
-    attivo:att,passivo:pas,ce:ce
+    attivo:att,passivo:pas,ce:ce,
+    rounding:depositRoundingDrift(att,pas)
   };
 }
+/* Scarto fra il totale arrotondato e la somma delle righe arrotondate. */
+function depositRoundingDrift(att,pas){
+  function drift(rows){
+    var tot=rows[rows.length-1]||{},sum=0,sumP=0;
+    rows.forEach(function(x){if(x.total||x.group)return;sum+=num(x.amount);sumP+=num(x.amountPrev);});
+    return {cur:num(tot.amount)-sum,prev:num(tot.amountPrev)-sumP};
+  }
+  var a=drift(att),p=drift(pas);
+  var max=Math.max(Math.abs(a.cur),Math.abs(a.prev),Math.abs(p.cur),Math.abs(p.prev));
+  return {attivo:a,passivo:p,max:max};
+}
+/* Formato civilistico: euro interi, negativi fra parentesi, zero come trattino. */
+function fmtDep(n){
+  var r=Math.round(num(n));
+  if(!r)return '–';
+  var s=Math.abs(r).toLocaleString('it-IT',{useGrouping:true,maximumFractionDigits:0});
+  return r<0?'('+s+')':s;
+}
+window.fsFmtDeposit=fmtDep;
 window.fsBuildDeposit=buildDeposit;
 
 /* ---------------- Anteprima a schermo ---------------- */
@@ -4005,7 +4158,7 @@ function renderDeposit(){
     rows.forEach(function(x){
       var cls=x.grand?'xr-grand':(x.total?'xr-sub':(x.group?'xr-group':'xr-lvl'+x.lvl));
       h+='<tr class="'+cls+'" style="--ind:'+x.lvl+'"><td style="padding-left:'+(10+x.lvl*16)+'px">'+escapeHtml(x.label)+'</td>'+
-         '<td class="r">'+(x.group?'':fmtX(x.amount))+'</td><td class="r">'+(x.group?'':fmtX(x.amountPrev))+'</td></tr>';
+         '<td class="r">'+(x.group?'':fmtDep(x.amount))+'</td><td class="r">'+(x.group?'':fmtDep(x.amountPrev))+'</td></tr>';
     });
     return h+'</tbody></table>';
   }
@@ -4013,7 +4166,8 @@ function renderDeposit(){
     return '<tr><td style="width:62%">'+escapeHtml(r[0])+'</td><td colspan="2">'+escapeHtml(r[1])+'</td></tr>';}).join('')+'</tbody></table>';
   var head='<div class="fs-deposit-head"><h3>Bilancio di esercizio al '+escapeHtml(d.closing||'—')+'</h3>'+
     '<p>'+escapeHtml(d.denom)+' · '+escapeHtml(d.schema)+'</p>'+
-    '<p class="bd">Questa è l\'anteprima esatta del PDF e dell\'Excel scaricabili da <b>Esporta</b>. Le voci con valore nullo in entrambi gli esercizi sono omesse, come nel bilancio depositato.</p></div>';
+    '<p class="bd">Questa è l\'anteprima esatta del PDF e dell\'Excel scaricabili da <b>Esporta</b>. Importi in <b>unità di euro</b> senza decimali, come nel depositato (OIC 12): i centesimi restano nel working paper. Le voci con valore nullo in entrambi gli esercizi sono omesse.</p>'+
+    (d.rounding&&d.rounding.max>=1?'<div class="callout warn" style="margin-top:10px"><b>L\'arrotondamento all\'unità di euro sposta una quadratura di '+d.rounding.max+' €.</b> Il totale stampato viene dal valore pieno, non dalla somma delle righe arrotondate: la differenza è dichiarata invece di essere nascosta. Se il registro la rifiuta, va sistemata all\'origine, sui saldi.</div>':'')+'</div>';
   host.innerHTML=head+
     '<h4 class="fs-deposit-cap">Dati anagrafici</h4>'+V13.tableWrap(anag)+
     '<h4 class="fs-deposit-cap">Stato patrimoniale — Attivo</h4>'+V13.tableWrap(tbl('Voce',d.attivo))+
@@ -4065,8 +4219,8 @@ window.exportOfficialPDF=function(){
                 :(x.group?{fontStyle:'bold',textColor:[40,40,40]}:{}));
           return [
             {content:safe('   '.repeat(x.lvl)+x.label),styles:st},
-            {content:x.group?'':safe(fmtX(x.amount)),styles:Object.assign({halign:'right'},st)},
-            {content:x.group?'':safe(fmtX(x.amountPrev)),styles:Object.assign({halign:'right'},st)}
+            {content:x.group?'':safe(fmtDep(x.amount)),styles:Object.assign({halign:'right'},st)},
+            {content:x.group?'':safe(fmtDep(x.amountPrev)),styles:Object.assign({halign:'right'},st)}
           ];
         }),
         theme:'striped',
@@ -4106,9 +4260,10 @@ window.exportOfficialExcel=function(){
       var aoa=[[d.denom,'',''],['Bilancio di esercizio al '+(d.closing||'—'),'',''],[d.schema,'',''],['','',''],
                [caption,d.closing||'Corrente',d.prior||'Precedente']];
       rows.forEach(function(x){
+        /* Numeri veri in cella, ma interi: è il formato del depositato. */
         aoa.push(['    '.repeat(x.lvl)+x.label,
-                  x.group?'':round2(num(x.amount)),
-                  x.group?'':round2(num(x.amountPrev))]);
+                  x.group?'':Math.round(num(x.amount)),
+                  x.group?'':Math.round(num(x.amountPrev))]);
       });
       var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:84},{wch:20},{wch:20}];
       XLSX.utils.book_append_sheet(wb,ws,name);
@@ -4131,13 +4286,18 @@ setTimeout(function(){
   ['exportOfficialPDF','exportOfficialExcel'].forEach(function(name){
     var fn=window[name];if(typeof fn!=='function'||fn.__talGate)return;
     var w=function(){
-      var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
-      if(pending.length){if(window.toast)toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);
-        window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
-      if(typeof RESULT==='undefined'||!RESULT){if(window.toast)toast('Export bloccato: risultati non disponibili.',true);return;}
-      if(Math.abs(num(RESULT.totAtt)-num(RESULT.totPas))>0.5){
-        if(window.toast)toast('Export bloccato: Stato Patrimoniale non quadrato.',true);
-        window.fsShowView('results');var c=document.querySelector('[data-tab="checks"]');if(c)c.click();return;}
+      /* Un solo blocco di sicurezza per tutti: A.IX, quadratura, mappature non
+         valide e rettifiche non quadrate stanno in window.fsExportGate. */
+      if(window.fsExportGate){if(!window.fsExportGate())return;}
+      else{
+        var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
+        if(pending.length){if(window.toast)toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);
+          window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
+        if(typeof RESULT==='undefined'||!RESULT){if(window.toast)toast('Export bloccato: risultati non disponibili.',true);return;}
+        if(Math.abs(num(RESULT.totAtt)-num(RESULT.totPas))>0.5){
+          if(window.toast)toast('Export bloccato: Stato Patrimoniale non quadrato.',true);
+          window.fsShowView('results');var c=document.querySelector('[data-tab="checks"]');if(c)c.click();return;}
+      }
       if(!document.getElementById('an_periodo_a').value){
         if(window.toast)toast('Indica la data di chiusura dell’esercizio in Anagrafica: è l’intestazione del bilancio.',true);
         window.fsShowView('anagrafica');return;}
@@ -4525,11 +4685,19 @@ function periods(){
 
 window.exportXBRL=function(){
   try{
-    var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
-    if(pending.length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
+    /* Stesso blocco di sicurezza degli altri export: A.IX, quadratura,
+       mappature non valide, rettifiche non quadrate. */
+    if(window.fsExportGate){if(!window.fsExportGate())return;}
+    else{
+      var pending=(STATE.accounts||[]).filter(function(a){return a&&a.technicalResult&&a.resultStatus!=='confirmed';});
+      if(pending.length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
+    }
     var d=buildFacts();
     if(!d){toast('Nessun bilancio da esportare',true);return;}
     if(Math.abs(num(d.result.totAtt)-num(d.result.totPas))>0.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);return;}
+    /* Il bilancio civilistico si redige in euro: l'istanza dichiara l'unità EUR
+       e non esiste conversione. Meglio fermarsi che dichiarare euro altro. */
+    if((gv('an_valuta')||'EUR')!=='EUR'){toast('Export bloccato: l’istanza XBRL è in euro. Riporta la valuta a EUR in Anagrafica.',true);window.fsShowView('anagrafica');return;}
     var p=periods();
     if(!p){toast('Indica il periodo dell’esercizio in Anagrafica: serve per i contesti XBRL.',true);window.fsShowView('anagrafica');return;}
     /* L'identificativo dell'entità è il codice fiscale numerico: nel file
@@ -4676,6 +4844,27 @@ function notice(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(notice,0);},{once:true});
 else setTimeout(notice,0);
+})();
+</script>
+
+<script id="fs-site-nav-mobile">
+/* Navigazione del sito su telefono. Sotto i 760px site-shell.css nasconde
+   `.tal-gh-nav` e la riapre solo con `.tal-menu-open` sull'intestazione: la
+   classe la mette questo pulsante. Stesso comportamento di LIPE e F24. */
+(function(){
+  function init(){
+    var header=document.querySelector('.tal-global-header');
+    var btn=document.getElementById('talGhMenuToggle');
+    var nav=document.getElementById('talGhNav');
+    if(!header||!btn||!nav)return;
+    var open='Apri il menu',close='Chiudi il menu';
+    function setOpen(on){header.classList.toggle('tal-menu-open',on);btn.setAttribute('aria-expanded',String(on));btn.setAttribute('aria-label',on?close:open);}
+    btn.setAttribute('aria-label',open);
+    btn.addEventListener('click',function(){setOpen(!header.classList.contains('tal-menu-open'));});
+    nav.querySelectorAll('a,button').forEach(function(x){x.addEventListener('click',function(){if(window.matchMedia('(max-width:760px)').matches)setOpen(false);});});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 

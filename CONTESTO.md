@@ -434,6 +434,45 @@ file di «Configura con AI» usano gli stessi identificativi validi, e il
 template pubblicato è **generato dagli stessi header del tool** (`make_template`
 legge `TEMPLATE_HEADERS` dal sorgente) proprio per non poter divergere.
 
+## Come si aggancia una pagina applicativa nuova
+
+Costato quattro difetti visibili sul sito pubblicato: la prima versione di
+`/tools/f24/` è uscita con l'intestazione rotta perché la verifica era passata
+solo da DOM e stato, mai da uno sguardo alla pagina. **Una pagina di tool ha
+bisogno di tre fogli, non di uno.**
+
+| Serve | Perché |
+|---|---|
+| `site-shell.css` | disegna il contenitore dell'intestazione (`.tal-global-header`, `.tal-gh-frame`) e la sua griglia responsive |
+| `tal-app.css` | token, controlli, tabelle, sidebar, finestre. **Ritocca** l'intestazione, non la costruisce |
+| lo `<style>` di pagina | logo, voci di menu, pastiglie della lingua e pannello `.tal-publication`: stanno nel foglio di ciascun tool, non in quelli condivisi |
+
+Senza il terzo, logo e menu escono come immagine a grandezza naturale ed elenco
+di link sottolineati, anche con gli altri due agganciati.
+
+Le altre tre trappole di aggancio, tutte incontrate in quel giro:
+
+1. **Niente classe `btn` sul pulsante del menu.** In `tal-app.css` la regola dei
+   bottoni porta `display:inline-flex !important` e sovrascrive il `display:none`
+   con cui il pulsante resta nascosto sopra i 980px: risultato, un «☰ Menu»
+   piantato sopra al marchio della sidebar a schermo intero. Gli altri quattro
+   tool usano `class="sb-toggle"` e basta.
+2. **`site-shell.css` allarga l'intestazione a 100vw** con margini negativi.
+   Dentro l'area applicativa, già spostata a destra dalla sidebar, sborda. Va
+   riportata al contenitore con
+   `.app-main .tal-global-header{width:100%!important;margin-left:0!important;…}`.
+3. **Gli z-index del sito partono da 5000.** L'intestazione è a `z-index:5000`:
+   un pulsante flottante a 70 ci finisce sotto e diventa incliccabile, e la
+   sidebar aperta su telefono si fa coprire il marchio. In F24 il pulsante sta a
+   `5100`, la velatura a `5050`, la sidebar a `5060` sotto i 980px.
+
+**Navigazione del sito su telefono.** Sotto i 1080px `site-shell.css` nasconde
+`.tal-gh-nav` e la riapre solo con `.tal-menu-open` sull'intestazione, classe
+che va messa da un pulsante `.tal-gh-menu-toggle` nel markup. Ce l'hanno la
+home, LIPE, il Fascicolo e ora F24; **`financial-statement` e
+`financial-analysis` no**, quindi su quei due la navigazione del sito è
+irraggiungibile da telefono. È un difetto vero e aperto, non una scelta.
+
 ## Contrasto — due correzioni nel layer condiviso, 13 agosto 2026
 
 L'audit di contrasto precedente dichiarava «nessun fallimento su 4 tool», ma
@@ -505,6 +544,10 @@ invariate. Per verificare una modifica al foglio condiviso, sostituire il
   esaustivo, con INPS e INAIL volutamente più stretti dell'Erario. Un codice
   fuori elenco produce un avviso, non un blocco, e l'utente può aggiungerlo.
   Vale la pena allargarlo con un elenco ufficiale, non a memoria.
+- **Navigazione del sito su telefono in `financial-statement` e
+  `financial-analysis`**: manca il pulsante `.tal-gh-menu-toggle`, quindi sotto
+  i 1080px le voci Home/Strumenti/… non sono raggiungibili. Si chiude copiando
+  il pulsante e le tre righe di gestione da `/tools/f24/`.
 - **Contrasto delle freccette `.chev` nel Fascicolo**: il glifo «›» a 22px sta a
   **2,40:1**. È decorativo — l'etichetta accanto porta il significato — quindi
   non è testo informativo, ma resta sotto anche la soglia 3:1 dei componenti non

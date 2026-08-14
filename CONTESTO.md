@@ -114,7 +114,7 @@ Se in futuro si uniformasse, il lavoro è sostituire la sola `.workspace-nav`.
 
 Versioni reali (allineate ovunque, anche nei dati strutturati):
 `1.4.1` Bilancio ITA GAAP · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
-cliente · `3.4.1→3.4.3` LIPE · `1.0.0` Generatore F24.
+cliente · `3.6.0` LIPE · `1.0.0` Generatore F24.
 
 ## Trappole verificate sul campo
 
@@ -960,6 +960,97 @@ da fuori non funziona, verificato. Il punto comune alle due strade è
 `#fs_save_btn`, perché il Salva della barra gli fa `click()`: l'aggancio è
 lì. La scrittura è silenziosa, così il messaggio che resta a schermo è quello
 del fascicolo.
+
+## Concept condiviso — la barra unica e i cinque tool allineati, 14 agosto 2026
+
+**I tre comandi di sessione ora esistono ovunque.** Bilancio e Analisi
+avevano Nuovo · Salva · Archivio; LIPE e F24 avevano solo etichetta e stato,
+il Fascicolo teneva gli stessi tre comandi sepolti nel menu «Altro» fra altre
+nove voci. Ora la barra la disegna `tal-app.js` e ogni tool dichiara che cosa
+significano i tre verbi da lui, in `window.TAL_SESSION`:
+
+```js
+window.TAL_SESSION = { onNew, onSave, onArchive, hints:{…} }
+```
+
+Il valore può essere una funzione **o il selettore di un comando che il tool
+ha già cablato** — nel Fascicolo i tre premono le voci di `#cmdMenu`, così
+non esistono due implementazioni della stessa azione. `hints` diventa il
+`title`: la parola è la stessa nei cinque tool, quello che fa cambia (in F24
+«Salva» scarica un file, il lavoro in corso è già tenuto dal salvataggio
+automatico) ed è giusto dirlo invece di lasciarlo intuire.
+
+**Due difetti di intestazione chiusi.** In Analisi il pannello «Interfaccia
+operativa in italiano.» stava sopra il contenuto di ogni schermata: rimosso.
+Sempre in Analisi, `installV17Dom` iniettava un secondo **«Salva lavoro»**
+dentro l'intestazione del sito, con il suo indicatore di stato: due Salva
+sulla stessa schermata, e lo stato lo dice già la pastiglia della barra.
+Rimosso il pulsante; `manualSaveV17` resta viva, e `saveWork` — che è quello
+che chiama la barra — fa di più (valida denominazione/P.IVA e scrive
+nell'archivio), quindi non si è perso niente.
+
+**Il cambio lingua nei tool.** Quattro tool su cinque mandavano ENG e ESP al
+**catalogo** `/en/tools/` e `/es/tools/` invece che alla pagina di *quel*
+tool nell'altra lingua: si cliccava ENG dentro il Bilancio e si finiva
+sull'elenco degli strumenti. Le dieci pagine per-tool esistevano già (`en/` e
+`es/`, con le pastiglie corrette in entrambe le direzioni) e solo F24 le
+usava. Ora le usano tutti e cinque.
+
+**Esito della verifica di omogeneità**, misurata sui cinque tool in
+esecuzione: barra 42px con lo stesso gradiente viola→petrolio e gli stessi
+tre comandi; zero pulsanti nell'intestazione del sito; nessun avviso di
+interfaccia; «Informazioni sullo strumento» dentro «Come si usa» (il
+Fascicolo non ha quel pannello: tiene la voce ⓘ nel menu); pastiglie di
+lingua sulle pagine proprie; nessuno scorrimento orizzontale.
+
+## LIPE 3.6.0 — l'import unico, e il difetto che lo rendeva inutile
+
+Segnalazione: «se vado su clienti, importa da excel e scarico excel devo per
+forza selezionare una società; come faccio a configurare un cliente nuovo e
+il suo codiciario?».
+
+**Il percorso d'ingresso portava nel posto sbagliato.** La scheda «Importa da
+Excel» della schermata Clienti saltava a «Elaborazione periodica», cioè
+all'import degli **importi del periodo**, che per sapere mesi e periodicità
+ha bisogno di un cliente che esista già — e un cliente nuovo, per
+definizione, non c'è. Il file che serve per primo (anagrafica + codiciario,
+un solo workbook, come il template del Bilancio) c'era già, ma stava più in
+basso nella pagina e **nessun percorso d'ingresso ci portava**. Ora ci
+portano la scheda d'ingresso e una voce di sidebar «Importa da Excel», nel
+gruppo Configurazione come negli altri tool.
+
+**Il difetto vero l'ha fatto emergere il percorso, non la lettura.** Il
+codiciario si rileggeva per nome di colonna normalizzato, e la
+normalizzazione butta via tutto ciò che non è lettera o cifra — **«%»
+compreso**. Così `Imponibile →` e `% imponibile` diventavano la stessa chiave
+`imponibile`, e la seconda copriva la prima: al posto del rigo VP arrivava la
+percentuale, `routeValue(100,['VP2','VP3'])` restituiva stringa vuota e
+**ogni codice tornava senza destinazione**, cioè escluso dal quadro VP. Vale
+per tutte e tre le coppie. Conseguenza: il template scaricato dal tool e
+ricaricato senza toccarlo perdeva ogni destinazione, e il file di «Configura
+con AI», che ha le stesse intestazioni, faceva la stessa fine. È questo il
+«non gestisce la configurazione» della segnalazione.
+
+La rilettura ora lavora **per indice di colonna** e riconosce le colonne
+percentuale *prima* di normalizzare, guardando se l'intestazione comincia per
+«%». Le intestazioni del template **non sono state cambiate**, di proposito:
+i file già prodotti dall'AI continuano a funzionare.
+
+**Un file, un cliente.** L'import riempiva i campi e si fermava lì: il cliente
+restava inesistente finché qualcuno non premeva Salva. Ora, se il foglio
+Anagrafica porta denominazione e P.IVA valida, la configurazione viene
+salvata, resa attiva e il contesto della sidebar aggiornato nello stesso
+gesto. Se il salvataggio non va a buon fine il messaggio non lo dichiara
+comunque: si guarda l'archivio prima di dirlo.
+
+E il template degli importi non si limita più a rifiutare: se in archivio c'è
+un solo cliente lo sceglie, se non ce n'è nessuno dice cosa fare e porta
+all'import della configurazione.
+
+**Provato sul tool in esecuzione**, non sul sorgente: workbook Anagrafica +
+Codiciario → cliente creato e attivo, tre codici con le destinazioni intatte
+(`V22→VP2/VP4`, `A22→VP3/VP5`, `RC22→VP3/VP4/VP5`) → import degli importi →
+quadro VP con VP2 100.000, VP3 50.000, VP4 24.200, VP5 11.000, VP6 13.200.
 
 ## Aperto
 

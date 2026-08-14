@@ -44,6 +44,48 @@
     return '<span class="save-pill tal-save-pill" id="' + id + '">Salvataggio automatico</span>';
   }
 
+  /* I tre comandi di sessione sono gli stessi ovunque — Nuovo, Salva,
+     Archivio, nell'ordine del Bilancio, che è il riferimento — ma dietro
+     ognuno c'è la funzione del tool. Ogni tool li dichiara in
+     `window.TAL_SESSION`; il valore può essere una funzione o il selettore di
+     un comando che il tool ha già cablato altrove, così non si duplica
+     logica che esiste. `hint` diventa il `title`: la parola è la stessa
+     dappertutto, quello che fa cambia da tool a tool ed è giusto dirlo. */
+  var ACTION_KEYS = [
+    { key: 'onNew', label: 'Nuovo', cls: '' },
+    { key: 'onSave', label: 'Salva', cls: 'primary' },
+    { key: 'onArchive', label: 'Archivio', cls: '' }
+  ];
+
+  function runSessionAction(value) {
+    if (typeof value === 'function') { value(); return; }
+    if (typeof value === 'string') {
+      var el = document.querySelector(value);
+      if (el) el.click();
+    }
+  }
+
+  function actionsEl() {
+    var cfg = window.TAL_SESSION;
+    if (!cfg) return null;
+    var box = document.createElement('div');
+    box.className = 'tal-session-actions';
+    ACTION_KEYS.forEach(function (a) {
+      if (!cfg[a.key]) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = a.cls;
+      b.textContent = (cfg.labels && cfg.labels[a.key]) || a.label;
+      var hint = cfg.hints && cfg.hints[a.key];
+      if (hint) b.title = hint;
+      b.addEventListener('click', function () { runSessionAction(cfg[a.key]); });
+      box.appendChild(b);
+    });
+    return box.children.length ? box : null;
+  }
+
+  var HAS_ACTIONS = '.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions';
+
   function buildBar() {
     var main = document.querySelector('.app-main') || document.body;
     var bar = findBar();
@@ -59,23 +101,36 @@
         lab.textContent = 'Sessione di lavoro';
         bar.insertBefore(lab, bar.firstChild);
       }
+      /* Il Fascicolo la barra ce l'aveva, ma senza i tre comandi: li aggiunge
+         subito dopo l'etichetta, prima dei comandi propri del tool. */
+      if (!bar.querySelector(HAS_ACTIONS)) {
+        var acts = actionsEl();
+        if (acts) {
+          var label = bar.querySelector('.tal-session-label,.tal-fs-commandcopy,.tal-commandbar-copy');
+          if (label) label.insertAdjacentElement('afterend', acts);
+          else bar.insertBefore(acts, bar.firstChild);
+        }
+      }
       /* Niente distanziatore: la pastiglia si spinge a destra da sola con
          `margin-left:auto`. Un elemento elastico in mezzo, su telefono, si
          prendeva una riga tutta sua e la striscia andava a tre righe. */
-      if (!bar.querySelector('.save-pill,.tal-save-pill')) {
-        bar.insertAdjacentHTML('beforeend', pillHtml('talSavePill'));
-      }
+      var pill = bar.querySelector('.save-pill,.tal-save-pill');
+      if (!pill) bar.insertAdjacentHTML('beforeend', pillHtml('talSavePill'));
+      /* Lo stato del salvataggio chiude la riga in tutti e cinque i tool: nel
+         Fascicolo stava in mezzo ai comandi. */
+      else if (pill !== bar.lastElementChild) bar.appendChild(pill);
       return bar;
     }
 
-    /* Nessuna barra propria (LIPE): se ne costruisce una, con l'etichetta e lo
+    /* Nessuna barra propria: se ne costruisce una, con etichetta, comandi e
        stato del salvataggio. Niente nome della società: è nella sidebar. */
     bar = document.createElement('div');
     bar.className = 'cmdbar tal-cmdbar tal-session-bar';
     bar.setAttribute('aria-label', 'Sessione di lavoro');
-    bar.innerHTML =
-      '<span class="tal-session-label">Sessione di lavoro</span>' +
-      pillHtml('talSavePill');
+    bar.innerHTML = '<span class="tal-session-label">Sessione di lavoro</span>';
+    var built = actionsEl();
+    if (built) bar.appendChild(built);
+    bar.insertAdjacentHTML('beforeend', pillHtml('talSavePill'));
 
     var header = main.querySelector('.tal-global-header');
     var anchor = main.querySelector('.tal-tool-safety') || header;

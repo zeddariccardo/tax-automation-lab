@@ -45,8 +45,8 @@ Official source: https://taxautomationlab.com/tools/f24/
 
 <!-- Tax Automation Lab — layer applicativo condiviso -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814">
-<script defer src="/assets/tal-app.js?v=20260814"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260814b">
+<script defer src="/assets/tal-app.js?v=20260814b"></script>
 <style>
 /* ==========================================================================
    Generatore F24 — foglio proprio del tool
@@ -6572,6 +6572,22 @@ window.__TAL_F24__ = {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
 else boot();
+
+/* I tre comandi della barra di sessione, gli stessi del Bilancio. La barra la
+   disegna `tal-app.js`: qui si dice solo che cosa vogliono dire in F24.
+   «Salva» qui scrive un file, non archivia: il lavoro in corso è già tenuto
+   dal salvataggio automatico, e il `title` lo dichiara invece di lasciarlo
+   intuire. */
+window.TAL_SESSION = {
+    onNew: () => newProject(),
+    onSave: () => saveProject(),
+    onArchive: () => goStage('archive'),
+    hints: {
+        onNew: 'Azzera il progetto in corso. Archivio contribuenti e crediti restano.',
+        onSave: 'Scarica il progetto come file. Il lavoro in corso è già tenuto dal salvataggio automatico di questo browser.',
+        onArchive: 'Porta all’archivio dei contribuenti.'
+    }
+};
 
 </script>
 </body></html>

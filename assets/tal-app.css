@@ -768,7 +768,14 @@ html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdb
   font-size:9.5px !important;
   border-radius:7px !important;
 }
-html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button{
+html.tal-tool-page :is(.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions){
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  flex-wrap:wrap;
+  min-width:0;
+}
+html.tal-tool-page :is(.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions) button{
   border:1px solid rgba(247,247,245,.38) !important;
   background:rgba(255,255,255,.10) !important;
   color:#F7F7F5 !important;
@@ -776,10 +783,10 @@ html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button{
   letter-spacing:.08em;
   text-transform:uppercase;
 }
-html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button:hover{
+html.tal-tool-page :is(.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions) button:hover{
   background:rgba(255,255,255,.2) !important;
 }
-html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button.primary{
+html.tal-tool-page :is(.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions) button.primary{
   background:linear-gradient(135deg,#8E63C4,#2E93B0) !important;
   border-color:transparent !important;
   color:#fff !important;
@@ -805,7 +812,7 @@ html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdb
 /* Su telefono la striscia andava a tre righe: etichetta, comandi, stato.
    Etichetta e stato stanno sulla stessa riga, i comandi sotto. */
 @media(max-width:620px){
-  html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.tal-fs-commandactions,.tal-commandbar-actions){
+  html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.tal-session-actions,.tal-fs-commandactions,.tal-commandbar-actions){
     order:3; flex:1 1 100%;
   }
   html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.save-pill,.tal-save-pill){

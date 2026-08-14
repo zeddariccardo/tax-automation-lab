@@ -646,6 +646,58 @@ resta visibile quando l'addebito è sui conti dei contribuenti, e i campi
 persona fisica e persona giuridica **non** compaiono insieme —
 `updateTelematicConfigFields()` viene chiamata all'apertura della finestra.
 
+## F24 — specificità, errori dei moduli e modello a tutta pagina, 14 agosto 2026
+
+Tre segnalazioni: «se imposto un nuovo cliente e schiaccio salva non me lo
+salva»; «se sbaglio la P.IVA gli avvisi vengono riprodotti sotto la schermata
+e non si leggono»; «da mobile predisporre il Mod. F24 è quasi impossibile».
+Più una quarta, guardando lo schermo: «come può una persona lavorare così su
+un ritaglio minuscolo? l'F24 deve essere grande».
+
+**Le prime due erano lo stesso difetto.** Il salvataggio non falliva: veniva
+**rifiutato** perché mancava il codice fiscale, e il motivo usciva in un
+messaggio a scomparsa ancorato al bordo inferiore della finestra — misurato:
+`bottom` a 582px su una finestra alta 582 — mentre l'utente guarda i campi in
+cima a un modulo alto 1300px. Tre secondi, fuori dal campo visivo, e il
+risultato è indistinguibile da un pulsante che non funziona. Ora ogni modulo
+ha un riepilogo degli errori **in cima, appiccicato mentre si scorre**: elenca
+tutti i rilievi insieme, marca i campi, porta il primo in vista e resta finché
+non è stato corretto. Vale per contribuente, credito, nuovo F24 e
+intermediario.
+
+**La terza aveva una causa che i controlli non potevano vedere.**
+`tal-app.css` veste tutti gli input del tool con
+`html.tal-tool-page input:not([type=checkbox]):not([type=radio]):not([type=file])
+{min-height:38px !important;padding:8px 11px !important;font-size:13.5px !important}`.
+Quella regola vale **(0,4,2)** — i tre `:not([type=…])` contano come classi —
+e batteva `.mf-field` (0,1,0) *anche con `!important` su entrambe*. Risultato:
+ogni campo del modello forzato a 38px su righe alte 13,8, e **106 campi su 146
+sovrapposti**, che coprivano il modello. Non era un difetto solo mobile: era
+così anche su desktop, e i miei controlli non lo vedevano perché cercavano
+elementi *fuori* dal foglio, non elementi *sovrapposti fra loro*. La correzione
+è l'identificatore: `html.tal-tool-page #modelSheet .mf-field` vale (1,2,1) e
+vince senza ambiguità. **Un prefisso a base di classi qui non basta.**
+
+**Il modello ora prende tutta la pagina.** In modalità modello spariscono la
+rail degli F24 e il pannello laterale dei rilievi: al loro posto una barra con
+il menu dell'F24 aperto, sei pulsanti per saltare alla sezione e gli
+ingrandimenti; i rilievi diventano una striscia sotto al foglio. La colonna di
+lettura passa da 1280 a 1760px (`body.model-focus`). Il foglio è passato da
+~530px a 1043px di larghezza, con righe da 20px.
+
+**«Adatta» non scende sotto il compilabile.** Su un telefono un A4 a larghezza
+schermo dà righe da sei pixel: guardabile, non compilabile. Ora «Adatta»
+riempie la larghezza ma non sotto i 17px di riga (872px di foglio), e gli
+ingrandimenti sono multipli di quella base, così «220%» significa la stessa
+cosa su ogni schermo. Il corpo del testo dei campi è in `cqw` sul foglio
+(`container-type:inline-size`), quindi cresce insieme allo zoom: il fattore
+era 0,62cqw, cioè circa metà del necessario, ora è 1,32cqw — l'1,95%
+dell'altezza di riga per il rapporto A4.
+
+**Attenzione al rientro in percentuale su elementi in posizione assoluta**
+(già annotato, si è ripresentato): si calcola sulla larghezza del contenitore,
+non dell'elemento.
+
 ## F24 — il modello compilabile e la mappa dei riquadri, 13 agosto 2026
 
 Segnalazione: «la compilazione guidata è pietosa, se metto un codice tributo e

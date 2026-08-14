@@ -537,30 +537,75 @@ body{margin:0;overflow-x:hidden}
    sfondo; ogni campo è posizionato in percentuale, così zoom e larghezza dello
    schermo non spostano nulla rispetto ai riquadri stampati. */
 
-.model-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-.model-toolbar .help{margin:0;max-width:640px}
-.model-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px;align-items:start}
-@media(max-width:1180px){.model-layout{grid-template-columns:1fr}}
+/* In modalità modello la pagina si toglie di mezzo: niente rail degli F24 a
+   sinistra né pannello dei rilievi a destra, perché comprimevano il foglio in
+   un ritaglio in cui non si poteva lavorare. L'F24 prende tutta la larghezza,
+   la scelta del modello diventa un menu e i rilievi una striscia sotto. */
+/* Il contenitore della pagina e' tarato sulla lettura (1280px). Sul modello
+   quel limite lavora contro: l'F24 e' un A4 e piu' e' largo piu' e'
+   compilabile, quindi qui la colonna si allarga a tutta la finestra. */
+body.model-focus .app-main main{max-width:1760px}
+.editor-shell.is-model{grid-template-columns:minmax(0,1fr)}
+.editor-shell.is-model .group-rail{display:none}
 
-.model-canvas{
-  overflow:auto;max-height:calc(100vh - 210px);padding:14px;
-  background:#2b2f36;border-radius:var(--f24-r-lg);
+.model-bar{
+  display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px;
+  padding:10px 12px;border:1px solid var(--f24-line-2);border-radius:var(--f24-r-lg);
+  background:var(--f24-card);
 }
+.model-pick{min-width:230px;flex:0 1 320px}
+.model-pick select{width:100%}
+.model-bar .model-jump{flex:1 1 auto;margin:0}
+.model-bar .preview-zoom{flex:0 0 auto}
+
+.model-issues{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+}
+.model-issues .mf-issue{flex:1 1 280px;margin:0}
+.model-issues .mf-ok{flex:1 1 100%}
+
+/* Il foglio ha bisogno di altezza: sotto c'è solo la striscia dei rilievi,
+   quindi si prende quasi tutta la finestra. */
+.model-canvas{
+  overflow:auto;height:calc(100vh - 190px);min-height:520px;padding:14px;
+  background:#2b2f36;border-radius:var(--f24-r-lg);
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+}
+/* `container-type:inline-size` fa sì che il corpo del testo dei campi (in
+   `cqw`) segua la larghezza del foglio invece di quella della finestra:
+   ingrandendo il modello si ingrandisce anche quello che c'è scritto dentro,
+   che è l'unica cosa che rende il modello leggibile su uno schermo piccolo. */
 .model-sheet{
-  position:relative;width:140%;margin:0 auto;aspect-ratio:210/297;
+  position:relative;width:100%;margin:0 auto;aspect-ratio:210/297;
+  container-type:inline-size;
   background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.35);
 }
 .model-sheet .mf-bg{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;pointer-events:none}
 
-.mf-field{
-  position:absolute;margin:0;padding:0 1px !important;min-height:0 !important;
+/* ATTENZIONE ALLA SPECIFICITÀ.
+   tal-app.css veste tutti gli input del tool con
+   `html.tal-tool-page input:not([type=checkbox])…{min-height:38px !important;
+   padding:8px 11px !important;font-size:13.5px !important}`. Quella regola ha
+   specificità (0,2,2) e batteva `.mf-field` (0,1,0) anche a parità di
+   `!important`: ogni campo del modello veniva forzato a 38px su righe alte
+   13,8px, e **106 campi su 146 si sovrapponevano**, coprendo il modello.
+   Quella regola vale (0,4,2), perché i tre `:not([type=…])` contano come
+   classi: un prefisso a base di classi non la batte. Serve l'identificatore
+   del foglio — `#modelSheet` porta a (1,2,1) e vince senza ambiguità.
+   Se un giorno i campi tornassero giganti, è qui che si guarda. */
+html.tal-tool-page #modelSheet .mf-field{
+  position:absolute;margin:0;
+  padding:0 1px !important;min-height:0 !important;height:auto;
   border:1px solid transparent !important;border-radius:2px !important;
   background:transparent !important;color:#111 !important;
-  font:600 clamp(7px,0.78vw,12px)/1 var(--f24-mono) !important;
+  font-family:var(--f24-mono) !important;font-weight:600 !important;
+  font-size:clamp(5px,1.32cqw,20px) !important;line-height:1 !important;
   text-align:center;box-sizing:border-box;
 }
-.mf-field:hover{background:rgba(20,83,104,.10) !important;border-color:rgba(20,83,104,.35) !important}
-.mf-field:focus{
+html.tal-tool-page #modelSheet .mf-field:hover{
+  background:rgba(20,83,104,.10) !important;border-color:rgba(20,83,104,.35) !important;
+}
+html.tal-tool-page #modelSheet .mf-field:focus{
   outline:none !important;background:#fff !important;
   border-color:var(--f24-accent) !important;
   box-shadow:0 0 0 2px rgba(20,83,104,.35) !important;z-index:3;
@@ -568,26 +613,43 @@ body{margin:0;overflow-x:hidden}
 /* Il rientro lascia libere le due caselle dei centesimi. In `em` segue il
    corpo del testo; in percentuale si calcolerebbe sulla larghezza del foglio
    e mangerebbe quasi tutto il campo. */
-.mf-field.mf-money{text-align:right;padding-right:2.6em !important}
-.mf-field.mf-code{font-weight:700}
+html.tal-tool-page #modelSheet .mf-field.mf-money{text-align:right;padding-right:2.6em !important}
+html.tal-tool-page #modelSheet .mf-field.mf-code{font-weight:700 !important}
 
-.mf-flag{position:absolute;display:grid;place-items:center;margin:0;padding:0;border:0;background:transparent;cursor:pointer}
-.mf-flag:hover{background:rgba(20,83,104,.12)}
-.mf-flag input{width:74%;height:74%;margin:0;accent-color:var(--f24-accent)}
+html.tal-tool-page #modelSheet .mf-flag{
+  position:absolute;display:grid;place-items:center;margin:0;padding:0;
+  border:0;background:transparent;cursor:pointer;box-sizing:border-box;
+}
+html.tal-tool-page #modelSheet .mf-flag:hover{background:rgba(20,83,104,.12)}
+html.tal-tool-page #modelSheet .mf-flag input{
+  width:78%;height:78%;min-height:0 !important;margin:0;accent-color:var(--f24-accent);
+}
 
-.mf-static{
+html.tal-tool-page #modelSheet .mf-static{
   position:absolute;display:flex;align-items:center;justify-content:center;
-  box-sizing:border-box;
-  color:#111;font:600 clamp(7px,0.78vw,12px)/1 var(--f24-mono);
+  box-sizing:border-box;color:#111;
+  font-family:var(--f24-mono);font-weight:600;
+  font-size:clamp(5px,1.32cqw,20px);line-height:1;
   white-space:nowrap;overflow:hidden;pointer-events:none;
 }
-.mf-static.mf-left{justify-content:flex-start;padding-left:2px}
-.mf-static.mf-cell{font-weight:700}
+html.tal-tool-page #modelSheet .mf-static.mf-left{justify-content:flex-start;padding-left:2px}
+html.tal-tool-page #modelSheet .mf-static.mf-cell{font-weight:700}
 /* Totali e saldi calcolati: gli euro finiscono sulla virgola stampata, i
    centesimi nelle due caselle successive, come sulla carta. */
-.mf-static.mf-euro{justify-content:flex-end;color:#0b3a49;font-weight:700}
-.mf-static.mf-cent{color:#0b3a49;font-weight:700}
-.mf-static.mf-segno{color:#0b3a49;font-weight:700}
+html.tal-tool-page #modelSheet .mf-static.mf-euro{justify-content:flex-end;color:#0b3a49;font-weight:700}
+html.tal-tool-page #modelSheet .mf-static.mf-cent{color:#0b3a49;font-weight:700}
+html.tal-tool-page #modelSheet .mf-static.mf-segno{color:#0b3a49;font-weight:700}
+
+/* Salto diretto alla sezione: su uno schermo stretto il modello è alto
+   quattro schermate, e cercare la sezione INAIL scorrendo è la parte più
+   sgradevole del lavoro. */
+.model-jump{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.model-jump button{
+  padding:7px 11px;border:1px solid var(--f24-line-2);border-radius:999px;
+  background:var(--f24-card);color:var(--f24-ink-2);cursor:pointer;
+  font:650 11.5px var(--f24-sans);min-height:36px;
+}
+.model-jump button:hover{border-color:var(--f24-accent);color:var(--f24-accent)}
 
 .model-side{
   position:sticky;top:16px;padding:14px 16px;max-height:calc(100vh - 210px);overflow:auto;
@@ -870,6 +932,25 @@ body{margin:0;overflow-x:hidden}
 .modal-actions.stack .btn{width:100%}
 body.modal-open{overflow:hidden}
 
+/* Il riepilogo degli errori resta in cima al modulo mentre si scorre: è la
+   ragione per cui un salvataggio è stato rifiutato, e deve restare leggibile
+   finché non è stata corretta. */
+.modal-errors{
+  position:sticky;top:0;z-index:3;
+  margin:0 0 14px;padding:11px 13px;
+  border:1px solid var(--f24-warn-line);border-left:3px solid var(--f24-warn);
+  border-radius:var(--f24-r);background:var(--f24-warn-bg);color:var(--f24-warn);
+}
+.modal-errors b{display:block;font-size:12.5px;margin-bottom:4px}
+.modal-errors ul{margin:0;padding-left:18px;font-size:12.5px;line-height:1.55}
+.modal-errors li{margin-bottom:2px}
+.modal-errors .text-button{color:inherit;text-align:left}
+
+html.tal-tool-page .modal .is-invalid{
+  border-color:var(--f24-warn) !important;
+  box-shadow:0 0 0 2px rgba(165,61,40,.18) !important;
+}
+
 .inline-details{border:1px solid var(--f24-line);border-radius:var(--f24-r);padding:10px 13px;background:var(--f24-paper)}
 .inline-details summary{cursor:pointer;font-size:12px;font-weight:650}
 .inline-details .grid{margin-top:12px}
@@ -906,6 +987,11 @@ body.modal-open{overflow:hidden}
   #sidebar.open{transform:none}
   .app-main{margin-left:0}
   .sb-toggle{display:inline-flex}
+  /* Su uno schermo stretto il foglio va guardato ingrandito, quindi conta
+     avere più altezza possibile e poter scorrere in entrambe le direzioni. */
+  .model-canvas{height:76vh;min-height:0;padding:6px}
+  .model-bar{padding:8px 10px;gap:8px}
+  .model-pick{flex:1 1 100%;min-width:0}
 }
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms !important;animation-duration:.01ms !important}}
 
@@ -1133,11 +1219,11 @@ body.modal-open{overflow:hidden}
 <button class="active" data-action="work-view" data-view="table" id="viewTableBtn" type="button">Compila riga per riga</button>
 <button data-action="work-view" data-view="model" id="viewModelBtn" type="button">Compila sul Modello F24</button>
 </div>
-<button class="btn add" data-action="add-row" type="button">Aggiungi riga</button>
+<button class="btn add" data-action="add-row" data-only-table type="button">Aggiungi riga</button>
 <button class="btn ghost" data-action="duplicate-group" type="button">Duplica F24</button>
 <button class="btn ghost" data-action="preview-group" type="button">Anteprima</button>
 <span class="spacer"></span>
-<input aria-label="Cerca nel progetto" class="row-search" id="rowSearch" placeholder="Cerca nel progetto" type="search"/>
+<input aria-label="Cerca fra le righe" class="row-search" data-only-table id="rowSearch" placeholder="Cerca fra le righe" type="search"/>
 </div>
 <div class="bulk-bar" id="bulkBar">
 <b id="bulkCount">0 righe selezionate</b>
@@ -1162,18 +1248,18 @@ body.modal-open{overflow:hidden}
 </div>
 
 <div hidden id="modelWorkView">
-<div class="model-toolbar">
-<p class="help">Scrivi direttamente nei riquadri del modello: sono gli stessi in cui verrà stampato il dato. Anagrafica, totali e saldi sono calcolati e non si modificano da qui.</p>
+<div class="model-bar">
+<div class="field model-pick"><label for="modelGroupPick">F24 aperto</label><select id="modelGroupPick"></select></div>
+<div class="model-jump" id="modelJump" role="group" aria-label="Vai alla sezione"></div>
 <div class="preview-zoom" role="group" aria-label="Ingrandimento del modello">
-<button data-action="model-zoom" data-zoom="1" type="button">Adatta</button>
-<button class="active" data-action="model-zoom" data-zoom="1.4" type="button">140%</button>
-<button data-action="model-zoom" data-zoom="1.9" type="button">190%</button>
+<button class="active" data-action="model-zoom" data-zoom="fit" type="button">Adatta</button>
+<button data-action="model-zoom" data-zoom="1.5" type="button">150%</button>
+<button data-action="model-zoom" data-zoom="2.2" type="button">220%</button>
+<button data-action="model-zoom" data-zoom="3.2" type="button">320%</button>
 </div>
 </div>
-<div class="model-layout">
-<div class="model-canvas"><div class="model-sheet" id="modelSheet"></div></div>
-<aside class="model-side"><h3>Rilievi</h3><div id="modelIssues"></div></aside>
-</div>
+<div class="model-canvas" id="modelCanvas"><div class="model-sheet" id="modelSheet"></div></div>
+<div class="model-issues" id="modelIssues"></div>
 </div>
 </div>
 </div>
@@ -1356,6 +1442,7 @@ body.modal-open{overflow:hidden}
 <div class="modal"><button aria-label="Chiudi finestra" class="x" data-action="close-modal" data-modal="modalClient" type="button">×</button>
 <h3 id="clientModalTitle">Nuova anagrafica</h3>
 <div class="sub">Salvata solo in questo browser.</div>
+<div class="modal-errors" hidden id="modalClientErrors"></div>
 <div class="grid">
 <div class="field wide"><label for="cName">Denominazione *</label><input id="cName"/></div>
 <div class="field"><label for="cCf">Codice fiscale *</label><input id="cCf" maxlength="16"/></div>
@@ -1494,6 +1581,7 @@ body.modal-open{overflow:hidden}
 <div class="modal small"><button aria-label="Chiudi finestra" class="x" data-action="close-modal" data-modal="modalNewF24" type="button">×</button>
 <h3 id="newF24Title">Imposta il modello</h3>
 <div class="sub">Contribuente, data di pagamento e flusso definiscono l’F24. Puoi cambiarli in qualunque momento dall’intestazione del modello.</div>
+<div class="modal-errors" hidden id="modalNewF24Errors"></div>
 <div class="grid">
 <div class="field full"><label for="nfClient">Contribuente</label><select id="nfClient"></select></div>
 <div class="field"><label for="nfDate">Data di pagamento</label><input id="nfDate" type="date"/></div>
@@ -1526,6 +1614,7 @@ body.modal-open{overflow:hidden}
 <div class="modal"><button aria-label="Chiudi finestra" class="x" data-action="close-modal" data-modal="modalCredit" type="button">×</button>
 <h3 id="creditTitle">Credito disponibile</h3>
 <div class="sub">Quello che annoti qui è una tua dichiarazione, non una posizione verificata presso l’Agenzia.</div>
+<div class="modal-errors" hidden id="modalCreditErrors"></div>
 <div class="grid">
 <div class="field full"><label for="crClient">Contribuente</label><select id="crClient"></select></div>
 <div class="field"><label for="crCode">Codice tributo</label><input id="crCode" placeholder="6099"/></div>
@@ -1566,6 +1655,7 @@ body.modal-open{overflow:hidden}
 <div class="modal modal-wide"><button aria-label="Chiudi finestra" class="x" data-action="close-modal" data-modal="modalTelematic" type="button">×</button>
 <h3 id="telematicModalTitle">Configura F24 Cumulativo</h3>
 <div class="sub">Dati del fornitore o intermediario riportati nel record A del tracciato.</div>
+<div class="modal-errors" hidden id="modalTelematicErrors"></div>
 <div class="grid">
 <div class="field"><label for="tProviderType">Tipo intermediario</label><select id="tProviderType"><option value="14">Persona non fisica</option><option value="04">Persona fisica</option></select></div>
 <div class="field wide"><label for="tProviderCf">Codice fiscale *</label><input id="tProviderCf" maxlength="16"/></div>
@@ -2081,7 +2171,9 @@ const state = {
     activeStage: 'mode',
     activeGroup: '',
     workView: 'table',
-    modelZoom: 1.4,
+    /* 'fit' riempie la larghezza disponibile: e' il modo in cui il foglio
+       si legge meglio, e da li' si ingrandisce se serve. */
+    modelZoom: 'fit',
     rev: 0,
     dirty: false,
     autosaveFailed: false,
@@ -2336,6 +2428,59 @@ function closeModal(id) {
 /* confirm() e prompt() nativi bloccano il thread e non si possono vestire.
    Qui diventano finestre dell'app con la stessa promessa: nessuna azione
    distruttiva parte senza una conferma esplicita. */
+/* ==========================================================================
+   Errori dei moduli
+   --------------------------------------------------------------------------
+   Il motivo per cui un salvataggio veniva rifiutato usciva in un messaggio a
+   scomparsa, in fondo alla finestra del browser, per tre secondi: chi stava
+   guardando i campi in cima a un modulo alto non lo vedeva mai, e il
+   risultato era indistinguibile da un pulsante che non funziona. È il difetto
+   che faceva sembrare che «Salva» non salvasse.
+
+   Ora l'errore sta dentro al modulo, in cima, resta finché non viene
+   corretto, marca i campi che lo hanno causato e porta il primo in vista.
+   ========================================================================== */
+
+function clearFormErrors(modalId) {
+    const box = document.getElementById(modalId + 'Errors');
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+    const modal = document.getElementById(modalId);
+    if (modal) modal.querySelectorAll('.is-invalid').forEach(e => e.classList.remove('is-invalid'));
+}
+
+/* errori: [{campo:'cCf', msg:'…'}] — `campo` è facoltativo. */
+function showFormErrors(modalId, errori) {
+    const box = document.getElementById(modalId + 'Errors');
+    const modal = document.getElementById(modalId);
+    if (!box || !modal) { toast(errori[0].msg, true); return false; }
+    modal.querySelectorAll('.is-invalid').forEach(e => e.classList.remove('is-invalid'));
+    box.hidden = false;
+    box.innerHTML = `<b>${errori.length === 1 ? 'Un campo da correggere' : errori.length + ' campi da correggere'}</b><ul>` +
+        errori.map(e => e.campo
+            ? `<li><button class="text-button" data-action="focus-field" data-field="${esc(e.campo)}" type="button">${esc(e.msg)}</button></li>`
+            : `<li>${esc(e.msg)}</li>`).join('') + '</ul>';
+    errori.forEach(e => {
+        const el = e.campo && document.getElementById(e.campo);
+        if (el) el.classList.add('is-invalid');
+    });
+    const primo = errori.find(e => e.campo && document.getElementById(e.campo));
+    if (primo) {
+        const el = document.getElementById(primo.campo);
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        setTimeout(() => el.focus(), 120);
+    } else {
+        box.scrollIntoView({ block: 'nearest' });
+    }
+    return false;
+}
+
+/* Un campo smette di essere segnalato appena lo si tocca. */
+document.addEventListener('input', e => {
+    if (e.target.classList && e.target.classList.contains('is-invalid')) {
+        e.target.classList.remove('is-invalid');
+    }
+});
+
 let confirmResolve = null;
 function askConfirm(text, confirmLabel) {
     setText('confirmText', text);
@@ -4629,6 +4774,7 @@ function openClientModal(client, prefill) {
     Object.entries(map).forEach(([id, v]) => setVal(id, v || ''));
     const rb = $('cRulesBtn');
     if (rb) rb.hidden = !(client && client.id);
+    clearFormErrors('modalClient');
     openModal('modalClient');
 }
 
@@ -4646,13 +4792,22 @@ function saveClientFromModal() {
         rules: existing ? clientRules(existing) : { codeFlow: [], defaultRef: '', defaultOffice: '', defaultIban: '' },
         draft: false, updatedAt: new Date().toISOString()
     };
-    if (!c.name) return toast('Indica la denominazione', true);
-    if (!c.cf) return toast('Il codice fiscale è necessario per compilare il modello F24', true);
-    if (!isValidTaxCode(c.cf)) return toast('Codice fiscale non valido: verifica lunghezza e carattere di controllo', true);
-    if (c.vat && !isValidVatNumber(c.vat)) return toast('Partita IVA non valida', true);
-    if (c.iban && !isValidItalianIban(c.iban)) return toast('IBAN non valido', true);
+    /* Tutti i rilievi insieme, dentro al modulo: prima uscivano uno alla
+       volta in un messaggio che spariva in fondo alla pagina, e correggerne
+       uno serviva solo a scoprire il successivo. */
+    const errori = [];
+    if (!c.name) errori.push({ campo: 'cName', msg: 'Indica la denominazione o il cognome e nome.' });
+    if (!c.cf) errori.push({ campo: 'cCf', msg: 'Il codice fiscale è obbligatorio: sul modello F24 la partita IVA non può sostituirlo. Per le società coincide di norma con la partita IVA.' });
+    else if (!isValidTaxCode(c.cf)) errori.push({ campo: 'cCf', msg: 'Codice fiscale non valido: controlla la lunghezza e il carattere di controllo.' });
+    if (c.vat && !isValidVatNumber(c.vat)) errori.push({ campo: 'cVat', msg: 'Partita IVA non valida: sono undici cifre con carattere di controllo.' });
+    if (c.iban && !isValidItalianIban(c.iban)) errori.push({ campo: 'cIban', msg: 'IBAN non valido: ventisette caratteri, da IT più due cifre di controllo.' });
+    if (!c.address) errori.push({ campo: 'cAddress', msg: 'Indica l’indirizzo del domicilio fiscale: serve sul modello.' });
+    if (!c.city) errori.push({ campo: 'cCity', msg: 'Indica il comune del domicilio fiscale.' });
+    if (!c.province) errori.push({ campo: 'cProvince', msg: 'Indica la provincia del domicilio fiscale.' });
     const dup = state.clients.find(x => x.id !== c.id && ((c.cf && normalizeId(x.cf) === c.cf) || (c.vat && c.vat === normalizeId(x.vat))));
-    if (dup) return toast(`Esiste già un contribuente con lo stesso identificativo: ${dup.name}`, true);
+    if (dup) errori.push({ campo: 'cCf', msg: `Esiste già un contribuente con lo stesso identificativo: ${dup.name}.` });
+    if (errori.length) return showFormErrors('modalClient', errori);
+    clearFormErrors('modalClient');
 
     const i = state.clients.findIndex(x => x.id === c.id);
     if (i >= 0) state.clients[i] = { ...state.clients[i], ...c };
@@ -5232,6 +5387,7 @@ function openNewF24Modal() {
     const scadenza = new Date(oggi.getFullYear(), oggi.getMonth() + (oggi.getDate() > 16 ? 1 : 0), 16);
     setVal('nfDate', `${scadenza.getFullYear()}-${String(scadenza.getMonth() + 1).padStart(2, '0')}-16`);
     setVal('nfFlow', '');
+    clearFormErrors('modalNewF24');
     openModal('modalNewF24');
 }
 
@@ -5321,6 +5477,13 @@ function applyWorkView() {
     $('modelWorkView').hidden = !modello;
     $('viewTableBtn').classList.toggle('active', !modello);
     $('viewModelBtn').classList.toggle('active', modello);
+    /* Sul modello la pagina si semplifica: via la rail degli F24 e i comandi
+       che valgono solo per la tabella, perché il foglio ha bisogno di tutta
+       la larghezza per essere compilabile. */
+    const shell = document.querySelector('.editor-shell');
+    if (shell) shell.classList.toggle('is-model', modello);
+    document.body.classList.toggle('model-focus', modello);
+    document.querySelectorAll('[data-only-table]').forEach(e => { e.hidden = modello; });
     if (modello) renderInteractiveModel();
 }
 
@@ -5485,7 +5648,9 @@ function renderInteractiveModel() {
     }
 
     host.innerHTML = h;
-    setModelZoom(state.modelZoom || 1.4);
+    setModelZoom(state.modelZoom || 'fit');
+    renderModelPicker();
+    renderModelJump();
     renderModelIssues(g);
 }
 
@@ -5510,14 +5675,70 @@ function renderModelIssues(g) {
 /* Ingrandimento del modello: il foglio A4 a schermo pieno è illeggibile su
    un portatile, ma zoomando i riquadri restano al loro posto perché la
    posizione è in percentuale, non in pixel. */
+/* Sotto questa altezza di riga il modello si guarda ma non si compila: le
+   caselle diventano strisce di pochi pixel e il testo dentro è illeggibile. */
+const MODEL_ROW_MIN_PX = 17;
+
+/* «Adatta» riempie la larghezza disponibile, **ma non scende sotto la soglia
+   in cui il foglio smette di essere compilabile**: su un telefono un A4 a
+   larghezza schermo dà righe da sei pixel, e l'unica cosa onesta è partire
+   già ingranditi e lasciare scorrere. Le altre misure sono multipli della
+   larghezza disponibile, così «220%» significa la stessa cosa ovunque. */
 function setModelZoom(zoom) {
-    state.modelZoom = Number(zoom) || 1;
-    const sheet = $('modelSheet');
-    if (!sheet) return;
-    sheet.style.width = (100 * state.modelZoom).toFixed(2) + '%';
+    state.modelZoom = zoom === 'fit' ? 'fit' : (Number(zoom) || 1);
+    const sheet = $('modelSheet'), canvas = $('modelCanvas');
+    if (!sheet || !canvas) return;
+    const disponibile = canvas.clientWidth - 28;
+    /* L'altezza di una riga vale l'1,95% della larghezza del foglio (4,10 mm
+       su 297, per il rapporto A4). Da qui la larghezza minima perché una riga
+       resti compilabile. */
+    const minimo = MODEL_ROW_MIN_PX / 0.0195;
+    const base = Math.max(disponibile, minimo);
+    /* Gli ingrandimenti partono da quella base, non dalla larghezza grezza:
+       così «220%» vuol dire davvero il doppio del leggibile su ogni schermo. */
+    sheet.style.width = (state.modelZoom === 'fit' ? base : base * state.modelZoom).toFixed(0) + 'px';
     document.querySelectorAll('[data-action="model-zoom"]').forEach(b => {
-        b.classList.toggle('active', Number(b.dataset.zoom) === state.modelZoom);
+        b.classList.toggle('active', String(b.dataset.zoom) === String(state.modelZoom));
     });
+}
+
+/* Ridimensionando la finestra «Adatta» deve continuare ad adattarsi. */
+let modelResizeTimer = null;
+window.addEventListener('resize', () => {
+    if (state.workView !== 'model') return;
+    clearTimeout(modelResizeTimer);
+    modelResizeTimer = setTimeout(() => setModelZoom(state.modelZoom), 150);
+});
+
+/* Il menu degli F24 sostituisce la rail quando si lavora sul modello. */
+function renderModelPicker() {
+    const sel = $('modelGroupPick');
+    if (!sel) return;
+    const groups = groupF24();
+    sel.innerHTML = groups.map(g =>
+        `<option value="${esc(g.key)}"${g.key === state.activeGroup ? ' selected' : ''}>` +
+        `${esc((g.client.name || 'Contribuente') + ' · ' + g.label)}</option>`).join('');
+}
+
+/* Salto diretto alla sezione: il modello è alto più schermate e cercare
+   l'INAIL scorrendo è la parte più sgradevole del lavoro. */
+function renderModelJump() {
+    const host = $('modelJump');
+    if (!host) return;
+    host.innerHTML = Object.entries(F24_MAP.sezioni).map(([k, s]) =>
+        `<button data-action="model-goto" data-sezione="${esc(k)}" type="button">${esc(SECTION_UI[k].label)}</button>`).join('');
+}
+
+function modelGoto(key) {
+    const canvas = $('modelCanvas'), sheet = $('modelSheet');
+    if (!canvas || !sheet) return;
+    const top = F24_MAP.sezioni[key].rows[0];
+    /* La posizione è in millimetri sul foglio: si converte nella scala a cui
+       il foglio è disegnato in questo momento. */
+    const y = sheet.offsetTop + (top / F24_PAGE.h) * sheet.offsetHeight;
+    canvas.scrollTo({ top: Math.max(0, y - 40), behavior: 'smooth' });
+    const primo = sheet.querySelector(`.mf-field[data-sezione="${key}"][data-riga="0"]`);
+    if (primo) setTimeout(() => primo.focus({ preventScroll: true }), 260);
 }
 
 /* ---------- Controlli, anteprima e output --------------------------------- */
@@ -5628,6 +5849,7 @@ function openCreditModal(id) {
     setVal('crAmount', cr ? String(cr.amount).replace('.', ',') : '');
     setVal('crOrigin', cr ? cr.origin : '');
     setVal('crNotes', cr ? cr.notes : '');
+    clearFormErrors('modalCredit');
     openModal('modalCredit');
 }
 
@@ -6183,6 +6405,8 @@ const CLICK_ACTIONS = {
     'preview-group': () => previewCurrentGroup(),
     'work-view': el => switchWorkView(el.dataset.view),
     'model-zoom': el => setModelZoom(el.dataset.zoom),
+    'model-goto': el => modelGoto(el.dataset.sezione),
+    'focus-field': el => { const f = $(el.dataset.field); if (f) { f.scrollIntoView({ block: 'center' }); f.focus(); } },
     'open-row': el => openRowDetail(el.dataset.id),
     'save-row-detail': () => saveRowDetail(),
     'duplicate-row': el => duplicateRow(el.dataset.id),
@@ -6254,6 +6478,7 @@ document.addEventListener('change', e => {
     if (e.target.id === 'clientImport' || e.target.id === 'clientImport2') return importClientsFile(e);
     if (e.target.id === 'projectImport' || e.target.id === 'projectImport2') return loadProjectFile(e);
     if (e.target.id === 'codesImport') return importCustomCodes(e);
+    if (e.target.id === 'modelGroupPick') { state.activeGroup = e.target.value; renderEditor(); return; }
     if (e.target.id === 'tProviderType' || e.target.id === 'tDebitMode') return updateTelematicConfigFields();
     if (e.target.id === 'carrySource') {
         const g = groupF24().find(x => x.key === e.target.value);

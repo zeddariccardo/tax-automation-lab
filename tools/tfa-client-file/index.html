@@ -121,12 +121,6 @@ a{color:inherit}
 .save-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid rgba(95,181,154,.34);background:rgba(95,181,154,.14);color:#bfe6d8;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
 .save-pill.busy{border-color:rgba(200,155,106,.4);background:rgba(200,155,106,.14);color:#f0d6b3}
 .save-pill.error{border-color:rgba(205,92,68,.5);background:rgba(205,92,68,.18);color:#ffd7cb}
-.cmd-menu-wrap{position:relative}
-.cmd-menu{position:absolute;right:0;top:44px;min-width:250px;padding:8px;border:1px solid #c8c6c0;border-radius:10px;background:#fff;box-shadow:0 18px 52px rgba(0,0,0,.25);display:none;flex-direction:column;gap:5px;z-index:45}
-.cmd-menu.open{display:flex}
-.cmd-menu button{width:100%;text-align:left;border:0;background:transparent;color:var(--fg);padding:9px 10px;border-radius:7px;font:600 12px var(--sans);cursor:pointer;min-height:40px}
-.cmd-menu button:hover{background:var(--g1)}
-.cmd-menu .sep{height:1px;background:var(--g2);margin:3px 2px}
 
 /* ---------- typography / page head ---------- */
 .page-head{margin-bottom:20px}
@@ -388,7 +382,7 @@ a{color:inherit}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{
-  .sidebar,.cmdbar,.sb-toggle,.tal-global-header,.tal-tool-safety,.tal-publication,.tal-site-footer,.modal-ov,.toast,.page-actions,.record-actions,.panel-head .tools,.section-h .spacer{display:none!important}
+  .sidebar,.cmdbar,.sb-toggle,.tal-global-header,.tal-publication,.tal-site-footer,.modal-ov,.toast,.page-actions,.record-actions,.panel-head .tools,.section-h .spacer{display:none!important}
   .app-main{margin-left:0}
   .app-main main{max-width:none;padding:0}
   .panel,.record,.nav-card,.kpi{break-inside:avoid;box-shadow:none}
@@ -454,7 +448,6 @@ a{color:inherit}
  .tal-gh-menu-toggle{min-width:40px;padding:0 9px;font-size:10px}
 }
 </style>
-<style id="tal-tool-safety-style">.tal-tool-safety{max-width:1180px;margin:12px auto 14px;padding:13px 16px;border:1px solid rgba(20,83,104,.24);border-left:4px solid #145368;border-radius:10px;background:#eef4f6;color:#20333a;font:13px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}.tal-tool-safety strong{font-weight:800}.tal-tool-safety span{display:block;margin-top:3px}@media(max-width:760px){.tal-tool-safety{margin:10px 10px 13px}}</style>
 <style id="tal-publication-layer">
 .tal-publication{position:relative;z-index:52;padding:12px clamp(16px,3vw,34px);background:#0E1624;color:#F7F7F5;border-bottom:1px solid rgba(247,247,245,.14);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif}
 .tal-publication a{color:#F7F7F5}
@@ -484,12 +477,6 @@ a{color:inherit}
 .workspace-link{min-height:39px;padding:8px 10px;font-size:12px;line-height:1.25}
 .sb-foot{padding-top:9px}
 
-.tal-tool-safety.tal-tool-safety-compact{max-width:none;margin:8px clamp(18px,3.5vw,44px) 0;padding:8px 11px;min-height:42px;display:flex;align-items:center;gap:10px;border-left-width:3px;border-radius:9px;font-size:11.5px;line-height:1.35;background:#eef4f6}
-.tal-safety-copy{display:flex;align-items:center;gap:4px;min-width:0;flex:1;color:#31464d}
-.tal-safety-copy strong{color:#20333a;white-space:nowrap}
-.tal-safety-copy span{overflow-wrap:anywhere}
-.tal-safety-detail{flex:0 0 auto;min-height:30px;padding:5px 9px;border:1px solid rgba(20,83,104,.32);border-radius:7px;background:#fff;color:#145368;font:700 9.5px var(--sans);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-.tal-safety-detail:hover{background:#f7fbfc}
 
 .cmdbar{top:96px;margin:8px clamp(18px,3.5vw,44px) 0;padding:8px 10px;gap:8px;border-radius:11px}
 .cmdbar .btn{min-height:36px;padding:7px 11px}
@@ -533,13 +520,9 @@ body.tal-header-compact .cmdbar{top:72px}
 .tal-global-header.tal-compact .tal-gh-nav a,.tal-global-header.tal-compact .tal-gh-nav button{width:100%;justify-content:flex-start;min-height:42px;padding:0 13px;font-size:11.5px}
 
 @media(max-width:980px){
-  .tal-tool-safety.tal-tool-safety-compact{margin:8px 14px 0}
   .app-main main{padding-top:16px}
 }
 @media(max-width:620px){
-  .tal-tool-safety.tal-tool-safety-compact{align-items:flex-start}
-  .tal-safety-copy{display:block}
-  .tal-safety-copy span{display:inline}
   .cmdbar{margin-top:8px}
   .page-head h1{font-size:24px}
 }
@@ -548,8 +531,8 @@ body.tal-header-compact .cmdbar{top:72px}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v2.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814b">
-<script defer src="/assets/tal-app.js?v=20260814b"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260814c">
+<script defer src="/assets/tal-app.js?v=20260814c"></script>
 </head>
 
 <body class="tal-tool-page">
@@ -591,10 +574,24 @@ body.tal-header-compact .cmdbar{top:72px}
     <div aria-labelledby="capSections" class="workspace-nav" id="sectionNav"></div>
   </div>
 
+  <!-- Erano le tre voci proprie del menu «Altro»: le uniche che non si
+       raggiungevano da nessun'altra parte, e da telefono restavano fuori
+       dallo schermo. Qui sono nel gruppo di lavoro, come le voci degli altri
+       tool, e la sidebar su telefono si apre con il ☰. -->
+  <div class="sb-block">
+    <span class="sb-cap" id="capPeriodo">Esercizio e date</span>
+    <div aria-labelledby="capPeriodo" class="workspace-nav">
+      <button class="workspace-link" data-action="new-fy" type="button"><span aria-hidden="true" class="ws-ic">↻</span>Apri nuovo esercizio</button>
+      <button class="workspace-link" data-action="as-of" type="button"><span aria-hidden="true" class="ws-ic">◷</span>Situazione a una data</button>
+      <button class="workspace-link" data-action="effective-date" type="button"><span aria-hidden="true" class="ws-ic">✎</span>Data efficacia</button>
+    </div>
+  </div>
+
   <div class="sb-block">
     <span class="sb-cap" id="capResults">Risultati e dati</span>
     <div aria-labelledby="capResults" class="workspace-nav">
       <button class="workspace-link" data-action="export" type="button"><span aria-hidden="true" class="ws-ic">↧</span>Esporta</button>
+      <button class="workspace-link" data-action="print" type="button"><span aria-hidden="true" class="ws-ic">⎙</span>Stampa la pagina</button>
       <button class="workspace-link" data-action="data" type="button"><span aria-hidden="true" class="ws-ic">⛁</span>Dati e backup</button>
       <button class="workspace-link" data-action="help" type="button"><span aria-hidden="true" class="ws-ic">?</span>Come si usa</button>
     </div>
@@ -612,38 +609,17 @@ body.tal-header-compact .cmdbar{top:72px}
 </div>
 </header>
 
-<aside class="tal-tool-safety tal-tool-safety-compact" id="tal-tool-safety" role="note">
-  <div class="tal-safety-copy"><strong>Strumento sperimentale</strong><span>· dati locali · verifica sempre gli output prima dell’uso professionale</span></div>
-  <button class="tal-safety-detail" id="safetyDetails" type="button">Dettagli</button>
-</aside>
-
-
-
-<div aria-label="Azioni sul fascicolo" class="cmdbar">
+<!-- La striscia «Strumento sperimentale» non c'è più: il disclaimer sta nel
+     piede di ogni pagina e per esteso in «Come si usa». Ripeterlo in cima a
+     ogni schermata era rumore davanti a chi sta già lavorando.
+     Il menu «Altro» è finito con lei: da telefono restava fuori dalla barra e
+     le sue voci vivono ora tutte nella sidebar, che ha il suo ☰. -->
+<div aria-label="Sessione di lavoro" class="cmdbar">
   <div class="cmd-context">
     <b id="cmdClient">Nessun cliente</b>
     <span id="cmdMeta">Crea un cliente per iniziare</span>
   </div>
   <span class="save-pill" id="savePill">Salvato</span>
-  <button class="btn accent" id="cmdExport" type="button">Esporta</button>
-  <div class="cmd-menu-wrap">
-    <button aria-expanded="false" aria-haspopup="true" class="btn ghost" id="cmdMore" type="button">Altro ▾</button>
-    <div class="cmd-menu" id="cmdMenu">
-      <button data-action="new-client" type="button">＋ Nuovo cliente</button>
-      <button data-action="clients" type="button">▣ Elenco clienti</button>
-      <button data-action="import" type="button">⇩ Importa Excel</button>
-      <div class="sep"></div>
-      <button data-action="new-fy" type="button">↻ Apri nuovo esercizio</button>
-      <button data-action="as-of" type="button">◷ Situazione a una data…</button>
-      <button data-action="effective-date" type="button">✎ Data efficacia prossima modifica…</button>
-      <div class="sep"></div>
-      <button data-action="save-now" type="button">✓ Salva ora</button>
-      <button data-action="print" type="button">⎙ Stampa la pagina</button>
-      <button data-action="data" type="button">⛁ Dati e backup</button>
-      <button data-action="help" type="button">? Come si usa</button>
-      <button data-action="about" type="button">ⓘ Informazioni sullo strumento</button>
-    </div>
-  </div>
 </div>
 
 <main><div id="page" tabindex="-1"></div></main>
@@ -1228,8 +1204,6 @@ document.addEventListener('keydown',function(e){
       return;
     }
     closeNodeMenu();
-    $('#cmdMenu').classList.remove('open');
-    $('#cmdMore').setAttribute('aria-expanded','false');
     setSidebar(false);
   }
   if(e.key==='Tab'&&$('#modalOverlay').classList.contains('open')){
@@ -1333,7 +1307,11 @@ function updateShell(){
   }
   $('#scopeFyBtn').textContent=hasClient()?('FY '+selectedFY):'Esercizio';
   var manualSaveBtn=$('#cmdSave');if(manualSaveBtn)manualSaveBtn.disabled=!hasClient();
-  $('#cmdExport').disabled=!hasClient();
+  /* Le voci che pretendono un cliente si spengono insieme, invece di
+     accettare il clic e rispondere con un avviso. */
+  $$('.workspace-link[data-action="export"],.workspace-link[data-action="print"],'+
+     '.workspace-link[data-action="new-fy"],.workspace-link[data-action="as-of"],'+
+     '.workspace-link[data-action="effective-date"]').forEach(function(b){b.disabled=!hasClient()});
   $$('.primary-tab').forEach(function(b){b.classList.toggle('active',b.dataset.scope===view.scope);b.disabled=!hasClient()});
   renderSectionNav();
 }
@@ -1466,33 +1444,12 @@ function manualSaveNow(){
   clearTimeout(saveTimer);
   if(persist())toast('Fascicolo salvato nel browser di questo dispositivo');
 }
-$('#cmdExport').onclick=function(){exportModal()};
-var safetyDetailsEl=$('#safetyDetails');if(safetyDetailsEl)safetyDetailsEl.onclick=function(){safetyModal()};
-$('#cmdMore').onclick=function(e){
-  e.stopPropagation();
-  var m=$('#cmdMenu'), open=!m.classList.contains('open');
-  m.classList.toggle('open',open);
-  this.setAttribute('aria-expanded',String(open));
-};
-$('#cmdMenu').addEventListener('click',function(e){
-  var b=e.target.closest('button[data-action]');
-  if(!b)return;
-  $('#cmdMenu').classList.remove('open');
-  $('#cmdMore').setAttribute('aria-expanded','false');
-  runAction(b.dataset.action);
-});
 document.addEventListener('click',function(e){
-  if(!e.target.closest('.cmd-menu-wrap')){
-    $('#cmdMenu').classList.remove('open');
-    $('#cmdMore').setAttribute('aria-expanded','false');
-  }
   if(!e.target.closest('.node-menu')&&!e.target.closest('[data-node]'))closeNodeMenu();
 });
 
 function runAction(a){
   if(a==='help')return helpModal();
-  if(a==='about')return aboutModal();
-  if(a==='safety')return safetyModal();
   if(a==='save-now')return manualSaveNow();
   if(a==='data')return dataModal();
   if(a==='clients')return clientsModal();
@@ -1504,6 +1461,9 @@ function runAction(a){
   if(a==='as-of')return asOfModal();
   if(a==='effective-date')return effectiveDateModal();
 }
+/* La barra di sessione condivisa vive fuori da questo IIFE e ha bisogno dei
+   comandi del tool: li chiede a questo dispatcher, che resta l'unico. */
+window.tfaRunAction=runAction;
 
 /* ==================================================================== */
 /*  ROUTER                                                              */
@@ -2516,40 +2476,26 @@ function clientsModal(){
 }
 
 /* --------------------------------------------------------- guida, dati */
-function aboutModal(){
-  openModal({
-    title:'Fascicolo fiscale cliente · v'+VERSION,
-    sub:'Profilo permanente e novità dell’esercizio, senza duplicare ogni anno le informazioni che non cambiano.',
-    body:'<div class="steps">'+
-      step(1,'Profilo permanente','Business, contabilità, gruppo, aree fiscali, contenzioso e operazioni che restano rilevanti nel tempo.')+
-      step(2,'Esercizio','Solo le novità dell’anno e gli eventuali incarichi specifici del periodo.')+
-      step(3,'Output','PDF sintetico da leggere, Excel strutturato per il lavoro e backup JSON per la sicurezza.')+
-      '</div><div class="modal-note"><strong>Interfaccia operativa in italiano.</strong> I dati sono elaborati e salvati localmente nel browser di questo dispositivo.</div>',
-    foot:'<button class="btn" data-close type="button">Chiudi</button>'
-  });
-}
-function safetyModal(){
-  openModal({
-    title:'Uso professionale e dati locali',
-    sub:'Informazioni essenziali prima di utilizzare gli output con dati reali.',
-    body:'<div class="notice info"><strong>Strumento sperimentale di supporto.</strong> Verifica sempre dati, regole, classificazioni e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.</div>'+
-      '<div class="notice warn"><strong>I dati restano su questo dispositivo.</strong> Se cambi dispositivo, usi la navigazione privata o cancelli i dati del sito, il fascicolo può andare perso. Esporta periodicamente un backup JSON da “Altro → Dati e backup”.</div>'+
-      '<p style="font-size:12.5px;color:var(--g5);line-height:1.6">Tax Automation Lab non sostituisce il giudizio professionale, le procedure di revisione, le istruzioni dichiarative o l’analisi della normativa applicabile al caso concreto.</p>',
-    foot:'<button class="btn" data-close type="button">Ho capito</button>'
-  });
-}
 
+/* «Come si usa» ha assorbito le due finestre che le stavano accanto —
+   «Informazioni sullo strumento» e l'avviso d'uso della striscia in cima —
+   perché erano tre porte sullo stesso discorso, e le prime due si aprivano
+   da un menu che su telefono non si vedeva. Come negli altri quattro tool,
+   qui dentro c'è tutto quello che c'è da sapere prima di lavorare davvero. */
 function helpModal(){
   openModal({
     title:'Come si usa',
-    sub:'Tre passaggi e sei operativo.',
+    sub:'Fascicolo fiscale cliente · v'+VERSION+' — tre passaggi e sei operativo.',
     body:'<div class="steps">'+
       step(1,'Costruisci il profilo permanente','Anagrafica, contabilità, gruppo, aree fiscali, contenzioso e operazioni. È ciò che resta valido negli anni: si compila una volta e si corregge solo quando cambia davvero qualcosa.')+
       step(2,'Ogni esercizio registra solo le novità','Nella scheda Esercizio aggiungi ciò che è cambiato, classificandolo con le stesse sezioni del profilo. Se la novità è strutturale, con un clic la riporti nel profilo permanente.')+
       step(3,'Esporta quando serve','PDF impaginato per la lettura, Excel strutturato per il lavoro, backup JSON per la sicurezza. Gli output sono sintetici per scelta.')+
       '</div>'+
       '<div class="modal-note">Le aree e le sezioni vuote non sono un errore: dichiarano che per quel cliente non c’è nulla di rilevante. '+
-      'Il fascicolo si salva automaticamente dopo ogni modifica. Se vuoi forzare la scrittura immediata trovi <strong>Salva ora</strong> nel menu “Altro”.</div>',
+      'Il fascicolo si salva automaticamente dopo ogni modifica; <strong>Salva ora</strong> è nella barra della sessione di lavoro, in cima.</div>'+
+      '<div class="notice info" style="margin-top:14px"><strong>Strumento sperimentale di supporto.</strong> Verifica sempre dati, regole, classificazioni e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.</div>'+
+      '<div class="notice warn"><strong>I dati restano su questo dispositivo.</strong> Se cambi dispositivo, usi la navigazione privata o cancelli i dati del sito, il fascicolo può andare perso. Esporta periodicamente un backup JSON da <strong>Dati e backup</strong>, nella sidebar.</div>'+
+      '<p style="font-size:12.5px;color:var(--g5);line-height:1.6">Tax Automation Lab non sostituisce il giudizio professionale, le procedure di revisione, le istruzioni dichiarative o l’analisi della normativa applicabile al caso concreto. L’interfaccia operativa è in italiano.</p>',
     foot:'<button class="btn" data-close type="button">Ho capito</button>',
     onMount:function(){try{localStorage.setItem(WELCOME_KEY,'1')}catch(e){}}
   });
@@ -3832,14 +3778,16 @@ try{
 })();
 </script>
 
-<script id="tfa-session-commands">/* I tre comandi della barra di sessione, gli stessi del Bilancio. Erano già
-   nel menu «Altro», sepolti fra altre nove voci: qui salgono in superficie.
-   Il comando non viene riscritto — si preme quello che il tool ha già
-   cablato dentro `#cmdMenu`, così esiste una sola implementazione. */
+<script id="tfa-session-commands">/* I tre comandi della barra di sessione, gli stessi del Bilancio. Erano nel
+   menu «Altro», sepolti fra altre nove voci e fuori schermo su telefono.
+   Passano dal dispatcher del tool — `runAction` — e non da un pulsante
+   nascosto da premere: quel menu non esiste più, e agganciarsi a un elemento
+   del DOM per invocare una funzione era un giro inutile che si è rotto nel
+   momento in cui il DOM è cambiato. */
 window.TAL_SESSION={
-  onNew:'#cmdMenu [data-action="new-client"]',
-  onSave:'#cmdMenu [data-action="save-now"]',
-  onArchive:'#cmdMenu [data-action="clients"]',
+  onNew:function(){window.tfaRunAction('new-client')},
+  onSave:function(){window.tfaRunAction('save-now')},
+  onArchive:function(){window.tfaRunAction('clients')},
   hints:{
     onNew:'Crea un nuovo fascicolo cliente.',
     onSave:'Scrive subito il fascicolo nel browser, senza aspettare il salvataggio automatico.',

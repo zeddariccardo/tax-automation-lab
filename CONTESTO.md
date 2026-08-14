@@ -1052,6 +1052,55 @@ Codiciario → cliente creato e attivo, tre codici con le destinazioni intatte
 (`V22→VP2/VP4`, `A22→VP3/VP5`, `RC22→VP3/VP4/VP5`) → import degli importi →
 quadro VP con VP2 100.000, VP3 50.000, VP4 24.200, VP5 11.000, VP6 13.200.
 
+## La striscia d'avviso e il menu «Altro», 14 agosto 2026
+
+Due residui che rompevano l'omogeneità appena raggiunta.
+
+**«Strumento sperimentale» in cima a ogni schermata.** Ce l'avevano il
+Fascicolo (striscia compatta, visibile) e LIPE (riquadro pieno, già nascosto
+da `tal-app.css` ma ancora nel sorgente). Rimossa da entrambi, con la sua CSS:
+il disclaimer sta nel piede di **ogni** pagina e per esteso in «Come si usa»,
+quindi non si è perso niente — si è smesso di ripeterlo davanti a chi sta
+lavorando. Nel Fascicolo «Come si usa» ha assorbito anche le altre due
+finestre che dicevano cose vicine, `aboutModal` e `safetyModal`: erano tre
+porte sullo stesso discorso.
+
+**Il menu «Altro» del Fascicolo.** Undici voci in un dropdown ancorato a
+destra della barra: su telefono restava fuori. Sciolto:
+
+| Voce | Dove sta ora |
+|---|---|
+| Nuovo cliente · Salva ora · Elenco clienti | i tre comandi della barra di sessione |
+| Importa Excel · Dati e backup · Come si usa | erano già nella sidebar |
+| Apri nuovo esercizio · Situazione a una data · Data efficacia | nuovo gruppo «Esercizio e date» nella sidebar |
+| Stampa la pagina | gruppo «Risultati e dati», accanto a Esporta |
+| Informazioni sullo strumento | dentro «Come si usa» |
+
+Con il menu è sparito anche il pulsante **Esporta** della barra, che
+duplicava la voce già presente nella sidebar. La barra del Fascicolo è ora
+identica alle altre quattro: etichetta, Nuovo, Salva, Archivio, pastiglia.
+
+**Attenzione, e mi è costato un difetto vero.** `window.TAL_SESSION` del
+Fascicolo era cablato sui **selettori** delle voci di `#cmdMenu`
+(`onSave:'#cmdMenu [data-action="save-now"]'`): premeva un pulsante nascosto
+invece di chiamare una funzione. Cancellato il menu, i tre comandi della
+barra sarebbero morti in silenzio. Ora passano da `window.tfaRunAction`, che
+espone il dispatcher `runAction` fuori dall'IIFE. **Agganciarsi a un elemento
+del DOM per invocare una funzione è una dipendenza invisibile**: si rompe
+quando il DOM cambia, e non lo dice nessuno.
+
+Tre altri riferimenti agli elementi cancellati avrebbero lanciato:
+`$('#cmdMenu')` nella gestione di Escape, `$('#cmdExport').disabled` in
+`updateShell`, e l'handler `#cmdMore`. Le voci che pretendono un cliente ora
+si spengono insieme in `updateShell` invece di accettare il clic e rispondere
+con un avviso.
+
+Verificato in pagina: barra a 41px su tutti e cinque i tool con le stesse
+quattro parti, `tfaRunAction` risponde su tutte e sette le azioni spostate,
+nessun errore in console, nessuno scorrimento orizzontale, e a 375px i tre
+comandi del Fascicolo sono tutti dentro lo schermo (77px di barra contro gli
+80 del Bilancio).
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia

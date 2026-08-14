@@ -281,7 +281,7 @@ footer a:hover{color:#F7F7F5!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
-<style id="tal-tool-safety-style">.tal-tool-safety{max-width:1180px;margin:12px auto 14px;padding:13px 16px;border:1px solid rgba(20,83,104,.24);border-left:4px solid #145368;border-radius:10px;background:#eef4f6;color:#20333a;font:13px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}.tal-tool-safety strong{font-weight:800}.tal-tool-safety span{display:block;margin-top:3px}.app-main>.tal-tool-safety{margin-left:auto;margin-right:auto}@media(max-width:760px){.tal-tool-safety{margin:10px 10px 13px}}</style><link href="/assets/site-shell.css?v=20260810-v61510-header-1" rel="stylesheet"/>
+<link href="/assets/site-shell.css?v=20260810-v61510-header-1" rel="stylesheet"/>
 <meta name="description" content="Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
@@ -311,8 +311,8 @@ footer a:hover{color:#F7F7F5!important}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814b">
-<script defer src="/assets/tal-app.js?v=20260814b"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260814c">
+<script defer src="/assets/tal-app.js?v=20260814c"></script>
 </head><body class="tal-tool-page">
 <button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
@@ -342,7 +342,8 @@ footer a:hover{color:#F7F7F5!important}
 <nav aria-label="Navigazione principale" class="tal-gh-nav"><a href="/">Home</a><a href="/tools/" aria-current="page">Strumenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
 <div aria-label="Lingua" class="tal-gh-lang"><a href="/tools/lipe/" hreflang="it" aria-current="page" class="active">ITA</a><a href="/en/tools/lipe/" hreflang="en">ENG</a><a href="/es/tools/lipe/" hreflang="es">ESP</a></div>
 </div>
-</header><aside id="tal-tool-safety" class="tal-tool-safety" role="note"><strong>Strumento sperimentale di supporto.</strong> Verifica sempre dati, regole e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.<span>I dati restano nel browser di questo dispositivo. Se cambi dispositivo o cancelli i dati del sito, l’archivio può andare perso. Esporta periodicamente una copia di sicurezza.</span></aside>
+</header><!-- La striscia d'avviso e' stata rimossa: il disclaimer sta nel piede di
+     ogni pagina e per esteso in «Come si usa», come negli altri tool. -->
 <section aria-label="Informazioni di pubblicazione" class="tal-publication">
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
@@ -1749,7 +1750,9 @@ function buildSections(){
       '<div class="panel"><h3>3. Elaborazione periodica</h3><p>Scegli anno e periodo, carica gli importi dal template e il tool costruisce il quadro VP. I codici non riconosciuti vengono elencati: vanno aggiunti al codiciario, non ignorati.</p></div>'+
       '<div class="panel"><h3>4. Quadro VP e file telematico</h3><p>Il quadro VP mostra i righi compilati con i controlli sul periodo. Il file <span class="cell-code">.xml</span> segue le specifiche IVP18: un modulo per periodo, IVA dovuta o a credito, riporto del credito del periodo precedente.</p>'+
       '<p>Il nome del file porta un progressivo per cliente, anno e periodo: due invii successivi dello stesso periodo restano distinguibili.</p></div>'+
-      '<div class="panel"><h3>Limiti e responsabilità</h3><p>Il tool produce il file secondo le specifiche, ma <b>non lo trasmette e non lo valida presso l’Agenzia</b>. La classificazione dei codici IVA, la correttezza dei dati e il controllo con il software di controllo dell’Agenzia restano in capo al professionista.</p></div>';
+      '<div class="panel"><h3>Limiti e responsabilità</h3><p><b>Strumento sperimentale di supporto.</b> Verifica sempre dati, regole e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.</p>'+
+      '<p>Il tool produce il file secondo le specifiche, ma <b>non lo trasmette e non lo valida presso l’Agenzia</b>. La classificazione dei codici IVA, la correttezza dei dati e il controllo con il software di controllo dell’Agenzia restano in capo al professionista.</p>'+
+      '<p>I dati restano nel browser di questo dispositivo. Se cambi dispositivo o cancelli i dati del sito, l’archivio può andare perso: esporta periodicamente una copia di sicurezza da <b>Dati e backup</b>.</p></div>';
     main.appendChild(h);
   }
 }

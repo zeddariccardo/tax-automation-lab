@@ -446,6 +446,16 @@ html:not(.tal-tool-page) .display{
 /* Home: il titolo sale e resta incolonnato al centro. Prima sommava la gronda
    della pagina (54px) a quella dell'apertura (76px) e partiva troppo in basso. */
 html:not(.tal-tool-page) .page[data-page="home"]{padding-top:clamp(10px,1.4vw,18px) !important}
+/* La stessa somma restava su ogni altra pagina della home: «Chi sono»
+   partiva 125px sotto l'intestazione contro i 76px di /tools/ e
+   /approfondimenti/, perché il padding di `.page` si aggiungeva a quello di
+   `.page-header`. Il ritmo alto lo porta l'apertura, non il contenitore:
+   dove c'è un'apertura, il contenitore non ne mette altro.
+   I 5px che restano non sono un capriccio: dentro la home l'intestazione
+   appoggia 10px più in basso della sua posizione di flusso e il contenitore
+   la rincorre di 5. Con questi, «Chi sono» cade agli stessi 76px dal bordo
+   dell'intestazione di /tools/ e /approfondimenti/, misurati sulla pagina. */
+html:not(.tal-tool-page) .page:has(.page-header){padding-top:5px !important}
 html:not(.tal-tool-page) .home-hero{
   padding:clamp(18px,2.6vw,40px) 0 clamp(18px,2.4vw,28px) !important;
   text-align:center;

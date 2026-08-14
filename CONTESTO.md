@@ -899,6 +899,17 @@ fondo: riempirli trasformerebbe una tabella in una scacchiera.
 alle voci di menu della sidebar: cliccarlo portava via la sessione di lavoro.
 Il link nell'intestazione del sito resta com'è, perché lì è navigazione.
 
+**Gronda doppia su «Chi sono».** Nella home a pagine (`index.html` e le due
+tradotte) `.page` porta `padding-top:54px` e `.page-header` prende i
+`clamp(40px,6vw,76px)` del ritmo condiviso: si sommavano, e «Chi sono»
+partiva **125px** sotto l'intestazione contro i **76px** di `/tools/` e
+`/approfondimenti/`. La stessa somma era già stata corretta per la sola home
+(`.page[data-page="home"]`) e mai per le altre. Ora il contenitore non mette
+gronda dove c'è già un'apertura: `.page:has(.page-header){padding-top:5px}`.
+I 5px non sono un capriccio — dentro la home l'intestazione appoggia 10px
+più in basso della sua posizione di flusso e il contenitore la rincorre di
+5. Misurato sulla pagina: 76px su desktop e 40px a 375, identici agli altri.
+
 **Un difetto trovato per strada.** `tal-app.js` sostituiva
 `localStorage.setItem` sull'istanza, e in Chrome quello **scrive una chiave
 vera di nome `setItem`** dentro l'archivio dell'utente — che finiva anche nei

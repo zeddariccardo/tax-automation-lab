@@ -548,8 +548,8 @@ body.tal-header-compact .cmdbar{top:72px}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v2.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260813">
-<script defer src="/assets/tal-app.js?v=20260813"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260814">
+<script defer src="/assets/tal-app.js?v=20260814"></script>
 </head>
 
 <body class="tal-tool-page">
@@ -3773,7 +3773,13 @@ if(state()){
   selectedFY=d0.client.currentFY;d0._mirror=temporalPayload(d0);
 }
 setSaveState('ok');
+/* Il Fascicolo si riapriva dentro l'ultimo cliente lavorato: chi lo apriva
+   per cominciare qualcosa di nuovo trovava l'anagrafica di un altro già
+   compilata. Ora l'ingresso è l'elenco clienti, come negli altri quattro
+   tool — il cliente attivo resta quello, basta un clic per rientrarci.
+   L'indirizzo diretto (#/profilo/tax) continua a portare dove dice. */
 if(hasClient()&&readHash()){/* sezione richiesta dall'indirizzo */}
+else if(hasClient()){view={scope:'manage',section:'clients',taxArea:null,asOf:null};}
 render();
 window.addEventListener('beforeunload',function(){
   if(saveTimer){clearTimeout(saveTimer);persist()}

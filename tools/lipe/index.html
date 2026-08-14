@@ -311,8 +311,8 @@ footer a:hover{color:#F7F7F5!important}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260813">
-<script defer src="/assets/tal-app.js?v=20260813"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260814">
+<script defer src="/assets/tal-app.js?v=20260814"></script>
 </head><body class="tal-tool-page">
 <button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
@@ -1258,7 +1258,38 @@ function loadDemo(){
 }
 function migrateV2(){if(localStorage.getItem(KEYS.migrated))return;const old=readStore('taxtool_lipe_v2_clients',{}),clients=getClients();let count=0;for(const [p,r] of Object.entries(old)){if(clients[p])continue;const byCode={};for(const m of Object.values(r.mapping||{})){const code=String(m.taxCode||'').toUpperCase();if(!code)continue;if(!byCode[code])byCode[code]={...defaultMapping(code),description:m.description||'',baseRow:m.baseRow==='-'?'':m.baseRow||'',dueRow:m.dueRow==='-'?'':m.dueRow||'',dedRow:m.dedRow==='-'?'':m.dedRow||'',basePct:pct(m.basePct),duePct:pct(m.duePct),dedPct:pct(m.dedPct),note:m.note||''};else{const x=byCode[code];x.baseRow=x.baseRow||(m.baseRow==='-'?'':m.baseRow||'');x.dueRow=x.dueRow||(m.dueRow==='-'?'':m.dueRow||'');x.dedRow=x.dedRow||(m.dedRow==='-'?'':m.dedRow||'')}}clients[p]={version:APP_VERSION,client:{...defaultClient(),...r.client,piva:p,periodType:r.client?.periodType||'M'},mapping:Object.values(byCode),savedAt:r.savedAt||new Date().toISOString()};count++}if(count)writeStore(KEYS.clients,clients);localStorage.setItem(KEYS.migrated,'1')}
 function initEvents(){document.querySelectorAll('[data-scroll]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.scroll).scrollIntoView({behavior:'smooth'}));$('save-client').onclick=saveClient;$('new-client').onclick=newClient;$('export-client-json').onclick=()=>exportClientJson();$('import-client-json').onchange=e=>{importClientJson(e.target.files[0]);e.target.value=''};$('add-mapping-row').onclick=addMapping;$('toggle-advanced').onclick=()=>{state.advanced=!state.advanced;renderConfigMapping()};$('download-mapping-template').onclick=downloadMappingTemplate;$('mapping-upload').onchange=e=>{importMappingExcel(e.target.files[0]);e.target.value=''};$('toggle-paste-mapping').onclick=()=>{$('paste-mapping-box').hidden=!$('paste-mapping-box').hidden};$('apply-mapping-paste').onclick=()=>{try{const rows=parseGridText($('mapping-paste').value,'mapping');if(!rows.length){toast('Nessuna riga valida rilevata.',true);return}mergeMappings(rows)}catch(e){toast('Dati incollati non riconosciuti: '+e.message,true)}};$('clear-mapping-paste').onclick=()=>{$('mapping-paste').value=''};$('run-client').onchange=e=>activateClient(e.target.value);$('run-year').onchange=syncRunFields;$('run-quarter').onchange=syncRunFields;$('download-amounts-template').onclick=downloadAmountsTemplate;$('amounts-upload').onchange=e=>{importAmountsExcel(e.target.files[0]);e.target.value=''};$('toggle-paste-amounts').onclick=()=>{$('paste-amounts-box').hidden=!$('paste-amounts-box').hidden};$('apply-amounts-paste').onclick=()=>{if(!state.activeRecord){toast('Seleziona prima un cliente.',true);return}try{const rows=parseGridText($('amounts-paste').value,'amounts');if(!rows.length){toast('Nessuna riga valida rilevata.',true);return}setPeriodRows(rows,'Dati incollati da Excel')}catch(e){toast('Dati incollati non riconosciuti: '+e.message,true)}};$('clear-amounts-paste').onclick=()=>{$('amounts-paste').value=''};$('save-unknown').onclick=saveUnknown;document.querySelectorAll('[data-load-demo]').forEach(b=>b.onclick=loadDemo);$('export-pdf').onclick=exportPdf;$('export-excel').onclick=exportWorkingPaper;$('export-xml').onclick=exportXml;$('save-history').onclick=saveHistory;$('clear-period').onclick=clearPeriod;window.addEventListener('beforeunload',()=>{persistWork(true);persistSession()})}
-function init(){migrateV2();bindConfigFields();initEvents();syncConfigToFields();const session=readStore(KEYS.session,null),clients=getClients();if(session&&clients[session.piva]){state.activeClientKey=session.piva;state.activeRecord=clone(clients[session.piva]);state.year=num(session.year)||state.year;state.quarter=num(session.quarter)||state.quarter;restoreWorkForCurrent()}$('run-year').value=state.year;$('run-quarter').value=state.quarter;deriveImportIssues();renderConfigMapping();renderSavedClients();renderRunClientOptions();renderProcessing();renderHistory()}
+/* L'ultima sessione veniva ripresa da sola: si apriva il tool e si trovava
+   dentro il cliente e il periodo di qualcun altro — o di ieri — senza
+   averlo chiesto. Ora l'ingresso è vergine e la ripresa è un clic
+   dichiarato. La sessione non si perde: resta in archivio finché non la si
+   riprende o non la si scarta. */
+function resumeSession(session,record){
+  state.activeClientKey=session.piva;
+  state.activeRecord=clone(record);
+  state.year=num(session.year)||state.year;
+  state.quarter=num(session.quarter)||state.quarter;
+  restoreWorkForCurrent();
+  $('run-year').value=state.year;$('run-quarter').value=state.quarter;
+  deriveImportIssues();renderConfigMapping();renderSavedClients();renderRunClientOptions();renderProcessing();renderHistory();
+  const b=document.getElementById('lipe-resume');if(b)b.remove();
+  toast('Sessione ripresa: '+((record.client&&record.client.denom)||session.piva)+' · '+state.year+' · periodo '+state.quarter+'.');
+}
+function offerResume(session,record){
+  const host=document.getElementById('client-config');if(!host)return;
+  const b=document.createElement('div');
+  b.id='lipe-resume';b.className='tal-resume';b.style.margin='0 0 16px';
+  b.innerHTML='<b>C’è una lavorazione non chiusa su questa postazione:</b> '+
+    esc((record.client&&record.client.denom)||session.piva)+' · anno '+esc(String(session.year||''))+
+    ' · periodo '+esc(String(session.quarter||''))+
+    '. Il tool è partito da zero: riprendila solo se è tua e vuoi continuarla.'+
+    '<div class="btn-row" style="margin-top:10px"><button class="btn" type="button" id="lipe-resume-yes">Riprendi la lavorazione</button>'+
+    '<button class="btn ghost" type="button" id="lipe-resume-no">Scarta</button></div>';
+  const lead=host.querySelector('.bd');
+  if(lead)host.insertBefore(b,lead);else host.appendChild(b);
+  document.getElementById('lipe-resume-yes').onclick=()=>resumeSession(session,record);
+  document.getElementById('lipe-resume-no').onclick=()=>{try{localStorage.removeItem(KEYS.session);}catch(_){}b.remove();toast('Sessione scartata. Gli archivi dei clienti restano.');};
+}
+function init(){migrateV2();bindConfigFields();initEvents();syncConfigToFields();const session=readStore(KEYS.session,null),clients=getClients();if(session&&clients[session.piva]){offerResume(session,clients[session.piva]);}$('run-year').value=state.year;$('run-quarter').value=state.quarter;deriveImportIssues();renderConfigMapping();renderSavedClients();renderRunClientOptions();renderProcessing();renderHistory()}
 window.addEventListener('DOMContentLoaded',init);
 
 </script>

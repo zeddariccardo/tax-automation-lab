@@ -26,9 +26,15 @@ Sono mutuamente esclusivi e non possono contaminarsi:
 | `assets/tal-app.css` | 5 applicazioni | `html.tal-tool-page` |
 | `assets/tal-app.js` | idem | barra comandi condivisa |
 
-Gli indirizzi portano `?v=20260812` (`?v=20260813` sulle pagine nuove): **va incrementato a ogni modifica dei
+Gli indirizzi portano `?v=20260812` (`?v=20260814` su `tal-app.css` e
+`tal-app.js` nei cinque tool): **va incrementato a ogni modifica dei
 fogli**, altrimenti i browser di chi ha già visitato il sito servono la versione
 vecchia.
+
+`tal-app.js` non è più solo la barra comandi: dalla 2.0 tiene anche la barra di
+sessione unica, lo spostamento di «Informazioni sullo strumento» dentro «Come si
+usa», la tinta dei pulsanti per etichetta e l'apertura di «Configura con AI» in
+scheda nuova. Vedi la sezione del 14 agosto in fondo.
 
 Documentazione di dettaglio: `assets/tal-design.README.md`.
 
@@ -40,7 +46,10 @@ Documentazione di dettaglio: `assets/tal-design.README.md`.
   viola era al 47% e schiacciava tutto: non riportarlo su.
 - **Accento unico dei tool**: petrolio `#145368`. Niente lime, niente blu, niente
   viola: erano tre accenti diversi in quattro tool.
-- **Verde = aggiungi, arancio = modifica** (`.btn.add`, `.btn.edit`).
+- **Verde = aggiungi, arancio = modifica, viola→petrolio = salva**
+  (`.btn.add`, `.btn.edit`, `.btn.save`). Dalla 2.0 le classi le mette
+  `tal-app.js` leggendo l'etichetta; per forzare o escludere un pulsante,
+  `data-tal-tone="add|edit|save|none"`.
 - **Sidebar dei tool**: petrolio, stato attivo in pastiglia bianca.
 - Tutto il movimento rispetta `prefers-reduced-motion`.
 
@@ -104,7 +113,7 @@ crediti, Configura con AI, Dati e backup, Come si usa — e tutto il resto
 Se in futuro si uniformasse, il lavoro è sostituire la sola `.workspace-nav`.
 
 Versioni reali (allineate ovunque, anche nei dati strutturati):
-`1.4.0` Bilancio civilistico · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
+`1.4.1` Bilancio ITA GAAP · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
 cliente · `3.4.1→3.4.3` LIPE · `1.0.0` Generatore F24.
 
 ## Trappole verificate sul campo
@@ -828,6 +837,118 @@ usava già `?v=20260813` prima che il foglio cambiasse, quindi il browser
 serviva il contenuto vecchio sotto lo stesso indirizzo e le misure risultavano
 invariate. Per verificare una modifica al foglio condiviso, sostituire il
 `<link>` con uno che porti una query casuale, altrimenti si misura la cache.
+
+## Concept condiviso — cinque correzioni d'uso, 14 agosto 2026
+
+Segnalazioni di Riccardo su tutti e cinque i tool, più cinque sul solo
+Bilancio. Le prime cinque vivono nel layer condiviso (`tal-app.css`,
+`tal-app.js`, portati a `?v=20260814`): toccarle lì significa non doverle
+ripetere quando nasce il sesto tool.
+
+**1. L'ingresso non è più occupato da qualcun altro.** Aprendo il Bilancio si
+trovava l'Anagrafica già compilata con «Alfa Industriale S.r.l.», la sua
+P.IVA nella scheda «Salva il fascicolo corrente» e un anno proposto: era la
+bozza `fs_draft_v1` ripristinata in silenzio da `restoreDraft()`. Stessa cosa
+in LIPE (`taxtool_lipe_v3_session` + `_work`) e nel Fascicolo, che riapriva
+direttamente l'ultimo cliente. Il lavoro **non si butta**: resta dov'è e
+viene offerto da una fascia gialla (`.tal-resume`) con «Riprendi» e «Scarta».
+La bozza viene tenuta anche in memoria, così scrivere in un campo — che
+riscrive `fs_draft_v1` — non fa perdere la possibilità di riprenderla.
+`refreshSaveCard` non propone più l'anno solare: senza data di chiusura in
+Anagrafica il campo resta vuoto, perché un anno inventato è peggio di un
+campo vuoto. `financial-analysis` non persisteva nulla e F24 chiedeva già
+(«Riprendere il lavoro?»): lì non c'era niente da correggere.
+
+**2. Una sola barra di sessione, sottile, con i colori del sito.** Bilancio e
+Analisi ne avevano due impilate — la propria «Sessione di lavoro» più la
+`.tal-cmdbar` condivisa — e la seconda ripeteva il nome della società che
+sta già nella sidebar: 117px per dire due volte la stessa cosa. Ora è una
+striscia sola, **41px** su desktop e 80 su telefono, viola `#5B3A8C` →
+petrolio `#145368`. Il contesto duplicato resta **nel DOM** (i tool ci
+scrivono dentro: toglierlo romperebbe `updateCommandLabel`, `#cmdMeta` e
+simili) ma è `display:none`. `tal-app.js` adotta la barra del tool se c'è e
+ne costruisce una solo dove manca. **Attenzione all'ordine di boot:**
+`tal-app.js` è `defer` e gira *prima* del listener `DOMContentLoaded` che
+crea la barra di Bilancio e Analisi — da qui `boot()` con `setTimeout(…,0)` e
+`reconcileBar()`, che toglie la barra sintetica se ne compare una vera.
+Attenzione anche al `flex-direction:column` che quei due fogli mettono sotto
+i 620px: senza forzare `row` la striscia torna a tre righe.
+
+**3. «Informazioni sullo strumento» sta in «Come si usa».** Il pannello
+`.tal-publication` era in cima a *ogni* schermata di ogni tool. Ora
+`tal-app.js` lo sposta nella sezione di aiuto — `#view-help`, `#view-method`,
+`#lipe-help`, `#stage-guide` — e lo apre. LIPE costruisce la sua a runtime,
+quindi il tentativo si ripete fino a dodici volte a 400ms. Fuori da lì il
+pannello è nascosto dalla CSS, così non lampeggia al caricamento.
+
+**4. Il colore dice cosa fa il pulsante.** Verde aggiunge, arancio modifica —
+era la regola del Fascicolo, ma solo Fascicolo e F24 la applicavano (36 e 8
+pulsanti; gli altri tre, **zero**). Marcarli a mano era impraticabile: la
+maggior parte nasce a runtime dentro stringhe HTML. La classificazione è per
+**etichetta**, in `tal-app.js`, con un `MutationObserver` per quelli nuovi.
+Il terzo caso, il salvataggio, prima non esisteva: ora è `.btn.save`, viola
+sfumato in petrolio, gli stessi colori della barra di sessione perché è la
+stessa azione. Override per pulsante con `data-tal-tone="add|edit|save|none"`.
+Esclusi di proposito: la sidebar, le schede, i menu a tendina e **la barra di
+sessione** — lì «Nuovo» azzera l'elaborazione, e verniciarlo di verde direbbe
+l'opposto di quello che fa. Esclusa anche «Nuova elaborazione», per la stessa
+ragione. I comandi di riga (`.lk`) prendono il colore del testo, non il
+fondo: riempirli trasformerebbe una tabella in una scacchiera.
+
+**5. «Configura con AI» apre una scheda nuova.** Era un link normale in mezzo
+alle voci di menu della sidebar: cliccarlo portava via la sessione di lavoro.
+Il link nell'intestazione del sito resta com'è, perché lì è navigazione.
+
+**Un difetto trovato per strada.** `tal-app.js` sostituiva
+`localStorage.setItem` sull'istanza, e in Chrome quello **scrive una chiave
+vera di nome `setItem`** dentro l'archivio dell'utente — che finiva anche nei
+backup JSON. Ora la sostituzione è su `Storage.prototype`.
+
+## Bilancio ITA GAAP 1.4.1 — cinque correzioni, 14 agosto 2026
+
+**«Bilancio riclassificato» → «Bilancio ITA GAAP»**, in sidebar e in
+intestazione di sezione. Le otto schede erano in fila e mettevano sullo stesso
+piano cose che non lo sono; ora sono tre gruppi con l'etichetta sopra:
+**Viste** (Stato Patrimoniale · Conto Economico · Prospetto di deposito),
+**Strumenti di lavoro** (Riclassifica per conto · Non mappati · Storni ·
+Rettifiche IAS→OIC), **Controllo** (Verifiche). `showTab` cerca
+`#results_tabs .tab`, quindi annidarle nei gruppi non ha richiesto di
+toccarla.
+
+**«Riclassifica per conto» era una tabella da guardare.** Mostrava i conti e
+la voce assegnata e finiva lì: per cambiare una voce si doveva passare da
+«Non mappati» — che elenca solo i conti *senza* voce — o trascinare la riga
+nello schema. Ora ogni riga ha la sua casella di scelta, con un filtro di
+ricerca e due viste ridotte (solo senza voce, solo con riclassifiche
+parziali). Svuotare la casella non «smappa» il conto: rimette la voce che
+portava dal file, e l'etichetta lo dice.
+
+**La riclassifica parziale è uno storno, non un motore nuovo.** «Sposta una
+parte…» chiede voce di destinazione e importo (corrente e, se serve,
+precedente) e scrive uno storno con `partial:true`, `accCode` e `accKey`:
+stessi controlli di quadratura, stesso posto negli export, e compare come
+sotto-riga sotto al conto con il suo «Annulla». Bloccata sui conti senza
+voce, perché senza voce di partenza lo spostamento sbilancerebbe il bilancio.
+Avvisa — non blocca — se l'importo supera quello del conto.
+
+**Le rettifiche avevano quattro colonne** — Dare corr., Avere corr., Dare
+prec., Avere prec. — e le prime due si confondevano con le seconde. Le
+colonne dell'esercizio precedente sono uscite da tabella ed editor. Gli
+importi già scritti **non vengono cancellati**: `collect()` li rilegge dalla
+rettifica di partenza riga per riga (senza quello, salvare una modifica li
+azzerava in silenzio) e una nota sotto la scheda li dichiara. Accanto a
+«Nuova rettifica» e «Parti da un modello» c'è ora **«Rettifiche esercizio
+precedente»**: legge `fs_archive_v1`, prende il fascicolo dell'anno
+precedente più vicino a quello in corso e permette di riportarne una
+selezione. Arrivano `active:false` e `carried:true`, come vuole la regola già
+scritta per «Crea nuovo anno».
+
+**La mappatura si salva dal comando in alto.** `saveCurrent` è chiusa dentro
+l'IIFE della barra comandi e **non è una proprietà di window** — avvolgerla
+da fuori non funziona, verificato. Il punto comune alle due strade è
+`#fs_save_btn`, perché il Salva della barra gli fa `click()`: l'aggancio è
+lì. La scrittura è silenziosa, così il messaggio che resta a schermo è quello
+del fascicolo.
 
 ## Aperto
 

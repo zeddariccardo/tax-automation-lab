@@ -701,3 +701,189 @@ html.tal-tool-page .tal-save-pill.is-failed{
   html.tal-tool-page .tal-cmdbar{margin-inline:12px;padding:9px 11px}
   html.tal-tool-page .tal-cmdbar .cmd-context{flex:1 1 100%}
 }
+
+/* ---------- 15. Barra di sessione (v2.1) ---------------------------------- */
+
+/* Il nome della società stava scritto due volte sullo stesso schermo: nella
+   sidebar e di nuovo nella barra sotto la «Sessione di lavoro». Uno dei due è
+   rumore, e quello che se ne va è il secondo — la sidebar è sempre visibile.
+   Quindi il contesto resta nel DOM (i tool ci scrivono dentro) ma non si
+   vede, e la barra si riduce a quello che serve davvero: dove sono, se il
+   lavoro è al sicuro, i comandi di sessione.
+
+   Una sola barra per tool, con i colori del sito: viola in apertura, petrolio
+   in chiusura, come la banda della home. */
+
+html.tal-tool-page{
+  --tal-session-1:#5B3A8C;   /* viola del sito, portato al livello dei tool */
+  --tal-session-2:#145368;   /* petrolio: l'accento unico */
+  --tal-save-1:#6D3C99;
+  --tal-save-2:#145368;
+}
+
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar){
+  display:flex !important;
+  /* Bilancio e Analisi passavano a colonna sotto i 620px: tre righe per
+     dire tre cose corte. La striscia resta una riga finché ci sta. */
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+  margin:10px clamp(18px,3.5vw,44px) 12px !important;
+  padding:5px 12px !important;
+  min-height:0 !important;
+  border:1px solid rgba(247,247,245,.18) !important;
+  border-radius:10px !important;
+  background:linear-gradient(100deg,var(--tal-session-1),var(--tal-session-2) 66%) !important;
+  color:#F7F7F5 !important;
+  box-shadow:0 6px 18px -8px rgba(11,47,61,.5) !important;
+  backdrop-filter:none !important;
+}
+
+/* L'etichetta: una riga sola, non due. */
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) .tal-session-label,
+html.tal-tool-page :is(.tal-fs-commandcopy,.tal-commandbar-copy) b{
+  flex:0 0 auto;
+  font-size:9.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.11em !important;
+  text-transform:uppercase !important;
+  color:rgba(247,247,245,.86) !important;
+}
+html.tal-tool-page :is(.tal-fs-commandcopy,.tal-commandbar-copy){
+  flex:0 0 auto !important;
+  flex-direction:row !important;
+  align-items:center !important;
+}
+/* Il doppione del nome società: resta nel DOM, sparisce dallo schermo. */
+html.tal-tool-page :is(.tal-fs-commandcopy,.tal-commandbar-copy) span,
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) .cmd-context{
+  display:none !important;
+}
+
+/* I comandi: più bassi, così la barra resta una striscia. */
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(button,.btn){
+  min-height:30px !important;
+  padding:5px 11px !important;
+  font-size:9.5px !important;
+  border-radius:7px !important;
+}
+html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button{
+  border:1px solid rgba(247,247,245,.38) !important;
+  background:rgba(255,255,255,.10) !important;
+  color:#F7F7F5 !important;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button:hover{
+  background:rgba(255,255,255,.2) !important;
+}
+html.tal-tool-page :is(.tal-fs-commandactions,.tal-commandbar-actions) button.primary{
+  background:linear-gradient(135deg,#8E63C4,#2E93B0) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+/* Il petrolio dell'accento è anche la coda della barra: un pulsante
+   `accent` ci si mimetizzava dentro. Sulla striscia diventa un contorno
+   chiaro, come gli altri comandi di sessione. */
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) .btn.accent{
+  background:rgba(255,255,255,.16) !important;
+  border-color:rgba(247,247,245,.5) !important;
+  color:#fff !important;
+}
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) .save-pill,
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) .tal-save-pill{
+  margin-left:auto;
+}
+@media(max-width:760px){
+  html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar){
+    margin-inline:12px !important;
+    padding:6px 10px !important;
+  }
+}
+/* Su telefono la striscia andava a tre righe: etichetta, comandi, stato.
+   Etichetta e stato stanno sulla stessa riga, i comandi sotto. */
+@media(max-width:620px){
+  html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.tal-fs-commandactions,.tal-commandbar-actions){
+    order:3; flex:1 1 100%;
+  }
+  html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.save-pill,.tal-save-pill){
+    order:2; margin-left:auto;
+  }
+}
+
+/* ---------- 16. Il colore dice cosa fa il pulsante ------------------------ */
+
+/* Verde aggiunge, arancio modifica: era già la regola del Fascicolo cliente.
+   Mancava il terzo caso, il salvataggio, che nei quattro tool era un pulsante
+   nero indistinguibile da «Esporta» o «Chiudi». Ora è viola sfumato in
+   petrolio: gli stessi due colori della barra di sessione, perché è la stessa
+   azione — mettere al sicuro il lavoro in corso. */
+html.tal-tool-page :is(.btn.save,.btn.tal-save){
+  background:linear-gradient(135deg,var(--tal-save-1),var(--tal-save-2)) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+  box-shadow:0 5px 14px rgba(91,58,140,.20) !important;
+}
+html.tal-tool-page :is(.btn.save,.btn.tal-save):hover{
+  box-shadow:0 7px 18px rgba(91,58,140,.30) !important;
+}
+/* I tool hanno anche pulsanti senza classe `btn`: la tinta va data lo stesso. */
+html.tal-tool-page :is(button,a).tal-tone-add:not(.btn):not(.lk){
+  background:linear-gradient(135deg,var(--tal-add-1),var(--tal-add-2)) !important;
+  border-color:var(--tal-add-line) !important;
+  color:var(--tal-add-ink) !important;
+}
+html.tal-tool-page :is(button,a).tal-tone-edit:not(.btn):not(.lk){
+  background:linear-gradient(135deg,var(--tal-edit-1),var(--tal-edit-2)) !important;
+  border-color:var(--tal-edit-2) !important;
+  color:var(--tal-edit-ink) !important;
+}
+html.tal-tool-page :is(button,a).tal-tone-save:not(.btn):not(.lk){
+  background:linear-gradient(135deg,var(--tal-save-1),var(--tal-save-2)) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+/* I comandi di riga (`.lk`) sono testo, non pastiglie: prendono il colore, non
+   il fondo. Riempirli trasformerebbe una tabella in una scacchiera. */
+html.tal-tool-page .lk.tal-tone-edit{color:var(--tal-edit-2) !important}
+html.tal-tool-page .lk.tal-tone-add{color:#1B6B47 !important}
+html.tal-tool-page .lk.tal-tone-save{color:var(--tal-save-1) !important}
+/* Dentro la barra di sessione comanda la barra: lì i pulsanti restano chiari
+   sul fondo scuro, altrimenti si perde la gerarchia della striscia. */
+html.tal-tool-page :is(.tal-session-bar,.tal-fs-commandbar,.tal-commandbar,.cmdbar) :is(.tal-tone-add,.tal-tone-edit){
+  background:rgba(255,255,255,.10) !important;
+  border-color:rgba(247,247,245,.38) !important;
+  color:#F7F7F5 !important;
+}
+
+/* ---------- 17. Ripresa del lavoro non chiuso ----------------------------- */
+
+/* I tool riprendevano da soli l'ultima sessione: si apriva il Bilancio e
+   l'Anagrafica era già quella di un'altra società, con la sua P.IVA nella
+   scheda di salvataggio. Il lavoro non si butta — ma si riprende su
+   richiesta, e l'ingresso resta un foglio bianco. */
+html.tal-tool-page .tal-resume{
+  border:1px solid var(--tal-gold-line) !important;
+  border-left:4px solid var(--tal-gold) !important;
+  border-radius:10px !important;
+  background:var(--tal-gold-bg) !important;
+  color:#3A3118 !important;
+  padding:13px 15px !important;
+  font-size:13px;
+  line-height:1.5;
+}
+html.tal-tool-page .tal-resume b{color:#241E0C}
+
+/* ---------- 18. Informazioni sullo strumento ------------------------------ */
+
+/* Stava in cima a ogni schermata, in tutte e cinque le applicazioni: tre righe
+   di presentazione ripetute davanti a chi sta lavorando. Il posto giusto è
+   «Come si usa», ed è lì che tal-app.js la sposta. Finché non l'ha spostata
+   resta nascosta, così non lampeggia al caricamento. */
+html.tal-tool-page .tal-publication:not(.tal-publication-inhelp){display:none !important}
+html.tal-tool-page .tal-publication-inhelp{
+  display:block !important;
+  margin:22px 0 0 !important;
+}

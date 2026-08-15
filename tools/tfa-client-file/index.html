@@ -3795,5 +3795,22 @@ window.TAL_SESSION={
   }
 };
 </script>
+
+<style id="tfa-import-layout-fix">
+.import-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px;align-items:stretch}
+.import-step{display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-areas:"number title" "number description" ". action";grid-template-rows:auto 1fr auto;column-gap:12px;row-gap:7px;min-width:0;padding:16px;border:1px solid var(--g2);border-radius:13px;background:#fff}
+.import-step .n{grid-area:number;display:grid;place-items:center;width:36px;height:36px;margin:0;border-radius:50%;background:var(--accent-soft);color:var(--accent-deep);font-size:13px;font-weight:850;line-height:1}
+.import-step h3{grid-area:title;margin:1px 0 0;font-size:14px;line-height:1.3}
+.import-step p{grid-area:description;margin:0;color:var(--g4);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.import-step>.btn{grid-area:action;justify-self:start;align-self:end;margin-top:3px}
+.import-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.import-stat{min-width:0;padding:10px 11px;border:1px solid var(--g2);border-radius:10px;background:#fbfaf8}
+.import-stat b{display:block;font-size:18px;line-height:1.15}.import-stat span{display:block;margin-top:3px;color:var(--g4);font-size:9.5px;line-height:1.35;text-transform:uppercase;letter-spacing:.06em;overflow-wrap:anywhere}
+.import-diagnostics{display:grid;gap:7px;margin-top:12px}.import-diag{padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fbfaf8;font-size:11.5px;line-height:1.45}.import-diag.warn{background:var(--gold-bg);border-color:var(--gold-line);color:var(--gold)}.import-diag.info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}
+.import-file-name{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 9px;border-radius:999px;background:var(--info-bg);color:var(--info);font-size:10px;font-weight:700;overflow-wrap:anywhere}
+.conflict-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:11.5px}.conflict-table th,.conflict-table td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.conflict-table th{color:var(--g4);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em}
+@media(max-width:900px){.import-flow{grid-template-columns:1fr}.import-step{grid-template-columns:42px minmax(0,1fr);grid-template-areas:"number title" "number description" ". action"}.import-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.import-step{padding:14px}.import-summary{grid-template-columns:1fr}.conflict-table{font-size:10.5px}}
+</style>
 </body>
 </html>

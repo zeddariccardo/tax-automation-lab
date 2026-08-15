@@ -17,7 +17,13 @@ function inlineScripts(html){
   return out;
 }
 
-for(const relative of ['tools/financial-analysis/index.html','tools/lipe/index.html']){
+for(const relative of [
+  'tools/financial-analysis/index.html',
+  'tools/lipe/index.html',
+  'tools/f24/index.html',
+  'tools/tfa-client-file/index.html',
+  'configura-con-ai/index.html'
+]){
   const scripts=inlineScripts(read(relative));
   assert.ok(scripts.length>0,`${relative}: nessuno script inline trovato`);
   scripts.forEach((source,index)=>assert.doesNotThrow(()=>new vm.Script(source,{filename:`${relative}#script-${index+1}`})));
@@ -31,6 +37,11 @@ assert.match(fa,/return \(g\.cg_prod_direct\|\|0\)\+\(g\.cg_prod_indirect\|\|0\)
 assert.match(fa,/Benchmark incompleto/);
 assert.match(fa,/Diagnostica crisi e continuità/);
 assert.match(fa,/aria-controls/);
+assert.match(fa,/id="fa-kpi-menu-clarity-style"/);
+assert.match(fa,/className='sb-close-mobile'/);
+assert.match(fa,/Come leggere le schede/);
+assert.match(fa,/Con assunzioni/);
+assert.match(fa,/Da completare/);
 
 const lipe=read('tools/lipe/index.html');
 assert.match(lipe,/data-tool-version="3\.6\.1"/);
@@ -47,5 +58,19 @@ assert.match(lipe,/filename:'IT'\+transmitter\+'_LI_'/);
 assert.match(lipe,/year===2023\?25\.82:100/);
 assert.match(lipe,/PROSPETTO DI LAVORO · NON PRESENTABILE/);
 assert.match(lipe,/moduleProfile:'single'/);
+
+const f24=read('tools/f24/index.html');
+assert.match(f24,/\.demo-banner\[hidden\]\{display:none!important\}/);
+
+const tfa=read('tools/tfa-client-file/index.html');
+assert.match(tfa,/id="tfa-import-layout-fix"/);
+assert.match(tfa,/\.import-flow\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+
+const configureAi=read('configura-con-ai/index.html');
+assert.match(configureAi,/class="screen-marker"/);
+assert.match(configureAi,/analisi-bilancio-import-20260815\.png/);
+assert.match(configureAi,/lipe-periodo-20260815\.png/);
+assert.match(configureAi,/fascicolo-importa-excel-20260815\.png/);
+assert.match(configureAi,/f24-import-massivo-20260815\.png/);
 
 console.log('Audit remediation: sintassi e regole critiche verificate.');

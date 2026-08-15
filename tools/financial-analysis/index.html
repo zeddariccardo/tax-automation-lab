@@ -3477,5 +3477,78 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
+<style id="fa-kpi-menu-clarity-style">
+.sb-close-mobile{display:none}
+#view-kpi .checks-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#view-kpi .check-item{min-height:64px;padding:10px 12px;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:none}
+#view-kpi .check-item .name{font-size:10px;letter-spacing:.07em}
+#view-kpi .check-item .value{font-size:20px}
+.kpi-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#f8f7f4}
+.kpi-legend-title{font-size:10px;font-weight:800;color:var(--g5);margin-right:2px}
+.kpi-legend-item{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:10px;font-weight:700;color:var(--g5)}
+.kpi-legend-item::before,.status-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--status-color,#7d8490);flex:0 0 auto}
+.kpi-legend-item.green,.status-pill.green{--status-color:#25775c}
+.kpi-legend-item.yellow,.status-pill.yellow{--status-color:#9a6b05}
+.kpi-legend-item.orange,.status-pill.orange{--status-color:#b14b31}
+.kpi-legend-item.gray,.status-pill.gray{--status-color:#747b86}
+.kpi-family-group{margin-bottom:10px;border-radius:12px;box-shadow:none}
+.kpi-family-group>summary{padding:12px 14px;background:#f7f6f2}
+.kpi-family-body{padding:10px}
+.kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:0}
+.kpi-card,.kpi-card.green,.kpi-card.yellow,.kpi-card.orange,.kpi-card.gray{padding:12px;border:1px solid #dedbd4;border-left:1px solid #dedbd4;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(14,22,36,.04)}
+.kpi-card:hover{border-color:#b8b4aa;box-shadow:0 5px 14px rgba(14,22,36,.07)}
+.kpi-head{gap:8px}
+.kpi-card h3{font-size:12.5px;line-height:1.3;margin-top:2px}
+.kpi-family{font-size:8px}
+.kpi-value{font-size:21px;line-height:1.1;margin:8px 0 5px}
+.kpi-card .status-pill{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;padding:4px 7px;border:1px solid color-mix(in srgb,var(--status-color) 32%,white);border-radius:999px;background:color-mix(in srgb,var(--status-color) 9%,white);color:var(--status-color);font-size:8.5px;font-weight:800;white-space:nowrap}
+.kpi-card .status-pill::before{margin:0}
+.kpi-simple{font-size:10.5px!important;line-height:1.42;margin:5px 0 0!important;color:var(--g5)}
+.v20-kpi-detail{margin-top:8px;padding-top:7px}
+.v20-kpi-detail summary{min-height:30px;display:flex;align-items:center;font-size:9.5px}
+.kpi-card.issue-critical,.kpi-card.issue-warning{border-color:#d9a797;box-shadow:none}
+.kpi-issue{font-size:10.5px;line-height:1.4}
+@media(max-width:1180px){.kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:860px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){#view-kpi .checks-grid,.kpi-grid{grid-template-columns:1fr}.kpi-legend{align-items:flex-start}.kpi-legend-title{width:100%}}
+@media(max-width:980px){
+  html.fa-tool-menu-open .sb-toggle{display:none!important}
+  .appbar#sidebar.open .sb-close-mobile{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-left:auto;border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.10);color:#fff;font:700 20px/1 var(--sans);cursor:pointer}
+  .appbar#sidebar.open .sb-close-mobile:focus-visible{outline:3px solid #fff;outline-offset:2px}
+}
+</style>
+<script id="fa-kpi-menu-clarity">
+(function(){
+'use strict';
+function enhanceKpiClarity(){
+  var summary=document.getElementById('kpi-summary');
+  if(summary&&!summary.querySelector('.kpi-legend'))summary.insertAdjacentHTML('beforeend','<div class="kpi-legend" aria-label="Legenda stato KPI"><span class="kpi-legend-title">Come leggere le schede</span><span class="kpi-legend-item green">Calcolato</span><span class="kpi-legend-item yellow">Con assunzioni</span><span class="kpi-legend-item orange">Da completare</span></div>');
+  document.querySelectorAll('#kpi-content .status-pill').forEach(function(pill){
+    var label=pill.classList.contains('green')?'Calcolato':pill.classList.contains('yellow')?'Con assunzioni':pill.classList.contains('orange')?'Da completare':'Non applicabile';
+    pill.textContent=label;pill.setAttribute('aria-label','Stato KPI: '+label);
+  });
+}
+if(typeof renderKpis==='function'){
+  var clarityBaseRenderKpis=renderKpis;
+  renderKpis=function(){var out=clarityBaseRenderKpis.apply(this,arguments);enhanceKpiClarity();return out;};
+  window.renderKpis=renderKpis;
+}
+function installSidebarClose(){
+  var sidebar=document.getElementById('sidebar'),brand=sidebar&&sidebar.querySelector('.sb-brand');
+  if(!sidebar||!brand||brand.querySelector('.sb-close-mobile'))return;
+  var close=document.createElement('button');close.type='button';close.className='sb-close-mobile';close.setAttribute('aria-label','Chiudi il menu Analisi di bilancio');close.textContent='×';brand.appendChild(close);
+  close.addEventListener('click',function(){if(typeof toggleSidebar==='function')toggleSidebar();setTimeout(function(){document.getElementById('sb-toggle')?.focus();},30);});
+  function sync(){
+    var mobile=matchMedia('(max-width:980px)').matches,open=mobile&&sidebar.classList.contains('open');
+    document.documentElement.classList.toggle('fa-tool-menu-open',open);close.hidden=!open;
+  }
+  new MutationObserver(sync).observe(sidebar,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('resize',sync,{passive:true});sync();
+}
+function bootClarity(){installSidebarClose();if(document.getElementById('view-kpi')?.classList.contains('active'))enhanceKpiClarity();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootClarity,{once:true});else bootClarity();
+})();
+</script>
+
 <script src="/assets/tal-xlsx-guard.js?v=20260810-1"></script>
 </body></html>

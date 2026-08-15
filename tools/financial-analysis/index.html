@@ -255,7 +255,7 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 <section class="fs-view" id="view-kpi">
 <span class="step-label">VI · KPI</span><h2 class="page-title">Analisi per indici</h2><p class="page-lead">Gli indicatori sono organizzati per famiglia. I colori descrivono l’<b>affidabilità del dato</b>, non la qualità economico-finanziaria della società. Le anomalie oggettive sono esposte separatamente.</p><div class="rule"></div>
 <div class="panel kpi-actions"><div><h2>Report KPI</h2><p>Esporta un report autonomo con valore, formula, stato di affidabilità, note metodologiche e segnalazioni fattuali.</p></div><div class="btn-row"><button class="btn" onclick="exportKpiExcel()">Esporta KPI Excel</button><button class="btn secondary" onclick="printKpiReport()">Esporta / stampa KPI PDF</button></div></div>
-<div class="panel"><div class="grid g3"><div class="field"><label for="kpi-ebitda-base">Base EBITDA per i multipli</label><select id="kpi-ebitda-base" onchange="setAdjustedKpiMode(this.value)"><option value="reported">EBITDA contabile</option><option value="adjusted">EBITDA rettificato</option></select><span class="hint">Si applica a EBITDA margin, PFN/EBITDA, debito/EBITDA e interest coverage EBITDA.</span></div><div class="field"><label>Legenda affidabilità</label><div class="legend-inline"><span class="legend-dot green"></span> Completo <span class="legend-dot yellow"></span> Con assunzioni <span class="legend-dot orange"></span> Dati mancanti <span class="legend-dot gray"></span> N/A</div></div></div></div>
+<div class="panel"><div class="grid g3"><div class="field"><label for="kpi-ebitda-base">Base EBITDA per i multipli</label><select id="kpi-ebitda-base" onchange="setAdjustedKpiMode(this.value)"><option value="reported">EBITDA contabile</option><option value="adjusted">EBITDA rettificato</option></select><span class="hint">Si applica a EBITDA margin, PFN/EBITDA, debito/EBITDA e interest coverage EBITDA.</span></div><div class="field"><label>Legenda affidabilità</label><div class="legend-inline"><span class="legend-dot green"></span> Completo <span class="legend-dot yellow"></span> Con assunzioni <span class="legend-dot orange"></span> Da integrare <span class="legend-dot gray"></span> Non applicabile</div></div></div></div>
 <div id="kpi-summary"></div><div id="kpi-content"></div>
 <div class="panel" style="margin-top:20px"><h2>Dati integrativi per KPI</h2><p>Questi dati non sono contenuti nel bilancio civilistico. Compilali soltanto per attivare o affinare gli indicatori indicati.</p><div class="grid g3" style="margin-top:15px"><div class="field"><label for="extra-emp-current">Dipendenti medi — corrente</label><input id="extra-emp-current" min="0" type="number"/><span class="hint">Media dell’esercizio corrente</span></div><div class="field"><label for="extra-emp-previous">Dipendenti medi — precedente</label><input id="extra-emp-previous" min="0" type="number"/><span class="hint">Dato documentale per il comparativo</span></div><div class="field"><label for="extra-purchases">Acquisti rilevanti per DPO — corrente</label><input id="extra-purchases" step="0.01" type="number"/><span class="hint">In assenza il tool usa B6 come proxy e lo segnala</span></div><div class="field"><label for="extra-vat-sales">IVA media sui crediti clienti (%)</label><input id="extra-vat-sales" max="100" min="0" step="0.1" type="number"/><span class="hint">Facoltativa; corregge il denominatore del DSO</span></div><div class="field"><label for="extra-vat-purchases">IVA media sui debiti fornitori (%)</label><input id="extra-vat-purchases" max="100" min="0" step="0.1" type="number"/><span class="hint">Facoltativa; corregge il denominatore del DPO</span></div><div class="field"><label for="extra-cashflow">Cash flow disponibile per il debito</label><input id="extra-cashflow" step="0.01" type="number"/></div><div class="field"><label for="extra-debtservice">Servizio del debito prospettico</label><input id="extra-debtservice" step="0.01" type="number"/></div></div><div class="btn-row"><button class="btn secondary" onclick="saveExtraKpi()">Salva dati integrativi</button></div></div>
 </section>
@@ -935,13 +935,13 @@ function factualAlerts(c=ceCore(),s=spCore()){
   return a;
 }
 function setAdjustedKpiMode(v){STATE.extra.useAdjustedEbitda=v==='adjusted';saveConfig(false);updateAll();}
-function kpiStatusLabel(s){return s==='green'?'Completo':s==='yellow'?'Con assunzioni':s==='orange'?'Dati mancanti':'Non applicabile';}
+function kpiStatusLabel(s){return s==='green'?'Completo':s==='yellow'?'Con assunzioni':s==='orange'?'Da integrare':'Non applicabile';}
 
 function renderKpis(){
   if(!STATE.loaded){$('#kpi-content').innerHTML='<div class="empty-state"><h3>Nessun KPI disponibile</h3><p>Importa il bilancio per iniziare.</p></div>';return;}
   const all=makeKpis(),families=[...new Set(all.map(k=>k.family))],counts={green:0,yellow:0,orange:0,gray:0};all.forEach(k=>counts[k.status]++);const alerts=factualAlerts();
   $('#kpi-ebitda-base').value=(STATE.extra.useAdjustedEbitda===true||STATE.extra.useAdjustedEbitda==='true')?'adjusted':'reported';
-  $('#kpi-summary').innerHTML=`<div class="checks-grid"><div class="check-item ok"><span class="name">KPI calcolabili</span><span class="value">${counts.green}</span></div><div class="check-item warn"><span class="name">Con assunzioni</span><span class="value">${counts.yellow}</span></div><div class="check-item fail"><span class="name">Dati mancanti</span><span class="value">${counts.orange}</span></div><div class="check-item"><span class="name">Non applicabili</span><span class="value">${counts.gray}</span></div></div>${alerts.length?`<div class="factual-alerts"><h2>Segnalazioni fattuali</h2>${alerts.map(a=>`<div class="fact-alert ${a.severity==='critical'?'':'warn'}"><b>${esc(a.title)}.</b> ${esc(a.text)}</div>`).join('')}</div>`:'<div class="callout ok"><b>Nessuna anomalia fattuale primaria rilevata.</b> Ciò non costituisce un giudizio positivo sulla società.</div>'}`;
+  $('#kpi-summary').innerHTML=`<div class="checks-grid"><div class="check-item ok"><span class="name">KPI completi</span><span class="value">${counts.green}</span></div><div class="check-item warn"><span class="name">Con assunzioni</span><span class="value">${counts.yellow}</span></div><div class="check-item fail"><span class="name">Da integrare</span><span class="value">${counts.orange}</span></div><div class="check-item"><span class="name">Non applicabili</span><span class="value">${counts.gray}</span></div></div>${alerts.length?`<div class="factual-alerts"><h2>Segnalazioni fattuali</h2>${alerts.map(a=>`<div class="fact-alert ${a.severity==='critical'?'':'warn'}"><b>${esc(a.title)}.</b> ${esc(a.text)}</div>`).join('')}</div>`:'<div class="callout ok"><b>Nessuna anomalia fattuale primaria rilevata.</b> Ciò non costituisce un giudizio positivo sulla società.</div>'}`;
   $('#kpi-content').innerHTML=families.map((family,idx)=>{const arr=all.filter(k=>k.family===family),fc={green:0,yellow:0,orange:0,gray:0};arr.forEach(k=>fc[k.status]++);return `<details class="kpi-family-group" ${idx<2?'open':''}><summary><span>${esc(family)}</span><span class="kpi-family-counts">${fc.green} completi · ${fc.yellow} con assunzioni · ${fc.orange} da integrare</span></summary><div class="kpi-family-body"><div class="kpi-grid">${arr.map(k=>{const b=benchmarkFor(k.code);return `<article class="kpi-card ${k.status} ${k.issueSeverity?'issue-'+k.issueSeverity:''}"><div class="kpi-head"><div><span class="kpi-family">${esc(k.family)}</span><h3>${esc(k.name)}</h3></div><span class="status-pill ${k.status}">${kpiStatusLabel(k.status)}</span></div><div class="kpi-value">${formatKpi(k)}</div><div class="kpi-formula">${esc(k.formula)}</div>${k.dataBasis?`<div class="kpi-data-basis">Base: ${esc(k.dataBasis)}</div>`:''}${k.note?`<p class="kpi-note">${esc(k.note)}</p>`:''}${k.issue?`<div class="kpi-issue"><b>Segnalazione:</b> ${esc(k.issue)}</div>`:''}${b?benchmarkHtml(k,b):''}</article>`;}).join('')}</div></div></details>`;}).join('');
 }
 function benchmarkHtml(k,b){const f=v=>k.unit==='%'?fmt(v*100,1)+'%':k.unit==='EUR'?money(v):k.unit==='giorni'?fmt(v,1)+' gg':fmt(v,2)+'x';return `<div class="benchmark-strip"><b>Benchmark ${esc(b.year)}</b><span>Q1 ${f(b.q1)}</span><span>Mediana ${f(b.median)}</span><span>Q3 ${f(b.q3)}</span><small>${esc(b.source)}${b.sample?' · '+esc(b.sample):''}</small></div>`;}
@@ -3483,14 +3483,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #view-kpi .check-item{min-height:64px;padding:10px 12px;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:none}
 #view-kpi .check-item .name{font-size:10px;letter-spacing:.07em}
 #view-kpi .check-item .value{font-size:20px}
-.kpi-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#f8f7f4}
-.kpi-legend-title{font-size:10px;font-weight:800;color:var(--g5);margin-right:2px}
-.kpi-legend-item{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:10px;font-weight:700;color:var(--g5)}
-.kpi-legend-item::before,.status-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--status-color,#7d8490);flex:0 0 auto}
-.kpi-legend-item.green,.status-pill.green{--status-color:#25775c}
-.kpi-legend-item.yellow,.status-pill.yellow{--status-color:#9a6b05}
-.kpi-legend-item.orange,.status-pill.orange{--status-color:#b14b31}
-.kpi-legend-item.gray,.status-pill.gray{--status-color:#747b86}
+.status-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--status-color,#7d8490);flex:0 0 auto}
+.status-pill.green{--status-color:#25775c}
+.status-pill.yellow{--status-color:#9a6b05}
+.status-pill.orange{--status-color:#b14b31}
+.status-pill.gray{--status-color:#747b86}
 .kpi-family-group{margin-bottom:10px;border-radius:12px;box-shadow:none}
 .kpi-family-group>summary{padding:12px 14px;background:#f7f6f2}
 .kpi-family-body{padding:10px}
@@ -3510,7 +3507,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .kpi-issue{font-size:10.5px;line-height:1.4}
 @media(max-width:1180px){.kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:860px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){#view-kpi .checks-grid,.kpi-grid{grid-template-columns:1fr}.kpi-legend{align-items:flex-start}.kpi-legend-title{width:100%}}
+@media(max-width:560px){#view-kpi .checks-grid,.kpi-grid{grid-template-columns:1fr}}
 @media(max-width:980px){
   html.fa-tool-menu-open .sb-toggle{display:none!important}
   .appbar#sidebar.open .sb-close-mobile{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-left:auto;border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.10);color:#fff;font:700 20px/1 var(--sans);cursor:pointer}
@@ -3520,19 +3517,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="fa-kpi-menu-clarity">
 (function(){
 'use strict';
-function enhanceKpiClarity(){
-  var summary=document.getElementById('kpi-summary');
-  if(summary&&!summary.querySelector('.kpi-legend'))summary.insertAdjacentHTML('beforeend','<div class="kpi-legend" aria-label="Legenda stato KPI"><span class="kpi-legend-title">Come leggere le schede</span><span class="kpi-legend-item green">Calcolato</span><span class="kpi-legend-item yellow">Con assunzioni</span><span class="kpi-legend-item orange">Da completare</span></div>');
-  document.querySelectorAll('#kpi-content .status-pill').forEach(function(pill){
-    var label=pill.classList.contains('green')?'Calcolato':pill.classList.contains('yellow')?'Con assunzioni':pill.classList.contains('orange')?'Da completare':'Non applicabile';
-    pill.textContent=label;pill.setAttribute('aria-label','Stato KPI: '+label);
-  });
-}
-if(typeof renderKpis==='function'){
-  var clarityBaseRenderKpis=renderKpis;
-  renderKpis=function(){var out=clarityBaseRenderKpis.apply(this,arguments);enhanceKpiClarity();return out;};
-  window.renderKpis=renderKpis;
-}
 function installSidebarClose(){
   var sidebar=document.getElementById('sidebar'),brand=sidebar&&sidebar.querySelector('.sb-brand');
   if(!sidebar||!brand||brand.querySelector('.sb-close-mobile'))return;
@@ -3545,7 +3529,7 @@ function installSidebarClose(){
   new MutationObserver(sync).observe(sidebar,{attributes:true,attributeFilter:['class']});
   window.addEventListener('resize',sync,{passive:true});sync();
 }
-function bootClarity(){installSidebarClose();if(document.getElementById('view-kpi')?.classList.contains('active'))enhanceKpiClarity();}
+function bootClarity(){installSidebarClose();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootClarity,{once:true});else bootClarity();
 })();
 </script>

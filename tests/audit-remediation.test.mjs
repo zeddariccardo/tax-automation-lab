@@ -19,10 +19,13 @@ function inlineScripts(html){
 
 for(const relative of [
   'tools/financial-analysis/index.html',
+  'tools/financial-statement/index.html',
   'tools/lipe/index.html',
   'tools/f24/index.html',
   'tools/tfa-client-file/index.html',
-  'configura-con-ai/index.html'
+  'configura-con-ai/index.html',
+  'en/configure-with-ai/index.html',
+  'es/configura-con-ia/index.html'
 ]){
   const scripts=inlineScripts(read(relative));
   assert.ok(scripts.length>0,`${relative}: nessuno script inline trovato`);
@@ -39,9 +42,10 @@ assert.match(fa,/Diagnostica crisi e continuità/);
 assert.match(fa,/aria-controls/);
 assert.match(fa,/id="fa-kpi-menu-clarity-style"/);
 assert.match(fa,/className='sb-close-mobile'/);
-assert.match(fa,/Come leggere le schede/);
+assert.match(fa,/Legenda affidabilità/);
 assert.match(fa,/Con assunzioni/);
-assert.match(fa,/Da completare/);
+assert.match(fa,/Da integrare/);
+assert.doesNotMatch(fa,/class="kpi-legend"/);
 
 const lipe=read('tools/lipe/index.html');
 assert.match(lipe,/data-tool-version="3\.6\.1"/);
@@ -68,9 +72,27 @@ assert.match(tfa,/\.import-flow\{display:grid;grid-template-columns:repeat\(3,mi
 
 const configureAi=read('configura-con-ai/index.html');
 assert.match(configureAi,/class="screen-marker"/);
+assert.match(configureAi,/Bilancio civilistico ITA GAAP/);
+assert.match(configureAi,/bilancio-ita-gaap-import-20260815\.png/);
 assert.match(configureAi,/analisi-bilancio-import-20260815\.png/);
 assert.match(configureAi,/lipe-periodo-20260815\.png/);
 assert.match(configureAi,/fascicolo-importa-excel-20260815\.png/);
 assert.match(configureAi,/f24-import-massivo-20260815\.png/);
+assert.match(configureAi,/setupGrid\.appendChild\(f24Setup\)/);
+assert.doesNotMatch(configureAi,/financial-statement-import-(?:tab|button)\.png/);
+
+for(const relative of ['en/configure-with-ai/index.html','es/configura-con-ia/index.html']){
+  const page=read(relative);
+  assert.match(page,/ITA GAAP/);
+  assert.match(page,/bilancio-ita-gaap-import-20260815\.png/);
+  assert.match(page,/f24-import-massivo-20260815\.png/);
+  assert.doesNotMatch(page,/financial-statement-import-(?:tab|button)\.png/);
+}
+
+for(const relative of ['configura-con-ai/index.html','en/configure-with-ai/index.html','es/configura-con-ia/index.html']){
+  for(const match of read(relative).matchAll(/(?:src|href)="(\/resources\/[^"?#]+)[^"\s]*"/g)){
+    assert.ok(fs.existsSync(path.join(root,match[1].slice(1))),`${relative}: risorsa mancante ${match[1]}`);
+  }
+}
 
 console.log('Audit remediation: sintassi e regole critiche verificate.');

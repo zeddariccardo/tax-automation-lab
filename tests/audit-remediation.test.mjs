@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+
+const here=path.dirname(fileURLToPath(import.meta.url));
+const root=path.resolve(here,'..');
+const read=relative=>fs.readFileSync(path.join(root,relative),'utf8');
+
+function inlineScripts(html){
+  const out=[];
+  for(const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)){
+    if(/\bsrc\s*=/i.test(match[1])||/application\/ld\+json/i.test(match[1]))continue;
+    out.push(match[2]);
+  }
+  return out;
+}
+
+for(const relative of ['tools/financial-analysis/index.html','tools/lipe/index.html']){
+  const scripts=inlineScripts(read(relative));
+  assert.ok(scripts.length>0,`${relative}: nessuno script inline trovato`);
+  scripts.forEach((source,index)=>assert.doesNotThrow(()=>new vm.Script(source,{filename:`${relative}#script-${index+1}`})));
+}
+
+const fa=read('tools/financial-analysis/index.html');
+assert.match(fa,/\['cg_inventory_products','Variazione prodotti e lavori in corso'\]/);
+assert.match(fa,/\['cg_internal_work','Incrementi per lavori interni'\]/);
+assert.match(fa,/\['cg_prod_da','D&A industriale allocata al costo del venduto'\]/);
+assert.match(fa,/return \(g\.cg_prod_direct\|\|0\)\+\(g\.cg_prod_indirect\|\|0\)\+\(g\.cg_inventory_products\|\|0\)\+\(g\.cg_internal_work\|\|0\)\+\(g\.cg_prod_da\|\|0\)/);
+assert.match(fa,/Benchmark incompleto/);
+assert.match(fa,/Diagnostica crisi e continuità/);
+assert.match(fa,/aria-controls/);
+
+const lipe=read('tools/lipe/index.html');
+assert.match(lipe,/data-tool-version="3\.6\.1"/);
+assert.match(lipe,/"softwareVersion":"3\.6\.1"/);
+assert.match(lipe,/const APP_VERSION='3\.6\.1'/);
+assert.match(lipe,/const PATCH_VERSION='3\.6\.1'/);
+assert.match(lipe,/var VERSION='3\.6\.1'/);
+assert.match(lipe,/xmlPushMoney\(tags,'VersamentiAutoUE',v\.vp10\)/);
+assert.match(lipe,/if\(!q5\|\|sub\)xmlPushMoney\(tags,'CreditiImposta',v\.vp11\)/);
+assert.match(lipe,/if\(!q5\|\|sub\)\{if\(v\.vp14deb/);
+assert.match(lipe,/front\.push\(xmlTag\('FlagConferma','1',3\)\)/);
+assert.match(lipe,/seqKey='IVP18_'\+transmitter/);
+assert.match(lipe,/filename:'IT'\+transmitter\+'_LI_'/);
+assert.match(lipe,/year===2023\?25\.82:100/);
+assert.match(lipe,/PROSPETTO DI LAVORO · NON PRESENTABILE/);
+assert.match(lipe,/moduleProfile:'single'/);
+
+console.log('Audit remediation: sintassi e regole critiche verificate.');

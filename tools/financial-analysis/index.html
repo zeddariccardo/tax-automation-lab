@@ -190,7 +190,7 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 <script defer src="/assets/tal-app.js?v=20260814c"></script>
 </head>
 <body class="tal-tool-page"><h1 class="sr-only" id="tool-main-title">Analisi di bilancio</h1>
-<button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
+<button aria-label="Apri o chiudi il menu Financial Analysis" class="sb-toggle" id="sb-toggle" type="button">☰ Menu analisi</button>
 <div class="sb-backdrop" id="sb-backdrop"></div>
 <nav aria-label="Navigazione del tool" class="appbar" id="sidebar">
 <div class="sb-brand"><span class="sb-logo">FA</span><span class="sb-brandtext"><b>Financial Analysis</b><small>Reclassification · KPI</small></span></div>
@@ -1076,7 +1076,7 @@ document.addEventListener('DOMContentLoaded',init);
    ============================================================ */
 const V14_ADVANCED_VIEWS=[
   ['cashflow','F','Rendiconto finanziario'],
-  ['adequacy','D','Adeguati assetti'],
+  ['adequacy','D','Crisi e continuità'],
   ['dupont','U','Analisi DuPont'],
   ['bridge','V','Bridge variazioni'],
   ['history','S','Serie storica']
@@ -1111,9 +1111,9 @@ function installV14Views(){
   <div id="cashflow-content"></div>
 </section>
 <section class="fs-view" id="view-adequacy">
-  <h2><span>Analisi avanzata</span>Diagnostica degli adeguati assetti</h2>
+  <h2><span>Analisi avanzata</span>Diagnostica crisi e continuità</h2>
   <p class="lead">Organizza indicatori economici, patrimoniali e finanziari utili al monitoraggio degli squilibri. Non attribuisce automaticamente uno stato di crisi e non sostituisce la valutazione prospettica dell’organo amministrativo e del professionista.</p>
-  <div class="callout"><b>Perimetro:</b> gli indicatori storici sono un presidio diagnostico. La verifica degli adeguati assetti richiede anche dati prospettici, scadenziari, budget di tesoreria e informazioni qualitative non contenute nel bilancio.</div>
+  <div class="callout"><b>Perimetro:</b> questa è una diagnostica finanziaria preliminare. Non verifica l’adeguatezza degli assetti organizzativi, amministrativi e contabili; servono anche dati prospettici, scadenziari, budget di tesoreria e informazioni qualitative non contenute nel bilancio.</div>
   <div class="panel"><h2>Informazioni facoltative per i controlli oggettivi</h2><p>Inserisci esclusivamente importi verificati. I dati scaduti non vengono stimati dal tool.</p>
     <div class="grid">
       <div class="field"><label for="ad-share-capital">Capitale sociale sottoscritto</label><input id="ad-share-capital" inputmode="decimal" placeholder="Per il confronto con la perdita"><span class="hint">Il confronto non considera automaticamente riserve e perdite pregresse.</span></div>
@@ -1346,7 +1346,7 @@ const SCHEME_TARGETS={
     ['ce_prod','Valore della produzione'],['ce_external','Costi operativi esterni'],['ce_personnel','Costo del personale'],['ce_da_prov','D&A, svalutazioni e accantonamenti'],['ce_financial','Gestione finanziaria e rettifiche'],['ce_taxes','Imposte'],['ce_other','Altri componenti']
   ]},
   ce_cogs:{type:'CE',label:'Conto economico — costo del venduto',kpi:'Gross margin, DIO e analisi funzionale',targets:[
-    ['cg_revenue','Ricavi'],['cg_other_revenue','Altri ricavi operativi'],['cg_prod_direct','Produzione — costi diretti'],['cg_prod_indirect','Produzione — costi indiretti'],['cg_logistics','Logistica'],['cg_selling','Commerciale'],['cg_ga','Amministrazione / corporate'],['cg_rd','Ricerca e sviluppo'],['cg_other_operating','Altri costi operativi'],['cg_da_prov','D&A, svalutazioni e accantonamenti'],['cg_financial','Gestione finanziaria'],['cg_taxes','Imposte']
+    ['cg_revenue','Ricavi'],['cg_inventory_products','Variazione prodotti e lavori in corso'],['cg_internal_work','Incrementi per lavori interni'],['cg_other_revenue','Altri ricavi operativi'],['cg_prod_direct','Produzione — costi diretti'],['cg_prod_indirect','Produzione — costi indiretti'],['cg_prod_da','D&A industriale allocata al costo del venduto'],['cg_logistics','Logistica'],['cg_selling','Commerciale'],['cg_ga','Amministrazione / corporate'],['cg_rd','Ricerca e sviluppo'],['cg_other_operating','Altri costi operativi'],['cg_da_prov','D&A, svalutazioni e accantonamenti non allocati'],['cg_financial','Gestione finanziaria'],['cg_taxes','Imposte']
   ]},
   ce_contrib:{type:'CE',label:'Conto economico — margine di contribuzione',kpi:'Margine di contribuzione e struttura dei costi',targets:[
     ['cc_revenue','Ricavi e altri proventi operativi'],['cc_variable','Costi variabili'],['cc_mixed_variable','Quota variabile dei costi misti'],['cc_fixed_specific','Costi fissi specifici'],['cc_mixed_fixed','Quota fissa dei costi misti'],['cc_fixed_common','Costi fissi comuni'],['cc_da_prov','D&A, svalutazioni e accantonamenti'],['cc_financial','Gestione finanziaria'],['cc_taxes','Imposte']
@@ -1400,7 +1400,7 @@ function defaultTarget(scheme,g){
     if(/^A/.test(c))return'ce_prod';if(/^(B6|B7|B8|B11|B14)/.test(c))return'ce_external';if(/^B9/.test(c))return'ce_personnel';if(/^(B10|B12|B13)/.test(c))return'ce_da_prov';if(/^C|^D/.test(c))return'ce_financial';if(/^20/.test(c))return'ce_taxes';return'ce_other';
   }
   if(scheme==='ce_cogs'){
-    if(c==='A1')return'cg_revenue';if(/^A/.test(c))return'cg_other_revenue';if(/^(B10|B12|B13)/.test(c))return'cg_da_prov';if(/^C|^D/.test(c))return'cg_financial';if(/^20/.test(c))return'cg_taxes';
+    if(c==='A1')return'cg_revenue';if(c==='A2'||c==='A3')return'cg_inventory_products';if(c==='A4')return'cg_internal_work';if(/^A/.test(c))return'cg_other_revenue';if(/^B10/.test(c)&&/ammort|svalut/.test(d)&&/impiant|stabil|produz|macchin/.test(d))return'cg_prod_da';if(/^(B10|B12|B13)/.test(c))return'cg_da_prov';if(/^C|^D/.test(c))return'cg_financial';if(/^20/.test(c))return'cg_taxes';
     const fn=at.function||inferFunction(a).value;return {production_direct:'cg_prod_direct',production_indirect:'cg_prod_indirect',logistics:'cg_logistics',selling:'cg_selling',ga:'cg_ga',rd:'cg_rd',other:'cg_other_operating'}[fn]||'cg_other_operating';
   }
   if(scheme==='ce_contrib'){
@@ -1456,7 +1456,7 @@ function syncMappingDecision(scheme,key,rows){
   if(rows.length!==1)return;const a=STATE.accounts.find(x=>accountKey(x)===key);if(!a)return;const t=rows[0].target,at=getAttr(a);
   if(scheme==='sp_fin'||scheme==='sp_sources'){if(/noncurrent_assets|permanent_uses/.test(t))at.currentClass='noncurrent';else if(/current_assets|current_uses/.test(t))at.currentClass='current';else if(/equity/.test(t))at.currentClass='equity';else if(/noncurrent_liab|consolidated_sources/.test(t))at.currentClass='noncurrent';else at.currentClass='current';at.currentClassStatus='confirmed';}
   if(scheme==='sp_pfn'){at.pfn=t==='spfn_debt'?'debt':t==='spfn_cash'?(sectionFor(a)==='sp_attivo'&&getAttr(a).nature==='cash'?'cash':'financial_asset'):'exclude';at.pfnStatus='confirmed';}
-  if(scheme==='ce_cogs'){const m={cg_prod_direct:'production_direct',cg_prod_indirect:'production_indirect',cg_logistics:'logistics',cg_selling:'selling',cg_ga:'ga',cg_rd:'rd',cg_other_operating:'other'};if(m[t]){at.function=m[t];at.functionStatus='confirmed';}}
+  if(scheme==='ce_cogs'){const m={cg_prod_direct:'production_direct',cg_prod_indirect:'production_indirect',cg_prod_da:'production_indirect',cg_logistics:'logistics',cg_selling:'selling',cg_ga:'ga',cg_rd:'rd',cg_other_operating:'other'};if(m[t]){at.function=m[t];at.functionStatus='confirmed';}}
   if(scheme==='ce_contrib'){const m={cc_variable:'variable',cc_fixed_specific:'fixed_specific',cc_fixed_common:'fixed_common'};if(m[t]){at.behavior=m[t];at.behaviorStatus='confirmed';}}
 }
 function renderMapping(){
@@ -1505,7 +1505,7 @@ function mappedSections(){
   const ceDefs=[
     ['ce_va','Conto economico — valore aggiunto',[['cv_revenue','Ricavi delle vendite'],['cv_inventory_products','Variazione prodotti e lavori in corso'],['cv_internal_work','Incrementi per lavori interni'],['cv_other_revenue','Altri ricavi e proventi'],['cv_materials','Materie e variazione materie'],['cv_services','Servizi'],['cv_leases','Godimento beni di terzi'],['cv_other_costs','Oneri diversi di gestione'],['cv_personnel','Costo del personale'],['cv_da','Ammortamenti e svalutazioni'],['cv_provisions','Accantonamenti'],['cv_financial','Gestione finanziaria'],['cv_revaluations','Rettifiche finanziarie'],['cv_taxes','Imposte']]],
     ['ce_ebitda','Conto economico — EBITDA / EBIT',[['ce_prod','Valore della produzione'],['ce_external','Costi operativi esterni'],['ce_personnel','Costo del personale'],['ce_da_prov','D&A, svalutazioni e accantonamenti'],['ce_financial','Gestione finanziaria e rettifiche'],['ce_taxes','Imposte']]],
-    ['ce_cogs','Conto economico — costo del venduto',[['cg_revenue','Ricavi'],['cg_other_revenue','Altri ricavi operativi'],['cg_prod_direct','Produzione — costi diretti'],['cg_prod_indirect','Produzione — costi indiretti'],['cg_logistics','Logistica'],['cg_selling','Commerciale'],['cg_ga','Amministrazione / corporate'],['cg_rd','Ricerca e sviluppo'],['cg_other_operating','Altri costi operativi'],['cg_da_prov','D&A, svalutazioni e accantonamenti'],['cg_financial','Gestione finanziaria'],['cg_taxes','Imposte']]],
+    ['ce_cogs','Conto economico — costo del venduto',[['cg_revenue','Ricavi'],['cg_inventory_products','Variazione prodotti e lavori in corso'],['cg_internal_work','Incrementi per lavori interni'],['cg_other_revenue','Altri ricavi operativi'],['cg_prod_direct','Produzione — costi diretti'],['cg_prod_indirect','Produzione — costi indiretti'],['cg_prod_da','D&A industriale allocata al costo del venduto'],['cg_logistics','Logistica'],['cg_selling','Commerciale'],['cg_ga','Amministrazione / corporate'],['cg_rd','Ricerca e sviluppo'],['cg_other_operating','Altri costi operativi'],['cg_da_prov','D&A, svalutazioni e accantonamenti non allocati'],['cg_financial','Gestione finanziaria'],['cg_taxes','Imposte']]],
     ['ce_contrib','Conto economico — margine di contribuzione',[['cc_revenue','Ricavi e altri proventi'],['cc_variable','Costi variabili'],['cc_mixed_variable','Quota variabile dei costi misti'],['cc_fixed_specific','Costi fissi specifici'],['cc_mixed_fixed','Quota fissa dei costi misti'],['cc_fixed_common','Costi fissi comuni'],['cc_da_prov','D&A, svalutazioni e accantonamenti'],['cc_financial','Gestione finanziaria'],['cc_taxes','Imposte']]],
     ['ce_areas','Conto economico — aree gestionali',[['ca_operating_revenue','Ricavi e proventi operativi'],['ca_operating_costs','Costi operativi'],['ca_financial','Gestione finanziaria'],['ca_revaluations','Rettifiche finanziarie'],['ca_taxes','Imposte']]],
     ['ce_adjusted','Conto economico — Adjusted EBITDA',[['cad_operating_revenue','Ricavi e proventi operativi'],['cad_operating_costs','Costi operativi reported'],['cad_below_ebitda','D&A, svalutazioni e accantonamenti'],['cad_financial','Gestione finanziaria'],['cad_taxes','Imposte']]]
@@ -3292,6 +3292,188 @@ function install(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(install,0);},{once:true});
 else setTimeout(install,0);
+})();
+</script>
+
+<style id="fa-audit-remediation-style">
+html{scroll-padding-top:calc(var(--tal-global-header-height,60px) + 12px)}
+.reclass-detail-toggle{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:5px 7px;border:0;border-radius:7px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.reclass-detail-toggle:hover{background:rgba(20,83,104,.08)}
+.reclass-detail-toggle:focus-visible,.move-select:focus-visible{outline:3px solid #246bfd;outline-offset:2px}
+.v20-segment button{min-height:44px}
+.tal-global-header .tal-gh-lang a{display:inline-flex!important;align-items:center!important;justify-content:center!important;border-radius:999px!important;line-height:1!important;text-decoration:none!important}
+@media(max-width:980px){
+  html.tal-tool-page .sb-toggle{top:var(--tal-tool-menu-top,68px)!important;width:auto!important;min-width:112px!important;height:44px!important;padding:9px 12px!important;font-size:11px!important;line-height:1!important;z-index:6010!important}
+  html.tal-tool-page .sb-toggle::before{content:none!important}
+  html.tal-tool-page #sidebar.open{z-index:6000!important}
+  html.tal-tool-page .sb-backdrop.show{z-index:5990!important}
+  .lk,.tal-start-demo,.v20-segment button,.reclass-detail-toggle,.move-select{min-height:44px;min-width:44px}
+}
+</style>
+<script id="fa-audit-remediation">
+(function(){
+'use strict';
+var FA_HASH={archive:'clienti',setup:'anagrafica',import:'importa',mapping:'mappatura',schemes:'schemi',exceptions:'eccezioni',reclass:'riclassificazioni',kpi:'kpi',executive:'dashboard',planning:'budget',centers:'centri',benchmark:'benchmark',adjust:'rettifiche',cashflow:'rendiconto',adequacy:'assetti',dupont:'dupont',bridge:'bridge',history:'serie-storica',reportcenter:'esporta',data:'dati',method:'aiuto'};
+
+function cogsSigned(field){
+  if(!STATE.selected.has('ce_cogs')||unresolved('function'))return null;
+  var g=aggregateScheme('ce_cogs',STATE.accounts,field||'current');
+  return (g.cg_prod_direct||0)+(g.cg_prod_indirect||0)+(g.cg_inventory_products||0)+(g.cg_internal_work||0)+(g.cg_prod_da||0);
+}
+function cogsValue(field){var v=cogsSigned(field);return v==null?null:Math.abs(v);}
+try{v17CogsValue=cogsValue;v18CogsValue=cogsValue;}catch(_){ }
+window.faCogsValue=cogsValue;
+
+if(typeof makeKpis==='function'){
+  var baseMakeKpis=makeKpis;
+  makeKpis=function(){
+    var out=baseMakeKpis.apply(this,arguments),dio=out.find(function(k){return k.code==='eff_dio';});
+    if(dio&&dio.value!=null)dio.note='Il denominatore coincide con il costo del venduto esposto nella riclassificazione, inclusa l’eventuale D&A industriale allocata.';
+    return out;
+  };
+  window.makeKpis=makeKpis;
+}
+
+if(typeof v17SectionModels==='function'){
+  var baseSectionModels=v17SectionModels;
+  v17SectionModels=function(){
+    var models=baseSectionModels.apply(this,arguments),idx=models.findIndex(function(m){return m.scheme==='ce_cogs';});
+    if(idx<0)return models;
+    var cur=aggregateScheme('ce_cogs',STATE.accounts,'current'),pre=aggregateScheme('ce_cogs',STATE.accounts,'previous');
+    var n=function(o,k){return Number(o[k]||0);},row=function(label,current,previous,kind,target){return {label:label,current:round2(current)||0,previous:round2(previous)||0,kind:kind||'detail',target:target||''};};
+    var cogs=n(cur,'cg_prod_direct')+n(cur,'cg_prod_indirect')+n(cur,'cg_inventory_products')+n(cur,'cg_internal_work')+n(cur,'cg_prod_da');
+    var cogsP=n(pre,'cg_prod_direct')+n(pre,'cg_prod_indirect')+n(pre,'cg_inventory_products')+n(pre,'cg_internal_work')+n(pre,'cg_prod_da');
+    var gross=n(cur,'cg_revenue')+cogs,grossP=n(pre,'cg_revenue')+cogsP;
+    var opex=n(cur,'cg_logistics')+n(cur,'cg_selling')+n(cur,'cg_ga')+n(cur,'cg_rd')+n(cur,'cg_other_operating');
+    var opexP=n(pre,'cg_logistics')+n(pre,'cg_selling')+n(pre,'cg_ga')+n(pre,'cg_rd')+n(pre,'cg_other_operating');
+    var ebitda=gross-n(cur,'cg_prod_da')+n(cur,'cg_other_revenue')+opex,ebitdaP=grossP-n(pre,'cg_prod_da')+n(pre,'cg_other_revenue')+opexP;
+    var ebit=ebitda+n(cur,'cg_prod_da')+n(cur,'cg_da_prov'),ebitP=ebitdaP+n(pre,'cg_prod_da')+n(pre,'cg_da_prov');
+    var net=ebit+n(cur,'cg_financial')+n(cur,'cg_taxes'),netP=ebitP+n(pre,'cg_financial')+n(pre,'cg_taxes');
+    models[idx]={title:'Conto economico — costo del venduto',scheme:'ce_cogs',note:'Il costo del venduto include A2/A3, A4 e l’eventuale D&A industriale allocata; l’EBITDA la riaggiunge in modo trasparente.',rows:[
+      row('Ricavi',n(cur,'cg_revenue'),n(pre,'cg_revenue'),'detail','cg_revenue'),
+      row('Variazione prodotti e lavori in corso',n(cur,'cg_inventory_products'),n(pre,'cg_inventory_products'),'detail','cg_inventory_products'),
+      row('Incrementi per lavori interni',n(cur,'cg_internal_work'),n(pre,'cg_internal_work'),'detail','cg_internal_work'),
+      row('Produzione — costi diretti',n(cur,'cg_prod_direct'),n(pre,'cg_prod_direct'),'detail','cg_prod_direct'),
+      row('Produzione — costi indiretti',n(cur,'cg_prod_indirect'),n(pre,'cg_prod_indirect'),'detail','cg_prod_indirect'),
+      row('D&A industriale nel costo del venduto',n(cur,'cg_prod_da'),n(pre,'cg_prod_da'),'detail','cg_prod_da'),
+      row('Costo del venduto',cogs,cogsP,'sub'),row('Margine lordo dopo D&A industriale',gross,grossP,'grand'),
+      row('Altri ricavi operativi',n(cur,'cg_other_revenue'),n(pre,'cg_other_revenue'),'detail','cg_other_revenue'),
+      row('Logistica',n(cur,'cg_logistics'),n(pre,'cg_logistics'),'detail','cg_logistics'),row('Commerciale',n(cur,'cg_selling'),n(pre,'cg_selling'),'detail','cg_selling'),row('Amministrazione / corporate',n(cur,'cg_ga'),n(pre,'cg_ga'),'detail','cg_ga'),row('Ricerca e sviluppo',n(cur,'cg_rd'),n(pre,'cg_rd'),'detail','cg_rd'),row('Altri costi operativi',n(cur,'cg_other_operating'),n(pre,'cg_other_operating'),'detail','cg_other_operating'),
+      row('Ripresa D&A industriale per EBITDA',-n(cur,'cg_prod_da'),-n(pre,'cg_prod_da'),'sub'),row('EBITDA',ebitda,ebitdaP,'grand'),row('D&A industriale allocata',n(cur,'cg_prod_da'),n(pre,'cg_prod_da'),'detail','cg_prod_da'),row('D&A, svalutazioni e accantonamenti non allocati',n(cur,'cg_da_prov'),n(pre,'cg_da_prov'),'detail','cg_da_prov'),row('EBIT',ebit,ebitP,'grand'),row('Gestione finanziaria',n(cur,'cg_financial'),n(pre,'cg_financial'),'detail','cg_financial'),row('Imposte',n(cur,'cg_taxes'),n(pre,'cg_taxes'),'detail','cg_taxes'),row('Risultato netto',net,netP,'grand')
+    ]};
+    return models;
+  };
+  window.v17SectionModels=v17SectionModels;
+}
+
+function faHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function faCalcRow(label,current,previous,cls){
+  var delta=Number(current||0)-Number(previous||0),change=previous?delta/Math.abs(previous):null;
+  return '<tr class="'+(cls||'')+'"><td>'+faHtml(label)+'</td><td class="r">'+money(current)+'</td><td class="r">'+(STATE.periods.previous.available?money(previous):'N/D')+'</td><td class="r">'+money(delta)+'</td><td class="r">'+(change==null?'—':pct(change))+'</td></tr>';
+}
+function faDetailRows(scheme,target){
+  var rows=[];relevantGroups(STATE.accounts,SCHEME_TARGETS[scheme].type).forEach(function(g){getAllocations(scheme,g,false).forEach(function(a){if(a.target!==target)return;var key=encodeURIComponent(g.key),delta=Number(a.current||0)-Number(a.previous||0);rows.push('<tr class="reclass-detail" data-detail="'+faHtml(scheme+'|'+target)+'" draggable="true" ondragstart="reclassDragStart(event,\''+scheme+'\',decodeURIComponent(\''+key+'\'),\''+faHtml(a.id)+'\')" ondragend="reclassDragEnd(event)"><td><span class="drag-handle">⋮⋮</span><span class="cell-code">'+faHtml(g.code)+'</span> '+faHtml(g.desc)+(getAllocations(scheme,g,false).length>1?' <span class="manual-tag">quota</span>':'')+'</td><td class="r">'+money(a.current)+'</td><td class="r">'+(STATE.periods.previous.available?money(a.previous):'N/D')+'</td><td class="r">'+money(delta)+'</td><td class="r">—</td></tr>');});});return rows.join('');
+}
+function faLeafRow(scheme,target,label,current,previous){
+  var delta=Number(current||0)-Number(previous||0),change=previous?delta/Math.abs(previous):null,detail=faDetailRows(scheme,target);
+  return '<tr class="xr-has-det xr-droppable" data-scheme="'+faHtml(scheme)+'" data-target="'+faHtml(target)+'" ondragover="reclassDragOver(event)" ondragleave="reclassDragLeave(event)" ondrop="reclassDrop(event,\''+scheme+'\',\''+target+'\')"><td><span class="caret">'+(detail?'▸':'')+'</span>'+faHtml(label)+'</td><td class="r">'+money(current)+'</td><td class="r">'+(STATE.periods.previous.available?money(previous):'N/D')+'</td><td class="r">'+money(delta)+'</td><td class="r">'+(change==null?'—':pct(change))+'</td></tr>'+detail;
+}
+function cogsTableBody(){
+  var c=aggregateScheme('ce_cogs',STATE.accounts,'current'),p=aggregateScheme('ce_cogs',STATE.accounts,'previous'),n=function(o,k){return Number(o[k]||0);};
+  var cogs=n(c,'cg_prod_direct')+n(c,'cg_prod_indirect')+n(c,'cg_inventory_products')+n(c,'cg_internal_work')+n(c,'cg_prod_da');
+  var cogsP=n(p,'cg_prod_direct')+n(p,'cg_prod_indirect')+n(p,'cg_inventory_products')+n(p,'cg_internal_work')+n(p,'cg_prod_da');
+  var gross=n(c,'cg_revenue')+cogs,grossP=n(p,'cg_revenue')+cogsP;
+  var opex=n(c,'cg_logistics')+n(c,'cg_selling')+n(c,'cg_ga')+n(c,'cg_rd')+n(c,'cg_other_operating'),opexP=n(p,'cg_logistics')+n(p,'cg_selling')+n(p,'cg_ga')+n(p,'cg_rd')+n(p,'cg_other_operating');
+  var ebitda=gross-n(c,'cg_prod_da')+n(c,'cg_other_revenue')+opex,ebitdaP=grossP-n(p,'cg_prod_da')+n(p,'cg_other_revenue')+opexP;
+  var ebit=ebitda+n(c,'cg_prod_da')+n(c,'cg_da_prov'),ebitP=ebitdaP+n(p,'cg_prod_da')+n(p,'cg_da_prov');
+  var net=ebit+n(c,'cg_financial')+n(c,'cg_taxes'),netP=ebitP+n(p,'cg_financial')+n(p,'cg_taxes');
+  return faLeafRow('ce_cogs','cg_revenue','Ricavi',n(c,'cg_revenue'),n(p,'cg_revenue'))+
+    faLeafRow('ce_cogs','cg_inventory_products','Variazione prodotti e lavori in corso',n(c,'cg_inventory_products'),n(p,'cg_inventory_products'))+
+    faLeafRow('ce_cogs','cg_internal_work','Incrementi per lavori interni',n(c,'cg_internal_work'),n(p,'cg_internal_work'))+
+    faLeafRow('ce_cogs','cg_prod_direct','Produzione — costi diretti',n(c,'cg_prod_direct'),n(p,'cg_prod_direct'))+
+    faLeafRow('ce_cogs','cg_prod_indirect','Produzione — costi indiretti',n(c,'cg_prod_indirect'),n(p,'cg_prod_indirect'))+
+    faLeafRow('ce_cogs','cg_prod_da','D&A industriale nel costo del venduto',n(c,'cg_prod_da'),n(p,'cg_prod_da'))+
+    faCalcRow('Costo del venduto',cogs,cogsP,'xr-sub')+faCalcRow('Margine lordo dopo D&A industriale',gross,grossP,'xr-grand')+
+    faLeafRow('ce_cogs','cg_other_revenue','Altri ricavi operativi',n(c,'cg_other_revenue'),n(p,'cg_other_revenue'))+
+    faLeafRow('ce_cogs','cg_logistics','Logistica',n(c,'cg_logistics'),n(p,'cg_logistics'))+faLeafRow('ce_cogs','cg_selling','Commerciale',n(c,'cg_selling'),n(p,'cg_selling'))+faLeafRow('ce_cogs','cg_ga','Amministrazione / corporate',n(c,'cg_ga'),n(p,'cg_ga'))+faLeafRow('ce_cogs','cg_rd','Ricerca e sviluppo',n(c,'cg_rd'),n(p,'cg_rd'))+faLeafRow('ce_cogs','cg_other_operating','Altri costi operativi',n(c,'cg_other_operating'),n(p,'cg_other_operating'))+
+    faCalcRow('Ripresa D&A industriale per EBITDA',-n(c,'cg_prod_da'),-n(p,'cg_prod_da'),'xr-sub')+faCalcRow('EBITDA',ebitda,ebitdaP,'xr-grand')+
+    faCalcRow('D&A industriale allocata (EBITDA a EBIT)',n(c,'cg_prod_da'),n(p,'cg_prod_da'),'xr-sub')+faLeafRow('ce_cogs','cg_da_prov','D&A, svalutazioni e accantonamenti non allocati',n(c,'cg_da_prov'),n(p,'cg_da_prov'))+
+    faCalcRow('EBIT',ebit,ebitP,'xr-grand')+faLeafRow('ce_cogs','cg_financial','Gestione finanziaria',n(c,'cg_financial'),n(p,'cg_financial'))+faLeafRow('ce_cogs','cg_taxes','Imposte',n(c,'cg_taxes'),n(p,'cg_taxes'))+faCalcRow('Risultato netto',net,netP,'xr-grand');
+}
+function enhanceReclass(){
+  document.querySelectorAll('#reclass-content tr.xr-has-det').forEach(function(tr){
+    var scheme=tr.dataset.scheme,target=tr.dataset.target,key=scheme+'|'+target,details=Array.from(document.querySelectorAll('#reclass-content tr.reclass-detail')).filter(function(x){return x.dataset.detail===key;});
+    if(!scheme||!target||!details.length)return;
+    tr.removeAttribute('onclick');var td=tr.cells[0];if(!td||td.querySelector('.reclass-detail-toggle'))return;
+    details.forEach(function(d,i){d.id='reclass-'+scheme+'-'+target+'-'+i;});
+    var btn=document.createElement('button');btn.type='button';btn.className='reclass-detail-toggle';btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',details.map(function(d){return d.id;}).join(' '));btn.innerHTML=td.innerHTML;td.innerHTML='';td.appendChild(btn);
+    btn.addEventListener('click',function(e){e.stopPropagation();toggleReclassDetail(scheme,target);btn.setAttribute('aria-expanded',String(details.some(function(d){return d.classList.contains('open');})));});
+  });
+  document.querySelectorAll('#reclass-content tr.reclass-detail').forEach(function(tr){
+    var parts=String(tr.dataset.detail||'').split('|'),scheme=parts[0],currentTarget=parts[1],cell=tr.cells[0];if(!SCHEME_TARGETS[scheme]||!cell||cell.querySelector('.move-select'))return;
+    var sel=document.createElement('select');sel.className='move-select';sel.setAttribute('aria-label','Sposta il conto in un’altra voce');sel.innerHTML='<option value="">Sposta a…</option>'+SCHEME_TARGETS[scheme].targets.filter(function(x){return x[0]!==currentTarget;}).map(function(x){return '<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>';}).join('');
+    sel.addEventListener('change',function(){if(!sel.value)return;var code=cell.querySelector('.cell-code')&&cell.querySelector('.cell-code').textContent.trim(),g=relevantGroups(STATE.accounts,SCHEME_TARGETS[scheme].type).find(function(x){return x.code===code;});if(g){var alloc=getAllocations(scheme,g,true);if(alloc.length===1)alloc[0].target=sel.value;syncMappingDecision(scheme,g.key,alloc);saveConfig(false);updateAll();toast('Conto spostato.');}});cell.appendChild(sel);
+  });
+}
+if(typeof renderReclass==='function'){
+  var fallbackRenderReclass=renderReclass;
+  renderReclass=function(){
+    if(typeof V17_BASE_RENDER_RECLASS==='function')V17_BASE_RENDER_RECLASS();else fallbackRenderReclass();
+    var section=Array.from(document.querySelectorAll('#reclass-content .reclass-section')).find(function(s){return /costo del venduto/i.test((s.querySelector('h2')||{}).textContent||'');});
+    if(section&&section.querySelector('tbody'))section.querySelector('tbody').innerHTML=cogsTableBody();
+    enhanceReclass();if(typeof v20AddIncidence==='function')v20AddIncidence();
+  };
+  window.renderReclass=renderReclass;
+}
+
+function faClamp(value){return Math.max(0,Math.min(100,Number(value)||0));}
+function benchmarkScore(value,b,lower){
+  if(!b||!Number.isFinite(value))return null;var q1=Number(b.q1),m=Number(b.median),q3=Number(b.q3);if(![q1,m,q3].every(Number.isFinite)||!(q1<m&&m<q3))return null;
+  if(lower)return benchmarkScore(-value,{q1:-q3,median:-m,q3:-q1},false);
+  if(value<=m)return faClamp(25+25*(value-q1)/(m-q1));
+  return faClamp(50+25*(value-m)/(q3-m));
+}
+v20Health=function(){
+  var k=Object.fromEntries(makeKpis().map(function(x){return [x.code,x];})),defs=[['Redditività','prof_ebitda_margin',25,false],['Liquidità','liq_current_ratio',20,false],['Solidità','str_autonomy',20,false],['Leverage','debt_pfn_ebitda',20,true],['Crescita','grow_revenue',15,false]],parts=[];
+  defs.forEach(function(d){var item=k[d[1]],value=item&&Number.isFinite(item.value)?item.value:null,b=value==null?null:benchmarkFor(d[1]),score=benchmarkScore(value,b,d[3]);if(score!=null)parts.push([d[0],score,d[2],d[1]]);});
+  var coverage=parts.reduce(function(s,x){return s+x[2];},0),score=coverage===100?Math.round(parts.reduce(function(s,x){return s+x[1]*x[2];},0)/100):null;
+  return {score:score,parts:parts,coverage:coverage,label:coverage===100?'Indice comparativo sperimentale':'Benchmark incompleto'};
+};
+window.v20Health=v20Health;
+
+if(typeof renderExecutive==='function'){
+  var baseRenderExecutive=renderExecutive;
+  renderExecutive=function(){
+    baseRenderExecutive.apply(this,arguments);var host=document.getElementById('executive-content'),h=STATE.loaded?v20Health():null;if(!host||!h)return;
+    var box=host.querySelector('.v20-score'),strong=box&&box.querySelector('strong'),unit=box&&box.querySelector('span'),label=box&&box.querySelector('b'),small=box&&box.querySelector('small'),grid=host.querySelector('.v20-health-grid');if(strong)strong.textContent=h.score==null?'—':String(h.score);if(unit){unit.textContent=h.score==null?'':'/100';unit.hidden=h.score==null;unit.style.display=h.score==null?'none':'';}if(label)label.textContent=h.label;if(small)small.textContent=h.coverage===100?'Posizione relativa rispetto ai benchmark caricati; non è un rating creditizio.':'Indice non calcolato: benchmark validi disponibili per il '+h.coverage+'% dei pesi.';if(grid){grid.hidden=h.coverage<100;if(h.coverage===100)grid.innerHTML=h.parts.map(function(x){return '<article><div><span>'+faHtml(x[0])+'</span><b>'+Math.round(x[1])+'/100</b></div><div class="v20-health-track"><i style="width:'+x[1]+'%"></i></div></article>';}).join('');}
+  };
+  window.renderExecutive=renderExecutive;
+}
+if(typeof v20DashboardRows==='function'){
+  var baseDashboardRows=v20DashboardRows;
+  v20DashboardRows=function(){var rows=baseDashboardRows.apply(this,arguments),h=v20Health();rows.forEach(function(r){if(r[0]==='Business Health Score sperimentale'){r[0]='Indice comparativo benchmark (sperimentale)';r[1]=h.score==null?'Non calcolato':h.score;}if(r[0]==='Nota')r[1]='Confronto relativo ai benchmark esterni caricati; non è rating, giudizio di merito creditizio o previsione.';});rows.push(['Copertura benchmark',h.coverage+'%']);return rows;};window.v20DashboardRows=v20DashboardRows;
+}
+
+if(typeof renderKpis==='function'){
+  var baseRenderKpis=renderKpis;
+  renderKpis=function(){var out=baseRenderKpis.apply(this,arguments);document.querySelectorAll('.v20-segment button').forEach(function(b){b.type='button';b.setAttribute('aria-pressed',String(b.classList.contains('active')));});return out;};window.renderKpis=renderKpis;
+}
+
+var rawSetView=window.setView;
+if(typeof rawSetView==='function'){
+  window.setView=function(id){var out=rawSetView.apply(this,arguments),slug=FA_HASH[id],want=slug?'#/'+slug:'';if(want&&location.hash!==want){try{history.pushState(null,'',want);}catch(_){location.hash=want;}}return out;};
+  try{setView=window.setView;}catch(_){ }
+}
+function applyLabels(){
+  var b=document.querySelector('[data-view="adequacy"]'),label=b&&b.querySelector('span:nth-child(2)');if(label)label.textContent='Crisi e continuità';
+  var h=document.querySelector('#view-adequacy h2');if(h)h.innerHTML='<span>Analisi avanzata</span>Diagnostica crisi e continuità';
+  document.querySelectorAll('#method-content h3').forEach(function(x){if(/Adeguati assetti/i.test(x.textContent))x.textContent='5. Crisi e continuità';});
+}
+function installGlobalMenu(){var header=document.querySelector('.tal-global-header'),frame=header&&header.querySelector('.tal-gh-frame'),nav=header&&header.querySelector('.tal-gh-nav');if(!header||!frame||!nav||frame.querySelector('.tal-gh-menu-toggle'))return;var button=document.createElement('button');button.type='button';button.className='tal-gh-menu-toggle';button.textContent='Menu';button.setAttribute('aria-label','Apri o chiudi la navigazione principale');button.setAttribute('aria-expanded','false');if(!nav.id)nav.id='fa-global-navigation';button.setAttribute('aria-controls',nav.id);frame.appendChild(button);button.addEventListener('click',function(){var open=!header.classList.contains('tal-menu-open');header.classList.toggle('tal-menu-open',open);button.setAttribute('aria-expanded',String(open));});nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){header.classList.remove('tal-menu-open');button.setAttribute('aria-expanded','false');});});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&header.classList.contains('tal-menu-open')){header.classList.remove('tal-menu-open');button.setAttribute('aria-expanded','false');button.focus();}});}
+if(typeof renderSidebar==='function'){var baseRenderSidebar=renderSidebar;renderSidebar=function(){var out=baseRenderSidebar.apply(this,arguments);applyLabels();return out;};window.renderSidebar=renderSidebar;}
+function syncMenuTop(){var h=document.querySelector('.tal-global-header'),bar=document.querySelector('.tal-session-bar'),headerBottom=h?Math.ceil(h.getBoundingClientRect().bottom):60,chromeBottom=bar?Math.ceil(bar.getBoundingClientRect().bottom):headerBottom,bottom=Math.max(headerBottom,chromeBottom);document.documentElement.style.setProperty('--tal-global-header-height',bottom+'px');document.documentElement.style.setProperty('--tal-tool-menu-top',(bottom+8)+'px');}
+function boot(){var t=document.getElementById('sb-toggle');if(t){t.textContent='☰ Menu analisi';t.setAttribute('aria-label','Apri o chiudi il menu Financial Analysis');}installGlobalMenu();syncMenuTop();applyLabels();if(window.ResizeObserver){var observer=new ResizeObserver(syncMenuTop),h=document.querySelector('.tal-global-header'),bar=document.querySelector('.tal-session-bar');if(h)observer.observe(h);if(bar)observer.observe(bar);}window.addEventListener('resize',syncMenuTop,{passive:true});setTimeout(syncMenuTop,250);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,40);},{once:true});else setTimeout(boot,40);
 })();
 </script>
 

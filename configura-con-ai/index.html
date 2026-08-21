@@ -655,7 +655,139 @@ Dopo il file, produci un elenco puntato con:
 
 Il file sara' controllato dal professionista prima dell'importazione e il tool
 eseguira' i propri controlli formali su saldi, capienza, codici e identificativi.
-</pre></details><p class="prompt-note">Il prompt vieta all’AI di correggere codici fiscali e codici tributo dall’aspetto anomalo: devono arrivare al tool come stanno, perché sia il controllo formale a rifiutarli invece di una correzione arbitraria a monte.</p></div></article></div></div></section>
+</pre></details><p class="prompt-note">Il prompt vieta all’AI di correggere codici fiscali e codici tributo dall’aspetto anomalo: devono arrivare al tool come stanno, perché sia il controllo formale a rifiutarli invece di una correzione arbitraria a monte.</p></div></article><article class="tool-card surface" id="convenienza-fiscale"><span class="label">CONVENIENZA FISCALE</span><h2>Convenienza fiscale</h2><p>Il template raccoglie tre cose separate: chi &egrave; il soggetto, quanto incassa e quanto spende. Il profilo viene prima dei numeri perch&eacute; professione e regime attuale decidono quali soglie contano. I costi portano ciascuno le proprie regole di IVA e deducibilit&agrave;, diverse fra ordinario e societ&agrave;: &egrave; l&rsquo;unico modo per confrontare un regime che deduce i costi con uno che non li deduce.</p><div class="doc-box"><h3>Materiali utili, anche in forme equivalenti</h3><ul><li>Dichiarazione dei redditi dell&rsquo;anno precedente, per i compensi e gli altri redditi</li><li>Registri IVA, fatture emesse o riepiloghi del gestionale, per i compensi dell&rsquo;anno</li><li>Libro cespiti, registro dei costi, estratti contabili o prima nota, per le spese annuali</li><li>Estratto conto della Cassa di previdenza, per aliquota soggettiva e minimi</li><li>Statuto, patto sociale o visura, per la quota di partecipazione nella STP o STA</li><li>Delibere di distribuzione e verbali, per l&rsquo;utile distribuito e il compenso amministratore</li></ul></div><div class="callout"><strong>I compensi sono al netto del contributo integrativo.</strong> L&rsquo;integrativo lo addebita il professionista in fattura e lo paga il cliente: non &egrave; un ricavo, e sommarlo gonfia tutti e tre gli scenari. Se le fatture espongono un totale comprensivo, il prompt chiede di scorporare e di dichiarare come lo si &egrave; fatto.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Convenienza_Fiscale_v1.0.xlsx">Scarica il template &darr;</a><button class="button secondary copy-btn" data-copy="convenienza-fiscale-prompt" type="button">Copia il prompt</button><a class="button secondary" href="/tools/convenienza-fiscale/">Apri il tool &rarr;</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leggi il prompt completo</summary><pre id="convenienza-fiscale-prompt">Agisci come assistente di data preparation fiscale per Tax Automation Lab.
+
+REGOLE COMUNI A TUTTI I TEMPLATE DI TAX AUTOMATION LAB
+Valgono prima e sopra le istruzioni specifiche che seguono.
+1.  Leggi per primo il foglio ISTRUZIONI del template: contiene le regole di
+    questo file e prevalgono su qualunque abitudine.
+2.  Usa solo le evidenze contenute nei documenti allegati. Se un dato non c'e',
+    non c'e': non ricostruirlo, non stimarlo, non completarlo per analogia.
+3.  Non correggere e non completare gli identificativi: codici fiscali, partite
+    IVA, codici tributo, codici IVA, codici conto. Riportali come stanno e
+    segnalali. Il controllo formale lo fa il tool, ed e' giusto cosi'.
+4.  Cancella o ignora ogni riga di esempio. Se il template ha un foglio di
+    esempi, non copiarne il contenuto nei fogli di lavoro.
+5.  Non lasciare valori predefiniti che il documento non sostiene. Se un campo
+    ammette una scelta - schema di bilancio, periodicita', sezione - e la fonte
+    non la dichiara, lascialo vuoto: non scegliere tu.
+6.  Se un dato e' ambiguo, lascia la cella vuota e apri un esito bloccante nel
+    foglio "Esiti AI". Una cella vuota si vede; un dato inventato con sicurezza
+    no, e arriva fino alla dichiarazione.
+7.  Cita la fonte di ogni dato non ovvio: documento, foglio, riga o pagina.
+8.  Riconcilia i conteggi: quante righe hai letto, quante ne hai scritte,
+    quante aggregate, quante escluse e perche'. I totali devono tornare.
+9.  Non rinominare fogli, colonne o intestazioni, non aggiungerne e non
+    riordinarle: il tool le riconosce per nome.
+10. Non dichiarare completo un lavoro che ha esiti bloccanti aperti.
+
+OBIETTIVO
+Compilare i fogli PROFILO, COMPENSI e COSTI del file
+"Template_Convenienza_Fiscale_v1.0.xlsx" per confrontare la cassa personale
+netta di un avvocato o di un dottore commercialista fra tre assetti: regime
+forfettario, partita IVA ordinaria e societa' professionale STP o STA. Il tool
+non decide: calcola i tre scenari e dichiara le assunzioni.
+
+PRIMA DI COMINCIARE
+1. Leggi il foglio ISTRUZIONI.
+2. Guarda il foglio ESEMPI_NON_IMPORTARE per capire la forma attesa, poi
+   dimenticalo: il tool non lo legge e riconosce quelle righe anche se
+   finiscono nei fogli di lavoro.
+3. I fogli PROFILO, COMPENSI e COSTI arrivano vuoti nella colonna dei valori.
+   E' voluto: se li ricarichi intatti il tool risponde "nessun dato da
+   importare", e va bene cosi'.
+
+IL PROFILO VIENE PRIMA DEI NUMERI
+Professione e regime attuale cambiano quali soglie contano e quali avvisi hanno
+senso, quindi vanno determinati prima. La professione decide anche la Cassa di
+previdenza - CNPADC per il commercialista, Cassa Forense per l'avvocato - e la
+forma societaria confrontata. Se i documenti non dicono la professione o il
+regime di partenza, lascia le celle vuote e aprii un esito bloccante: non
+dedurre l'una dall'altra.
+
+COMPENSI: COSA SONO E COSA NON SONO
+I compensi vanno indicati al netto dell'IVA e del contributo integrativo.
+L'integrativo lo addebita il professionista in fattura e lo paga il cliente:
+non e' un ricavo, e sommarlo gonfia ogni scenario. Se le fatture espongono un
+totale comprensivo, scorpora e dichiara come hai scorporato.
+Usa il termine compensi o ricavi, non reddito: le soglie del forfettario si
+misurano sui compensi incassati, non sull'utile.
+I compensi dell'anno precedente contano: oltre 85.000 il forfettario non e'
+applicabile nell'anno simulato, ed e' un dato che sta nella dichiarazione
+dell'anno prima, non in quella in corso.
+Gli altri redditi personali servono a due cose: la progressivita' IRPEF e la
+capienza per dedurre i contributi. Se il soggetto ha redditi di lavoro
+dipendente o pensione, indicali anche nella riga dedicata: oltre 35.000 sono
+causa ostativa.
+
+CAUSE OSTATIVE: DICHIARARE, NON DEDURRE
+Le tre righe con risposta SI o NO - aliquota al 5% per nuova attivita',
+partecipazioni incompatibili, attivita' prevalente verso datore o ex datore -
+sono dichiarazioni del professionista, non conclusioni tue. Mettile a SI solo
+se un documento lo afferma. Se non trovi nulla, lascia NO e apri un esito che
+dice che il requisito non e' stato verificato.
+Attenzione all'aliquota al 5%: il superamento degli 85.000 nell'anno NON la
+fa perdere. Non azzerarla perche' i compensi sono alti.
+
+COSTI: DUE NUMERI DIVERSI CHE NON VANNO CONFUSI
+Per ogni voce, l'importo annuale e' quello che esce di tasca. Le percentuali che
+seguono dicono quanto di quell'importo e' fiscalmente rilevante, e sono diverse
+fra ordinario e societa'. Non aggiustare l'importo per tenere conto della
+deducibilita': l'importo e' lordo di ogni regola, le regole stanno nelle
+colonne.
+Indica se l'importo e' al netto o comprensivo di IVA nella colonna
+"Importo IVA compresa": nel forfettario l'IVA non si detrae, quindi sbagliare
+quella colonna sposta il confronto di tutta l'imposta.
+"Uso professionale %" serve quando un bene e' anche personale: la quota
+personale esce di tasca ma non entra nel confronto fra regimi.
+"Tetto % dei compensi" e' il limite superiore della deduzione, non un secondo
+abbattimento. Le voci che ne hanno uno lo portano gia' scritto: rappresentanza
+all'1%, trasferte al 2%. Non toccarli se il documento non impone altro.
+Se una spesa non rientra in nessuna voce, aggiungi una riga con un nome nuovo:
+il tool crea la voce e parte dalle regole generiche. Non forzarla in una voce
+esistente con regole diverse.
+Le spese per personale dipendente hanno un effetto proprio: oltre 20.000 sono
+causa ostativa del forfettario. Tienile separate dai collaboratori con fattura.
+
+SOCIETA' PROFESSIONALE
+Compila quota di partecipazione, utile distribuito e costi di struttura solo se
+i documenti li sostengono. La quota di partecipazione determina l'utile
+attribuibile, il dividendo e la base contributiva: se non e' documentata,
+lasciala vuota e apri un esito bloccante, perche' un valore inventato sposta
+tutto lo scenario societario.
+Sulla remunerazione, indica dividendo, compenso oppure misto secondo quello che
+i documenti prevedono. Se non lo prevedono, lascia vuoto: la scelta e' del
+professionista, e il tool la esplora comunque.
+Non riclassificare il compenso amministratore fra Cassa e Gestione Separata:
+scrivi quello che i documenti dicono e, se non lo dicono, aprine un esito. La
+qualificazione dipende da autonomia e natura della carica, non da una regola
+automatica.
+
+ESITI AI: E' LA PARTE CHE CONTA
+Ogni assunzione, dubbio o dato mancante va nel foglio "Esiti AI", con la fonte.
+Scrivi "Bloccante" nella colonna Stato quando il dato manca o e' ambiguo in
+modo che invalida il confronto: il tool li mostra in evidenza e li porta
+nell'export. Un confronto con un esito bloccante aperto non e' un confronto
+finito.
+Usa "Risolto" solo per cio' che hai verificato su un documento, citandolo.
+
+RIEPILOGO FINALE
+Dopo il file, produci un elenco puntato con:
+- la professione e il regime attuale, con il documento da cui li hai ricavati;
+- i compensi dell'anno e dell'anno precedente, e come li hai scorporati da IVA
+  e contributo integrativo;
+- le voci di costo compilate, e quali regole predefinite hai cambiato e perche';
+- le voci che hai aggiunto perche' non esisteva una riga adatta;
+- i requisiti del forfettario che non hai potuto verificare;
+- gli esiti bloccanti aperti;
+- la riconciliazione dei conteggi: quante voci di costo hai letto nei documenti,
+  quante ne hai scritte in COSTI, quante hai aggregato e quante escluse, con il
+  motivo. Il tool dichiara quante righe ha letto: quel numero e il tuo devono
+  coincidere.
+
+Il file sara' controllato dal professionista prima dell'importazione. Il tool
+esegue i propri controlli e dichiara in pagina ogni assunzione del modello, ma
+non sostituisce il parere professionale e non verifica i requisiti dichiarati.</pre></details><p class="prompt-note">Il prompt vieta di dedurre la professione dal regime o viceversa, e di mettere a S&igrave; un requisito del forfettario che nessun documento afferma: quelle righe sono dichiarazioni del professionista, non conclusioni dell&rsquo;AI. Vieta anche di aggiustare gli importi dei costi per tenere conto della deducibilit&agrave;: l&rsquo;importo resta lordo di ogni regola, le regole stanno nelle colonne.</p></div></article></div></div></section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/approfondimenti/">Casi e metodo</a><a href="/privacy/">Privacy</a><a href="/security/">Sicurezza</a><a href="/terms/">Termini e disclaimer</a><a href="/licenses/">Licenze</a></nav><p>Progetto personale e indipendente. I contenuti non costituiscono consulenza professionale e il progetto non è approvato, sponsorizzato o affiliato a datori di lavoro o terze parti.</p></div></footer><a aria-label="Back to top" class="back-top" href="#top">↑</a>
-<script>var f24Setup=document.getElementById('f24'),setupGrid=document.querySelector('#financial-statement .tool-grid');if(f24Setup&&setupGrid)setupGrid.appendChild(f24Setup);document.querySelectorAll('.screen.annotated').forEach(function(fig){if(fig.querySelector(':scope > .screen-visual'))return;var visual=document.createElement('div');visual.className='screen-visual';var caption=fig.querySelector(':scope > figcaption');Array.from(fig.children).filter(function(el){return el!==caption}).forEach(function(el){visual.appendChild(el)});fig.insertBefore(visual,caption)});document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',async function(){var text=document.getElementById(btn.dataset.copy).textContent;var status=btn.parentElement.querySelector('.copy-status'),ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch(e){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{ok=!!document.execCommand('copy')}catch(_){ok=false}ta.remove()}status.textContent=ok?"Prompt copiato":"Copia non riuscita";status.style.color=ok?'':'#ffb4a8';setTimeout(function(){status.textContent='';status.style.color=''},2400)})});</script><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script defer src="/assets/site-shell.js"></script>
+<script>var f24Setup=document.getElementById('f24'),setupGrid=document.querySelector('#financial-statement .tool-grid');if(f24Setup&&setupGrid)setupGrid.appendChild(f24Setup);var cfSetup=document.getElementById('convenienza-fiscale');if(cfSetup&&setupGrid)setupGrid.appendChild(cfSetup);document.querySelectorAll('.screen.annotated').forEach(function(fig){if(fig.querySelector(':scope > .screen-visual'))return;var visual=document.createElement('div');visual.className='screen-visual';var caption=fig.querySelector(':scope > figcaption');Array.from(fig.children).filter(function(el){return el!==caption}).forEach(function(el){visual.appendChild(el)});fig.insertBefore(visual,caption)});document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',async function(){var text=document.getElementById(btn.dataset.copy).textContent;var status=btn.parentElement.querySelector('.copy-status'),ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch(e){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{ok=!!document.execCommand('copy')}catch(_){ok=false}ta.remove()}status.textContent=ok?"Prompt copiato":"Copia non riuscita";status.style.color=ok?'':'#ffb4a8';setTimeout(function(){status.textContent='';status.style.color=''},2400)})});</script><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script defer src="/assets/site-shell.js"></script>
 </body></html>

@@ -150,9 +150,9 @@ function prompts(rel) {
                   .replace(/&amp;/g, '&'));
 }
 
-test('Configura con AI: i cinque prompt portano tutte le regole comuni', () => {
+test('Configura con AI: i sei prompt portano tutte le regole comuni', () => {
   const list = prompts('configura-con-ai/index.html');
-  assert.equal(list.length, 5, 'la pagina italiana deve avere cinque prompt');
+  assert.equal(list.length, 6, 'la pagina italiana deve avere sei prompt');
   list.forEach((p, i) => {
     for (const [label, re] of COMMON_RULES) {
       assert.match(p, re, `prompt ${i + 1}: manca la regola comune «${label}»`);

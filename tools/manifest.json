@@ -1,6 +1,6 @@
 {
-  "release": "v6.16.0",
-  "date": "2026-08-21",
+  "release": "v6.17.0",
+  "date": "2026-08-22",
   "privacy_model": {
     "processing": "local_in_browser",
     "server_upload": false,
@@ -50,6 +50,15 @@
       "name": "Generatore F24",
       "version": "1.0.0",
       "site_url": "https://taxautomationlab.com/tools/f24/",
+      "release_filename": null,
+      "distribution": "online_only",
+      "license": "MIT"
+    },
+    {
+      "slug": "convenienza-fiscale",
+      "name": "Convenienza fiscale",
+      "version": "1.0.0",
+      "site_url": "https://taxautomationlab.com/tools/convenienza-fiscale/",
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT"

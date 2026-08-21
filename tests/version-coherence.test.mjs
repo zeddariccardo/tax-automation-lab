@@ -30,7 +30,8 @@ const TOOLS = {
   'financial-analysis' : 'Analisi di bilancio',
   'lipe'               : 'Generatore LIPE',
   'tfa-client-file'    : 'Fascicolo fiscale cliente',
-  'f24'                : 'Generatore F24'
+  'f24'                : 'Generatore F24',
+  'convenienza-fiscale': 'Convenienza fiscale'
 };
 
 /* Ogni voce è un posto in cui un tool dichiara la propria versione. Le

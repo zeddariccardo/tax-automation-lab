@@ -89,12 +89,51 @@ const target = path.join(root, 'sitemap.xml');
 const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
 
 if (CHECK) {
-  if (current === xml) {
-    console.log(`sitemap.xml aggiornato: ${pages.length} URL.`);
-    process.exit(0);
+  /* Cosa controlla, e perché non confronta i byte.
+
+     La prima versione pretendeva che il file generato fosse identico a quello
+     committato. In CI falliva sempre, e per un difetto di progetto, non del
+     sitemap: le date vengono dai commit, quindi il commit che aggiorna
+     sitemap.xml cambia le date che sitemap.xml dovrebbe dichiarare. È una
+     rincorsa che non può vincere.
+
+     Quello che rot davvero è l'elenco degli URL: una pagina nuova che nessuno
+     dichiara, o un alias `noindex` dichiarato per errore. Quello si controlla
+     in modo stretto. Sulle date si controlla che siano date valide e non nel
+     futuro — un `lastmod` domani dice a un motore di ricerca una bugia — e si
+     segnala lo scostamento senza far fallire la build: rigenerarlo è un
+     comando, e va fatto quando si prepara una release. */
+  const declared = new Map(
+    [...current.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)]
+      .map(m => [m[1], m[2]]));
+  const expected = new Map(pages.map(p => [p.loc, p.lastmod]));
+
+  const missing = [...expected.keys()].filter(u => !declared.has(u));
+  const extra   = [...declared.keys()].filter(u => !expected.has(u));
+  const today   = new Date().toISOString().slice(0, 10);
+  const badDate = [...declared.entries()]
+    .filter(([, d]) => !/^\d{4}-\d{2}-\d{2}$/.test(d) || d > today);
+
+  const problems = [];
+  if (missing.length) problems.push(`pagine indicizzabili non dichiarate (${missing.length}):\n  ` + missing.join('\n  '));
+  if (extra.length)   problems.push(`URL dichiarati che non esistono o sono noindex (${extra.length}):\n  ` + extra.join('\n  '));
+  if (badDate.length) problems.push(`lastmod non valido o nel futuro (${badDate.length}):\n  `
+    + badDate.map(([u, d]) => `${d}  ${u}`).join('\n  '));
+
+  if (problems.length) {
+    console.error('sitemap.xml non è allineato al contenuto.\n');
+    console.error(problems.join('\n\n'));
+    console.error('\nRigeneralo con:  node tests/build-sitemap.mjs');
+    process.exit(1);
   }
-  console.error('sitemap.xml non è aggiornato. Esegui:  node tests/build-sitemap.mjs');
-  process.exit(1);
+
+  const drifted = [...expected.entries()].filter(([u, d]) => declared.get(u) !== d);
+  console.log(`sitemap.xml allineato: ${pages.length} URL, nessuno mancante o di troppo.`);
+  if (drifted.length) {
+    console.log(`${drifted.length} date di modifica sono cambiate dopo l'ultima generazione.`);
+    console.log('Non è un errore. Rigenera prima di una release:  node tests/build-sitemap.mjs');
+  }
+  process.exit(0);
 }
 
 fs.writeFileSync(target, xml);

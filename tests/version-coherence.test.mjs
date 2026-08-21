@@ -78,3 +78,50 @@ for (const [dir, label] of Object.entries(TOOLS)) {
       `${dir}: manca data-tool-version sul tag <html>`);
   });
 }
+
+/* Il catalogo.
+
+   `tools/manifest.json` è il catalogo pubblico dei tool: nome, versione, URL,
+   licenza. La prima versione di questo test guardava solo dentro le pagine, e
+   il manifest è rimasto fuori — quindi ha continuato a dichiarare 1.3.6 per il
+   Bilancio che gira a 1.4.1, 3.4.3 per LIPE che gira a 3.6.1, 1.7.1 per il
+   Fascicolo che gira a 2.3.2. Era esattamente il difetto che il test doveva
+   impedire, in un file che il test non leggeva: il catalogo è uno dei posti
+   che TAL-P1-05 elenca, non un ripostiglio.
+
+   Controlla anche che l'elenco dei tool sia lo stesso: un tool nuovo che entra
+   nel sito e non nel catalogo resta invisibile a chi legge il manifest. */
+test('catalogo: manifest.json elenca gli stessi tool delle pagine', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'manifest.json'), 'utf8'));
+  const inManifest = manifest.tools.map(t => t.slug).sort();
+  const expected = Object.keys(TOOLS).sort();
+  assert.deepEqual(inManifest, expected,
+    `il catalogo elenca [${inManifest.join(', ')}], le pagine sono [${expected.join(', ')}]`);
+});
+
+test('catalogo: le versioni del manifest sono quelle che girano', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'manifest.json'), 'utf8'));
+  const wrong = [];
+  for (const entry of manifest.tools) {
+    const html = fs.readFileSync(path.join(root, 'tools', entry.slug, 'index.html'), 'utf8');
+    const running = (html.match(/data-tool-version="([^"]+)"/) || [])[1];
+    if (running !== entry.version) {
+      wrong.push(`  ${entry.slug}: catalogo ${entry.version}, in esecuzione ${running}`);
+    }
+  }
+  assert.equal(wrong.length, 0,
+    `${wrong.length} tool con versione sbagliata nel catalogo:\n${wrong.join('\n')}`);
+});
+
+test('catalogo: nome e URL del manifest coincidono con le pagine', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'manifest.json'), 'utf8'));
+  const problems = [];
+  for (const entry of manifest.tools) {
+    if (TOOLS[entry.slug] && entry.name !== TOOLS[entry.slug]) {
+      problems.push(`  ${entry.slug}: il catalogo lo chiama «${entry.name}», il sito «${TOOLS[entry.slug]}»`);
+    }
+    const url = `https://taxautomationlab.com/tools/${entry.slug}/`;
+    if (entry.site_url !== url) problems.push(`  ${entry.slug}: site_url è ${entry.site_url}, atteso ${url}`);
+  }
+  assert.equal(problems.length, 0, `catalogo non allineato:\n${problems.join('\n')}`);
+});

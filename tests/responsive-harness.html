@@ -3,7 +3,7 @@
      Copyright (c) 2026 Riccardo Zedda — MIT
 
      A che serve. L'audit del 21 agosto 2026 ha chiesto una prova oggettiva che
-     il comando del menu sia identico nei cinque tool a 320, 360, 390, 430, 768
+     il comando del menu sia identico nei tool a 320, 360, 390, 430, 768
      e 980 px, che sparisca a 981, e che nessuna pagina scorra in orizzontale.
      Farlo a mano vuol dire 45 combinazioni: questa pagina le esegue tutte
      caricando ogni tool in un iframe della larghezza voluta e misurando il DOM
@@ -54,7 +54,7 @@
   code{font:12px ui-monospace,Menlo,Consolas,monospace;background:#eeefec;padding:1px 4px;border-radius:4px}
 </style>
 
-<h1>Verifica responsive dei cinque tool</h1>
+<h1>Verifica responsive dei tool</h1>
 <p class="lede">Misura il comando del menu e lo scorrimento orizzontale a ogni
 breakpoint, caricando i tool in un iframe. Le attese: sotto 981&nbsp;px il
 comando è un quadrato di 44&times;44 in basso a sinistra, senza testo visibile e
@@ -75,7 +75,8 @@ const TOOLS = [
   ['Analisi di bilancio',    '/tools/financial-analysis/'],
   ['LIPE',                   '/tools/lipe/'],
   ['Fascicolo fiscale',      '/tools/tfa-client-file/'],
-  ['Generatore F24',         '/tools/f24/']
+  ['Generatore F24',         '/tools/f24/'],
+  ['Convenienza fiscale',    '/tools/convenienza-fiscale/']
 ];
 // 980 è l'ultimo px in cui il comando deve esserci, 981 il primo in cui non c'è.
 const WIDTHS = [320, 360, 390, 430, 768, 980, 981];

@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<!--
+Tax Automation Lab — Convenienza fiscale
+Copyright (c) 2026 Riccardo Zedda
+Licensed under the MIT License. See /legal-docs/MIT.txt.
+Official source: https://taxautomationlab.com/tools/convenienza-fiscale/
+-->
+<html class="tal-tool-page" data-tool-version="1.0.0" lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>Convenienza fiscale: forfettario, ordinario, STP/STA | Tax Automation Lab</title>
+<meta name="description" content="Tool gratuito per confrontare la cassa personale netta di un avvocato o dottore commercialista fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l., con soglia di convenienza oltre 85.000 euro, contribuzione di Cassa e simulazione del mix compenso/dividendo.">
+<meta name="author" content="Riccardo Zedda">
+<meta name="theme-color" content="#0E1624">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://taxautomationlab.com/tools/convenienza-fiscale/">
+<link rel="alternate" hreflang="it" href="https://taxautomationlab.com/tools/convenienza-fiscale/">
+<link rel="alternate" hreflang="x-default" href="https://taxautomationlab.com/tools/convenienza-fiscale/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:site_name" content="Tax Automation Lab">
+<meta property="og:title" content="Convenienza fiscale: forfettario, ordinario, STP/STA | Tax Automation Lab">
+<meta property="og:description" content="Confronta la cassa personale netta fra forfettario, ordinario e società professionale, direttamente nel browser.">
+<meta property="og:url" content="https://taxautomationlab.com/tools/convenienza-fiscale/">
+<meta property="og:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
+<meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Convenienza fiscale: forfettario, ordinario, STP/STA | Tax Automation Lab">
+<meta name="twitter:description" content="Confronta la cassa personale netta fra forfettario, ordinario e società professionale, direttamente nel browser.">
+<meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/inter-var-latin.woff2">
+<link rel="stylesheet" href="/assets/site-shell.css?v=20260810-v61510-header-1">
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260821c">
+<script defer src="/assets/tal-app.js?v=20260821c"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Convenienza fiscale",
+  "url": "https://taxautomationlab.com/tools/convenienza-fiscale/",
+  "description": "Confronto della cassa personale netta fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Browser",
+  "softwareVersion": "1.0.0",
+  "inLanguage": "it",
+  "isAccessibleForFree": true,
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+  "author": {"@type": "Person", "name": "Riccardo Zedda"},
+  "license": "https://taxautomationlab.com/legal-docs/MIT.txt"
+}
+</script>
+<style id="cf-style">
+/* Convenienza fiscale — stili locali.
+
+   Regola che ho seguito: qui sta solo ciò che è proprio di questo tool. Colori,
+   pulsanti, tabelle, finestre, barra di sessione e comando del menu vengono da
+   tal-app.css e non si ridefiniscono — è la lezione del menu mobile, dove
+   cinque definizioni locali della stessa cosa avevano prodotto cinque
+   comportamenti diversi. Se serve un colore, si usa un token --tal-*. */
+
+:root{
+  /* I tre regimi hanno un colore ciascuno, derivato dalla palette del sito.
+     Non bastano i colori: ogni serie porta anche un tratteggio e un'etichetta
+     propria, perché il colore da solo non è leggibile per tutti. */
+  --cf-forf:#145368;          /* --tal-accent */
+  --cf-ord:#8B6A16;           /* --tal-gold */
+  --cf-soc:#59147D;           /* viola del sito */
+  --cf-forf-bg:#EAF2F5;
+  --cf-ord-bg:#FFF8DF;
+  --cf-soc-bg:#F3EAF8;
+  --sbw:250px;
+}
+
+/* ---------- azzeramento -------------------------------------------------
+
+   Serve, e non lo dà il layer condiviso: `tal-app.css` porta colori, controlli
+   e comando mobile, non il reset. Senza queste due righe `body` teneva gli 8px
+   di margine del browser e `main`, non essendo in border-box, sommava 60px di
+   padding alla larghezza piena: 52px di scorrimento orizzontale su una pagina
+   che non ha niente di largo. Gli altri quattro tool lo dichiarano nel proprio
+   foglio, ed è giusto che lo faccia anche questo. */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--tal-sans,"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif);
+  color:var(--tal-ink,#1D1B16);background:var(--tal-paper,#F7F6F3);
+  font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+
+/* ---------- impianto della pagina applicativa ---------------------------
+
+   Sidebar fissa a sinistra e contenuto che le lascia il posto. Non sta in
+   tal-app.css: il layer condiviso dà colori, controlli e comando mobile, ma
+   l'impianto se lo dichiara ogni tool. Averlo dimenticato produceva una
+   sidebar che scorreva nel flusso e 23px di scorrimento orizzontale. I valori
+   sono gli stessi degli altri quattro tool, per non introdurre un'altra
+   variante dello stesso layout. */
+
+#sidebar{
+  position:fixed;top:0;left:0;width:var(--sbw);height:100vh;overflow-y:auto;
+  padding:20px 14px 16px;display:flex;flex-direction:column;gap:15px;z-index:60;
+  background:linear-gradient(180deg,var(--tal-sb-1,#12212b),var(--tal-sb-2,#0d1a22));
+  color:#F7F7F5
+}
+.app-main{margin-left:var(--sbw);min-height:100vh;display:flex;flex-direction:column}
+main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
+
+.sb-brand{display:flex;align-items:center;gap:11px;padding:0 4px}
+.sb-logo{display:grid;place-items:center;width:34px;height:34px;flex:0 0 auto;
+  border-radius:9px;background:rgba(247,247,245,.12);font-size:11px;font-weight:800;
+  letter-spacing:.04em}
+.sb-brandtext{min-width:0}
+.sb-brandtext b{display:block;font-size:13px;line-height:1.25}
+.sb-brandtext small{display:block;font-size:10px;opacity:.72;line-height:1.35}
+.sb-context{padding:10px 12px;border-radius:9px;background:rgba(247,247,245,.07);min-width:0}
+.sb-context b{display:block;font-size:12px;overflow-wrap:anywhere}
+.sb-context span{display:block;font-size:10px;opacity:.72;margin-top:2px}
+.workspace-nav{display:flex;flex-direction:column;gap:2px;flex:1 1 auto;min-height:0}
+.sb-cap,.sb-groupcap{display:block;padding:13px 12px 5px;font-size:9.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;opacity:.72}
+.sb-foot{font-size:9.5px;opacity:.6;line-height:1.45;padding:0 4px}
+
+.mobile-backdrop{position:fixed;inset:0;background:rgba(6,26,34,.5);z-index:5050;display:none}
+.mobile-backdrop.show{display:block}
+
+/* Il comando del menu esiste solo sotto i 980px. Va spento qui: tal-app.css lo
+   accende dentro `@media(max-width:980px)` ma non lo nasconde sopra, perché
+   ogni tool dichiara il proprio stato di partenza. Senza questa riga restava
+   visibile anche sul desktop, e l'armatura di test l'ha colto a 981px.
+   Posizione e forma le decide il layer condiviso: qui c'è solo il ripiego, in
+   basso a sinistra come negli altri quattro. */
+.sb-toggle{
+  display:none;align-items:center;justify-content:center;position:fixed;
+  top:auto;bottom:max(16px,env(safe-area-inset-bottom));
+  left:max(12px,env(safe-area-inset-left));z-index:5105;
+  min-height:44px;border:1px solid rgba(247,247,245,.18);border-radius:12px;
+  background:linear-gradient(135deg,var(--tal-accent,#145368),var(--tal-accent-deep,#0C3341));
+  color:#fff;padding:10px 15px;font:700 12px var(--tal-sans,sans-serif);cursor:pointer;
+  box-shadow:0 14px 34px rgba(14,22,36,.28)
+}
+@media(max-width:980px){.sb-toggle{display:inline-flex}}
+@media print{.sb-toggle{display:none!important}}
+
+@media(max-width:980px){
+  #sidebar{transform:translateX(-100%);transition:transform .22s ease;z-index:5060;
+    box-shadow:0 0 40px rgba(0,0,0,.35)}
+  #sidebar.open{transform:none}
+  .app-main{margin-left:0}
+}
+@media print{
+  #sidebar{display:none}
+  .app-main{margin-left:0}
+}
+
+/* ---------- percorso e stati ------------------------------------------- */
+
+.cf-link{
+  display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:0;
+  background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  border-radius:8px;min-height:40px
+}
+.cf-link:hover{background:rgba(247,247,245,.08)}
+.cf-link.active{background:rgba(247,247,245,.14);font-weight:650}
+.cf-link .ws-ic{
+  display:grid;place-items:center;width:22px;height:22px;flex:0 0 auto;
+  border-radius:50%;background:rgba(247,247,245,.14);font-size:10px;font-weight:800
+}
+.cf-link.done .ws-ic{background:var(--tal-ok);color:#fff}
+.cf-link .ws-label{flex:1 1 auto;min-width:0;font-size:12px}
+.cf-link .ws-state{font-size:10px;opacity:.72;font-variant-numeric:tabular-nums}
+
+/* ---------- struttura delle schermate ---------------------------------- */
+
+.cf-stage{display:none}
+.cf-stage.active{display:block}
+.cf-head{margin-bottom:20px}
+.cf-head h2{font-family:var(--tal-serif,Georgia,serif);font-weight:400;font-style:italic;
+  font-size:clamp(22px,3vw,29px);line-height:1.2;margin:0 0 6px}
+.cf-head p{color:var(--tal-ink-3);font-size:13px;max-width:74ch;margin:0}
+
+.cf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 20px}
+.cf-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cf-field label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--tal-ink-3)}
+.cf-field .cf-hint{font-size:11px;color:var(--tal-ink-4);line-height:1.45}
+.cf-field.full{grid-column:1/-1}
+
+/* Le scelte obbligatorie del profilo: cartoncini invece di una tendina, così
+   si vede che sono una decisione e non un dettaglio da scorrere. */
+.cf-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
+.cf-choice{
+  position:relative;display:block;padding:14px 15px;border:1px solid var(--tal-line);
+  border-radius:11px;background:var(--tal-card,#fff);cursor:pointer
+}
+.cf-choice input{position:absolute;opacity:0;pointer-events:none}
+.cf-choice b{display:block;font-size:13px;margin-bottom:2px}
+.cf-choice small{display:block;font-size:11px;color:var(--tal-ink-4);line-height:1.45}
+.cf-choice:has(input:checked){border-color:var(--tal-accent);box-shadow:inset 3px 0 0 var(--tal-accent)}
+.cf-choice:has(input:focus-visible){outline:2px solid var(--tal-accent);outline-offset:2px}
+
+/* ---------- la risposta, in cima ai risultati -------------------------- */
+
+.cf-verdict{
+  padding:20px 22px;border-radius:14px;background:var(--tal-accent-soft);
+  border:1px solid var(--tal-info-line);margin-bottom:22px
+}
+.cf-verdict .cf-vlabel{font-size:10px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tal-info)}
+.cf-verdict .cf-vname{font-size:clamp(19px,2.6vw,25px);font-weight:750;margin:4px 0 2px}
+.cf-verdict .cf-vnet{font-size:clamp(24px,3.4vw,34px);font-weight:800;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.cf-verdict .cf-vwhy{font-size:12.5px;color:var(--tal-ink-3);margin-top:8px;max-width:72ch}
+
+.cf-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.cf-card{
+  padding:17px 18px;border:1px solid var(--tal-line);border-radius:12px;
+  background:var(--tal-card,#fff);min-width:0;border-top:3px solid var(--tal-line)
+}
+.cf-card[data-regime="forfettario"]{border-top-color:var(--cf-forf)}
+.cf-card[data-regime="ordinario"]{border-top-color:var(--cf-ord)}
+.cf-card[data-regime="societa"]{border-top-color:var(--cf-soc)}
+.cf-card.is-winner{box-shadow:var(--tal-sh-3)}
+.cf-card h3{font-size:14px;margin:0 0 3px}
+.cf-card .cf-status{font-size:11px;color:var(--tal-ink-4);margin:0 0 12px;line-height:1.45}
+.cf-net{display:flex;flex-direction:column;gap:1px;padding:11px 0;
+  border-top:1px solid var(--tal-line);border-bottom:1px solid var(--tal-line)}
+.cf-net span{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--tal-ink-4)}
+.cf-net strong{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+.cf-mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:11px}
+.cf-mini>div{min-width:0}
+.cf-mini span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--tal-ink-4)}
+.cf-mini b{font-size:12.5px;font-variant-numeric:tabular-nums}
+/* Un regime non applicabile non mostra nessun numero: né il netto né i
+   parziali. Mostrare imposte e contributi di un regime che non si può usare
+   invita a leggerli come un'alternativa reale. */
+.cf-card.not-eligible .cf-net strong{font-size:15px;font-weight:700;color:var(--tal-ink-4)}
+.cf-card.not-eligible .cf-mini{display:none}
+
+/* ---------- avvisi ------------------------------------------------------ */
+
+.cf-alert{padding:15px 17px;border-radius:11px;margin-bottom:18px;
+  background:var(--tal-gold-bg);border:1px solid var(--tal-gold-line)}
+.cf-alert.is-critical{background:#FBECEB;border-color:#E3BDB9}
+.cf-alert h3{font-size:13.5px;margin:0 0 4px}
+.cf-alert p{font-size:12.5px;margin:0;line-height:1.55;max-width:76ch}
+.cf-checks{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.cf-checks li{padding:9px 11px;border:1px solid var(--tal-line);border-radius:8px;
+  background:var(--tal-sunken,#fbfaf8);font-size:11.5px;line-height:1.5}
+.cf-checks li.blocking{background:#FBECEB;border-color:#E3BDB9}
+
+/* Le regole di costo cambiate a mano si vedono. */
+.cf-badge-mod{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;
+  border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.05em;
+  text-transform:uppercase;background:var(--tal-gold-bg);color:var(--tal-gold);
+  border:1px solid var(--tal-gold-line)}
+
+/* ---------- grafici ---------------------------------------------------- */
+
+/* I grafici sono SVG disegnati a mano: nessuna libreria, nessuna CDN. Il
+   contenitore scorre in orizzontale solo se serve, e l'SVG dentro non scende
+   sotto una larghezza in cui le etichette si sovrappongono. */
+.cf-chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border:1px solid var(--tal-line);border-radius:12px;background:var(--tal-card,#fff);
+  padding:14px}
+.cf-chart-wrap svg{display:block;min-width:520px;width:100%;height:auto}
+.cf-legend{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:11px;font-size:11px}
+.cf-legend span{display:inline-flex;align-items:center;gap:6px;color:var(--tal-ink-3)}
+.cf-legend i{width:18px;height:0;border-top-width:2.5px;border-top-style:solid;flex:0 0 auto}
+.cf-readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;margin-top:13px}
+.cf-readout>div{padding:9px 11px;border:1px solid var(--tal-line);border-radius:9px;
+  background:var(--tal-sunken,#fbfaf8)}
+.cf-readout span{display:block;font-size:9.5px;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--tal-ink-4)}
+.cf-readout b{font-size:14px;font-variant-numeric:tabular-nums}
+
+.cf-section{margin-bottom:40px}
+.cf-section>h3{font-size:15px;margin:0 0 4px}
+.cf-section>p.cf-lead{font-size:12.5px;color:var(--tal-ink-3);margin:0 0 14px;max-width:76ch}
+
+.cf-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+
+@media(max-width:700px){
+  .cf-mini{grid-template-columns:1fr}
+  .cf-verdict{padding:16px 15px}
+}
+@media print{
+  .sb-toggle,.appbar,.tal-global-header,.tal-publication,.cf-actions{display:none!important}
+  .app-main{margin-left:0}
+}
+</style>
+</head>
+
+<body class="tal-tool-page">
+<!-- Niente classe `btn`: in tal-app.css la regola dei bottoni porta
+     `display:inline-flex !important` e sovrascriverebbe il `display:none`
+     con cui questo pulsante resta nascosto sopra i 980px. -->
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di Convenienza fiscale" class="sb-toggle no-print" data-action="toggle-sidebar" type="button">☰ Menu</button>
+<div class="mobile-backdrop" data-action="close-sidebar" id="mobileBackdrop"></div>
+<nav aria-label="Navigazione principale" class="appbar no-print" id="sidebar">
+<div class="sb-brand">
+<span class="sb-logo">CF</span>
+<span class="sb-brandtext"><b>Convenienza fiscale</b><small>Forfettario, ordinario, STP/STA</small></span>
+</div>
+<div class="sb-context" id="sbContext"><b id="sbContextName">Nessuna simulazione</b><span id="sbContextMeta">Comincia dal profilo</span></div>
+<div class="workspace-nav">
+<span class="sb-cap sb-groupcap">Percorso</span>
+<button class="cf-link" data-stage="profilo" type="button"><span aria-hidden="true" class="ws-ic">1</span><span class="ws-label">Profilo</span><span class="ws-state" id="stateProfilo">·</span></button>
+<button class="cf-link" data-stage="compensi" type="button"><span aria-hidden="true" class="ws-ic">2</span><span class="ws-label">Compensi e redditi</span><span class="ws-state" id="stateCompensi">·</span></button>
+<button class="cf-link" data-stage="costi" type="button"><span aria-hidden="true" class="ws-ic">3</span><span class="ws-label">Costi annuali</span><span class="ws-state" id="stateCosti">0</span></button>
+<button class="cf-link" data-stage="confronto" type="button"><span aria-hidden="true" class="ws-ic">4</span><span class="ws-label">Confronto</span><span class="ws-state" id="stateConfronto">·</span></button>
+<span class="sb-cap sb-groupcap">Risultati e dati</span>
+<button class="cf-link" data-stage="archivio" type="button"><span aria-hidden="true" class="ws-ic">▣</span><span class="ws-label">Archivio simulazioni</span><span class="ws-state" id="stateArchivio">0</span></button>
+<a class="cf-link" href="/configura-con-ai/#convenienza-fiscale"><span aria-hidden="true" class="ws-ic">AI</span><span class="ws-label">Configura con AI</span></a>
+<button class="cf-link" data-stage="dati" type="button"><span aria-hidden="true" class="ws-ic">⛁</span><span class="ws-label">Dati e backup</span></button>
+<button class="cf-link" data-stage="aiuto" type="button"><span aria-hidden="true" class="ws-ic">?</span><span class="ws-label">Come si usa</span></button>
+</div>
+<div class="sb-foot">Elaborazione locale. I dati non vengono inviati.</div>
+</nav>
+<div class="app-main">
+<header class="tal-global-header no-print">
+<div class="tal-gh-frame">
+<a aria-label="Home" class="tal-gh-brand" href="/"><img alt="" aria-hidden="true" class="tal-gh-logo" src="data:image/png;base64,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"/><span class="tal-gh-brand-copy">Tax &amp; Accounting — Automation Lab</span></a>
+<!-- Sotto i 1080px site-shell.css nasconde le voci e le riapre solo con
+     `.tal-menu-open` sull'intestazione: senza questo pulsante la navigazione
+     del sito sparisce su telefono. Ce l'hanno gia' LIPE e il Fascicolo. -->
+<button aria-controls="talGhNav" aria-expanded="false" aria-label="Apri o chiudi la navigazione del sito" class="tal-gh-menu-toggle" data-action="toggle-site-nav" type="button">Menu</button>
+<nav aria-label="Navigazione principale" class="tal-gh-nav" id="talGhNav"><a href="/">Home</a><a aria-current="page" href="/tools/">Strumenti</a><a href="/configura-con-ai/">Configura con AI</a><a href="/approfondimenti/">Casi e metodo</a><a href="/#about">Chi sono</a></nav>
+<div aria-label="Lingua" class="tal-gh-lang"><a aria-current="page" class="active" href="/tools/f24/" hreflang="it">ITA</a><a href="/en/tools/f24/" hreflang="en">ENG</a><a href="/es/tools/f24/" hreflang="es">ESP</a></div>
+</div>
+</header>
+<section aria-label="Informazioni di pubblicazione" class="tal-publication no-print">
+<details>
+<summary data-tal-key="summary">Informazioni sullo strumento</summary>
+<div class="tal-publication-body">
+<span class="tal-publication-label" data-tal-key="label">Convenienza fiscale · v1.0.0</span>
+<h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
+<p data-tal-key="lead">Confronta la cassa personale netta di un avvocato o di un dottore commercialista fra i tre assetti, con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e il mix fra compenso amministratore e dividendo.</p>
+<div class="tal-publication-facts">
+<div class="tal-publication-fact" data-tal-fact="0">Input: Excel o compilazione guidata</div><div class="tal-publication-fact" data-tal-fact="1">Output: confronto, grafici, Excel</div><div class="tal-publication-fact" data-tal-fact="2">Parametri: 2025 e 2026, modificabili</div><div class="tal-publication-fact" data-tal-fact="3">Dati: elaborazione locale</div>
+</div>
+<p class="tal-publication-note" data-tal-key="note">Il tool non sostituisce il parere professionale: le assunzioni che richiedono verifica sono elencate in ogni confronto.</p>
+</div>
+</details>
+</section>
+<main id="cfMain" tabindex="-1">
+
+<!-- ==================== 1. PROFILO ==================== -->
+<section class="cf-stage active" data-stage="profilo" id="stageProfilo">
+<div class="cf-head">
+<h2>Chi stiamo simulando</h2>
+<p>Il regime attuale serve prima dei numeri: cambia quali soglie contano e quali avvisi hanno senso. Tutti i campi di questa schermata sono obbligatori.</p>
+</div>
+
+<div class="cf-section">
+<h3>Professione</h3>
+<p class="cf-lead">Determina la Cassa di previdenza e la forma societaria confrontata.</p>
+<div class="cf-choices">
+<label class="cf-choice"><input checked name="cfProfession" type="radio" value="commercialista"><b>Dottore commercialista</b><small>CNPADC · si confronta la STP S.r.l.</small></label>
+<label class="cf-choice"><input name="cfProfession" type="radio" value="avvocato"><b>Avvocato</b><small>Cassa Forense · si confronta la STA S.r.l.</small></label>
+</div>
+</div>
+
+<div class="cf-section">
+<h3>Regime attuale</h3>
+<p class="cf-lead">Da dove si parte. Serve a distinguere la convenienza nell'anno in corso da quella del periodo successivo.</p>
+<div class="cf-choices">
+<label class="cf-choice"><input checked name="cfCurrentRegime" type="radio" value="forfettario"><b>Forfettario</b><small>Imposta sostitutiva, costi non deducibili</small></label>
+<label class="cf-choice"><input name="cfCurrentRegime" type="radio" value="ordinario"><b>Partita IVA ordinaria</b><small>IRPEF progressiva, costi analitici</small></label>
+<label class="cf-choice"><input name="cfCurrentRegime" type="radio" value="societa"><b>STP / STA S.r.l.</b><small>IRES, IRAP, remunerazione del socio</small></label>
+</div>
+</div>
+
+<div class="cf-section">
+<h3>Anno e soggetto</h3>
+<div class="cf-grid">
+<div class="cf-field">
+<label for="cfYear">Anno fiscale</label>
+<select class="tal-input" id="cfYear"><option value="2026">2026</option><option value="2025">2025</option></select>
+<span class="cf-hint">Aliquote, massimali e minimi cambiano per anno. Sono elencati in «Come si usa».</span>
+</div>
+<div class="cf-field">
+<label for="cfSubjectKind">Per chi</label>
+<select class="tal-input" id="cfSubjectKind"><option value="self">Per me</option><option value="other">Per un altro soggetto</option></select>
+</div>
+<div class="cf-field">
+<label for="cfSubjectName">Nome della simulazione</label>
+<input class="tal-input" id="cfSubjectName" maxlength="80" placeholder="es. Studio Rossi 2026" type="text">
+<span class="cf-hint">Serve solo a ritrovarla nell'archivio.</span>
+</div>
+</div>
+</div>
+
+<div class="cf-actions">
+<button class="btn" data-go="compensi" type="button">Continua con i compensi</button>
+<button class="btn secondary" data-action="load-demo" type="button">Prova con i dati dimostrativi</button>
+<button class="btn secondary" data-action="open-import" type="button">Importa da Excel</button>
+</div>
+</section>
+
+<!-- ==================== 2. COMPENSI ==================== -->
+<section class="cf-stage" data-stage="compensi" id="stageCompensi">
+<div class="cf-head">
+<h2>Compensi e redditi</h2>
+<p>Gli importi sono sempre annuali. I compensi si intendono al netto dell'IVA e del contributo integrativo, perché l'integrativo lo paga il cliente e non è un tuo ricavo.</p>
+</div>
+
+<div class="cf-section">
+<h3>Attività professionale</h3>
+<div class="cf-grid">
+<div class="cf-field">
+<label for="cfRevenue">Compensi / ricavi dell'anno</label>
+<input class="tal-input" id="cfRevenue" inputmode="decimal" type="text" value="85.000">
+<span class="cf-hint">Al netto di IVA e contributo integrativo.</span>
+</div>
+<div class="cf-field">
+<label for="cfPreviousRevenue">Compensi dell'anno precedente</label>
+<input class="tal-input" id="cfPreviousRevenue" inputmode="decimal" type="text" value="80.000">
+<span class="cf-hint">Oltre 85.000 il forfettario non è applicabile nell'anno simulato.</span>
+</div>
+<div class="cf-field">
+<label for="cfOtherIncome">Altri redditi personali</label>
+<input class="tal-input" id="cfOtherIncome" inputmode="decimal" type="text" value="0">
+<span class="cf-hint">Entrano nella progressività IRPEF e danno capienza alla deduzione dei contributi.</span>
+</div>
+<div class="cf-field">
+<label for="cfEmployeeIncome">di cui lavoro dipendente o pensione</label>
+<input class="tal-input" id="cfEmployeeIncome" inputmode="decimal" type="text" value="0">
+<span class="cf-hint">Oltre 35.000 è causa ostativa del forfettario.</span>
+</div>
+</div>
+</div>
+
+<div class="cf-section">
+<h3>Requisiti e cause ostative del forfettario</h3>
+<p class="cf-lead">Il tool non può verificarli al posto tuo: quello che dichiari qui entra nel confronto e resta scritto negli avvisi.</p>
+<div class="cf-grid">
+<div class="cf-field full">
+<label class="cf-choice" style="border-radius:9px"><input id="cfStartup" type="checkbox"><b>Aliquota 5% per nuova attività</b><small>Ricorrono tutte le condizioni di legge. Il superamento degli 85.000 nell'anno non fa perdere il 5%.</small></label>
+</div>
+<div class="cf-field full">
+<label class="cf-choice" style="border-radius:9px"><input id="cfIncompatible" type="checkbox"><b>Partecipazioni incompatibili</b><small>Società di persone, associazioni, o controllo di S.r.l. con attività riconducibile.</small></label>
+</div>
+<div class="cf-field full">
+<label class="cf-choice" style="border-radius:9px"><input id="cfEmployer" type="checkbox"><b>Attività prevalente verso datore o ex datore</b><small>Nei due anni precedenti.</small></label>
+</div>
+</div>
+</div>
+
+<div class="cf-section">
+<h3>Società professionale</h3>
+<p class="cf-lead">Serve solo al confronto con la STP/STA. Se non ti interessa, lascia i valori come sono.</p>
+<div class="cf-grid">
+<div class="cf-field">
+<label for="cfOwnership">Quota di partecipazione</label>
+<input class="tal-input" id="cfOwnership" inputmode="decimal" type="text" value="100">
+<span class="cf-hint">Percentuale. Determina utile attribuibile, dividendo e base contributiva.</span>
+</div>
+<div class="cf-field">
+<label for="cfDistribution">Utile distribuito</label>
+<input class="tal-input" id="cfDistribution" inputmode="decimal" type="text" value="100">
+<span class="cf-hint">Percentuale dell'utile distribuibile. Ciò che resta è utile trattenuto, non cassa tua.</span>
+</div>
+<div class="cf-field">
+<label for="cfCompanyOverhead">Costi di struttura della società</label>
+<input class="tal-input" id="cfCompanyOverhead" inputmode="decimal" type="text" value="0">
+<span class="cf-hint">Amministrazione, revisione, adempimenti societari.</span>
+</div>
+<div class="cf-field">
+<label for="cfIrapRate">Aliquota IRAP</label>
+<input class="tal-input" id="cfIrapRate" inputmode="decimal" type="text" value="3,9">
+<span class="cf-hint">Percentuale. Verifica la disciplina regionale.</span>
+</div>
+</div>
+</div>
+
+<div class="cf-section">
+<h3>Come esce la remunerazione dalla società</h3>
+<div class="cf-choices">
+<label class="cf-choice"><input checked name="cfExtraction" type="radio" value="dividend"><b>Solo dividendo</b><small>Ritenuta 26%, fuori dall'IRPEF progressiva</small></label>
+<label class="cf-choice"><input name="cfExtraction" type="radio" value="admin"><b>Solo compenso amministratore</b><small>IRPEF e previdenza</small></label>
+<label class="cf-choice"><input name="cfExtraction" type="radio" value="mix"><b>Compenso e dividendo</b><small>Il tool cerca il mix migliore</small></label>
+</div>
+<div class="cf-grid" id="cfAdminBox" style="margin-top:15px">
+<div class="cf-field">
+<label for="cfAdmin">Compenso amministratore</label>
+<input class="tal-input" id="cfAdmin" inputmode="decimal" type="text" value="0">
+</div>
+<div class="cf-field" id="cfAdminTreatmentBox">
+<label for="cfAdminTreatment">Previdenza sul compenso</label>
+<select class="tal-input" id="cfAdminTreatment"><option value="cassa">Cassa professionale</option><option value="inps">Gestione Separata INPS</option></select>
+<span class="cf-hint">La qualificazione va verificata nel caso concreto: dipende da autonomia e natura della carica.</span>
+</div>
+<div class="cf-field" id="cfInpsRateBox">
+<label for="cfInpsRate">Aliquota Gestione Separata</label>
+<select class="tal-input" id="cfInpsRate"><option value="24">24% · con altra copertura obbligatoria</option><option value="33.72">33,72% · senza altra copertura</option></select>
+<span class="cf-hint">Un terzo a carico dell'amministratore, due terzi della società.</span>
+</div>
+</div>
+</div>
+
+<div class="cf-section">
+<details>
+<summary style="cursor:pointer;font-size:13px;font-weight:650;padding:9px 0">Impostazioni previdenziali e locali</summary>
+<div class="cf-grid" style="margin-top:14px">
+<div class="cf-field" id="cfPensionRateBox">
+<label for="cfPensionRate">Aliquota soggettiva CNPADC</label>
+<input class="tal-input" id="cfPensionRate" inputmode="decimal" type="text" value="12">
+<span class="cf-hint">Dal 12% al 100%, scelta dall'iscritto.</span>
+</div>
+<div class="cf-field">
+<label for="cfMaternity">Contributo di maternità</label>
+<input class="tal-input" id="cfMaternity" inputmode="decimal" type="text" value="0">
+<span class="cf-hint">Importo fisso annuale della tua Cassa.</span>
+</div>
+<div class="cf-field">
+<label for="cfRegionalRate">Addizionale regionale</label>
+<input class="tal-input" id="cfRegionalRate" inputmode="decimal" type="text" value="1,23">
+<span class="cf-hint">Percentuale. Da verificare per la tua regione.</span>
+</div>
+<div class="cf-field">
+<label for="cfMunicipalRate">Addizionale comunale</label>
+<input class="tal-input" id="cfMunicipalRate" inputmode="decimal" type="text" value="0,8">
+<span class="cf-hint">Percentuale. Da verificare per il tuo comune.</span>
+</div>
+</div>
+</details>
+</div>
+
+<div class="cf-actions">
+<button class="btn" data-go="costi" type="button">Continua con i costi</button>
+<button class="btn secondary" data-go="profilo" type="button">Torna al profilo</button>
+</div>
+</section>
+
+<!-- ==================== 3. COSTI ==================== -->
+<section class="cf-stage" data-stage="costi" id="stageCosti">
+<div class="cf-head">
+<h2>Costi annuali</h2>
+<p>Tutti gli importi sono annuali. Ogni voce porta le proprie regole di IVA e deducibilità, diverse fra ordinario e società: aprile e modificale se il caso concreto lo richiede. Le regole cambiate a mano restano segnate.</p>
+</div>
+<div id="cfCostList"></div>
+<div class="cf-actions">
+<button class="btn add" data-action="add-cost" type="button">Aggiungi una voce di costo</button>
+<button class="btn secondary" data-action="reset-costs" type="button">Ripristina le regole predefinite</button>
+</div>
+<div class="cf-actions">
+<button class="btn" data-go="confronto" type="button">Vai al confronto</button>
+<button class="btn secondary" data-go="compensi" type="button">Torna ai compensi</button>
+</div>
+</section>
+
+<!-- ==================== 4. CONFRONTO ==================== -->
+<section class="cf-stage" data-stage="confronto" id="stageConfronto">
+<div class="cf-head">
+<h2>Confronto</h2>
+<p id="cfResultContext"></p>
+</div>
+<div hidden id="cfAlert"></div>
+<div class="cf-verdict" id="cfVerdict"></div>
+<div class="cf-cards" id="cfCards"></div>
+
+<div class="cf-section" style="margin-top:40px">
+<h3>La soglia oltre 85.000</h3>
+<p class="cf-lead" id="cfThresholdLead"></p>
+<div class="cf-readout" id="cfThresholdReadout"></div>
+</div>
+
+<div class="cf-section">
+<h3>Cassa netta al variare dei compensi</h3>
+<p class="cf-lead">A costi invariati. La linea orizzontale è il netto che otterresti fermandoti a 85.000 nel forfettario; il punto segnato è dove l'ordinario lo raggiunge.</p>
+<div class="cf-chart-wrap"><svg id="cfChartMain" role="img" aria-label="Cassa netta personale al variare dei compensi, per i tre regimi"></svg></div>
+<div class="cf-legend" id="cfLegendMain"></div>
+<div class="cf-readout" id="cfChartReadout"></div>
+</div>
+
+<div class="cf-section">
+<h3>Dai compensi alla cassa: cosa se ne va</h3>
+<p class="cf-lead">Lo stesso importo di partenza, i tre percorsi. Ogni barra scende di costi, contributi e imposte fino a ciò che ti resta.</p>
+<div class="cf-chart-wrap"><svg id="cfChartBridge" role="img" aria-label="Passaggio dai compensi alla cassa netta per ciascun regime"></svg></div>
+</div>
+
+<div class="cf-section">
+<h3>Cosa ribalta la scelta</h3>
+<p class="cf-lead">Quanto si muove il divario fra il regime migliore e il secondo, cambiando una variabile alla volta. Le barre a destra allargano il vantaggio, quelle a sinistra lo riducono.</p>
+<div class="cf-chart-wrap"><svg id="cfChartDrivers" role="img" aria-label="Sensibilità del divario di netto alle singole variabili"></svg></div>
+</div>
+
+<div class="cf-section">
+<h3>I due anni del passaggio</h3>
+<p class="cf-lead">L'anno simulato e il periodo successivo. Se supera 85.000, il forfettario cambia stato fra i due esercizi: è la distinzione che decide il momento del passaggio.</p>
+<div class="cf-chart-wrap"><svg id="cfChartYears" role="img" aria-label="Confronto fra anno simulato e periodo successivo"></svg></div>
+</div>
+
+<div class="cf-section">
+<h3>Da verificare prima di decidere</h3>
+<p class="cf-lead">Assunzioni del modello che dipendono dal caso concreto. Non sono errori: sono i punti su cui il tool si ferma e serve il tuo giudizio.</p>
+<ul class="cf-checks" id="cfChecks"></ul>
+</div>
+
+<div class="cf-actions">
+<button class="btn save" data-action="save-simulation" type="button">Salva nell'archivio</button>
+<button class="btn secondary" disabled data-action="export-excel" title="In arrivo col passo successivo: import ed export Excel." type="button">Esporta in Excel (in arrivo)</button>
+<button class="btn secondary" data-go="costi" type="button">Torna ai costi</button>
+</div>
+</section>
+
+<!-- ==================== ARCHIVIO / DATI / AIUTO ==================== -->
+<section class="cf-stage" data-stage="archivio" id="stageArchivio">
+<div class="cf-head"><h2>Archivio simulazioni</h2><p>Salvate in questo browser. Non vengono inviate da nessuna parte, e si perdono se cancelli i dati del browser: per conservarle, usa il backup in «Dati e backup».</p></div>
+<div id="cfArchiveList"></div>
+</section>
+
+<section class="cf-stage" data-stage="dati" id="stageDati">
+<div class="cf-head"><h2>Dati e backup</h2><p>Tutto quello che il tool tiene sta in questo browser. Da qui lo esporti, lo reimporti su un'altra macchina, o lo cancelli.</p></div>
+<div class="cf-actions">
+<button class="btn secondary" data-action="backup" type="button">Scarica un backup</button>
+<button class="btn secondary" data-action="restore" type="button">Ripristina da backup</button>
+<button class="btn edit" data-action="wipe" type="button">Cancella tutti i dati</button>
+</div>
+<div class="cf-section" style="margin-top:26px"><div id="cfStorageInfo"></div></div>
+</section>
+
+<section class="cf-stage" data-stage="aiuto" id="stageAiuto">
+<div class="cf-head"><h2>Come si usa</h2><p>Cosa fa il tool, cosa non fa, e con quali parametri.</p></div>
+<div id="cfHelp"></div>
+</section>
+
+</main>
+</div>
+
+
+<script id="cf-engine">
+/* Convenienza fiscale — motore fiscale e previdenziale.
+
+   Da dove viene. È il motore del calcolatore sviluppato fuori dal sito,
+   verificato riga per riga il 21 agosto 2026 e portato qui. I punti fiscali
+   difficili erano già giusti e sono stati conservati: le soglie del
+   forfettario, il 5% indipendente dal fatturato dell'anno, il massimale che
+   limita la base contributiva e non il compenso, e — il più delicato — la
+   contribuzione di Cassa calcolata sull'utile societario attribuibile e non
+   sul dividendo distribuito.
+
+   Cosa è cambiato nel porting, e perché:
+
+   1. I parametri stavano dentro le funzioni, in ternari `anno === 2026 ? a : b`.
+      Con due soli anni selezionabili funzionava, ma i sentinelle erano
+      incoerenti — i contributi confrontavano con 2026, l'IRPEF con 2025 —
+      quindi il primo anno aggiunto avrebbe mescolato parametri di annate
+      diverse senza dirlo. Ora c'è una tabella per anno: aggiungere un anno
+      significa aggiungere una voce, e un anno non previsto viene rifiutato
+      invece di ereditare numeri sbagliati.
+
+   2. I contributi obbligatori sono oneri deducibili dal reddito COMPLESSIVO.
+      Prima erano sottratti solo dal reddito che li generava, e l'eccedenza
+      andava perduta: nel caso «solo dividendo» la Cassa sull'utile
+      attribuibile veniva pagata senza produrre alcun risparmio d'imposta, e
+      il confronto penalizzava la società di tutto quell'importo. Corretto in
+      tutti e tre i regimi, perché correggerlo in uno solo falserebbe il
+      confronto, che è l'unica cosa che questo tool deve fare bene.
+
+   3. I costi avevano solo percentuali piatte. Mancavano la percentuale di uso
+      professionale e i tetti, che il brief chiede espressamente. Le spese di
+      rappresentanza erano deducibili al 100% senza limite: ora portano il
+      loro tetto sui compensi.
+
+   Cosa NON fa. Non decide: espone i numeri e dichiara le assunzioni. Ogni
+   punto che dipende dal caso concreto finisce in `verifiche()` e compare a
+   schermo. */
+
+'use strict';
+
+/* ---------------------------------------------------------------- parametri */
+
+/* Una voce per anno. Le fonti stanno in CF_FONTI, che «Come si usa» stampa in
+   pagina: un parametro senza fonte visibile è un parametro che nessuno può
+   controllare. */
+const CF_PARAMS = {
+  2026: {
+    /* Forfettario */
+    coefficiente: 0.78,          // avvocati e commercialisti, salvo diverso ATECO
+    sostitutivaOrdinaria: 0.15,
+    sostitutivaStartup: 0.05,
+    sogliaPermanenza: 85000,
+    sogliaCessazioneImmediata: 100000,
+    sogliaLavoroDipendente: 35000,
+    sogliaSpesePersonale: 20000,
+
+    /* IRPEF: [limite superiore dello scaglione, aliquota] */
+    scaglioni: [[28000, 0.23], [50000, 0.33], [Infinity, 0.43]],
+
+    /* Cassa Forense */
+    forense: {
+      soggettivo: 0.17, sogliaSoggettivo: 130000, oltreSoglia: 0.03,
+      minimoSoggettivo: 2790, integrativo: 0.04, minimoIntegrativo: 355
+    },
+    /* CNPADC */
+    cnpadc: {
+      soggettivoMin: 0.12, soggettivoMax: 1.00, massimale: 209300,
+      minimoSoggettivo: 3180, integrativo: 0.04, minimoIntegrativo: 954
+    },
+    /* Gestione Separata INPS per l'amministratore */
+    inps: {
+      massimale: 122295, conAltraCopertura: 0.24, senzaAltraCopertura: 0.3372,
+      quotaAmministratore: 1 / 3
+    },
+    ires: 0.24,
+    ritenutaDividendo: 0.26
+  },
+  2025: {
+    coefficiente: 0.78,
+    sostitutivaOrdinaria: 0.15,
+    sostitutivaStartup: 0.05,
+    sogliaPermanenza: 85000,
+    sogliaCessazioneImmediata: 100000,
+    sogliaLavoroDipendente: 35000,
+    sogliaSpesePersonale: 20000,
+    scaglioni: [[28000, 0.23], [50000, 0.35], [Infinity, 0.43]],
+    forense: {
+      soggettivo: 0.16, sogliaSoggettivo: 130000, oltreSoglia: 0.03,
+      minimoSoggettivo: 2750, integrativo: 0.04, minimoIntegrativo: 350
+    },
+    cnpadc: {
+      soggettivoMin: 0.12, soggettivoMax: 1.00, massimale: 206800,
+      minimoSoggettivo: 3140, integrativo: 0.04, minimoIntegrativo: 942
+    },
+    inps: {
+      massimale: 120607, conAltraCopertura: 0.24, senzaAltraCopertura: 0.3372,
+      quotaAmministratore: 1 / 3
+    },
+    ires: 0.24,
+    ritenutaDividendo: 0.26
+  }
+};
+
+const CF_FONTI = [
+  ['Regime forfettario', 'Agenzia delle Entrate, circolare 32/E del 5 dicembre 2023', 'https://www.agenziaentrate.gov.it/portale/documents/20143/5763741/Circolare+n.+32+del+5+dicembre+2023.pdf'],
+  ['Cassa Forense', 'Cassa Forense — riforma e aliquote contributive', 'https://www.cassaforense.it/DettaglioNews?id=14088&tipo=inEvidenza'],
+  ['Avvocato in forma societaria', 'Cassa Forense — previdenza nell’esercizio in forma societaria', 'https://www.cfnews.it/previdenza/la-previdenza-dell-avvocato-nell-esercizio-della-professione-in-forma-societaria/'],
+  ['CNPADC, contributo soggettivo', 'CNPADC — contributo soggettivo', 'https://www.cnpadc.it/la-cassa-per-me/contribuzione/contributo-soggettivo.html'],
+  ['CNPADC, importi e massimali', 'CNPADC — quanto, quando e come versare', 'https://www.cnpadc.it/la-cassa-per-me/contribuzione/quanto-quando-e-come-versare-i-contributi.html'],
+  ['Gestione Separata INPS', 'INPS — circolare 8 del 3 febbraio 2026', 'https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html'],
+  ['Dividendi', 'Agenzia delle Entrate / FiscoOggi — plusvalenze e dividendi', 'https://www.fiscooggi.it/portale/-/fiscalit%C3%A0-plusvalenze-e-dividendi-cosa-cambia-dopo-il-bilancio-2026']
+];
+
+/* Il minimo integrativo di Cassa Forense non compare nel brief e non l'ho
+   trovato in una fonte ufficiale citabile: resta nella tabella perché serve al
+   calcolo, ma è dichiarato fra le verifiche invece di essere presentato come
+   certo. Stesso trattamento per l'azzeramento dell'integrativo in società. */
+const CF_PARAMETRI_DA_VERIFICARE = ['forense.minimoIntegrativo'];
+
+function params(year) {
+  const p = CF_PARAMS[Number(year)];
+  if (!p) {
+    /* Meglio fermarsi che ereditare i numeri dell'anno sbagliato. Era il
+       difetto latente del motore di partenza. */
+    throw new Error('Anno ' + year + ' non previsto: i parametri esistono per ' +
+      Object.keys(CF_PARAMS).sort().join(' e ') + '.');
+  }
+  return p;
+}
+
+/* ------------------------------------------------------------------- costi */
+
+/* Ogni voce dichiara:
+     iva      aliquota IVA tipica
+     ivaOrd   quota di IVA detraibile per il professionista
+     ivaSoc   quota di IVA detraibile per la società
+     dedOrd   quota deducibile ai fini IRPEF
+     dedSoc   quota deducibile ai fini IRES
+     irap     quota deducibile ai fini IRAP
+     uso      percentuale di uso professionale (il resto è personale)
+     tetto    tetto di deducibilità come quota dei compensi; null se non c'è */
+const CF_COSTI_DEFAULT = [
+  { id: 'studio', nome: 'Affitto o coworking', nota: 'IVA secondo il contratto di locazione', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'utenze', nome: 'Utenze e gestione studio', nota: 'Energia, pulizie, spese di gestione', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'telefonia', nome: 'Telefonia e connessione', nota: 'Deducibilità all’80% per la telefonia', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: .8, dedSoc: .8, irap: .8, uso: 1, tetto: null },
+  { id: 'tecnologia', nome: 'Software, cloud e hardware', nota: 'I beni pluriennali possono richiedere ammortamento', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'assicurazioni', nome: 'Polizza RC professionale', nota: 'Operazione assicurativa senza IVA', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'formazione', nome: 'Formazione e aggiornamento', nota: 'Verificare limiti e inerenza', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'servizi', nome: 'Consulenze e servizi esterni', nota: 'Servizi professionali inerenti', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'personale', nome: 'Dipendenti e personale', nota: 'Oltre 20.000 è causa ostativa del forfettario. Deduzione IRAP da verificare', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 0, uso: 1, tetto: null },
+  { id: 'collaboratori', nome: 'Collaboratori con fattura', nota: 'Distinti dal personale dipendente', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'auto', nome: 'Auto e costi del veicolo', nota: 'Uso promiscuo: IVA al 40%, deducibilità al 20%', iva: .22, ivaOrd: .4, ivaSoc: .4, dedOrd: .2, dedSoc: .2, irap: .2, uso: 1, tetto: null },
+  { id: 'trasferte', nome: 'Trasferte, vitto e alloggio', nota: 'Vitto e alloggio al 75%, entro il 2% dei compensi', iva: .10, ivaOrd: 1, ivaSoc: 1, dedOrd: .75, dedSoc: .75, irap: .75, uso: 1, tetto: .02 },
+  { id: 'rappresentanza', nome: 'Rappresentanza e omaggi', nota: 'IVA non detraibile; tetto all’1% dei compensi', iva: .22, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: .01 },
+  { id: 'banca', nome: 'Commissioni bancarie e POS', nota: 'Spesso esenti o fuori campo IVA', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
+  { id: 'ordine', nome: 'Quota dell’Ordine', nota: 'Deducibile in capo alla persona; qualificazione societaria da verificare', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 0, irap: 0, uso: 1, tetto: null },
+  { id: 'altro', nome: 'Altri costi professionali', nota: 'Regola generica, modificabile', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null }
+];
+
+const CF_CAMPI_REGOLA = ['iva', 'ivaOrd', 'ivaSoc', 'dedOrd', 'dedSoc', 'irap', 'uso', 'tetto'];
+
+/* ---------------------------------------------------------------- utilità */
+
+const cfNum = (v, min = 0, max = Infinity) =>
+  Math.min(max, Math.max(min, Number(v) || 0));
+
+/* Somma progressiva su scaglioni [limite, aliquota]. */
+function cfProgressivo(base, scaglioni) {
+  let precedente = 0;
+  return scaglioni.reduce((tot, [limite, aliquota]) => {
+    const fetta = Math.max(0, Math.min(base, limite) - precedente);
+    precedente = limite;
+    return tot + fetta * aliquota;
+  }, 0);
+}
+
+/* --------------------------------------------------------------- il motore */
+
+function cfEngine(input) {
+  const P = params(input.year);
+  const compensi = cfNum(input.revenue);
+  const altriRedditi = cfNum(input.otherIncome);
+
+  /* ---- IRPEF -------------------------------------------------------- */
+
+  const irpefLorda = (base) => cfProgressivo(cfNum(base), P.scaglioni);
+
+  const detrazioneAutonomo = (r) => {
+    if (r <= 0) return 0;
+    let d = 0;
+    if (r <= 5500) d = 1265;
+    else if (r <= 28000) d = 500 + 765 * (28000 - r) / 22500;
+    else if (r <= 50000) d = 500 * (50000 - r) / 22000;
+    if (r > 11000 && r <= 17000) d += 50;
+    return Math.min(irpefLorda(r), Math.max(0, d));
+  };
+  const detrazioneDipendente = (r) => {
+    if (r <= 0) return 0;
+    let d = 0;
+    if (r <= 15000) d = 1955;
+    else if (r <= 28000) d = 1910 + 1190 * (28000 - r) / 13000;
+    else if (r <= 50000) d = 1910 * (50000 - r) / 22000;
+    if (r > 25000 && r <= 35000) d += 65;
+    return Math.min(irpefLorda(r), Math.max(0, d));
+  };
+
+  /* Le addizionali si applicano alla stessa base dell'IRPEF. È una
+     semplificazione: la base delle addizionali non coincide in tutto con
+     quella dell'imposta. È dichiarata fra le verifiche. */
+  const impostaPersonale = (base, tipo = 'autonomo') => {
+    const b = cfNum(base);
+    const detr = tipo === 'dipendente' ? detrazioneDipendente(b) : detrazioneAutonomo(b);
+    return Math.max(0, irpefLorda(b) - detr)
+      + b * cfNum(input.regionalRate) / 100
+      + b * cfNum(input.municipalRate) / 100;
+  };
+  const impostaBase = impostaPersonale(altriRedditi);
+
+  /* ---- contributi --------------------------------------------------- */
+
+  /* `volumeAffari` serve al contributo integrativo, che il professionista
+     addebita in fattura: pesa solo per la parte che non copre il minimo.
+     `inSocieta` azzera l'integrativo perché in una STP/STA lo addebita la
+     società — assunzione dichiarata fra le verifiche. */
+  function contributi(reddito, volumeAffari, inSocieta = false) {
+    const base = cfNum(reddito);
+    if (input.profession === 'commercialista') {
+      const c = P.cnpadc;
+      const aliquota = Math.min(c.soggettivoMax,
+        Math.max(c.soggettivoMin, cfNum(input.pensionRate) / 100));
+      const soggettivo = Math.max(c.minimoSoggettivo, Math.min(base, c.massimale) * aliquota);
+      const integrativo = inSocieta ? 0
+        : Math.max(0, c.minimoIntegrativo - cfNum(volumeAffari) * c.integrativo);
+      return soggettivo + integrativo + cfNum(input.maternity);
+    }
+    const f = P.forense;
+    const soggettivo = Math.max(f.minimoSoggettivo,
+      Math.min(base, f.sogliaSoggettivo) * f.soggettivo
+      + Math.max(0, base - f.sogliaSoggettivo) * f.oltreSoglia);
+    const integrativo = inSocieta ? 0
+      : Math.max(0, f.minimoIntegrativo - cfNum(volumeAffari) * f.integrativo);
+    return soggettivo + integrativo + cfNum(input.maternity);
+  }
+
+  /* ---- costi -------------------------------------------------------- */
+
+  /* Restituisce, per ogni voce, il costo che esce di cassa e la quota
+     deducibile, separati: sono due numeri diversi e confonderli è il modo
+     più rapido per sbagliare il confronto fra forfettario e ordinario. */
+  function totaliCosti(fattore = 1) {
+    const t = { lordo: 0, cassaOrd: 0, dedOrd: 0, cassaSoc: 0, dedSoc: 0, dedIrap: 0, voci: [] };
+    (input.costs || []).forEach((c) => {
+      const inserito = cfNum(c.amount) * fattore;
+      /* La quota di uso personale non è un costo professionale: esce di
+         tasca ma non entra nel confronto fra regimi. */
+      const uso = cfNum(c.uso, 0, 1);
+      const rilevante = inserito * uso;
+      const iva = cfNum(c.iva, 0, 1);
+      const netto = c.gross && iva > 0 ? rilevante / (1 + iva) : rilevante;
+      const impostaIva = c.gross ? rilevante - netto : netto * iva;
+      const lordo = netto + impostaIva;
+
+      /* L'IVA non detraibile diventa costo, e come tale è deducibile. */
+      const cassaOrd = netto + impostaIva * (1 - cfNum(c.ivaOrd, 0, 1));
+      const cassaSoc = netto + impostaIva * (1 - cfNum(c.ivaSoc, 0, 1));
+
+      /* Il tetto è espresso in quota dei compensi e si applica dopo la
+         percentuale di deducibilità: è il limite superiore, non un secondo
+         abbattimento. */
+      const limite = c.tetto == null ? Infinity : cfNum(c.tetto, 0, 1) * compensi;
+      /* `lordo`, non `inserito`: nel forfettario l'IVA non si detrae, quindi
+         di tasca esce netto + IVA anche quando l'importo è stato inserito al
+         netto. Sommare l'inserito sottostimava il costo del forfettario
+         esattamente dell'IVA, e lo faceva sembrare più conveniente di quanto
+         sia — il difetto è emerso dal confronto di fedeltà col motore di
+         partenza, non dalla lettura del codice. */
+      t.lordo += lordo;
+      t.cassaOrd += cassaOrd;
+      t.dedOrd += Math.min(cassaOrd * cfNum(c.dedOrd, 0, 1), limite);
+      t.cassaSoc += cassaSoc;
+      t.dedSoc += Math.min(cassaSoc * cfNum(c.dedSoc, 0, 1), limite);
+      t.dedIrap += Math.min(cassaSoc * cfNum(c.irap, 0, 1), limite);
+      t.voci.push({ id: c.id, nome: c.nome, lordo, cassaOrd, cassaSoc });
+    });
+    return t;
+  }
+
+  const tot = totaliCosti(cfNum(input.costFactor, 0, 100) || 1);
+
+  /* ---- 1. forfettario ----------------------------------------------- */
+
+  const spesePersonale = (input.costs || [])
+    .filter((c) => c.id === 'personale').reduce((s, c) => s + cfNum(c.amount), 0);
+
+  const forfApplicabile =
+    cfNum(input.previousRevenue) <= P.sogliaPermanenza &&
+    compensi <= P.sogliaCessazioneImmediata &&
+    cfNum(input.employeeIncome) <= P.sogliaLavoroDipendente &&
+    spesePersonale <= P.sogliaSpesePersonale &&
+    !input.incompatible && !input.employer;
+
+  const forfReddito = compensi * P.coefficiente;
+  const forfContributi = contributi(forfReddito, compensi);
+  const forfBase = Math.max(0, forfReddito - forfContributi);
+  const forfEccedenza = Math.max(0, forfContributi - forfReddito);
+  const forfImposta = forfBase * (input.startup ? P.sostitutivaStartup : P.sostitutivaOrdinaria);
+  /* L'eccedenza dei contributi sul reddito forfettario è deducibile dal
+     reddito complessivo: senza questo i contributi sarebbero trattati in tre
+     modi diversi nei tre regimi, e il confronto non starebbe in piedi. */
+  const forfSgravio = forfEccedenza > 0
+    ? impostaBase - impostaPersonale(Math.max(0, altriRedditi - Math.min(forfEccedenza, altriRedditi)))
+    : 0;
+  const forfNetto = compensi - tot.lordo - forfContributi - forfImposta + forfSgravio;
+
+  /* ---- 2. ordinario ------------------------------------------------- */
+
+  const ordUtile = Math.max(0, compensi - tot.dedOrd);
+  const ordContributi = contributi(ordUtile, compensi);
+  const ordLordo = altriRedditi + ordUtile;
+  const ordDedotto = Math.min(ordContributi, ordLordo);
+  const ordImponibile = Math.max(0, ordLordo - ordDedotto);
+  /* Nessun troncamento a zero sul differenziale: se la deduzione trova
+     capienza negli altri redditi l'imposta incrementale è davvero negativa,
+     perché quei redditi c'erano comunque. */
+  const ordImposta = impostaPersonale(ordImponibile) - impostaBase;
+  const ordNetto = compensi - tot.cassaOrd - ordContributi - ordImposta;
+
+  /* ---- 3. società professionale ------------------------------------- */
+
+  const quota = cfNum(input.ownership, 0, 100) / 100;
+  const inpsSuCompenso = input.profession === 'commercialista'
+    && input.adminTreatment === 'inps';
+  const inpsAliq = inpsSuCompenso ? cfNum(input.inpsRate) / 100 : 0;
+  const inpsMax = P.inps.massimale;
+  const quotaSoc = inpsAliq * (1 - P.inps.quotaAmministratore);
+  const struttura = cfNum(input.companyOverhead);
+  const cassaPreCompenso = Math.max(0, compensi - tot.cassaSoc - struttura);
+
+  /* Il massimale limita la base contributiva, non il compenso: sopra il
+     massimale la società non paga più contributi, quindi può erogare di più. */
+  const compensoPrimaDelTetto = cassaPreCompenso / (1 + quotaSoc);
+  const compensoMax = inpsSuCompenso
+    ? (compensoPrimaDelTetto <= inpsMax
+      ? compensoPrimaDelTetto
+      : Math.max(0, cassaPreCompenso - inpsMax * quotaSoc))
+    : cassaPreCompenso;
+  const compensoRichiesto = input.extractionMode === 'dividend' ? 0 : cfNum(input.admin);
+  const compenso = Math.min(compensoRichiesto, compensoMax);
+  const baseInps = Math.min(compenso, inpsMax);
+  const inpsSocio = baseInps * inpsAliq * P.inps.quotaAmministratore;
+  const inpsSocieta = baseInps * inpsAliq * (1 - P.inps.quotaAmministratore);
+
+  const baseIres = Math.max(0, compensi - tot.dedSoc - struttura - compenso - inpsSocieta);
+  const ires = baseIres * P.ires;
+  const baseIrap = Math.max(0, compensi - tot.dedIrap - struttura);
+  const irap = baseIrap * cfNum(input.irapRate) / 100;
+
+  const distribuibile = Math.max(0,
+    compensi - tot.cassaSoc - struttura - compenso - inpsSocieta - ires - irap);
+  const quotaDistribuita = input.extractionMode === 'admin' ? 0
+    : cfNum(input.distribution, 0, 100) / 100;
+  const dividendo = distribuibile * quotaDistribuita * quota;
+  const ritenuta = dividendo * P.ritenutaDividendo;
+  const trattenuto = distribuibile * (1 - quotaDistribuita) * quota;
+
+  /* La contribuzione professionale grava sull'utile attribuibile, distribuito
+     o no. È il punto che il brief chiede di non perdere. */
+  const baseCassa = baseIres * quota + (inpsSuCompenso ? 0 : compenso);
+  const cassaSocio = contributi(baseCassa, compensi * quota, true);
+
+  const contributiPersonali = cassaSocio + inpsSocio;
+  const socLordo = altriRedditi + compenso;
+  const socDedotto = Math.min(contributiPersonali, socLordo);
+  const socImponibile = Math.max(0, socLordo - socDedotto);
+  const socImposta = impostaPersonale(socImponibile,
+    inpsSuCompenso ? 'dipendente' : 'autonomo') - impostaBase;
+
+  const socNetto = dividendo - ritenuta + compenso - contributiPersonali - socImposta;
+
+  /* ---- esito -------------------------------------------------------- */
+
+  const etichetta = input.startup
+    ? Math.round(P.sostitutivaStartup * 100) : Math.round(P.sostitutivaOrdinaria * 100);
+
+  return {
+    params: P,
+    totali: tot,
+    scenari: [
+      {
+        id: 'forfettario', nome: 'Regime forfettario', applicabile: forfApplicabile,
+        netto: forfNetto, imposte: forfImposta - forfSgravio, contributi: forfContributi,
+        costi: tot.lordo, trattenuto: 0,
+        stato: forfApplicabile
+          ? (compensi > P.sogliaPermanenza
+            ? etichetta + '% · uscita dal periodo successivo'
+            : etichetta + '% · applicabile')
+          : 'Non applicabile',
+        dettaglio: { reddito: forfReddito, base: forfBase, eccedenzaContributi: forfEccedenza, sgravio: forfSgravio }
+      },
+      {
+        id: 'ordinario', nome: 'Partita IVA ordinaria', applicabile: true,
+        netto: ordNetto, imposte: ordImposta, contributi: ordContributi,
+        costi: tot.cassaOrd, trattenuto: 0,
+        stato: 'Applicabile · IRAP non dovuta',
+        dettaglio: { utile: ordUtile, imponibile: ordImponibile, contributiDedotti: ordDedotto }
+      },
+      {
+        id: 'societa',
+        nome: input.profession === 'commercialista' ? 'STP S.r.l.' : 'STA S.r.l.',
+        applicabile: true,
+        netto: socNetto,
+        imposte: ires * quota + irap * quota + ritenuta + socImposta,
+        contributi: contributiPersonali + inpsSocieta * quota,
+        costi: (tot.cassaSoc + struttura) * quota, trattenuto,
+        stato: 'IRES, IRAP e remunerazione del socio',
+        dettaglio: {
+          compenso, compensoMax, dividendo, ritenuta, distribuibile,
+          baseCassa, cassaSocio, inpsSocio, inpsSocieta: inpsSocieta * quota,
+          ires, irap, baseIres, contributiDedotti: socDedotto
+        }
+      }
+    ]
+  };
+}
+
+</script>
+<script id="cf-render">
+/* Convenienza fiscale — risultati e grafici.
+
+   Quattro grafici, tutti SVG scritti qui, nessuna libreria:
+
+   1. la curva del netto ai vari livelli di compensi, con la linea del netto a
+      85.000 e il punto di pareggio dell'ordinario;
+   2. il ponte, che scompone i compensi in ciò che se ne va e ciò che resta;
+   3. cosa ribalta la scelta, cioè quanto si muove il divario cambiando una
+      variabile alla volta;
+   4. i due anni del passaggio.
+
+   Regola comune: nessun dato affidato al solo colore, nessuna curva tagliata,
+   le soglie collocate in proporzione alla scala reale, e sotto ogni grafico i
+   numeri in chiaro. Ogni valore disegnato viene dal motore: la UI non
+   ricalcola niente per conto suo, altrimenti si finisce con un grafico che
+   contraddice la tabella accanto. */
+
+'use strict';
+
+(function () {
+
+const $ = (id) => document.getElementById(id);
+const euro = () => window.cfEuro;
+const esc = () => window.cfEsc;
+
+const COLORI = { forfettario: '#145368', ordinario: '#8B6A16', societa: '#59147D' };
+/* Il tratteggio è l'informazione ridondante che rende leggibile il grafico
+   senza distinguere i colori. */
+const TRATTI = { forfettario: '', ordinario: '7 4', societa: '2 3' };
+const NOMI = { forfettario: 'Forfettario', ordinario: 'Ordinario', societa: 'Società' };
+
+const NS = 'http://www.w3.org/2000/svg';
+function el(nome, attr, testo) {
+  const n = document.createElementNS(NS, nome);
+  Object.keys(attr || {}).forEach((k) => n.setAttribute(k, attr[k]));
+  if (testo != null) n.textContent = testo;
+  return n;
+}
+function svgPulito(id, w, h) {
+  const s = $(id);
+  while (s.firstChild) s.removeChild(s.firstChild);
+  s.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  s.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  return s;
+}
+const mille = (n) => Math.abs(n) >= 1000
+  ? Math.round(n / 1000).toLocaleString('it-IT') + 'k'
+  : Math.round(n).toLocaleString('it-IT');
+
+/* ==================================================================== esito */
+
+window.cfRenderConfronto = function () {
+  const stato = window.cfStato();
+  const E = euro(), X = esc();
+  const esito = window.cfCalcola();
+  const conv = window.cfConvenienza();
+  window.cfSetUltimoEsito({ esito, conv });
+
+  const applicabili = esito.scenari.filter((s) => s.applicabile);
+  const vincente = applicabili.reduce((b, s) => (s.netto > b.netto ? s : b), applicabili[0]);
+  const secondo = applicabili.filter((s) => s.id !== vincente.id)
+    .reduce((b, s) => (b == null || s.netto > b.netto ? s : b), null);
+  const divario = secondo ? vincente.netto - secondo.netto : 0;
+
+  $('cfResultContext').textContent =
+    (stato.subjectName || 'Simulazione') + ' · ' +
+    (stato.profession === 'commercialista' ? 'dottore commercialista' : 'avvocato') +
+    ' · anno ' + stato.year + ' · ' + E(stato.revenue) + ' di compensi';
+
+  $('cfVerdict').innerHTML =
+    '<div class="cf-vlabel">Alternativa più conveniente nel periodo simulato</div>' +
+    '<div class="cf-vname">' + X(vincente.nome) + '</div>' +
+    '<div class="cf-vnet">' + E(vincente.netto) + '</div>' +
+    '<div class="cf-vwhy">' +
+      (secondo
+        ? 'Lascia ' + E(divario) + ' in più di ' + X(secondo.nome).toLowerCase() +
+          ' (' + (Math.abs(secondo.netto) > 1 ? ((divario / Math.abs(secondo.netto)) * 100).toFixed(1).replace('.', ',') + '% in più' : 'divario') + ').'
+        : 'Unica alternativa applicabile nel periodo simulato.') +
+      ' La cifra è cassa personale netta: quello che resta dopo costi, contributi e imposte.' +
+    '</div>';
+
+  $('cfCards').innerHTML = esito.scenari.map((s) => {
+    const cls = 'cf-card' + (s.id === vincente.id ? ' is-winner' : '') +
+      (s.applicabile ? '' : ' not-eligible');
+    return '<article class="' + cls + '" data-regime="' + s.id + '">' +
+      '<h3>' + X(s.nome) + '</h3>' +
+      '<p class="cf-status">' + X(s.stato) +
+        (s.id === stato.currentRegime ? ' · regime attuale' : '') + '</p>' +
+      '<div class="cf-net"><span>Cassa personale netta</span><strong>' +
+        (s.applicabile ? E(s.netto) : 'Non applicabile') + '</strong></div>' +
+      '<div class="cf-mini">' +
+        '<div><span>Imposte</span><b>' + E(s.imposte) + '</b></div>' +
+        '<div><span>Contributi</span><b>' + E(s.contributi) + '</b></div>' +
+        '<div><span>Costi effettivi</span><b>' + E(s.costi) + '</b></div>' +
+        (s.trattenuto > 0 ? '<div><span>Utile trattenuto in società</span><b>' + E(s.trattenuto) + '</b></div>' : '') +
+      '</div></article>';
+  }).join('');
+
+  renderAvviso(conv);
+  renderSoglia(conv);
+  graficoCurva(conv);
+  graficoPonte(esito);
+  graficoDriver(esito, vincente, secondo);
+  graficoAnni(conv);
+  renderVerifiche(esito);
+};
+
+function renderAvviso(conv) {
+  const stato = window.cfStato(), E = euro();
+  const box = $('cfAlert');
+  const P = CF_PARAMS[stato.year];
+  const oltre100 = stato.revenue > P.sogliaCessazioneImmediata;
+  const oltre85 = stato.revenue > P.sogliaPermanenza;
+  /* L'avviso non dipende dal regime attuale: chi è in ordinario e simula
+     92.000 deve vedere lo stesso vincolo, perché la card del forfettario gli
+     mostra comunque un netto. Nel calcolatore di partenza compariva solo a chi
+     era già forfettario. */
+  if (!oltre85) { box.hidden = true; return; }
+  box.hidden = false;
+  box.className = 'cf-alert' + (oltre100 ? ' is-critical' : '');
+  box.innerHTML = oltre100
+    ? '<h3>Oltre ' + E(P.sogliaCessazioneImmediata) + ': il forfettario cessa nello stesso anno</h3>' +
+      '<p>Con ' + E(stato.revenue) + ' di compensi il forfettario non è applicabile nel periodo simulato. ' +
+      'Va verificato anche il trattamento IVA a partire dall’operazione che determina il superamento.</p>'
+    : '<h3>Fra ' + E(P.sogliaPermanenza) + ' e ' + E(P.sogliaCessazioneImmediata) + ': resti nell’anno, esci dal successivo</h3>' +
+      '<p>Con ' + E(stato.revenue) + ' di compensi il forfettario continua nell’anno simulato, se gli altri requisiti sono rispettati, ' +
+      'e cessa dal periodo successivo. La convenienza dei due esercizi è diversa: la trovi in «I due anni del passaggio».</p>';
+}
+
+function renderSoglia(conv) {
+  const E = euro();
+  const stato = window.cfStato();
+  $('cfThresholdLead').textContent = conv.applicabileA85
+    ? 'Fermandoti a ' + E(conv.soglia) + ' nel forfettario ti resterebbero ' + E(conv.nettoRiferimento) +
+      '. La domanda è quanto serve fatturare in ordinario per arrivare almeno allo stesso netto, con gli stessi costi annuali.'
+    : 'Il forfettario non è applicabile con i dati inseriti, quindi non c’è un netto di riferimento a ' +
+      E(conv.soglia) + ' da pareggiare. Il confronto resta fra ordinario e società.';
+
+  const celle = [];
+  if (conv.applicabileA85) {
+    celle.push(['Netto fermandosi a ' + mille(conv.soglia), E(conv.nettoRiferimento)]);
+    /* Se il pareggio cade sulla soglia stessa, dire «servono 85.000» a chi ne
+       fattura già 120.000 è vero e inutile: l'informazione utile è che
+       l'ordinario è già davanti a parità di compensi. */
+    const giaDavanti = conv.pareggio != null && conv.pareggio <= conv.soglia;
+    celle.push(['Fatturato di pareggio in ordinario',
+      conv.pareggio == null ? 'Non raggiunto'
+        : (giaDavanti ? 'Già a ' + mille(conv.soglia) : E(conv.pareggio))]);
+    celle.push(['Fatturato aggiuntivo necessario',
+      conv.pareggio == null ? '—' : (giaDavanti ? 'Nessuno' : E(conv.extra))]);
+  }
+  celle.push(['Costi annuali inseriti', E(conv.costiAttuali)]);
+  /* Il riferimento è dichiarato: nel calcolatore di partenza la soglia era
+     sempre calcolata a 85.000 e il testo non lo diceva, quindi a 150.000 e a
+     300.000 compariva lo stesso numero. */
+  celle.push(['Costi a cui l’ordinario pareggia, a ' + mille(conv.rifCosti) + ' di compensi',
+    conv.sogliaCosti == null ? 'Nessuna soglia utile' : E(conv.sogliaCosti)]);
+
+  $('cfThresholdReadout').innerHTML = celle
+    .map(([k, v]) => '<div><span>' + esc()(k) + '</span><b>' + v + '</b></div>').join('');
+}
+
+/* ============================================================ 1. la curva */
+
+function graficoCurva(conv) {
+  const W = 860, H = 400, L = 74, R = 24, T = 22, B = 54;
+  const s = svgPulito('cfChartMain', W, H);
+  const stato = window.cfStato();
+  const P = CF_PARAMS[stato.year];
+  const punti = conv.punti;
+
+  const serie = ['forfettario', 'ordinario', 'societa'];
+  let ymin = Infinity, ymax = -Infinity;
+  punti.forEach((p) => serie.forEach((k) => {
+    if (p[k] == null) return;
+    ymin = Math.min(ymin, p[k]); ymax = Math.max(ymax, p[k]);
+  }));
+  if (conv.applicabileA85) { ymin = Math.min(ymin, conv.nettoRiferimento); ymax = Math.max(ymax, conv.nettoRiferimento); }
+  /* Margine sopra e sotto: una curva che tocca il bordo sembra tagliata. */
+  const span = Math.max(1, ymax - ymin);
+  ymin -= span * 0.08; ymax += span * 0.08;
+  if (ymin > 0) ymin = Math.min(ymin, 0);
+
+  const x = (r) => L + (r - conv.min) / (conv.max - conv.min) * (W - L - R);
+  const y = (v) => T + (ymax - v) / (ymax - ymin) * (H - T - B);
+
+  /* griglia e assi */
+  const g = el('g', {});
+  for (let i = 0; i <= 5; i++) {
+    const v = ymin + (ymax - ymin) * i / 5;
+    g.appendChild(el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v),
+      stroke: '#E7E4DC', 'stroke-width': 1 }));
+    g.appendChild(el('text', { x: L - 9, y: y(v) + 4, 'text-anchor': 'end',
+      'font-size': 10.5, fill: '#6E6B65' }, mille(v)));
+  }
+  const passo = (conv.max - conv.min) / 6;
+  for (let i = 0; i <= 6; i++) {
+    const r = conv.min + passo * i;
+    g.appendChild(el('text', { x: x(r), y: H - B + 20, 'text-anchor': 'middle',
+      'font-size': 10.5, fill: '#6E6B65' }, mille(r)));
+  }
+  g.appendChild(el('text', { x: L, y: H - 10, 'font-size': 10.5, fill: '#8A8780' },
+    'compensi annui'));
+  g.appendChild(el('text', { x: 12, y: T - 6, 'font-size': 10.5, fill: '#8A8780' },
+    'cassa netta'));
+  s.appendChild(g);
+
+  /* Le soglie, collocate sulla scala reale. */
+  [[P.sogliaPermanenza, mille(P.sogliaPermanenza)], [P.sogliaCessazioneImmediata, mille(P.sogliaCessazioneImmediata)]]
+    .forEach(([v, etichetta]) => {
+      if (v < conv.min || v > conv.max) return;
+      s.appendChild(el('line', { x1: x(v), x2: x(v), y1: T, y2: H - B,
+        stroke: '#B9B4A8', 'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+      s.appendChild(el('text', { x: x(v) + 4, y: T + 12, 'font-size': 10,
+        fill: '#8A8780' }, etichetta));
+    });
+
+  /* Il netto fermandosi a 85.000: la linea da battere. */
+  if (conv.applicabileA85) {
+    s.appendChild(el('line', { x1: L, x2: W - R, y1: y(conv.nettoRiferimento), y2: y(conv.nettoRiferimento),
+      stroke: '#145368', 'stroke-width': 1.5, 'stroke-dasharray': '1 4', opacity: .85 }));
+    s.appendChild(el('text', { x: W - R - 4, y: y(conv.nettoRiferimento) - 7,
+      'text-anchor': 'end', 'font-size': 10, fill: '#145368', 'font-weight': 700 },
+      'netto fermandosi a ' + mille(conv.soglia)));
+  }
+
+  /* Le tre curve. Un tratto si interrompe dove il regime non è applicabile:
+     interpolare sopra il buco disegnerebbe un'alternativa che non esiste. */
+  serie.forEach((k) => {
+    let d = '', aperto = false;
+    punti.forEach((p) => {
+      if (p[k] == null) { aperto = false; return; }
+      d += (aperto ? 'L' : 'M') + x(p.r).toFixed(1) + ' ' + y(p[k]).toFixed(1) + ' ';
+      aperto = true;
+    });
+    if (d) s.appendChild(el('path', { d, fill: 'none', stroke: COLORI[k],
+      'stroke-width': 2.5, 'stroke-dasharray': TRATTI[k], 'stroke-linejoin': 'round' }));
+  });
+
+  /* Il punto di pareggio. */
+  if (conv.pareggio != null && conv.pareggio >= conv.min && conv.pareggio <= conv.max) {
+    const px = x(conv.pareggio), py = y(conv.nettoRiferimento);
+    s.appendChild(el('circle', { cx: px, cy: py, r: 5.5, fill: '#fff',
+      stroke: '#8B6A16', 'stroke-width': 2.5 }));
+    const a = px > W - 200 ? 'end' : 'start';
+    s.appendChild(el('text', { x: px + (a === 'end' ? -9 : 9), y: py + 18,
+      'text-anchor': a, 'font-size': 10.5, fill: '#8B6A16', 'font-weight': 700 },
+      'pareggio a ' + mille(conv.pareggio)));
+  }
+
+  /* Dove sei adesso. */
+  if (stato.revenue >= conv.min && stato.revenue <= conv.max) {
+    s.appendChild(el('line', { x1: x(stato.revenue), x2: x(stato.revenue), y1: T, y2: H - B,
+      stroke: '#0E1624', 'stroke-width': 1.5 }));
+    s.appendChild(el('text', { x: x(stato.revenue), y: H - B + 38, 'text-anchor': 'middle',
+      'font-size': 10, fill: '#0E1624', 'font-weight': 700 }, 'sei qui'));
+  }
+
+  $('cfLegendMain').innerHTML = serie.map((k) =>
+    '<span><i style="border-top-color:' + COLORI[k] + ';border-top-style:' +
+    (TRATTI[k] ? 'dashed' : 'solid') + '"></i>' + NOMI[k] + '</span>').join('') +
+    '<span><i style="border-top-color:#145368;border-top-style:dotted"></i>netto fermandosi a ' +
+    mille(conv.soglia) + '</span>';
+
+  /* I numeri sotto il grafico: chi non legge il disegno legge questi. */
+  const E = euro();
+  const alTuo = window.cfCalcola().scenari;
+  $('cfChartReadout').innerHTML = alTuo.map((sc) =>
+    '<div><span>' + NOMI[sc.id] + ' a ' + mille(stato.revenue) + '</span><b>' +
+    (sc.applicabile ? E(sc.netto) : 'non applicabile') + '</b></div>').join('');
+}
+
+/* ============================================================= 2. il ponte */
+
+function graficoPonte(esito) {
+  const stato = window.cfStato(), E = euro();
+  const W = 860, H = 330, L = 20, T = 40, B = 70;
+  const s = svgPulito('cfChartBridge', W, H);
+  const compensi = stato.revenue;
+
+  const scenari = esito.scenari;
+  const colonna = (W - L * 2) / scenari.length;
+  /* La scala è comune ai tre percorsi: barre alte uguali con valori diversi
+     sarebbero un inganno visivo. */
+  const massimo = Math.max(compensi, ...scenari.map((x) => Math.abs(x.netto)));
+  const alt = (v) => Math.max(0, v / massimo * (H - T - B));
+
+  scenari.forEach((sc, i) => {
+    const cx = L + colonna * i + colonna / 2;
+    const larghezza = Math.min(150, colonna - 34);
+    s.appendChild(el('text', { x: cx, y: 18, 'text-anchor': 'middle',
+      'font-size': 12, 'font-weight': 700, fill: '#1D1B16' }, NOMI[sc.id]));
+
+    if (!sc.applicabile) {
+      s.appendChild(el('text', { x: cx, y: H / 2, 'text-anchor': 'middle',
+        'font-size': 11.5, fill: '#8A8780' }, 'non applicabile'));
+      return;
+    }
+
+    /* Dai compensi si scende: costi, contributi, imposte. Ciò che resta è la
+       cassa. Il trattenuto in società si mostra a parte, appoggiato sopra,
+       perché non è denaro disponibile al socio. */
+    const pezzi = [
+      ['costi', sc.costi, '#B9B4A8'],
+      ['contributi', sc.contributi, '#8A8780'],
+      ['imposte', Math.max(0, sc.imposte), '#5D6470']
+    ];
+    let yCorr = T;
+    const totaleSopra = pezzi.reduce((a, p) => a + p[1], 0);
+    const scala = (H - T - B) / massimo;
+
+    /* colonna di partenza */
+    s.appendChild(el('rect', { x: cx - larghezza / 2 - 0, y: T, width: larghezza,
+      height: alt(compensi), fill: '#F0EFEB', stroke: '#E7E4DC' }));
+    s.appendChild(el('text', { x: cx, y: T - 6, 'text-anchor': 'middle',
+      'font-size': 10, fill: '#6E6B65' }, 'compensi ' + mille(compensi)));
+
+    pezzi.forEach(([nome, valore, colore]) => {
+      const h = valore * scala;
+      if (h < 0.4) return;
+      s.appendChild(el('rect', { x: cx - larghezza / 2, y: yCorr, width: larghezza,
+        height: h, fill: colore, opacity: .92 }));
+      if (h > 15) {
+        s.appendChild(el('text', { x: cx, y: yCorr + h / 2 + 3.5, 'text-anchor': 'middle',
+          'font-size': 9.5, fill: '#fff', 'font-weight': 700 }, mille(valore)));
+      }
+      yCorr += h;
+    });
+
+    const hNetto = Math.max(0, sc.netto) * scala;
+    s.appendChild(el('rect', { x: cx - larghezza / 2, y: yCorr, width: larghezza,
+      height: hNetto, fill: COLORI[sc.id] }));
+    if (hNetto > 15) {
+      s.appendChild(el('text', { x: cx, y: yCorr + hNetto / 2 + 4, 'text-anchor': 'middle',
+        'font-size': 11, fill: '#fff', 'font-weight': 800 }, mille(sc.netto)));
+    }
+
+    s.appendChild(el('text', { x: cx, y: H - B + 22, 'text-anchor': 'middle',
+      'font-size': 11.5, 'font-weight': 800, fill: COLORI[sc.id] }, E(sc.netto)));
+    s.appendChild(el('text', { x: cx, y: H - B + 38, 'text-anchor': 'middle',
+      'font-size': 9.5, fill: '#6E6B65' }, 'cassa personale'));
+    if (sc.trattenuto > 0) {
+      s.appendChild(el('text', { x: cx, y: H - B + 54, 'text-anchor': 'middle',
+        'font-size': 9.5, fill: '#59147D' }, '+ ' + E(sc.trattenuto) + ' in società'));
+    }
+  });
+}
+
+/* ================================================== 3. cosa ribalta la scelta */
+
+/* Ogni leva viene mossa in su e in giù, e si misura di quanto cambia il
+   divario fra il primo e il secondo. È il modo più diretto per rispondere alla
+   domanda «cosa dovrebbe succedere perché la decisione cambi». */
+function graficoDriver(esito, vincente, secondo) {
+  const W = 860, H = 300, L = 218, R = 96, T = 26, B = 34;
+  const s = svgPulito('cfChartDrivers', W, H);
+  if (!secondo) {
+    s.appendChild(el('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle',
+      'font-size': 12, fill: '#6E6B65' }, 'Serve più di un regime applicabile per confrontare le leve.'));
+    return;
+  }
+  const stato = window.cfStato();
+  const divarioBase = vincente.netto - secondo.netto;
+
+  const leve = [
+    ['Costi annuali', { costFactor: 1.3 }, { costFactor: 0.7 }, '±30%'],
+    ['Compensi', { revenue: stato.revenue * 1.2 }, { revenue: stato.revenue * 0.8 }, '±20%'],
+    ['Utile distribuito', { distribution: Math.min(100, stato.distribution + 30) }, { distribution: Math.max(0, stato.distribution - 30) }, '±30 punti'],
+    ['Quota di partecipazione', { ownership: Math.min(100, stato.ownership + 20) }, { ownership: Math.max(1, stato.ownership - 20) }, '±20 punti'],
+    ['Compenso amministratore', { admin: stato.admin + 25000, extractionMode: 'mix' }, { admin: Math.max(0, stato.admin - 25000), extractionMode: 'mix' }, '±25.000'],
+    ['Addizionali locali', { regionalRate: stato.regionalRate + 1, municipalRate: stato.municipalRate + .4 }, { regionalRate: Math.max(0, stato.regionalRate - 1), municipalRate: Math.max(0, stato.municipalRate - .4) }, '±1,4 punti']
+  ];
+  if (stato.profession === 'commercialista') {
+    leve.push(['Aliquota soggettiva CNPADC',
+      { pensionRate: Math.min(100, stato.pensionRate + 10) },
+      { pensionRate: Math.max(12, stato.pensionRate - 10) }, '±10 punti']);
+  }
+
+  const misura = (extra) => {
+    const sc = window.cfCalcola(extra).scenari;
+    const a = sc.find((x) => x.id === vincente.id);
+    const b = sc.find((x) => x.id === secondo.id);
+    if (!a || !b || !a.applicabile) return null;
+    return a.netto - b.netto;
+  };
+
+  const righe = leve.map(([nome, su, giu, quanto]) => {
+    const alto = misura(su), basso = misura(giu);
+    const dSu = alto == null ? 0 : alto - divarioBase;
+    const dGiu = basso == null ? 0 : basso - divarioBase;
+    return { nome, quanto, dSu, dGiu, ampiezza: Math.max(Math.abs(dSu), Math.abs(dGiu)) };
+  }).filter((r) => r.ampiezza > 1).sort((a, b) => b.ampiezza - a.ampiezza);
+
+  if (!righe.length) {
+    s.appendChild(el('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle',
+      'font-size': 12, fill: '#6E6B65' }, 'Nessuna delle leve considerate sposta il divario in modo apprezzabile.'));
+    return;
+  }
+
+  const massimo = Math.max(...righe.map((r) => r.ampiezza)) * 1.12;
+  const zero = L + (W - L - R) / 2;
+  const mezza = (W - L - R) / 2;
+  const hRiga = Math.min(30, (H - T - B) / righe.length);
+  const px = (v) => (v / massimo) * mezza;
+
+  s.appendChild(el('line', { x1: zero, x2: zero, y1: T - 8, y2: T + righe.length * hRiga + 4,
+    stroke: '#B9B4A8', 'stroke-width': 1 }));
+  s.appendChild(el('text', { x: zero, y: T - 14, 'text-anchor': 'middle',
+    'font-size': 10, fill: '#6E6B65' }, 'divario attuale ' + euro()(divarioBase)));
+
+  righe.forEach((r, i) => {
+    const yy = T + i * hRiga;
+    const h = Math.max(8, hRiga - 11);
+    s.appendChild(el('text', { x: L - 12, y: yy + h / 2 + 4, 'text-anchor': 'end',
+      'font-size': 11, fill: '#1D1B16' }, r.nome));
+    s.appendChild(el('text', { x: L - 12, y: yy + h / 2 + 15, 'text-anchor': 'end',
+      'font-size': 9, fill: '#8A8780' }, r.quanto));
+    [[r.dSu, '#2E6B3D'], [r.dGiu, '#8d2320']].forEach(([v, colore]) => {
+      if (Math.abs(v) < 1) return;
+      const w = Math.abs(px(v));
+      s.appendChild(el('rect', { x: v >= 0 ? zero : zero - w, y: yy, width: w, height: h,
+        fill: colore, opacity: .82, rx: 2 }));
+    });
+    const massimoRiga = Math.abs(r.dSu) >= Math.abs(r.dGiu) ? r.dSu : r.dGiu;
+    s.appendChild(el('text', {
+      x: massimoRiga >= 0 ? zero + Math.abs(px(massimoRiga)) + 7 : zero - Math.abs(px(massimoRiga)) - 7,
+      y: yy + h / 2 + 4, 'text-anchor': massimoRiga >= 0 ? 'start' : 'end',
+      'font-size': 10, 'font-weight': 700, fill: '#1D1B16' },
+      (massimoRiga > 0 ? '+' : '−') + mille(Math.abs(massimoRiga))));
+  });
+
+  s.appendChild(el('text', { x: L - 12, y: T + righe.length * hRiga + 24, 'text-anchor': 'end',
+    'font-size': 9.5, fill: '#8A8780' }, 'verde: allarga il vantaggio · rosso: lo riduce'));
+}
+
+/* ========================================================== 4. i due anni */
+
+function graficoAnni(conv) {
+  const stato = window.cfStato(), E = euro();
+  const W = 860, H = 260, L = 78, R = 30, T = 34, B = 62;
+  const s = svgPulito('cfChartYears', W, H);
+  const P = CF_PARAMS[stato.year];
+
+  /* Nel periodo successivo il forfettario non è più applicabile se nell'anno
+     simulato i compensi hanno superato la soglia: è la stessa regola che il
+     motore applica guardando i compensi dell'anno precedente. */
+  const annoUno = window.cfCalcola().scenari;
+  const annoDue = window.cfCalcola({ previousRevenue: stato.revenue }).scenari;
+  const gruppi = [
+    ['Anno simulato (' + stato.year + ')', annoUno],
+    ['Periodo successivo (' + (stato.year + 1) + ')', annoDue]
+  ];
+  const tutti = gruppi.flatMap(([, sc]) => sc.filter((x) => x.applicabile).map((x) => x.netto));
+  const massimo = Math.max(1, ...tutti) * 1.12;
+  const minimo = Math.min(0, ...tutti);
+  const y = (v) => T + (massimo - v) / (massimo - minimo) * (H - T - B);
+
+  const larghezzaGruppo = (W - L - R) / gruppi.length;
+  gruppi.forEach(([etichetta, sc], gi) => {
+    const x0 = L + larghezzaGruppo * gi;
+    s.appendChild(el('text', { x: x0 + larghezzaGruppo / 2, y: 18, 'text-anchor': 'middle',
+      'font-size': 11.5, 'font-weight': 700, fill: '#1D1B16' }, etichetta));
+    const bw = Math.min(74, (larghezzaGruppo - 40) / 3);
+    sc.forEach((x, i) => {
+      const bx = x0 + 20 + i * (bw + 14);
+      if (!x.applicabile) {
+        s.appendChild(el('text', { x: bx + bw / 2, y: y(0) - 6, 'text-anchor': 'middle',
+          'font-size': 9, fill: '#8A8780' }, 'n/a'));
+      } else {
+        const yy = y(Math.max(0, x.netto));
+        s.appendChild(el('rect', { x: bx, y: yy, width: bw,
+          height: Math.max(1, y(minimo) - yy), fill: COLORI[x.id], opacity: .9, rx: 3 }));
+        s.appendChild(el('text', { x: bx + bw / 2, y: yy - 6, 'text-anchor': 'middle',
+          'font-size': 10, 'font-weight': 700, fill: '#1D1B16' }, mille(x.netto)));
+      }
+      s.appendChild(el('text', { x: bx + bw / 2, y: H - B + 18, 'text-anchor': 'middle',
+        'font-size': 9.5, fill: '#6E6B65' }, NOMI[x.id]));
+    });
+  });
+  s.appendChild(el('line', { x1: L, x2: W - R, y1: y(minimo), y2: y(minimo),
+    stroke: '#B9B4A8', 'stroke-width': 1 }));
+
+  const cambia = annoUno[0].applicabile && !annoDue[0].applicabile;
+  s.appendChild(el('text', { x: L, y: H - 10, 'font-size': 10, fill: '#8A8780' },
+    cambia
+      ? 'Il forfettario è applicabile nell’anno simulato e non nel successivo: il confronto cambia fra i due esercizi.'
+      : 'Lo stato del forfettario non cambia fra i due esercizi con i dati inseriti.'));
+}
+
+/* ============================================================== verifiche */
+
+function renderVerifiche(esito) {
+  const stato = window.cfStato(), E = euro(), X = esc();
+  const v = [];
+  const P = CF_PARAMS[stato.year];
+
+  v.push([false, 'Coefficiente di redditività al ' + (P.coefficiente * 100) +
+    '%: vale per gli ATECO tipici di avvocati e commercialisti. Se il codice attività è diverso, il coefficiente cambia e con esso tutto il forfettario.']);
+
+  if (stato.previousRevenue > P.sogliaPermanenza) {
+    v.push([true, 'Compensi dell’anno precedente a ' + E(stato.previousRevenue) +
+      ', oltre ' + E(P.sogliaPermanenza) + ': il forfettario non è applicabile nel periodo simulato.']);
+  }
+  if (stato.employeeIncome > P.sogliaLavoroDipendente) {
+    v.push([true, 'Redditi di lavoro dipendente o pensione a ' + E(stato.employeeIncome) +
+      ', oltre ' + E(P.sogliaLavoroDipendente) + ': causa ostativa del forfettario.']);
+  }
+  const personale = (window.cfCosti() || []).filter((c) => c.id === 'personale')
+    .reduce((a, c) => a + window.cfLeggiNumero(c.amount), 0);
+  if (personale > P.sogliaSpesePersonale) {
+    v.push([true, 'Spese per personale a ' + E(personale) + ', oltre ' +
+      E(P.sogliaSpesePersonale) + ': causa ostativa del forfettario.']);
+  }
+  if (stato.incompatible) v.push([true, 'Partecipazioni incompatibili dichiarate: il forfettario è escluso.']);
+  if (stato.employer) v.push([true, 'Attività prevalente verso datore o ex datore dichiarata: il forfettario è escluso.']);
+  if (stato.startup) {
+    v.push([false, 'Aliquota al ' + (P.sostitutivaStartup * 100) +
+      '% applicata perché hai dichiarato che i requisiti della nuova attività sono verificati. Il tool non li controlla.']);
+  }
+
+  if (stato.profession === 'commercialista' && stato.adminTreatment === 'inps') {
+    v.push([false, 'Compenso amministratore in Gestione Separata: la classificazione dipende da autonomia e natura della carica, e non è automatica. Va verificata nel caso concreto.']);
+  } else {
+    v.push([false, 'Compenso amministratore attribuito alla Cassa professionale. In alcune configurazioni ricade invece nella Gestione Separata: è una qualificazione da verificare.']);
+  }
+
+  v.push([false, 'Contribuzione della società calcolata sulla quota di reddito e di volume d’affari attribuibile al socio, distribuita o no. È il criterio della disciplina, ma la posizione individuale va verificata con la tua Cassa.']);
+  v.push([false, 'Contributo integrativo azzerato nello scenario societario, perché in una STP/STA lo addebita la società. È un’assunzione del modello.']);
+  v.push([false, 'Minimo del contributo integrativo di Cassa Forense (' +
+    E(P.forense.minimoIntegrativo) + '): valore non confermato da una fonte ufficiale citabile. Verificalo per l’anno in corso.']);
+  v.push([false, 'IRAP societaria con aliquota ' + stato.irapRate +
+    '% su base semplificata: la disciplina regionale e i componenti deducibili vanno verificati.']);
+  v.push([false, 'Addizionali regionale (' + stato.regionalRate + '%) e comunale (' +
+    stato.municipalRate + '%) applicate alla stessa base dell’IRPEF, e con i valori che hai inserito. Le basi non coincidono in tutto e le aliquote dipendono da regione e comune.']);
+  v.push([false, 'Il dividendo non genera IRPEF progressiva né contributi sulla distribuzione. L’utile trattenuto in società non è cassa disponibile al socio.']);
+
+  const modificate = (window.cfCosti() || []).filter((c) => !c.custom &&
+    CF_CAMPI_REGOLA.some((k) => {
+      const b = CF_COSTI_DEFAULT.find((d) => d.id === c.id);
+      if (!b) return false;
+      const x = b[k], yy = c[k];
+      if (x == null && yy == null) return false;
+      if (x == null || yy == null) return true;
+      return Math.abs(Number(x) - Number(yy)) > 1e-9;
+    }));
+  if (modificate.length) {
+    v.push([false, modificate.length + (modificate.length === 1 ? ' voce di costo ha' : ' voci di costo hanno') +
+      ' regole cambiate a mano: ' + modificate.map((c) => c.nome).join(', ') + '.']);
+  }
+  const personali = (window.cfCosti() || []).filter((c) => c.uso < 1 && c.amount > 0);
+  if (personali.length) {
+    v.push([false, personali.length + (personali.length === 1 ? ' voce ha' : ' voci hanno') +
+      ' un uso professionale inferiore al 100%: la quota personale esce di tasca ma non entra nel confronto fra regimi.']);
+  }
+
+  $('cfChecks').innerHTML = v.map(([bloccante, testo]) =>
+    '<li' + (bloccante ? ' class="blocking"' : '') + '>' +
+    (bloccante ? '<b>Blocca il forfettario.</b> ' : '') + X(testo) + '</li>').join('');
+}
+
+/* ======================================= archivio, dati, come si usa */
+
+window.cfRenderArchivio = function () {
+  const a = window.cfLeggiArchivio(), E = euro(), X = esc();
+  const host = $('cfArchiveList');
+  if (!a.length) {
+    host.innerHTML = '<p class="cf-lead">Nessuna simulazione salvata. Dal confronto, «Salva nell’archivio».</p>';
+    return;
+  }
+  host.innerHTML = a.map((s) => {
+    const meglio = (s.sintesi || []).filter((x) => x.applicabile)
+      .reduce((b, x) => (b == null || x.netto > b.netto ? x : b), null);
+    return '<div class="cf-card" style="margin-bottom:9px">' +
+      '<div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">' +
+        '<b style="flex:1 1 200px;font-size:13.5px">' + X(s.nome) + '</b>' +
+        '<span style="font-size:11px;color:var(--tal-ink-4)">' +
+          new Date(s.quando).toLocaleString('it-IT') + '</span></div>' +
+      '<p class="cf-status" style="margin:6px 0 10px">' +
+        (s.stato.profession === 'commercialista' ? 'Commercialista' : 'Avvocato') +
+        ' · ' + s.stato.year + ' · ' + E(s.stato.revenue) + ' di compensi' +
+        (meglio ? ' · migliore: ' + (meglio.id === 'societa' ? 'società' : meglio.id) + ' ' + E(meglio.netto) : '') +
+      '</p>' +
+      '<div class="cf-actions" style="margin:0">' +
+        '<button class="btn secondary" data-open="' + X(s.id) + '" type="button">Riapri</button>' +
+        '<button class="btn secondary" data-del="' + X(s.id) + '" type="button">Elimina</button>' +
+      '</div></div>';
+  }).join('');
+
+  host.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => {
+    const s = window.cfLeggiArchivio().find((x) => x.id === b.dataset.open);
+    if (!s) return;
+    window.cfSetStato(Object.assign(window.cfStatoDefault(), s.stato));
+    window.cfSetCosti(window.cfNuoviCosti().map((base) => {
+      const salvato = (s.costi || []).find((c) => c.id === base.id);
+      return salvato ? Object.assign({}, base, salvato) : base;
+    }).concat((s.costi || []).filter((c) => c.custom)));
+    window.cfScriviStato(); window.cfRenderCosti(); window.cfAggiornaContesto();
+    window.cfSalvaLavoro(true); window.cfVaiA('confronto');
+    window.cfToast('Riaperta «' + s.nome + '».');
+  }));
+  host.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    if (!confirm('Eliminare questa simulazione dall’archivio?')) return;
+    window.cfScriviArchivio(window.cfLeggiArchivio().filter((x) => x.id !== b.dataset.del));
+    window.cfRenderArchivio();
+  }));
+};
+
+window.cfRenderDati = function () {
+  let usato = 0;
+  try {
+    Object.keys(localStorage).forEach((k) => {
+      if (k.indexOf('tal.convenienza') === 0) usato += (localStorage.getItem(k) || '').length;
+    });
+  } catch (e) { /* niente */ }
+  $('cfStorageInfo').innerHTML =
+    '<p class="cf-lead">Spazio occupato in questo browser: <b>' +
+    (usato / 1024).toFixed(1).replace('.', ',') + ' kB</b> · simulazioni in archivio: <b>' +
+    window.cfLeggiArchivio().length + '</b></p>' +
+    '<p class="cf-lead">Il backup è un file JSON con la simulazione corrente e l’archivio. ' +
+    'Serve a spostare il lavoro su un’altra macchina o a conservarlo prima di svuotare il browser.</p>';
+};
+
+window.cfRenderAiuto = function () {
+  const stato = window.cfStato(), E = euro(), X = esc();
+  const P = CF_PARAMS[stato.year];
+  const f = P.forense, c = P.cnpadc, i = P.inps;
+  $('cfHelp').innerHTML =
+    '<div class="cf-section"><h3>Cosa fa</h3>' +
+    '<p class="cf-lead">Confronta la cassa personale netta fra tre assetti: forfettario, partita IVA ordinaria e società professionale. ' +
+    'La cassa personale netta è ciò che resta dopo costi effettivi, contributi e imposte. Per la società, l’utile trattenuto è mostrato a parte: non è denaro tuo disponibile.</p></div>' +
+
+    '<div class="cf-section"><h3>Cosa non fa</h3>' +
+    '<p class="cf-lead">Non sostituisce il parere professionale, non verifica i requisiti che dichiari, non certifica la spettanza di crediti o deduzioni, ' +
+    'e non conosce la tua posizione individuale presso la Cassa. Ogni assunzione che dipende dal caso concreto è elencata in «Da verificare prima di decidere», dentro il confronto.</p></div>' +
+
+    '<div class="cf-section"><h3>Parametri usati per il ' + stato.year + '</h3>' +
+    '<div class="cf-readout">' +
+      ['Coefficiente di redditività|' + (P.coefficiente * 100) + '%',
+       'Imposta sostitutiva|' + (P.sostitutivaOrdinaria * 100) + '% · ' + (P.sostitutivaStartup * 100) + '% nuova attività',
+       'Soglia di permanenza|' + E(P.sogliaPermanenza),
+       'Cessazione immediata|oltre ' + E(P.sogliaCessazioneImmediata),
+       'Scaglioni IRPEF|' + P.scaglioni.map((s) => (s[1] * 100) + '%').join(' · '),
+       'IRES|' + (P.ires * 100) + '%',
+       'Ritenuta sul dividendo|' + (P.ritenutaDividendo * 100) + '%',
+       'Cassa Forense soggettivo|' + (f.soggettivo * 100) + '% fino a ' + E(f.sogliaSoggettivo) + ', poi ' + (f.oltreSoglia * 100) + '%',
+       'Cassa Forense minimo|' + E(f.minimoSoggettivo),
+       'CNPADC soggettivo|dal ' + (c.soggettivoMin * 100) + '% al ' + (c.soggettivoMax * 100) + '%',
+       'CNPADC massimale|' + E(c.massimale),
+       'CNPADC minimi|' + E(c.minimoSoggettivo) + ' soggettivo · ' + E(c.minimoIntegrativo) + ' integrativo',
+       'Gestione Separata|' + (i.conAltraCopertura * 100) + '% o ' + (i.senzaAltraCopertura * 100).toFixed(2).replace('.', ',') + '%',
+       'Massimale Gestione Separata|' + E(i.massimale)
+      ].map((r) => { const [k, val] = r.split('|');
+        return '<div><span>' + k + '</span><b style="font-size:12px;font-weight:650">' + val + '</b></div>'; }).join('') +
+    '</div></div>' +
+
+    '<div class="cf-section"><h3>Fonti</h3><ul class="cf-checks">' +
+    CF_FONTI.map(([tema, titolo, url]) =>
+      '<li><b>' + X(tema) + '</b> — <a href="' + X(url) + '" rel="noopener noreferrer" target="_blank">' +
+      X(titolo) + '</a></li>').join('') +
+    '</ul><p class="cf-lead" style="margin-top:12px">Prima di usare il tool per una decisione reale, verifica aliquote regionali e comunali, ' +
+    'importi annuali della tua Cassa, inquadramento del compenso amministratore, posizione individuale del socio ' +
+    'e disposizioni entrate in vigore dopo l’aggiornamento dei parametri.</p></div>';
+};
+
+})();
+
+</script>
+<script id="cf-ui">
+/* Convenienza fiscale — interfaccia, grafici e persistenza.
+
+   I grafici sono SVG scritti a mano: nessuna libreria e nessuna CDN. Il
+   calcolatore di partenza caricava floating-ui e lucide da unpkg.com, tre
+   richieste a terzi su ogni apertura, in un tool il cui piede promette
+   «elaborazione locale». Qui non c'è nulla da scaricare.
+
+   Regola sui grafici: nessuna informazione affidata al solo colore. Ogni serie
+   porta un tratteggio proprio e un'etichetta leggibile, e ogni grafico ha
+   sotto i suoi numeri in chiaro — chi non distingue i colori, o guarda una
+   stampa in bianco e nero, legge le stesse cose. */
+
+'use strict';
+
+(function () {
+
+const $ = (id) => document.getElementById(id);
+const q = (sel, root) => (root || document).querySelector(sel);
+const qa = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+const KEY_STATE = 'tal.convenienza.lavoro.v1';
+const KEY_ARCHIVE = 'tal.convenienza.archivio.v1';
+
+/* ------------------------------------------------------------- formattazione */
+
+const euro = (n) => (n < 0 ? '−' : '') + '€' +
+  Math.abs(Math.round(n)).toLocaleString('it-IT');
+const euroPreciso = (n) => (n < 0 ? '−' : '') + '€' +
+  Math.abs(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pct = (n) => n.toLocaleString('it-IT', { maximumFractionDigits: 1 }) + '%';
+
+/* Accetta «85.000», «85000», «85.000,50» e «85000.50»: chi compila non deve
+   indovinare il formato. */
+function leggiNumero(v) {
+  const s = String(v == null ? '' : v).trim().replace(/[€\s]/g, '');
+  if (!s) return 0;
+  if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) return Number(s.replace(/\./g, '').replace(',', '.')) || 0;
+  if (/^-?\d+,\d+$/.test(s)) return Number(s.replace(',', '.')) || 0;
+  return Number(s) || 0;
+}
+const scriviNumero = (n) => Number(n || 0).toLocaleString('it-IT', { maximumFractionDigits: 2 });
+
+function toast(messaggio, errore) {
+  let box = $('cfToast');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'cfToast';
+    box.setAttribute('role', 'status');
+    box.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
+      'z-index:6200;display:flex;flex-direction:column;gap:8px;max-width:min(560px,92vw)';
+    document.body.appendChild(box);
+  }
+  const el = document.createElement('div');
+  el.textContent = messaggio;
+  el.style.cssText = 'padding:11px 15px;border-radius:10px;font-size:12.5px;line-height:1.5;' +
+    'box-shadow:var(--tal-sh-3);border:1px solid ' + (errore ? '#E3BDB9' : 'var(--tal-ok-line)') +
+    ';background:' + (errore ? '#FBECEB' : 'var(--tal-ok-bg)') +
+    ';color:' + (errore ? '#8d2320' : 'var(--tal-ok)');
+  box.appendChild(el);
+  setTimeout(() => el.remove(), errore ? 7000 : 4200);
+}
+
+/* -------------------------------------------------------------------- stato */
+
+let costi = [];
+let ultimoEsito = null;
+
+function statoDefault() {
+  return {
+    profession: 'commercialista', currentRegime: 'forfettario', year: 2026,
+    subjectKind: 'self', subjectName: '',
+    revenue: 85000, previousRevenue: 80000, otherIncome: 0, employeeIncome: 0,
+    startup: false, incompatible: false, employer: false,
+    ownership: 100, distribution: 100, companyOverhead: 0, irapRate: 3.9,
+    extractionMode: 'dividend', admin: 0, adminTreatment: 'cassa', inpsRate: 24,
+    pensionRate: 12, maternity: 0, regionalRate: 1.23, municipalRate: 0.8
+  };
+}
+let stato = statoDefault();
+
+function nuoviCosti() {
+  return CF_COSTI_DEFAULT.map((d) => ({ ...d, amount: 0, gross: false, custom: false }));
+}
+
+/* Una regola è «modificata» se differisce dal default di quella voce. Per le
+   voci aggiunte a mano non c'è default, quindi non c'è nulla da segnalare. */
+function regoleModificate(c) {
+  if (c.custom) return [];
+  const base = CF_COSTI_DEFAULT.find((d) => d.id === c.id);
+  if (!base) return [];
+  return CF_CAMPI_REGOLA.filter((k) => {
+    const a = base[k], b = c[k];
+    if (a == null && b == null) return false;
+    if (a == null || b == null) return true;
+    return Math.abs(Number(a) - Number(b)) > 1e-9;
+  });
+}
+
+/* --------------------------------------------------------- lettura dal DOM */
+
+function raccogliStato() {
+  const radio = (name) => (q('input[name="' + name + '"]:checked') || {}).value;
+  stato.profession = radio('cfProfession') || stato.profession;
+  stato.currentRegime = radio('cfCurrentRegime') || stato.currentRegime;
+  stato.extractionMode = radio('cfExtraction') || stato.extractionMode;
+  stato.year = Number($('cfYear').value);
+  stato.subjectKind = $('cfSubjectKind').value;
+  stato.subjectName = $('cfSubjectName').value.trim();
+  ['revenue', 'previousRevenue', 'otherIncome', 'employeeIncome', 'ownership',
+   'distribution', 'companyOverhead', 'irapRate', 'admin', 'pensionRate',
+   'maternity', 'regionalRate', 'municipalRate'].forEach((k) => {
+    const el = $('cf' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (el) stato[k] = leggiNumero(el.value);
+  });
+  stato.startup = $('cfStartup').checked;
+  stato.incompatible = $('cfIncompatible').checked;
+  stato.employer = $('cfEmployer').checked;
+  stato.adminTreatment = $('cfAdminTreatment').value;
+  stato.inpsRate = leggiNumero($('cfInpsRate').value);
+  return stato;
+}
+
+function scriviStato() {
+  qa('input[name="cfProfession"]').forEach((r) => { r.checked = r.value === stato.profession; });
+  qa('input[name="cfCurrentRegime"]').forEach((r) => { r.checked = r.value === stato.currentRegime; });
+  qa('input[name="cfExtraction"]').forEach((r) => { r.checked = r.value === stato.extractionMode; });
+  $('cfYear').value = String(stato.year);
+  $('cfSubjectKind').value = stato.subjectKind;
+  $('cfSubjectName').value = stato.subjectName || '';
+  ['revenue', 'previousRevenue', 'otherIncome', 'employeeIncome', 'ownership',
+   'distribution', 'companyOverhead', 'irapRate', 'admin', 'pensionRate',
+   'maternity', 'regionalRate', 'municipalRate'].forEach((k) => {
+    const el = $('cf' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (el) el.value = scriviNumero(stato[k]);
+  });
+  $('cfStartup').checked = !!stato.startup;
+  $('cfIncompatible').checked = !!stato.incompatible;
+  $('cfEmployer').checked = !!stato.employer;
+  $('cfAdminTreatment').value = stato.adminTreatment;
+  $('cfInpsRate').value = String(stato.inpsRate);
+  aggiornaCampiCondizionali();
+}
+
+/* Il commercialista scegle fra Cassa e Gestione Separata; per l'avvocato la
+   Cassa Forense non è un default modificabile, è l'unica strada prevista
+   dalla disciplina, quindi il campo si spegne invece di mentire. */
+function aggiornaCampiCondizionali() {
+  const soc = stato.profession === 'commercialista';
+  $('cfAdminTreatmentBox').hidden = !soc;
+  $('cfInpsRateBox').hidden = !(soc && $('cfAdminTreatment').value === 'inps');
+  $('cfPensionRateBox').hidden = !soc;
+  const senzaCompenso = stato.extractionMode === 'dividend';
+  q('.cf-field', $('cfAdminBox')).hidden = senzaCompenso;
+}
+
+/* ------------------------------------------------------- costi: rendering */
+
+function renderCosti() {
+  const host = $('cfCostList');
+  host.innerHTML = costi.map((c, i) => {
+    const mod = regoleModificate(c);
+    return '<details class="cf-cost" data-i="' + i + '" style="border:1px solid var(--tal-line);' +
+      'border-radius:11px;background:var(--tal-card,#fff);margin-bottom:9px">' +
+      '<summary style="cursor:pointer;padding:13px 15px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">' +
+        '<b style="flex:1 1 190px;font-size:13px;min-width:0">' + esc(c.nome) + '</b>' +
+        '<span style="font-size:13px;font-variant-numeric:tabular-nums;font-weight:700">' + euro(c.amount) + '</span>' +
+        (mod.length ? '<span class="cf-badge-mod">Modificato dall’utente</span>' : '') +
+      '</summary>' +
+      '<div style="padding:0 15px 15px">' +
+        '<p class="cf-hint" style="margin:0 0 13px">' + esc(c.nota || '') + '</p>' +
+        '<div class="cf-grid">' +
+          campo(i, 'amount', 'Importo annuale', c.amount, 'text') +
+          '<div class="cf-field"><label for="cost' + i + 'gross">Importo inserito</label>' +
+            '<select class="tal-input" data-i="' + i + '" data-k="gross" id="cost' + i + 'gross">' +
+            '<option value="0"' + (c.gross ? '' : ' selected') + '>al netto di IVA</option>' +
+            '<option value="1"' + (c.gross ? ' selected' : '') + '>IVA compresa</option></select></div>' +
+          campo(i, 'iva', 'Aliquota IVA %', c.iva * 100) +
+          campo(i, 'uso', 'Uso professionale %', c.uso * 100) +
+          campo(i, 'ivaOrd', 'IVA detraibile % (ordinario)', c.ivaOrd * 100) +
+          campo(i, 'ivaSoc', 'IVA detraibile % (società)', c.ivaSoc * 100) +
+          campo(i, 'dedOrd', 'Deducibile % (IRPEF)', c.dedOrd * 100) +
+          campo(i, 'dedSoc', 'Deducibile % (IRES)', c.dedSoc * 100) +
+          campo(i, 'irap', 'Deducibile % (IRAP)', c.irap * 100) +
+          campo(i, 'tetto', 'Tetto % dei compensi', c.tetto == null ? '' : c.tetto * 100) +
+        '</div>' +
+        '<div class="cf-actions" style="margin-top:13px">' +
+          (c.custom
+            ? '<button class="btn secondary" data-action="del-cost" data-i="' + i + '" type="button">Elimina la voce</button>'
+            : (mod.length ? '<button class="btn secondary" data-action="reset-cost" data-i="' + i + '" type="button">Ripristina le regole predefinite</button>' : '')) +
+        '</div>' +
+      '</div></details>';
+  }).join('');
+  const compilate = costi.filter((c) => c.amount > 0).length;
+  $('stateCosti').textContent = String(compilate);
+}
+
+function campo(i, k, etichetta, valore, tipo) {
+  return '<div class="cf-field"><label for="cost' + i + k + '">' + etichetta + '</label>' +
+    '<input class="tal-input" data-i="' + i + '" data-k="' + k + '" id="cost' + i + k + '" ' +
+    'inputmode="decimal" type="' + (tipo || 'text') + '" value="' +
+    (valore === '' ? '' : scriviNumero(valore)) + '"></div>';
+}
+
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+/* ------------------------------------------------------------ navigazione */
+
+const STAGES = ['profilo', 'compensi', 'costi', 'confronto', 'archivio', 'dati', 'aiuto'];
+const ROTTE = { profilo: 'profilo', compensi: 'compensi', costi: 'costi',
+  confronto: 'confronto', archivio: 'archivio', dati: 'dati', aiuto: 'aiuto' };
+
+function vaiA(stage, spingi) {
+  if (STAGES.indexOf(stage) < 0) stage = 'profilo';
+  qa('.cf-stage').forEach((s) => s.classList.toggle('active', s.dataset.stage === stage));
+  qa('.cf-link[data-stage]').forEach((b) => b.classList.toggle('active', b.dataset.stage === stage));
+  if (stage === 'confronto') window.cfRenderConfronto();
+  if (stage === 'archivio') window.cfRenderArchivio();
+  if (stage === 'dati') window.cfRenderDati();
+  if (stage === 'aiuto') window.cfRenderAiuto();
+  if (spingi !== false) {
+    const h = '#/' + ROTTE[stage];
+    if (location.hash !== h) history.pushState({ stage }, '', h);
+  }
+  /* Il fuoco va al contenuto, altrimenti chi naviga da tastiera resta nella
+     sidebar e non sa che la schermata è cambiata. */
+  const main = $('cfMain');
+  if (main) { try { main.focus({ preventScroll: true }); } catch (e) { main.focus(); } }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (matchMedia('(max-width:980px)').matches) chiudiSidebar();
+  salvaLavoro(true);
+}
+
+function chiudiSidebar() {
+  $('sidebar').classList.remove('open');
+  $('mobileBackdrop').classList.remove('show');
+  const t = q('.sb-toggle');
+  if (t) t.setAttribute('aria-expanded', 'false');
+}
+function apriChiudiSidebar() {
+  const sb = $('sidebar');
+  const aperta = !sb.classList.contains('open');
+  sb.classList.toggle('open', aperta);
+  $('mobileBackdrop').classList.toggle('show', aperta);
+  const t = q('.sb-toggle');
+  if (t) t.setAttribute('aria-expanded', String(aperta));
+}
+
+/* ------------------------------------------------------------- il calcolo */
+
+function inputMotore(extra) {
+  return Object.assign({}, stato, { costs: costi }, extra || {});
+}
+
+function calcola(extra) {
+  return cfEngine(inputMotore(extra));
+}
+
+/* La soglia di convenienza. Il pareggio sul fatturato tiene i costi fermi:
+   è la domanda «quanto devo fatturare in ordinario per avere lo stesso netto
+   che avrei fermandomi a 85.000». La soglia sui costi è una domanda diversa —
+   «con quanti costi l'ordinario diventa migliore» — e lì i costi si muovono
+   per definizione. */
+function convenienza() {
+  const P = CF_PARAMS[stato.year];
+  const soglia = P.sogliaPermanenza;
+  const rifer = cfEngine(inputMotore({ revenue: soglia })).scenari[0];
+  const nettoOrdinarioA = (r) => cfEngine(inputMotore({ revenue: r })).scenari[1].netto;
+
+  let pareggio = null;
+  if (rifer.applicabile) {
+    const alto = 800000;
+    if (nettoOrdinarioA(alto) >= rifer.netto) {
+      let lo = soglia, hi = alto;
+      if (nettoOrdinarioA(lo) >= rifer.netto) hi = lo;
+      else for (let i = 0; i < 40; i++) {
+        const m = (lo + hi) / 2;
+        if (nettoOrdinarioA(m) >= rifer.netto) hi = m; else lo = m;
+      }
+      pareggio = Math.ceil(hi / 100) * 100;
+    }
+  }
+
+  /* La soglia di costo si calcola AL FATTURATO DELL'UTENTE, non a 85.000. Nel
+     calcolatore di partenza era sempre 85.000 e il testo non lo diceva: due
+     utenti a 150.000 e a 300.000 leggevano lo stesso numero. */
+  const costiAttuali = calcola().totali.lordo;
+  let sogliaCosti = null;
+  const rifCosti = Math.max(1, stato.revenue);
+  if (costiAttuali > 0) {
+    const delta = (f) => {
+      const s = cfEngine(inputMotore({ revenue: rifCosti, costFactor: f })).scenari;
+      return s[1].netto - s[0].netto;
+    };
+    if (delta(0) >= 0) sogliaCosti = 0;
+    else if (delta(8) >= 0) {
+      let lo = 0, hi = 8;
+      for (let i = 0; i < 40; i++) {
+        const m = (lo + hi) / 2;
+        if (delta(m) >= 0) hi = m; else lo = m;
+      }
+      sogliaCosti = costiAttuali * hi;
+    }
+  }
+
+  const min = Math.max(10000, Math.floor((soglia * 0.5) / 10000) * 10000);
+  const max = Math.min(600000, Math.max(160000,
+    Math.ceil(((pareggio || 160000) * 1.2) / 10000) * 10000,
+    Math.ceil((stato.revenue * 1.25) / 10000) * 10000));
+  const punti = [];
+  for (let i = 0; i <= 36; i++) {
+    const r = min + (max - min) * i / 36;
+    const s = cfEngine(inputMotore({ revenue: r })).scenari;
+    punti.push({ r,
+      forfettario: s[0].applicabile ? s[0].netto : null,
+      ordinario: s[1].netto,
+      societa: s[2].netto });
+  }
+  return { soglia, nettoRiferimento: rifer.netto, applicabileA85: rifer.applicabile,
+    pareggio, extra: pareggio == null ? null : Math.max(0, pareggio - soglia),
+    sogliaCosti, costiAttuali, rifCosti, min, max, punti };
+}
+
+window.cfConvenienza = convenienza;
+window.cfCalcola = calcola;
+window.cfStato = () => stato;
+window.cfCosti = () => costi;
+window.cfVaiA = vaiA;
+window.cfLeggiNumero = leggiNumero;
+window.cfEuro = euro;
+window.cfToast = toast;
+window.cfEsc = esc;
+window.cfRenderCosti = renderCosti;
+window.cfScriviStato = scriviStato;
+window.cfRaccogliStato = raccogliStato;
+window.cfNuoviCosti = nuoviCosti;
+window.cfStatoDefault = statoDefault;
+window.cfSetStato = (s) => { stato = s; };
+window.cfSetCosti = (c) => { costi = c; };
+window.cfUltimoEsito = () => ultimoEsito;
+window.cfSetUltimoEsito = (e) => { ultimoEsito = e; };
+window.cfKeys = { stato: KEY_STATE, archivio: KEY_ARCHIVE };
+window.cfSalvaLavoro = salvaLavoro;
+window.cfChiudiSidebar = chiudiSidebar;
+window.cfApriChiudiSidebar = apriChiudiSidebar;
+
+/* --------------------------------------------------------- persistenza */
+
+function salvaLavoro(silenzioso) {
+  try {
+    localStorage.setItem(KEY_STATE, JSON.stringify({ stato, costi, v: 1 }));
+    if (!silenzioso) toast('Lavoro salvato in questo browser.');
+    return true;
+  } catch (e) {
+    if (!silenzioso) toast('Salvataggio non riuscito: ' + e.message, true);
+    return false;
+  }
+}
+
+function riprendiLavoro() {
+  try {
+    const raw = localStorage.getItem(KEY_STATE);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (!d || !d.stato) return false;
+    stato = Object.assign(statoDefault(), d.stato);
+    /* Le voci di costo si riallineano ai default: se una regola predefinita
+       cambia con un aggiornamento, il lavoro salvato non deve restare
+       ancorato a una versione vecchia senza dirlo. Gli importi e le regole
+       toccate a mano restano. */
+    const salvati = Array.isArray(d.costi) ? d.costi : [];
+    costi = nuoviCosti().map((base) => {
+      const s = salvati.find((x) => x.id === base.id);
+      return s ? Object.assign({}, base, s) : base;
+    }).concat(salvati.filter((s) => s.custom));
+    return true;
+  } catch (e) { return false; }
+}
+
+function leggiArchivio() {
+  try { return JSON.parse(localStorage.getItem(KEY_ARCHIVE) || '[]') || []; }
+  catch (e) { return []; }
+}
+function scriviArchivio(a) {
+  localStorage.setItem(KEY_ARCHIVE, JSON.stringify(a));
+  $('stateArchivio').textContent = String(a.length);
+}
+
+window.cfLeggiArchivio = leggiArchivio;
+window.cfScriviArchivio = scriviArchivio;
+window.cfRiprendiLavoro = riprendiLavoro;
+
+/* ------------------------------------------------------- barra di sessione */
+
+window.TAL_SESSION = {
+  onNew: () => {
+    if (!confirm('Comincia una simulazione nuova? Quella in corso viene azzerata. L’archivio resta.')) return;
+    stato = statoDefault(); costi = nuoviCosti();
+    scriviStato(); renderCosti(); aggiornaContesto(); salvaLavoro(true);
+    vaiA('profilo');
+    toast('Simulazione azzerata.');
+  },
+  onSave: () => { raccogliStato(); salvaSimulazione(); },
+  onArchive: () => vaiA('archivio'),
+  hints: {
+    onNew: 'Azzera la simulazione in corso. L’archivio resta.',
+    onSave: 'Mette la simulazione corrente nell’archivio di questo browser.',
+    onArchive: 'Porta all’archivio delle simulazioni.'
+  }
+};
+
+/* I limiti dichiarati prima del caricamento, come negli altri tool. */
+window.TAL_LIMITS = {
+  xlsx: { bytes: 12 * 1024 * 1024, righe: 5000, fogli: 12 },
+  backup: { bytes: 8 * 1024 * 1024 }
+};
+
+function aggiornaContesto() {
+  const nome = stato.subjectName || (stato.subjectKind === 'self' ? 'Simulazione per me' : 'Nuovo soggetto');
+  $('sbContextName').textContent = nome;
+  $('sbContextMeta').textContent =
+    (stato.profession === 'commercialista' ? 'Commercialista' : 'Avvocato') +
+    ' · ' + stato.year + ' · ' + euro(stato.revenue);
+  $('stateProfilo').textContent = stato.subjectName ? '✓' : '·';
+  $('stateCompensi').textContent = stato.revenue > 0 ? '✓' : '·';
+}
+window.cfAggiornaContesto = aggiornaContesto;
+
+function salvaSimulazione() {
+  const esito = calcola();
+  const a = leggiArchivio();
+  const voce = {
+    id: 'sim-' + Date.now(),
+    nome: stato.subjectName || 'Senza nome',
+    quando: new Date().toISOString(),
+    stato: JSON.parse(JSON.stringify(stato)),
+    costi: JSON.parse(JSON.stringify(costi)),
+    sintesi: esito.scenari.map((s) => ({ id: s.id, netto: s.netto, applicabile: s.applicabile }))
+  };
+  a.unshift(voce);
+  scriviArchivio(a.slice(0, 60));
+  toast('Simulazione «' + voce.nome + '» salvata nell’archivio.');
+  window.cfRenderArchivio();
+}
+window.cfSalvaSimulazione = salvaSimulazione;
+
+/* ------------------------------------------------------------------ avvio */
+
+function collega() {
+  /* Comando del menu e sfondo */
+  qa('[data-action="toggle-sidebar"]').forEach((b) => b.addEventListener('click', apriChiudiSidebar));
+  qa('[data-action="close-sidebar"]').forEach((b) => b.addEventListener('click', chiudiSidebar));
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $('sidebar').classList.contains('open')) {
+      chiudiSidebar();
+      const t = q('.sb-toggle'); if (t) t.focus();
+    }
+  });
+
+  /* Percorso */
+  qa('.cf-link[data-stage]').forEach((b) =>
+    b.addEventListener('click', () => vaiA(b.dataset.stage)));
+  qa('[data-go]').forEach((b) => b.addEventListener('click', () => {
+    raccogliStato(); aggiornaContesto(); vaiA(b.dataset.go);
+  }));
+
+  /* Campi del profilo e dei compensi */
+  qa('input[name="cfProfession"],input[name="cfCurrentRegime"],input[name="cfExtraction"]')
+    .forEach((r) => r.addEventListener('change', () => {
+      raccogliStato(); aggiornaCampiCondizionali(); aggiornaContesto(); salvaLavoro(true);
+    }));
+  ['cfYear', 'cfSubjectKind', 'cfAdminTreatment', 'cfInpsRate'].forEach((id) =>
+    $(id).addEventListener('change', () => {
+      raccogliStato(); aggiornaCampiCondizionali(); aggiornaContesto(); salvaLavoro(true);
+    }));
+  qa('#stageProfilo input[type="text"],#stageCompensi input[type="text"],' +
+     '#stageCompensi input[type="checkbox"]').forEach((el) =>
+    el.addEventListener('change', () => { raccogliStato(); aggiornaContesto(); salvaLavoro(true); }));
+
+  /* Costi: un solo ascoltatore delegato, così le voci aggiunte a mano
+     funzionano senza riagganciare nulla. */
+  $('cfCostList').addEventListener('change', (e) => {
+    const el = e.target;
+    if (el.dataset.i == null) return;
+    const c = costi[Number(el.dataset.i)];
+    if (!c) return;
+    const k = el.dataset.k;
+    if (k === 'gross') c.gross = el.value === '1';
+    else if (k === 'amount') c.amount = leggiNumero(el.value);
+    else if (k === 'tetto') {
+      const v = String(el.value).trim();
+      c.tetto = v === '' ? null : leggiNumero(v) / 100;
+    } else c[k] = leggiNumero(el.value) / 100;
+    renderCosti(); salvaLavoro(true);
+  });
+  $('cfCostList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-action]');
+    if (!b) return;
+    const i = Number(b.dataset.i);
+    if (b.dataset.action === 'reset-cost') {
+      const base = CF_COSTI_DEFAULT.find((d) => d.id === costi[i].id);
+      if (base) { costi[i] = Object.assign({}, base, { amount: costi[i].amount, gross: costi[i].gross, custom: false }); }
+      renderCosti(); salvaLavoro(true); toast('Regole predefinite ripristinate.');
+    }
+    if (b.dataset.action === 'del-cost') {
+      costi.splice(i, 1); renderCosti(); salvaLavoro(true);
+    }
+  });
+
+  qa('[data-action]').forEach((b) => {
+    const a = b.dataset.action;
+    if (a === 'add-cost') b.addEventListener('click', () => {
+      const nome = prompt('Nome della voce di costo:');
+      if (!nome) return;
+      costi.push({ id: 'custom-' + Date.now(), nome: nome.slice(0, 60),
+        nota: 'Voce aggiunta a mano: le regole partono da quelle generiche.',
+        iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1,
+        tetto: null, amount: 0, gross: false, custom: true });
+      renderCosti(); salvaLavoro(true);
+    });
+    if (a === 'reset-costs') b.addEventListener('click', () => {
+      if (!confirm('Ripristina le regole predefinite di tutte le voci? Gli importi restano.')) return;
+      costi = nuoviCosti().map((base) => {
+        const vecchio = costi.find((c) => c.id === base.id);
+        return Object.assign({}, base, { amount: vecchio ? vecchio.amount : 0, gross: vecchio ? vecchio.gross : false });
+      }).concat(costi.filter((c) => c.custom));
+      renderCosti(); salvaLavoro(true); toast('Regole predefinite ripristinate su tutte le voci.');
+    });
+    if (a === 'save-simulation') b.addEventListener('click', () => { raccogliStato(); salvaSimulazione(); });
+    if (a === 'load-demo') b.addEventListener('click', caricaDemo);
+  });
+
+  /* Indirizzi delle sezioni: il tasto Indietro non deve uscire dal tool. */
+  window.addEventListener('popstate', () => {
+    const s = (location.hash || '').replace(/^#\//, '');
+    vaiA(STAGES.indexOf(s) >= 0 ? s : 'profilo', false);
+  });
+}
+
+function caricaDemo() {
+  stato = Object.assign(statoDefault(), {
+    subjectName: 'Studio dimostrativo', revenue: 120000, previousRevenue: 84000,
+    otherIncome: 15000, ownership: 100, distribution: 70, companyOverhead: 6000,
+    extractionMode: 'mix', admin: 40000
+  });
+  costi = nuoviCosti();
+  const demo = { studio: 14000, utenze: 3200, telefonia: 1400, tecnologia: 4800,
+    assicurazioni: 2200, formazione: 1800, servizi: 6500, auto: 7200,
+    trasferte: 2600, rappresentanza: 1500, banca: 700, ordine: 900 };
+  costi.forEach((c) => { if (demo[c.id]) c.amount = demo[c.id]; });
+  scriviStato(); renderCosti(); aggiornaContesto(); salvaLavoro(true);
+  vaiA('confronto');
+  toast('Dati dimostrativi caricati. Niente di reale: sostituiscili con i tuoi.');
+}
+
+function avvia() {
+  const ripreso = riprendiLavoro();
+  if (!ripreso) { stato = statoDefault(); costi = nuoviCosti(); }
+  scriviStato();
+  renderCosti();
+  aggiornaContesto();
+  $('stateArchivio').textContent = String(leggiArchivio().length);
+  collega();
+  const s = (location.hash || '').replace(/^#\//, '');
+  vaiA(STAGES.indexOf(s) >= 0 ? s : 'profilo', false);
+  if (ripreso) toast('Ripresa la simulazione lasciata aperta in questo browser.');
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia);
+else avvia();
+
+})();
+
+</script>
+<script src="/assets/tal-xlsx-guard.js?v=20260810-1"></script>
+</body></html>

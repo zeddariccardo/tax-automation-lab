@@ -25,6 +25,204 @@
    Lo stato del salvataggio resta osservato sulla scrittura vera
    (Storage.prototype.setItem): un indicatore «Salvato» che si accende senza
    che nulla sia stato scritto è peggio che non averlo. */
+/* ---------------------------------------------------------------------------
+   Foglio «Esiti AI» — lettore condiviso.
+
+   Il foglio esiste nel template di «Configura con AI» di tutti e cinque i
+   tool, ed è il posto dove l'AI scrive dubbi, assunzioni e fonti. Il Bilancio
+   civilistico lo importava e lo trasformava in eccezioni da chiudere; Analisi,
+   LIPE, Fascicolo e F24 lo ignoravano. Risultato: i dati passavano e proprio
+   l'avviso che dovrebbe fermare una decisione incerta si perdeva. È il rilievo
+   TAL-P1-02 dell'audit del 21 agosto 2026.
+
+   Sta qui, e non dentro i tool, perché è la stessa lettura per tutti: una sola
+   definizione, così non divergono come è già successo col menu mobile. Non
+   tocca il DOM ed è definito prima della guardia `tal-tool-page`, quindi è
+   disponibile anche a chi carica questo file fuori da una pagina applicativa
+   (per esempio i test). */
+(function () {
+  'use strict';
+
+  /* Confronto tollerante: accenti, maiuscole, spazi doppi e spazi non
+     separabili non devono far mancare una colonna. Lo spazio unificatore
+     U+00A0 arriva davvero, incollato dentro Excel. */
+  function norm(s) {
+    var t = String(s == null ? '' : s).replace(/ /g, ' ');
+    if (t.normalize) t = t.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return t.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  /* Uno stato conta come chiuso solo se lo dice. Il default è aperto: un
+     campo vuoto è un dubbio non risolto, non un dubbio che non c'è. */
+  function isClosed(stato) {
+    return /^(risolt|chius|verificat|ok\b|superat|confermat)/.test(norm(stato));
+  }
+
+  /* «Bloccante» è una parola che l'AI può scrivere nello stato o nel tipo:
+     quando c'è, l'elaborazione non deve proseguire finché non è chiusa. */
+  function isBlocking(row) {
+    var s = norm(row.stato) + ' ' + norm(row.tipo);
+    return /blocc|critic|impedisc/.test(s);
+  }
+
+  /* Trova il foglio per nome, tollerando accenti, spazi e maiuscole. */
+  function findSheet(wb, wanted) {
+    if (!wb || !wb.SheetNames) return null;
+    var target = norm(wanted);
+    for (var i = 0; i < wb.SheetNames.length; i++) {
+      if (norm(wb.SheetNames[i]) === target) return wb.SheetNames[i];
+    }
+    for (var j = 0; j < wb.SheetNames.length; j++) {
+      if (norm(wb.SheetNames[j]).indexOf(target) >= 0) return wb.SheetNames[j];
+    }
+    return null;
+  }
+
+  /* Legge il foglio e restituisce le eccezioni. `XLSX` arriva dal chiamante:
+     questo file non dipende dalla libreria e non la carica. */
+  function read(wb, XLSX, sheetName) {
+    if (!wb || !XLSX) return [];
+    var name = findSheet(wb, sheetName || 'Esiti AI');
+    if (!name) return [];
+    var data = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: '' });
+    var head = -1;
+    for (var r = 0; r < Math.min(data.length, 15); r++) {
+      var row = (data[r] || []).map(function (x) { return norm(x); });
+      if (row.indexOf('elemento da verificare') >= 0) { head = r; break; }
+    }
+    if (head < 0) return [];
+    var H = (data[head] || []).map(function (x) { return norm(x); });
+    /* Le intestazioni del template sono composte («Codice conto / campo»,
+       «Osservazione / assunzione»): serve il prefisso, non l'uguaglianza. */
+    var ix = function (label) {
+      var k = norm(label);
+      for (var i = 0; i < H.length; i++) { if (H[i].indexOf(k) === 0) return i; }
+      return -1;
+    };
+    var iTipo = ix('tipo'), iEl = ix('elemento da verificare'), iSt = ix('stato'),
+        iOss = ix('osservazione'), iFonte = ix('fonte');
+    /* La colonna di riferimento si chiama diversamente in ogni tool: «Codice
+       conto / campo» nel Bilancio, «Codice IVA / campo» in LIPE. */
+    var iRif = ix('codice');
+    var out = [];
+    for (var i2 = head + 1; i2 < data.length; i2++) {
+      var rw = data[i2] || [];
+      var g = function (j) { return j >= 0 ? String(rw[j] == null ? '' : rw[j]).trim() : ''; };
+      var elemento = g(iEl);
+      if (!elemento) continue;
+      var tipo = g(iTipo);
+      /* La riga di esempio del template non è un'eccezione vera. */
+      if (norm(tipo) === 'esempio' || /non lasciare questa riga/i.test(elemento)) continue;
+      var item = {
+        tipo: tipo, rif: g(iRif), elemento: elemento, stato: g(iSt),
+        osservazione: g(iOss), fonte: g(iFonte), sourceRow: i2 + 1
+      };
+      item.closed = isClosed(item.stato);
+      item.blocking = !item.closed && isBlocking(item);
+      out.push(item);
+    }
+    return out;
+  }
+
+  function summarize(findings) {
+    var list = findings || [];
+    var open = list.filter(function (f) { return !f.closed; });
+    return {
+      total: list.length,
+      open: open.length,
+      closed: list.length - open.length,
+      blocking: open.filter(function (f) { return f.blocking; }).length
+    };
+  }
+
+  /* Righe pronte per il foglio «Esiti AI» di un export: le eccezioni
+     sopravvivono al giro completo import → lavoro → export. */
+  function toSheetRows(findings) {
+    var head = ['Tipo', 'Codice / campo', 'Elemento da verificare', 'Stato',
+                'Osservazione / assunzione', 'Fonte utilizzata'];
+    return [head].concat((findings || []).map(function (f) {
+      return [f.tipo || '', f.rif || '', f.elemento || '', f.stato || '',
+              f.osservazione || '', f.fonte || ''];
+    }));
+  }
+
+  window.TAL_AI = { read: read, summarize: summarize, toSheetRows: toSheetRows,
+                    isClosed: isClosed, findSheet: findSheet };
+})();
+
+/* ---------------------------------------------------------------------------
+   Limiti di caricamento — contratto condiviso.
+
+   Prima ogni tool decideva i suoi: Analisi 15 MB, LIPE 25 MB, il Fascicolo 12
+   per gli XLSX e 6 per le immagini, F24 5, e il Bilancio civilistico **nessun
+   limite**. Su un file grande la lettura di SheetJS blocca il thread
+   principale: su iPhone la scheda muore senza dire perché. È il rilievo
+   TAL-P1-08 dell'audit del 21 agosto 2026.
+
+   I numeri sono volutamente generosi — un bilancio vero non arriva a 15 MB —
+   perché servono a fermare l'incidente (il file sbagliato, l'export di un ERP
+   intero), non a limitare l'uso. Il Fascicolo tiene soglie più strette sui
+   propri allegati e immagini: sono più severe di queste, quindi restano.
+
+   `check()` va chiamato **prima** di leggere il file, e restituisce null se va
+   bene o un messaggio pronto da mostrare. Il messaggio dice sempre il limite e
+   la dimensione vera: «troppo grande» da solo non aiuta nessuno. */
+(function () {
+  'use strict';
+  var MB = 1024 * 1024;
+
+  var LIMITS = {
+    xlsxBytes:     15 * MB,   // foglio di calcolo in ingresso
+    jsonBytes:     25 * MB,   // backup e archivi
+    imageBytes:     6 * MB,   // allegati immagine
+    rowsPerSheet:   25000,
+    sheetsPerFile:  40,
+    cellsPerFile:   400000
+  };
+
+  function human(bytes) {
+    if (bytes >= MB) return (bytes / MB).toFixed(bytes >= 10 * MB ? 0 : 1).replace('.', ',') + ' MB';
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  }
+
+  /* kind: 'xlsx' | 'json' | 'image'. Estensioni accettate per ciascuno, così
+     il messaggio sul formato sbagliato è uno solo per tutta la suite. */
+  var KINDS = {
+    xlsx:  { bytes: 'xlsxBytes',  re: /\.(xlsx|xls)$/i,          what: 'un file .xlsx o .xls' },
+    json:  { bytes: 'jsonBytes',  re: /\.json$/i,                what: 'un file .json' },
+    image: { bytes: 'imageBytes', re: /\.(png|jpe?g|webp|gif)$/i, what: 'un’immagine PNG, JPG o WEBP' }
+  };
+
+  function check(file, kind) {
+    var k = KINDS[kind] || KINDS.xlsx;
+    if (!file) return 'Nessun file selezionato.';
+    if (!k.re.test(file.name || '')) {
+      return 'Formato non supportato: serve ' + k.what + '.';
+    }
+    var max = LIMITS[k.bytes];
+    if (typeof file.size === 'number' && file.size > max) {
+      return 'Il file pesa ' + human(file.size) + ' e il limite è ' + human(max)
+           + '. Un file così grande blocca il browser durante la lettura: '
+           + 'esporta solo i fogli che servono, oppure dividilo.';
+    }
+    return null;
+  }
+
+  /* Da mostrare accanto al controllo di caricamento: il limite dichiarato
+     prima, non scoperto dopo il fallimento. */
+  function describe(kind) {
+    var k = KINDS[kind] || KINDS.xlsx;
+    var s = 'Massimo ' + human(LIMITS[k.bytes]);
+    if (kind === 'xlsx' || !kind) {
+      s += ', ' + LIMITS.rowsPerSheet.toLocaleString('it-IT') + ' righe per foglio, '
+         + LIMITS.sheetsPerFile + ' fogli';
+    }
+    return s + '.';
+  }
+
+  window.TAL_LIMITS = { values: LIMITS, check: check, describe: describe, human: human };
+})();
+
 (function () {
   'use strict';
 
@@ -299,16 +497,68 @@
     buildBar();
   }
 
+  /* Salto al contenuto, per i cinque tool.
+     Da tastiera, prima del contenuto, si attraversano intestazione globale,
+     barra di sessione e sidebar intera: decine di tabulazioni a ogni cambio di
+     schermata. Solo Analisi di bilancio aveva un salto proprio (TAL-P2-04).
+     È idempotente: se un tool ne ha già uno non ne aggiunge un secondo, così
+     due salti di fila non diventano il difetto successivo. */
+  function installSkipLink() {
+    if (document.querySelector('.tal-skip-link, .skip-link')) return;
+    var main = document.querySelector('.app-main main')
+            || document.querySelector('main')
+            || document.querySelector('.app-main');
+    if (!main) return;
+    if (!main.id) main.id = 'tal-main-content';
+    /* tabindex="-1": in Safari un'ancora verso un contenitore non focusabile
+       sposta la vista ma non il fuoco, e la tabulazione successiva riparte
+       dall'inizio — il salto sembra funzionare e non serve a niente. */
+    if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+    var a = document.createElement('a');
+    a.className = 'tal-skip-link';
+    a.href = '#' + main.id;
+    a.textContent = 'Vai al contenuto principale';
+    a.addEventListener('click', function () {
+      setTimeout(function () { try { main.focus({ preventScroll: false }); } catch (e) { main.focus(); } }, 0);
+    });
+    document.body.insertAdjacentElement('afterbegin', a);
+  }
+
+  /* Il limite dichiarato prima del caricamento, non scoperto dopo il
+     fallimento (TAL-P1-08). Si attacca a ogni input per file XLSX: i tool ne
+     hanno da uno a cinque, e prima nessuno diceva quanto grande può essere un
+     file prima di far morire la scheda. */
+  function declareUploadLimits() {
+    if (!window.TAL_LIMITS) return;
+    var testo = window.TAL_LIMITS.describe('xlsx');
+    var inputs = document.querySelectorAll('input[type="file"][accept*="xls"]');
+    for (var i = 0; i < inputs.length; i++) {
+      var input = inputs[i];
+      if (input.dataset.talLimitShown) continue;
+      input.dataset.talLimitShown = '1';
+      /* L'input è spesso nascosto dietro un pulsante o una zona di trascinamento:
+         la nota va accanto a quello che si vede, non all'input. */
+      var host = input.closest('.dropzone, .upload, .panel, .field, .import-step') || input.parentElement;
+      if (!host || host.querySelector('.tal-upload-limit')) continue;
+      var nota = document.createElement('p');
+      nota.className = 'tal-upload-limit';
+      nota.textContent = testo;
+      host.appendChild(nota);
+    }
+  }
+
   function start() {
     buildBar();
     watchStorage();
     movePublication(0);
     externalizeAiLink();
     watchButtons();
+    installSkipLink();
+    declareUploadLimits();
     /* La sidebar e la barra di qualche tool nascono dopo il boot: vanno
        riprese quando compaiono. `requestAnimationFrame` qui non serve — in
        scheda non attiva non parte. */
-    setTimeout(function () { reconcileBar(); externalizeAiLink(); }, 800);
+    setTimeout(function () { reconcileBar(); externalizeAiLink(); declareUploadLimits(); }, 800);
   }
 
   function boot() { setTimeout(start, 0); }

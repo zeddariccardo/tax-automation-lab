@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 -->
 <!DOCTYPE html>
-<html class="tal-tool-page" lang="it">
+<html class="tal-tool-page" data-tool-version="2.3.2" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -362,7 +362,10 @@ a{color:inherit}
   .sidebar.open{transform:none}
   .sb-backdrop{z-index:5090}
   .app-main{margin-left:0}
-  .sb-toggle{display:inline-flex;align-items:center;gap:7px;position:fixed;top:auto;bottom:max(16px,env(safe-area-inset-bottom));left:max(12px,env(safe-area-inset-left));z-index:5105;min-height:46px;border:1px solid rgba(247,247,245,.18);background:linear-gradient(135deg,var(--tal-purple),var(--tal-teal));color:#fff;border-radius:999px;padding:10px 15px;font:700 12px var(--sans);cursor:pointer;box-shadow:0 14px 34px rgba(14,22,36,.28)}
+  /* min-height:46px e border-radius:999px vincevano sul quadrato di 44px di
+     tal-app.css (min-height batte height): il Fascicolo era alto 46 e a
+     pillola, gli altri 44 e quadrati. Allineati, così i cinque coincidono. */
+  .sb-toggle{display:inline-flex;align-items:center;gap:7px;position:fixed;top:auto;bottom:max(16px,env(safe-area-inset-bottom));left:max(12px,env(safe-area-inset-left));z-index:5105;min-height:44px;border:1px solid rgba(247,247,245,.18);background:linear-gradient(135deg,var(--tal-purple),var(--tal-teal));color:#fff;border-radius:12px;padding:10px 15px;font:700 12px var(--sans);cursor:pointer;box-shadow:0 14px 34px rgba(14,22,36,.28)}
   .cmdbar{position:relative;top:auto;margin:14px 14px 0}
   .app-main main{padding-left:16px;padding-right:16px}
   .nav-cards{grid-template-columns:1fr}
@@ -403,7 +406,34 @@ a{color:inherit}
 @media(max-width:700px){.panel-head{flex-direction:column;align-items:stretch}.panel-head .tools{width:100%;display:flex;flex-wrap:wrap}.panel-head .tools .btn{flex:1 1 auto}}
 @media(max-width:430px){.graph-canvas{width:100%}.graph-layout{min-width:0;width:100%}}
 </style>
-\n<style id="ctp-import-v230-style">\n.manage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}\n.manage-card{background:#fff;border:1px solid var(--g2);border-radius:14px;padding:17px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}\n.manage-card.current{border-color:rgba(95,181,154,.8);box-shadow:inset 4px 0 0 var(--tal-green)}\n.manage-card h3{font-size:15px;font-weight:650;overflow-wrap:anywhere}\n.manage-card p{font-size:12px;color:var(--g4);line-height:1.5}\n.manage-card .manage-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}\n.import-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}\n.import-step{background:#fff;border:1px solid var(--g2);border-radius:14px;padding:18px;min-width:0}\n.import-step .n{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--accent-soft);color:var(--accent-deep);font-weight:800;font-size:11px;margin-bottom:12px}\n.import-step h3{font-size:14px;margin-bottom:5px}\n.import-step p{font-size:12px;color:var(--g4);line-height:1.55;margin-bottom:12px}\n.import-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}\n.import-stat{border:1px solid var(--g2);border-radius:10px;padding:10px 11px;background:#fbfaf8}\n.import-stat b{display:block;font-size:18px;line-height:1.15}.import-stat span{font-size:10px;color:var(--g4);text-transform:uppercase;letter-spacing:.07em}\n.import-diagnostics{display:grid;gap:7px;margin-top:12px}\n.import-diag{padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.45;border:1px solid var(--line);background:#fbfaf8}\n.import-diag.warn{background:var(--gold-bg);border-color:var(--gold-line);color:var(--gold)}\n.import-diag.info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}\n.conflict-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}\n.conflict-table th,.conflict-table td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left;vertical-align:top}.conflict-table th{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--g4)}\n.client-search{max-width:520px;margin-bottom:15px}.client-search input{width:100%;min-height:42px;padding:9px 12px;border:1px solid #cbc8c0;border-radius:8px;background:#fff}\n.import-file-name{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;background:var(--info-bg);color:var(--info);border-radius:999px;font-size:10px;font-weight:700}\n@media(max-width:820px){.import-flow,.manage-grid{grid-template-columns:1fr}.import-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}\n@media(max-width:480px){.import-summary{grid-template-columns:1fr}.conflict-table{font-size:10.5px}}\n</style>\n<style id="tal-global-header-style">
+
+<style id="ctp-import-v230-style">
+.manage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.manage-card{background:#fff;border:1px solid var(--g2);border-radius:14px;padding:17px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.manage-card.current{border-color:rgba(95,181,154,.8);box-shadow:inset 4px 0 0 var(--tal-green)}
+.manage-card h3{font-size:15px;font-weight:650;overflow-wrap:anywhere}
+.manage-card p{font-size:12px;color:var(--g4);line-height:1.5}
+.manage-card .manage-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+.import-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.import-step{background:#fff;border:1px solid var(--g2);border-radius:14px;padding:18px;min-width:0}
+.import-step .n{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--accent-soft);color:var(--accent-deep);font-weight:800;font-size:11px;margin-bottom:12px}
+.import-step h3{font-size:14px;margin-bottom:5px}
+.import-step p{font-size:12px;color:var(--g4);line-height:1.55;margin-bottom:12px}
+.import-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.import-stat{border:1px solid var(--g2);border-radius:10px;padding:10px 11px;background:#fbfaf8}
+.import-stat b{display:block;font-size:18px;line-height:1.15}.import-stat span{font-size:10px;color:var(--g4);text-transform:uppercase;letter-spacing:.07em}
+.import-diagnostics{display:grid;gap:7px;margin-top:12px}
+.import-diag{padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.45;border:1px solid var(--line);background:#fbfaf8}
+.import-diag.warn{background:var(--gold-bg);border-color:var(--gold-line);color:var(--gold)}
+.import-diag.info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}
+.conflict-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px}
+.conflict-table th,.conflict-table td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left;vertical-align:top}.conflict-table th{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--g4)}
+.client-search{max-width:520px;margin-bottom:15px}.client-search input{width:100%;min-height:42px;padding:9px 12px;border:1px solid #cbc8c0;border-radius:8px;background:#fff}
+.import-file-name{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;background:var(--info-bg);color:var(--info);border-radius:999px;font-size:10px;font-weight:700}
+@media(max-width:820px){.import-flow,.manage-grid{grid-template-columns:1fr}.import-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.import-summary{grid-template-columns:1fr}.conflict-table{font-size:10.5px}}
+</style>
+<style id="tal-global-header-style">
 .tal-global-header,.tal-global-header *{box-sizing:border-box}
 .tal-global-header{position:sticky;top:0;z-index:5000;width:100%;padding:18px clamp(14px,3vw,42px) 0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#F7F7F5}
 .tal-gh-frame{width:min(1460px,100%);margin:0 auto;min-height:76px;padding:10px 12px 10px 14px;display:grid;grid-template-columns:minmax(220px,auto) minmax(0,1fr) auto;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(20,22,39,.97),rgba(17,28,43,.97));border:1px solid rgba(247,247,245,.16);border-radius:16px;box-shadow:0 18px 54px rgba(8,11,25,.24);backdrop-filter:blur(16px)}
@@ -531,13 +561,13 @@ body.tal-header-compact .cmdbar{top:72px}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v2.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814c">
-<script defer src="/assets/tal-app.js?v=20260814c"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260821c">
+<script defer src="/assets/tal-app.js?v=20260821c"></script>
 </head>
 
 <body class="tal-tool-page">
 <a class="visually-hidden" href="#page">Vai al contenuto</a>
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu dello strumento" class="sb-toggle" id="sbToggle" type="button">☰ Menu</button>
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di Fascicolo fiscale cliente" class="sb-toggle" id="sbToggle" type="button">☰ Menu</button>
 <div class="sb-backdrop" id="sbBackdrop"></div>
 
 <nav aria-label="Navigazione dello strumento" class="sidebar" id="sidebar">
@@ -3758,21 +3788,46 @@ try{
 </script>
 <script id="ctp-header-width-runtime-v211">
 (function(){
+  /* Densità dell'intestazione globale.
+
+     Com'era, e perché non andava. La soglia era `larghezza di .app-main < 1220`.
+     Ma .app-main è il viewport meno la sidebar, cioè circa 258px in meno: la
+     soglia si raggiungeva solo oltre i ~1500px di viewport. Su un portatile
+     normale il Fascicolo era quindi **sempre** compatto, e siccome le regole
+     `.tal-compact` spostano la navigazione del sito dietro l'hamburger, questo
+     era l'unico dei cinque tool in cui Home/Strumenti/Configura con AI non si
+     vedevano in linea sul desktop. Il ramo con le voci in linea era codice di
+     fatto irraggiungibile. È il rilievo TAL-P2-06.
+
+     Com'è ora. Stessa soglia degli altri quattro tool — 760px di **viewport**,
+     la stessa di `@media(max-width:760px)` in site-shell.css e nel foglio
+     locale dell'intestazione. Sopra i 760px l'intestazione è identica a quella
+     di Bilancio, Analisi, LIPE e F24; sotto, la compattazione entra e coincide
+     con quello che le media query già facevano. Si misura il viewport e non
+     .app-main proprio perché il confronto deve essere con gli altri tool, che
+     guardano il viewport. */
+  var COMPACT_BELOW=760;
   function init(){
-    var main=document.querySelector('.app-main');
     var header=document.querySelector('.tal-global-header');
-    if(!main||!header)return;
-    function apply(width){
-      var compact=width<1220;
+    if(!header)return;
+    var mq=window.matchMedia('(max-width:'+(COMPACT_BELOW-1)+'px)');
+    function apply(){
+      var compact=mq.matches;
       header.classList.toggle('tal-compact',compact);
       document.body.classList.toggle('tal-header-compact',compact);
       if(!compact)header.classList.remove('tal-menu-open');
     }
-    apply(main.getBoundingClientRect().width);
-    if(window.ResizeObserver){
-      var ro=new ResizeObserver(function(entries){if(entries&&entries[0])apply(entries[0].contentRect.width)});
-      ro.observe(main);
-    }else window.addEventListener('resize',function(){apply(main.getBoundingClientRect().width)});
+    apply();
+    /* addListener è deprecato ma è l'unico che risponde su Safari più vecchi:
+       si prova prima quello standard. */
+    if(mq.addEventListener)mq.addEventListener('change',apply);
+    else if(mq.addListener)mq.addListener(apply);
+    /* Il resize serve comunque, non come alternativa: se la pagina nasce a
+       larghezza zero e viene allargata dopo — succede dentro un iframe, ed è
+       come se ne accorge l'armatura di test — l'evento `change` della media
+       query non sempre arriva, e senza questo la pagina resterebbe compatta
+       per sempre. Costa un ricalcolo di due classList.toggle. */
+    window.addEventListener('resize',apply,{passive:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

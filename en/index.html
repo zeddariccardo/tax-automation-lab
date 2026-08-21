@@ -669,8 +669,28 @@ html.tal-show-intro #intro{
     return ()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',size);window.removeEventListener('pointermove',pos);window.removeEventListener('touchmove',pos)};
   }
 
+  /* Il modulo dell'animazione arriva da un CDN e pesa: se il browser non sa
+     disegnare in WebGL, scaricarlo e' banda buttata e finisce con un avviso in
+     console che non dice niente all'utente e sporca la diagnostica di chi
+     legge la pagina (TAL-P2-07). Qui si chiede prima al browser se puo', e
+     solo allora si scarica. Il fallback su canvas 2D resta identico: la hero
+     si vede comunque, e l'animazione e' decorativa. */
+  function canRenderWebGL(){
+    try{
+      const c=document.createElement('canvas');
+      const gl=c.getContext('webgl2')||c.getContext('webgl')||c.getContext('experimental-webgl');
+      if(!gl)return false;
+      /* Un contesto ottenuto non basta: su alcune configurazioni esiste ma e'
+         un software renderer che porta la pagina a pochi fotogrammi. */
+      const lose=gl.getExtension('WEBGL_lose_context');
+      if(lose)lose.loseContext();
+      return true;
+    }catch(e){return false;}
+  }
+
   async function initTubes(){
     const canvas=document.getElementById('tubes-canvas');
+    if(!canRenderWebGL()){fallbackStop=initFallback(canvas);return;}
     try{
       const module=await Promise.race([import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('WebGL module timeout')),2800))]);
       const TubesCursor=module.default;

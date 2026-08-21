@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!-- Tax Automation Lab — armatura di verifica responsive
+     Copyright (c) 2026 Riccardo Zedda — MIT
+
+     A che serve. L'audit del 21 agosto 2026 ha chiesto una prova oggettiva che
+     il comando del menu sia identico nei cinque tool a 320, 360, 390, 430, 768
+     e 980 px, che sparisca a 981, e che nessuna pagina scorra in orizzontale.
+     Farlo a mano vuol dire 45 combinazioni: questa pagina le esegue tutte
+     caricando ogni tool in un iframe della larghezza voluta e misurando il DOM
+     reale, non il sorgente.
+
+     Come si usa. Servire il repository su HTTP (stessa origine, altrimenti gli
+     iframe non sono ispezionabili) e aprire /tests/responsive-harness.html.
+     Il riepilogo compare in pagina; `window.__TAL_RESULTS` contiene lo stesso
+     esito in forma leggibile da un programma, ed è quello che legge
+     tests/responsive.e2e.mjs in CI.
+
+     Attenzione: env(safe-area-inset-*) vale 0 in un browser desktop, quindi qui
+     si misurano i 12/16 px di fallback. La safe area va provata sul dispositivo
+     fisico: questa pagina non la sostituisce. -->
+<title>Verifica responsive — Tax Automation Lab</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{
+    --ok:#136b4a; --ok-bg:#e6f4ee; --ko:#8d2320; --ko-bg:#fbeceb;
+    --ink:#14171f; --mut:#5d6470; --line:#dfe1e6; --bg:#f7f7f5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  h1{font-size:19px;margin:0 0 4px}
+  p.lede{margin:0 0 18px;color:var(--mut);max-width:70ch}
+  #run{min-height:44px;padding:10px 18px;border:1px solid var(--ink);border-radius:9px;
+       background:var(--ink);color:#fff;font:700 12px/1 inherit;letter-spacing:.06em;
+       text-transform:uppercase;cursor:pointer}
+  #run[disabled]{opacity:.5;cursor:default}
+  #verdict{margin:18px 0;padding:12px 14px;border-radius:10px;font-weight:700;display:none}
+  #verdict.pass{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
+  #verdict.fail{background:var(--ko-bg);color:var(--ko);border:1px solid var(--ko)}
+  table{border-collapse:collapse;width:100%;font-size:12px;background:#fff;
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);background:#fbfbfa}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  tr.ko td{background:var(--ko-bg)}
+  .tag{display:inline-block;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700}
+  .tag.ok{background:var(--ok-bg);color:var(--ok)}
+  .tag.ko{background:var(--ko-bg);color:var(--ko)}
+  .wrap{overflow-x:auto}
+  #stage{position:fixed;left:-99999px;top:0}
+  #stage iframe{border:0;height:844px;display:block}
+  code{font:12px ui-monospace,Menlo,Consolas,monospace;background:#eeefec;padding:1px 4px;border-radius:4px}
+</style>
+
+<h1>Verifica responsive dei cinque tool</h1>
+<p class="lede">Misura il comando del menu e lo scorrimento orizzontale a ogni
+breakpoint, caricando i tool in un iframe. Le attese: sotto 981&nbsp;px il
+comando è un quadrato di 44&times;44 in basso a sinistra, senza testo visibile e
+con l'icona al posto suo; a 981&nbsp;px non c'è; mai scorrimento orizzontale.</p>
+
+<button id="run" type="button">Esegui la verifica</button>
+<div id="verdict" role="status"></div>
+<div class="wrap"><table id="out"><thead><tr>
+  <th>Tool</th><th class="n">Larghezza</th><th>Atteso</th><th class="n">L&times;A</th>
+  <th class="n">Da sin.</th><th class="n">Dal fondo</th><th>Icona</th>
+  <th>Testo</th><th class="n">Overflow</th><th>Esito</th>
+</tr></thead><tbody></tbody></table></div>
+<div id="stage" aria-hidden="true"></div>
+
+<script>
+const TOOLS = [
+  ['Bilancio civilistico',   '/tools/financial-statement/'],
+  ['Analisi di bilancio',    '/tools/financial-analysis/'],
+  ['LIPE',                   '/tools/lipe/'],
+  ['Fascicolo fiscale',      '/tools/tfa-client-file/'],
+  ['Generatore F24',         '/tools/f24/']
+];
+// 980 è l'ultimo px in cui il comando deve esserci, 981 il primo in cui non c'è.
+const WIDTHS = [320, 360, 390, 430, 768, 980, 981];
+
+const stage = document.getElementById('stage');
+const tbody = document.querySelector('#out tbody');
+const verdict = document.getElementById('verdict');
+const runBtn = document.getElementById('run');
+
+function loadTool(url, width){
+  return new Promise(resolve => {
+    const f = document.createElement('iframe');
+    f.style.width = width + 'px';
+    f.src = url + '?harness=' + Date.now();
+    let done = false;
+    const finish = () => { if (!done) { done = true; resolve(f); } };
+    f.addEventListener('load', () => setTimeout(finish, 350)); // lascia girare i boot()
+    setTimeout(finish, 6000);                                   // non restare appeso
+    stage.appendChild(f);
+  });
+}
+
+function measure(frame){
+  const w = frame.contentWindow, d = frame.contentDocument;
+  if (!d) return {error: 'documento non accessibile'};
+  const de = d.documentElement;
+  const b = d.querySelector('.sb-toggle');
+  const out = {
+    overflow: Math.max(0, Math.round(de.scrollWidth - de.clientWidth),
+                          Math.round(d.body.scrollWidth - d.body.clientWidth)),
+    present: false
+  };
+
+  /* Salto al contenuto (TAL-P2-04). Si controlla che ce ne sia esattamente
+     uno, che punti a un bersaglio esistente e che quel bersaglio sia
+     focusabile: un'ancora verso un contenitore senza tabindex sposta la vista
+     ma non il fuoco, e il salto sembra funzionare senza servire a niente.
+     Lo stato visibile al fuoco non si misura qui: in una finestra non a fuoco
+     `:focus` non corrisponde, e verrebbe un falso negativo. */
+  const skips = d.querySelectorAll('.tal-skip-link, .skip-link');
+  out.skipCount = skips.length;
+  if (skips.length === 1) {
+    const href = skips[0].getAttribute('href') || '';
+    const target = href.startsWith('#') && href.length > 1 ? d.querySelector(href) : null;
+    out.skipTarget = !!target;
+    out.skipFocusable = !!(target && target.hasAttribute('tabindex'));
+    out.skipOffscreen = Math.round(skips[0].getBoundingClientRect().top) < 0;
+  }
+  if (b){
+    const r = b.getBoundingClientRect(), cs = w.getComputedStyle(b);
+    const bf = w.getComputedStyle(b, '::before');
+    out.present = cs.display !== 'none' && r.width > 0 && r.height > 0;
+    out.w = Math.round(r.width); out.h = Math.round(r.height);
+    out.left = Math.round(r.left);
+    out.bottomGap = Math.round(w.innerHeight - r.bottom);
+    out.radius = cs.borderRadius;
+    out.textHidden = parseFloat(cs.fontSize) === 0;
+    out.icon = (bf.content || '').replace(/["']/g, '');
+    out.ariaLabel = b.getAttribute('aria-label') || '';
+    out.ariaControls = b.getAttribute('aria-controls') || '';
+    out.ariaExpanded = b.getAttribute('aria-expanded');
+  }
+  return out;
+}
+
+function judge(width, m){
+  const fails = [];
+  const shouldShow = width <= 980;
+  if (m.error) return ['—', ['iframe: ' + m.error]];
+  if (m.overflow > 0) fails.push('scorrimento orizzontale di ' + m.overflow + 'px');
+  if (m.skipCount !== 1) fails.push('salti al contenuto: ' + m.skipCount + ' (ne serve 1)');
+  else {
+    if (!m.skipTarget)    fails.push('il salto punta a un bersaglio che non esiste');
+    if (!m.skipFocusable) fails.push('il bersaglio del salto non è focusabile (manca tabindex)');
+    if (!m.skipOffscreen) fails.push('il salto è visibile anche senza fuoco');
+  }
+  if (shouldShow){
+    if (!m.present) fails.push('comando assente');
+    else {
+      if (m.w !== 44 || m.h !== 44) fails.push('non è 44×44 (' + m.w + '×' + m.h + ')');
+      if (m.left !== 12)      fails.push('non è a 12px da sinistra (' + m.left + ')');
+      if (m.bottomGap !== 16) fails.push('non è a 16px dal fondo (' + m.bottomGap + ')');
+      if (!m.textHidden)      fails.push('mostra il nome del tool');
+      if (m.icon !== '☰')     fails.push('icona assente');
+      if (!m.ariaLabel)       fails.push('aria-label mancante');
+      if (m.ariaControls !== 'sidebar') fails.push('aria-controls diverso da "sidebar"');
+      if (m.ariaExpanded === null)      fails.push('aria-expanded mancante');
+    }
+  } else if (m.present) {
+    fails.push('comando ancora presente a ' + width + 'px');
+  }
+  return [shouldShow ? 'presente 44×44' : 'assente', fails];
+}
+
+async function run(){
+  runBtn.disabled = true; tbody.innerHTML = ''; verdict.style.display = 'none';
+  const results = [];
+  for (const [name, url] of TOOLS){
+    for (const width of WIDTHS){
+      const frame = await loadTool(url, width);
+      let m;
+      try { m = measure(frame); } catch(e){ m = {error: e.message}; }
+      frame.remove();
+      const [expected, fails] = judge(width, m);
+      results.push({tool: name, width, expected, ok: fails.length === 0, fails, measured: m});
+
+      const tr = document.createElement('tr');
+      if (fails.length) tr.className = 'ko';
+      const cell = v => { const td = document.createElement('td'); td.textContent = v; return td; };
+      const num  = v => { const td = cell(v); td.className = 'n'; return td; };
+      tr.append(cell(name), num(width + 'px'), cell(expected),
+        num(m.present ? m.w + '×' + m.h : '—'),
+        num(m.present ? m.left : '—'),
+        num(m.present ? m.bottomGap : '—'),
+        cell(m.present ? (m.icon || '—') : '—'),
+        cell(m.present ? (m.textHidden ? 'nascosto' : 'VISIBILE') : '—'),
+        num(m.overflow == null ? '?' : m.overflow));
+      const last = document.createElement('td');
+      const tag = document.createElement('span');
+      tag.className = 'tag ' + (fails.length ? 'ko' : 'ok');
+      tag.textContent = fails.length ? 'no' : 'ok';
+      last.appendChild(tag);
+      if (fails.length){ last.appendChild(document.createTextNode(' ' + fails.join('; '))); }
+      tr.appendChild(last);
+      tbody.appendChild(tr);
+    }
+  }
+  window.__TAL_RESULTS = results;
+  const bad = results.filter(r => !r.ok);
+  verdict.className = bad.length ? 'fail' : 'pass';
+  verdict.textContent = bad.length
+    ? bad.length + ' controlli falliti su ' + results.length + '.'
+    : 'Tutti i ' + results.length + ' controlli superati.';
+  verdict.style.display = 'block';
+  runBtn.disabled = false;
+  return results;
+}
+
+runBtn.addEventListener('click', run);
+window.__talRun = run;   // per l'automazione
+</script>

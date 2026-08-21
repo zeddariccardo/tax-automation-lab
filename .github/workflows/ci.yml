@@ -1,0 +1,55 @@
+# Tax Automation Lab — verifica obbligatoria prima della pubblicazione.
+#
+# Perché esiste. Fino al 21 agosto 2026 nel repository non c'era nessuna CI:
+# l'unico controllo era un test statico eseguito a mano, e l'audit di quel
+# giorno lo ha contato come rilievo (TAL-P1-06). Le due correzioni più gravi
+# che ha trovato — il comando del menu che spariva e i template che
+# importavano dati dimostrativi — sono esattamente il tipo di difetto che
+# torna in silenzio: qui c'è un test per ciascuno.
+#
+# Cosa NON copre, e va detto perché non sia un falso senso di sicurezza:
+# la validazione col modulo di controllo dell'Agenzia delle Entrate (F24A0 e
+# LIPE) e con TEBENI per l'XBRL non è automatizzabile qui, si fa a mano e si
+# conserva l'esito. Nemmeno la matrice sui dispositivi fisici: Chromium
+# headless non ha una safe area.
+
+name: Verifica
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  statico:
+    name: Test statici e coerenza
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build-sitemap legge le date di commit: senza la storia completa
+          # ripiegherebbe sul tempo di modifica dei file del runner.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintassi degli script inline, regole critiche, versioni
+        run: node --test "tests/*.test.mjs"
+      - name: Il sitemap è allineato al contenuto
+        run: node tests/build-sitemap.mjs --check
+
+  e2e:
+    name: Comando del menu e responsive nei cinque tool
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installa Playwright
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Verifica a 320, 360, 390, 430, 768, 980 e 981 px
+        run: npm run test:e2e

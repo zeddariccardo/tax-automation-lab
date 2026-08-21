@@ -523,12 +523,33 @@ html.tal-tool-page .tal-gh-logo{filter:drop-shadow(0 8px 18px rgba(20,83,104,.36
 
 /* Il pulsante del menu resta sullo schermo mentre la pagina scorre: da pillola
    larga a quadrato di 44px copre meno della metà del testo. L'etichetta resta
-   nel DOM, quindi il nome accessibile non cambia. */
+   nel DOM, quindi il nome accessibile non cambia.
+
+   Questa è l'UNICA definizione di forma e posizione del comando su mobile, per
+   tutti e cinque i tool. Prima ogni tool decideva la sua: il Fascicolo in basso
+   a sinistra con la safe area, il Bilancio e LIPE a `top:12px`, Analisi e LIPE
+   con un `top` ricalcolato da header e barra di sessione tramite
+   `--tal-tool-menu-top` e un ResizeObserver. Quell'ancoraggio a un'altezza
+   variabile è la ragione per cui il comando spariva e ricompariva durante lo
+   scroll su Safari iPhone: la barra del browser cambia altezza, il `top`
+   inseguiva, e a menu aperto Analisi nascondeva perfino il pulsante. Ora la
+   posizione è fissa in basso a sinistra e non dipende da nessuna misura. Le
+   regole locali di posizione sono state rimosse dai cinque tool: se ne
+   ricompare una, questo blocco la vince comunque con `!important`. */
 @media(max-width:980px){
   html.tal-tool-page .sb-toggle{
+    display:inline-flex !important;
+    align-items:center !important;
+    position:fixed !important;
+    top:auto !important;
+    bottom:max(16px,env(safe-area-inset-bottom)) !important;
+    left:max(12px,env(safe-area-inset-left)) !important;
+    right:auto !important;
+    z-index:5105 !important;
     width:44px !important;
     min-width:44px !important;
     height:44px !important;
+    min-height:44px !important;
     padding:0 !important;
     gap:0 !important;
     justify-content:center !important;
@@ -536,8 +557,50 @@ html.tal-tool-page .tal-gh-logo{filter:drop-shadow(0 8px 18px rgba(20,83,104,.36
     font-size:0 !important;
     box-shadow:var(--tal-sh-3) !important;
   }
-  html.tal-tool-page .sb-toggle::before{content:"\2630";font-size:17px;line-height:1;color:#fff}
+  html.tal-tool-page .sb-toggle::before{content:"\2630" !important;font-size:17px !important;line-height:1 !important;color:#fff !important}
 }
+
+/* ---------- 11-ter. Limite di caricamento dichiarato ---------------------- */
+
+html.tal-tool-page .tal-upload-limit{
+  margin:7px 0 0 !important;
+  font-size:10.5px !important;
+  line-height:1.45 !important;
+  color:var(--tal-muted,#5d6470) !important;
+}
+
+/* ---------- 11-bis. Salto al contenuto ------------------------------------ */
+
+/* Chi naviga da tastiera, prima di arrivare al contenuto, attraversa
+   l'intestazione globale, la barra di sessione e tutta la sidebar: decine di
+   tabulazioni a ogni cambio di schermata. Solo Analisi di bilancio aveva un
+   salto, e se lo era costruito da sola. Ora è nel layer condiviso, come il
+   comando del menu: una definizione per cinque tool. */
+html.tal-tool-page .tal-skip-link{
+  position:fixed !important;
+  left:12px;
+  top:-80px;                     /* fuori schermo finché non prende il fuoco */
+  z-index:9999 !important;
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding:11px 16px;
+  border:1px solid var(--tal-ink,#0E1624);
+  border-radius:10px;
+  background:#fff;
+  color:#0E1624;
+  font:700 12px/1 var(--tal-sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif);
+  text-decoration:none;
+  box-shadow:0 10px 28px rgba(14,22,36,.28);
+  transition:top .12s ease;
+}
+html.tal-tool-page .tal-skip-link:focus,
+html.tal-tool-page .tal-skip-link:focus-visible{
+  top:12px;
+  outline:3px solid var(--tal-accent,#145368);
+  outline-offset:2px;
+}
+@media print{ html.tal-tool-page .tal-skip-link{display:none !important} }
 
 /* ---------- 12. Focus e stampa -------------------------------------------- */
 

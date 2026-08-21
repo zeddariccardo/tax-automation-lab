@@ -1,24 +1,95 @@
 THIRD-PARTY NOTICES
+Tax Automation Lab — https://taxautomationlab.com
+Last reviewed: 21 August 2026
 
-The TaxTool HTML files contain vendored third-party JavaScript libraries so
-that the applications can operate locally as single files.
+The five operational tools are single HTML files that vendor their JavaScript
+dependencies inline, so that each application runs locally in the browser with
+no network calls. The original copyright and licence notices of those libraries
+are preserved inside the distributed HTML and are not relicensed by the Tax
+Automation Lab MIT licence.
 
-Libraries identified in the published files:
-- SheetJS Community Edition 0.20.3
-- jsPDF 4.2.1
-- jsPDF AutoTable 5.0.8
+--------------------------------------------------------------------------------
+1. VENDORED LIBRARIES, PER TOOL
+--------------------------------------------------------------------------------
 
-The original copyright and licence notices embedded in those libraries are
-preserved inside each distributed HTML file. The libraries remain subject to
-their respective licences and are not relicensed by the Tax Automation Lab
-MIT licence.
+Verified by inspecting the published HTML on 21 August 2026. A dash means the
+library is not present in that file.
 
-Official project references:
-- https://sheetjs.com/
-- https://github.com/parallax/jsPDF
-- https://github.com/simonbengtsson/jsPDF-AutoTable
+  Tool (path under /tools/)   SheetJS   jsPDF    AutoTable   JSZip
+  --------------------------  --------  -------  ----------  --------
+  financial-statement         0.20.3    4.2.1    5.0.8       -
+  financial-analysis          0.20.3    -        -           3.10.1
+  lipe                        0.20.3    4.2.1    5.0.8       -
+  tfa-client-file             0.20.3    -        -           -
+  f24                         0.20.3    4.2.1    -           3.10.1
+
+Licences and upstream projects:
+
+- SheetJS Community Edition 0.20.3 — Apache License 2.0
+  https://sheetjs.com/ · https://git.sheetjs.com/sheetjs/sheetjs
+
+- jsPDF 4.2.1 — MIT License
+  https://github.com/parallax/jsPDF
+
+- jsPDF AutoTable 5.0.8 — MIT License
+  https://github.com/simonbengtsson/jsPDF-AutoTable
+
+- JSZip 3.10.1 — dual licensed, MIT or GPLv3 at the user's option.
+  Used here under the MIT option.
+  https://stuk.github.io/jszip/
 
 Vendored SheetJS CE build verification:
-- File: xlsx.full.min.js 0.20.3 (embedded in each operational tool HTML)
-- MD5: 6b3130af1ceadf07caa0ec08af7addff
-- SHA-256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41
+  File:    xlsx.full.min.js 0.20.3 (embedded in each operational tool HTML)
+  MD5:     6b3130af1ceadf07caa0ec08af7addff
+  SHA-256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41
+
+--------------------------------------------------------------------------------
+2. REFERENCED BUT NOT DISTRIBUTED
+--------------------------------------------------------------------------------
+
+- html2canvas — NOT bundled in any tool.
+  The pre-release audit of 21 August 2026 listed html2canvas as a missing
+  notice. It was re-checked: the only occurrences of the name are inside jsPDF,
+  which declares it as an optional peer dependency and tries to import it on
+  demand for its `html()` rendering path. No html2canvas code and no
+  html2canvas copyright banner is present in any published file, and the tools
+  never take that code path. Nothing is distributed, so nothing is licensed
+  here. If a future feature needs `jsPDF.html()`, the library will have to be
+  vendored and this section updated (html2canvas is MIT, Niklas von Hertzen).
+
+--------------------------------------------------------------------------------
+3. LOADED FROM A THIRD-PARTY CDN AT RUNTIME
+--------------------------------------------------------------------------------
+
+- threejs-components 0.0.19 — MIT License
+  https://github.com/vaalentin/threejs-components (upstream)
+  Imported by the three homepages (/, /en/, /es/) as a dynamic ES module from
+  https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/... to animate the
+  hero background. It is decorative: the import is wrapped in a timeout race
+  and the page falls back to a static hero if it fails, so the site works
+  without it.
+
+  This is the only third-party network dependency on the whole site, and it is
+  a supply-chain surface: a compromised CDN response would execute in the
+  visitor's browser. It is pinned to an exact version, which prevents silent
+  upgrades but not tampering with that version's bytes. Self-hosting the file
+  under /assets/ — or adding a Subresource Integrity hash, which is not
+  available for ES module imports and would require a classic script tag —
+  remains open. The operational tools do not load it.
+
+--------------------------------------------------------------------------------
+4. FONTS AND ASSETS
+--------------------------------------------------------------------------------
+
+Web fonts are self-hosted under /assets/fonts/. No font, icon set, stylesheet
+or script is fetched from a third party by the five tools.
+
+--------------------------------------------------------------------------------
+5. HOW TO KEEP THIS FILE HONEST
+--------------------------------------------------------------------------------
+
+This inventory was wrong before because nothing checked it: JSZip had been
+vendored into two tools without being listed. When adding, removing or
+upgrading a vendored library, update the table in section 1 in the same commit,
+and grep the published HTML rather than trusting a package manifest — there
+isn't one, the libraries are pasted into the files.

@@ -1101,6 +1101,155 @@ nessun errore in console, nessuno scorrimento orizzontale, e a 375px i tre
 comandi del Fascicolo sono tutti dentro lo schermo (77px di barra contro gli
 80 del Bilancio).
 
+## Audit pre-pubblicazione — le correzioni del 21 agosto 2026
+
+L'audit esterno del 21 agosto (quattro P0, nove P1, dodici P2/P3) è stato
+verificato rilievo per rilievo sul codice **in esecuzione**, non sul sorgente.
+La maggior parte reggeva. Tre rilievi no, e vale la pena sapere quali, perché il
+modo in cui sbagliavano si ripeterà:
+
+- il template del Bilancio **aveva già** il campo «Schema di bilancio» vuoto: il
+  difetto era nell'app, che ci metteva «abbreviato» di suo;
+- `html2canvas` era elencata fra le dipendenze da dichiarare: **non è
+  distribuita**, sono agganci opzionali dentro jsPDF, zero banner di copyright
+  nei file. Contare, non fidarsi;
+- il template importi di LIPE veniva descritto leggendo `downloadAmountsTemplate`
+  alla riga 1065, che è **sovrascritta** più sotto. Il rilievo restava valido, ma
+  per caso: l'involucro finisce per chiamare la versione con le righe demo.
+
+### Le due trappole nuove, che costano più delle altre
+
+1. **Le definizioni sovrapposte valgono anche per i gate.** In LIPE `buildXml` è
+   definita **quattro** volte in successione. Ho scritto il controllo sugli esiti
+   AI nella prima e non faceva niente. La forma robusta è un **involucro finale**
+   in coda al file:
+
+   ```js
+   (function(){ var base=window.buildXml; window.buildXml=function(){
+     var out=base.apply(this,arguments); /* aggiungi qui */ return out; };
+     try{buildXml=window.buildXml;}catch(_){ } })();
+   ```
+
+   Serve anche riassegnare il binding nudo, non solo `window.*`: le funzioni
+   chiamanti usano l'identificatore, non la proprietà.
+
+2. **Un gate può essere già morto e nessuno lo sa.** In `financial-analysis` la
+   `exportExcel` viva cerca il gate con
+   `typeof v18RequireExportGate==='function'`, ma quella funzione è dichiarata
+   **dentro un altro IIFE**: da lì `typeof` vale `'undefined'`, la condizione è
+   falsa e il gate **non viene mai eseguito**. Il controllo vivo è la `gate()`
+   usata da `protect()`, che avvolge tutti e otto gli export e le stampe. Il
+   controllo di quadratura scritto in `v18HardGate` era quindi inerte da tempo —
+   per fortuna `gate()` ne fa uno equivalente. **Provare chiamando, non
+   leggendo.**
+
+### Cosa è cambiato, per rilievo
+
+| Rilievo | Cosa era | Cosa è ora |
+|---|---|---|
+| P0-01 menu mobile | forma e posizione decise da ogni tool: il Fascicolo in basso con safe area, Bilancio e LIPE a `top:12px`, Analisi e LIPE con `top` ricalcolato da header e barra via `--tal-tool-menu-top` e un ResizeObserver, e Analisi lo **nascondeva** a menu aperto | una sola definizione in `tal-app.css`: quadrato 44×44, sola icona, in basso a sinistra con safe area. Rimossi gli override locali e la variabile. `--tal-global-header-height` resta, la usa lo scroll-padding |
+| P0-02 righe demo F24 | `PAGAMENTI` con 5 pagamenti attivi di ALFA/BETA (54.500 a debito, 2.000 a credito), nel file distribuito **e** nel template generato | `PAGAMENTI` vuoto; esempi in `ESEMPI_NON_IMPORTARE`; l'importatore salta i fogli di esempio anche nel ripiego e riconosce le righe campione per impronta completa (nome + identificativo + sezione + codice + importi), non per il solo codice fiscale — una partita IVA valida può appartenere a un cliente vero |
+| P0-03 righe demo LIPE | `downloadAmountsTemplate` generava 4 movimenti già valorizzati, nel contesto di un cliente selezionato | foglio `Importi` vuoto, esempi separati, filtro anti-demo, e `setPeriodRows` dichiara i movimenti **prima → dopo** |
+| P0-04 telematico F24 | l'audit chiedeva di disabilitarlo | **non toccato**, per decisione di Riccardo del 21 agosto: resta dietro la conferma esplicita, come deciso il 13 agosto |
+| P1-01 escape nel Fascicolo | 27 sequenze letterali sulla **riga 406**: due nodi di testo visibili sopra l'header (i due caratteri di escape visti nello screenshot iPhone) e 25 dentro il CSS, dove un escape prima del selettore diventa un `n` attaccato (`n.manage-grid`) e uccide la regola | riga riparata. Effetto collaterale non previsto dall'audit: `.manage-grid`, `.manage-card` e `.client-search` esistevano **solo** lì, quindi l'elenco clienti era senza stile e nessuno l'aveva notato |
+| P1-02 Esiti AI | solo il Bilancio leggeva il foglio | lettore condiviso `window.TAL_AI` in `tal-app.js`; Analisi e LIPE lo importano, lo persistono (`STATE.extra.aiFindings` e record cliente), lo esportano, e le eccezioni **bloccanti** fermano export e XML |
+| P1-03 schema abbreviato | menu preselezionato, template con «abbreviato», e qualunque valore non contenente «ordinar» diventava abbreviato — anche un campo scritto male | opzione «— da scegliere —», template vuoto, import che non inventa, e gate che blocca l'export finché la scelta manca |
+| P1-05 versioni | Bilancio 1.4.0 dichiarato e 1.4.1 nel codice; Analisi 2.1.0 e 2.0.4 in tre costanti; Fascicolo senza `data-tool-version` | una sola versione per tool, e `tests/version-coherence.test.mjs` che fallisce alla prima divergenza |
+| P1-06 nessuna CI | un solo test statico, eseguito a mano | `.github/workflows/ci.yml`, `tests/version-coherence`, `tests/prompt-template-contract` (apre gli `.xlsx` e conta le righe), `tests/responsive-harness.html` e `tests/responsive.e2e.mjs` su 5 tool × 7 larghezze |
+| P1-07 mapping LIPE | il template precompilava V22/A22/RC22/FC con destinazioni VP attive quando il cliente non aveva codiciario | `Codiciario` esce con i soli codici del cliente; se non ne ha, vuoto. Esempi nel foglio ignorato |
+| P1-08 limiti file | Analisi 15 MB, LIPE 25, Fascicolo 12/6/25, F24 5, **Bilancio nessuno** | contratto condiviso `window.TAL_LIMITS`, dichiarato in pagina prima del caricamento; il Fascicolo tiene le sue soglie più strette sugli allegati |
+| P1-09 licenze | mancava JSZip 3.10.1 (vendorizzata in Analisi e F24) e F24 non era fra i tool MIT | `THIRD-PARTY-NOTICES.txt` riscritto con la matrice per tool, e F24 aggiunto nelle tre lingue |
+| P2-02 working paper LIPE | nessuna larghezza di colonna: «Verifiche» tagliava etichette e descrizioni | `wpAdd` imposta larghezze, riga bloccata e autofiltro su tutti i fogli |
+| P2-04 skip link | solo Analisi, con implementazione propria | in `tal-app.js` per tutti e cinque, idempotente, con `tabindex="-1"` sul bersaglio: senza, in Safari il fuoco non si sposta e il salto sembra funzionare senza servire |
+| P2-05 overflow Analisi | `.tal-commandbar` dichiarava `width:min(1200px,100% - 36px)` presumendo 18px di margine per lato, mentre `tal-app.css` li porta a 44: 8px fuori dal contenitore | larghezza rimossa, la geometria la decide solo il layer condiviso. Era l'unico tool con un foglio locale per la barra |
+| P2-07 console homepage | il modulo WebGL dal CDN veniva scaricato anche dove non poteva servire | controllo di capacità prima dell'import; il fallback canvas resta identico |
+| P2-08 template | pochi blocchi riquadri e filtri | riga di intestazione bloccata e autofiltro nei template generati e nel working paper |
+| P2-10 sitemap | 36 URL su 44 dichiaravano il 4 agosto | `tests/build-sitemap.mjs`, che prende le date da git, con `--check` in CI |
+| P3-01 grammatica | «benchmark validi disponibili per il 0% dei pesi» | caso zero distinto, e niente articolo davanti al numero |
+
+### Le regole comuni nei prompt di «Configura con AI»
+
+Tutti e cinque i prompt italiani portano ora, in testa, lo stesso blocco di
+dieci regole: leggere prima `ISTRUZIONI`, usare solo le evidenze, non correggere
+gli identificativi, ignorare gli esempi, non lasciare default non sostenuti,
+lasciare vuoto il dato ambiguo aprendo un esito bloccante, citare la fonte,
+riconciliare i conteggi delle righe, non rinominare fogli e colonne, non
+dichiarare completo un lavoro con esiti aperti. Nel prompt F24 è stata anche
+riscritta la regola sul saldo netto: se la fonte non distingue debito e credito,
+**entrambe** le colonne restano vuote e il caso diventa bloccante. Prima diceva
+«riporta il dato come lo trovi», che voleva dire scegliere una colonna a caso.
+
+Un test verifica che le dieci regole ci siano in tutti e cinque i prompt.
+
+### Difetti trovati durante la correzione, non presenti nell'audit
+
+- **LIPE scorreva in orizzontale a 320 e 360 px** (42 e 2 px). La regola a
+  `max-width:720px` usava `grid-template-columns:1fr` invece di
+  `minmax(0,1fr)`: `1fr` ha un minimo implicito di `min-content`, quindi la
+  colonna restava a 303px dentro una griglia da 235. Le altre due regole della
+  stessa cascata usavano già `minmax(0,…)`.
+- **L'elenco clienti del Fascicolo era senza stile**, conseguenza della riga 406
+  (vedi P1-01 sopra).
+- **Il Fascicolo teneva l'header compatto quasi sempre — corretto.** `apply()`
+  compattava quando `.app-main` scendeva sotto 1220px, ma la sidebar ne toglie
+  circa 258: la soglia si raggiungeva solo oltre i ~1500px di viewport, quindi
+  su un portatile normale la navigazione del sito era **sempre** dietro
+  l'hamburger e il ramo con le voci in linea era di fatto irraggiungibile. Era
+  l'unico dei cinque tool così. **Allineato il 21 agosto** su decisione di
+  Riccardo: la soglia è ora 760px di **viewport**, la stessa di
+  `@media(max-width:760px)` in `site-shell.css` e nel foglio locale
+  dell'intestazione. Sopra i 760px l'header è identico a quello di Bilancio,
+  Analisi, LIPE e F24; sotto, la compattazione entra e coincide con quello che le
+  media query già facevano — logo a 34px, padding stretti, selettore lingua a
+  tre colonne. Verificato: a 1280px nessun `tal-compact`, hamburger nascosto,
+  navigazione in linea, barra comandi a 96px; a 700px compatto, hamburger
+  raggiungibile, barra comandi `position:relative` (quindi l'offset a 72px non
+  entra in conflitto). Si misura il viewport e non `.app-main` proprio perché il
+  confronto deve essere con gli altri tool, che guardano il viewport. Il
+  listener `resize` c'è **in aggiunta** a quello della media query: se la pagina
+  nasce a larghezza zero e viene allargata dopo — succede dentro un iframe, ed è
+  così che l'ha scoperto l'armatura di test — l'evento `change` non sempre
+  arriva.
+- **`Prompt_F24_AI_v1.0.txt` è una seconda copia** del prompt della pagina,
+  linkata da `/en/` e `/es/`, e poteva divergere in silenzio. Ora
+  `tests/prompt-template-contract.test.mjs` le confronta e fallisce se
+  divergono. Il `.txt` è stato risincronizzato: porta le dieci regole comuni, il
+  blocco «PRIMA DI COMINCIARE» e la regola corretta sul saldo netto.
+- **Sette `.txt` di prompt obsoleti rimossi il 21 agosto**, su decisione di
+  Riccardo: i quattro doppioni di Analisi (`v2.0.0`, `v2.0.1`, `v2.0.2`,
+  `v2.0.4`) e i tre del Bilancio (`v1.3.1`, `v1.3.3`, `v1.3.4`). Nessuno era
+  linkato da alcuna pagina, tutti erano raggiungibili per URL e avrebbero
+  servito istruzioni superate a chi ci arrivava. Erano tracciati in git, quindi
+  restano nella storia. **Restano due `.txt`**: quello F24, che è linkato, e
+  `Prompt_Fascicolo_Fiscale_Cliente_AI_v1.0.txt`, che non è linkato da nessuna
+  pagina ma è l'unica versione esistente per quel tool e non ha successore — se
+  serve, va linkato dalla card del Fascicolo; se non serve, va cancellato anche
+  quello. Non l'ho deciso.
+
+### Cosa resta aperto dell'audit, e perché
+
+- **P1-04, golden test ufficiali**: XML LIPE dal software di controllo
+  dell'Agenzia, tracciato F24A0 dal modulo F24A0, XBRL da TEBENI. Non è
+  automatizzabile qui: sono strumenti esterni, si eseguono a mano e si conserva
+  l'esito — versione del controllo, data, hash del file, risultato. Fino ad
+  allora `validatoConModuloUfficiale` resta `false` e la generazione resta
+  dietro la conferma.
+- **P2-01, pagina 2 quasi vuota nel PDF working paper del Bilancio**: serve
+  logica di preflight sui salti pagina in jsPDF, non una riga di CSS. Da fare
+  con un confronto visivo prima e dopo.
+- **P2-03, PDF non taggati**: jsPDF non produce PDF/UA. O si dichiara il limite
+  nella pagina, o si cambia catena di generazione: è una scelta, non una
+  correzione.
+- **P2-09, HTML monolitici con definizioni sovrapposte**: è la causa prima delle
+  due trappole descritte all'inizio. Non si chiude con una correzione ma con una
+  build, ed è un lavoro a sé. Nel frattempo la regola resta: **cercare l'ultima
+  definizione, e provarla chiamandola.**
+- **P3-02, gli export XLSX sono istantanee senza formule**: da dichiarare nella
+  UI e nei nomi dei file.
+- **Matrice sui dispositivi fisici**: Chromium headless non ha safe area, quindi
+  l'E2E misura i 12/16px di fallback. iPhone e Android vanno provati a mano.
+
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia

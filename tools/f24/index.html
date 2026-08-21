@@ -45,8 +45,8 @@ Official source: https://taxautomationlab.com/tools/f24/
 
 <!-- Tax Automation Lab — layer applicativo condiviso -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814c">
-<script defer src="/assets/tal-app.js?v=20260814c"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260821c">
+<script defer src="/assets/tal-app.js?v=20260821c"></script>
 <style>
 /* ==========================================================================
    Generatore F24 — foglio proprio del tool
@@ -139,7 +139,9 @@ body{margin:0;overflow-x:hidden}
    in basso, dove non litiga con il marchio e resta a portata di pollice
    mentre la pagina scorre. */
 .sb-toggle{
-  position:fixed;left:14px;bottom:18px;top:auto;z-index:5100;display:none;
+  /* Stessa safe area degli altri quattro tool: su iPhone la barra di Safari
+     mangiava i 18px fissi. tal-app.css rifinisce forma e dimensione. */
+  position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));top:auto;z-index:5105;display:none;
   align-items:center;justify-content:center;
 }
 .mobile-backdrop{position:fixed;inset:0;background:rgba(6,26,34,.5);z-index:5050;display:none}
@@ -1007,7 +1009,7 @@ html.tal-tool-page .modal .is-invalid{
 <!-- Niente classe `btn`: in tal-app.css la regola dei bottoni porta
      `display:inline-flex !important` e sovrascriverebbe il `display:none`
      con cui questo pulsante resta nascosto sopra i 980px. -->
-<button aria-label="Apri o chiudi il menu" class="sb-toggle no-print" data-action="toggle-sidebar" type="button">☰ Menu</button>
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di Generatore F24" class="sb-toggle no-print" data-action="toggle-sidebar" type="button">☰ Menu</button>
 <div class="mobile-backdrop" id="mobileBackdrop" data-action="close-sidebar"></div>
 
 <nav aria-label="Navigazione principale" class="appbar no-print" id="sidebar">
@@ -3404,12 +3406,68 @@ function extractEntities(rows) {
     return entities;
 }
 
+/* Qualsiasi foglio che si dichiari di esempio è fuori dall'importazione, anche
+   se è l'unico del file: meglio dire «non ho trovato niente da importare» che
+   caricare righe inventate. Il ripiego su SheetNames[0] senza questo filtro
+   era la falla: bastava cancellare PAGAMENTI perché toccasse agli esempi. */
+const EXAMPLE_SHEET_RE = /esempi|non[\s_-]*importare|example|sample/i;
+
+/* Impronte delle righe di esempio distribuite col template, calcolate dalle
+   righe stesse: se un giorno cambiano, il filtro le segue senza doverlo
+   riscrivere. Serve perché il foglio esempi si può copiare a mano in
+   PAGAMENTI, e in quel caso il nome del foglio non aiuta più. Il confronto è
+   sull'intera riga — nome, identificativo, sezione, codice e importo — non sul
+   solo codice fiscale: una partita IVA formalmente valida può appartenere a un
+   cliente vero, e non voglio rifiutargli un'importazione legittima. */
+let DEMO_ROW_FINGERPRINTS = null;
+function demoFingerprint(r) {
+    return [String(r.entityName || '').trim().toUpperCase(), normalizeId(r.cf), normalizeId(r.vat),
+        String(r.section || '').trim().toUpperCase(), String(r.taxCode || '').trim().toUpperCase(),
+        String(r.year || '').trim(), Number(r.debit || 0), Number(r.credit || 0)].join('|');
+}
+function demoFingerprintSet() {
+    if (DEMO_ROW_FINGERPRINTS) return DEMO_ROW_FINGERPRINTS;
+    DEMO_ROW_FINGERPRINTS = new Set();
+    try {
+        buildSampleRows(true).forEach(cells => {
+            const raw = {};
+            TEMPLATE_HEADERS.forEach((h, i) => { raw[h] = cells[i]; });
+            DEMO_ROW_FINGERPRINTS.add(demoFingerprint(canonicalRow(raw)));
+        });
+    } catch (e) { /* mai far cadere l'import per il filtro anti-demo */ }
+    return DEMO_ROW_FINGERPRINTS;
+}
+
 async function readSpreadsheet(file) {
     const data = await file.arrayBuffer();
     const wb = XLSX.read(data, { type: 'array', cellDates: true });
-    const preferred = wb.SheetNames.find(n => /pagament|f24|dati/i.test(n)) || wb.SheetNames[0];
+    const usable = wb.SheetNames.filter(n => !EXAMPLE_SHEET_RE.test(n));
+    if (!usable.length) {
+        throw new Error('il file contiene solo fogli di esempio. Compila il foglio PAGAMENTI con i dati del tuo cliente.');
+    }
+    const preferred = usable.find(n => /pagament|f24|dati/i.test(n)) || usable[0];
     const raw = XLSX.utils.sheet_to_json(wb.Sheets[preferred], { defval: '' });
-    return raw.map(canonicalRow).filter(r => r.taxCode || r.debit || r.credit || r.entityName || r.cf || r.vat);
+    const all = raw.map(canonicalRow)
+        .filter(r => r.taxCode || r.debit || r.credit || r.entityName || r.cf || r.vat);
+
+    const demo = demoFingerprintSet();
+    const rows = all.filter(r => !demo.has(demoFingerprint(r)));
+    const skipped = all.length - rows.length;
+    if (skipped) {
+        /* Non silenzioso: chi ha copiato gli esempi per sbaglio deve sapere
+           esattamente cosa è stato lasciato fuori e perché. */
+        toast(skipped === 1
+            ? 'Una riga di esempio del template è stata esclusa: ALFA o BETA non sono clienti reali.'
+            : `${skipped} righe di esempio del template sono state escluse: ALFA e BETA non sono clienti reali.`, true);
+    }
+    if (!rows.length && skipped) {
+        throw new Error('il foglio conteneva solo le righe di esempio del template. Sostituiscile con i dati del tuo cliente.');
+    }
+    if (rows.length) {
+        toast(rows.length === 1 ? 'Letta 1 riga dal foglio «' + preferred + '».'
+                                : `Lette ${rows.length} righe dal foglio «${preferred}». Confrontale con i documenti di partenza.`);
+    }
+    return rows;
 }
 
 function prepareImport(rows, fileName) {
@@ -3505,9 +3563,19 @@ function showImportReport(subtitle, items) {
 
 /* ---------- Template ------------------------------------------------------ */
 
-function buildTemplateSheet(mass) {
-    const ent  = mass ? ['ALFA S.R.L.', '01234567897', '01234567897'] : ['', '', ''];
-    const ent2 = mass ? ['BETA S.P.A.', '09876543217', '09876543217'] : ['', '', ''];
+/* Il nome del foglio degli esempi. L'importatore lo salta per costruzione:
+   vedi EXAMPLE_SHEET_RE e readSpreadsheet. Cambiarlo qui non basta, va
+   cambiato anche là — per questo è una costante sola. */
+const EXAMPLE_SHEET_NAME = 'ESEMPI_NON_IMPORTARE';
+
+/* Le righe di esempio. Restano identiche a prima — servono a far vedere com'è
+   fatta una riga giusta — ma non stanno più nel foglio che il tool importa.
+   Prima erano attive in PAGAMENTI: chi scaricava il template e lo ricaricava
+   senza toccarlo si portava dentro 54.500 € a debito e 2.000 a credito di ALFA
+   e BETA. È il rilievo TAL-P0-02 dell'audit del 21 agosto 2026. */
+function buildSampleRows(mass) {
+    const ent  = ['ALFA S.R.L.', '01234567897', '01234567897'];
+    const ent2 = ['BETA S.P.A.', '09876543217', '09876543217'];
     const blank = () => Array(TEMPLATE_HEADERS.length).fill('');
     const make = (company, flow, desc, date, section, tax, period, year, debit, credit, office, ref, note, pf, pt) => {
         const r = blank();
@@ -3519,17 +3587,36 @@ function buildTemplateSheet(mass) {
     };
     const sample = [
         make(ent, '1', 'Dipendenti', '16/09/2026', 'Erario', '1001', '0008', '2026', 12000, '', '', '', 'Ritenute lavoro dipendente'),
-        /* La riga INPS porta i periodi: senza, l'esempio del template
-           produrrebbe un modello con un errore bloccante, e chi lo scarica
-           per capire come funziona vedrebbe il tool «rotto». */
+        /* La riga INPS porta i periodi: senza, l'esempio produrrebbe un
+           modello con un errore bloccante, e chi lo legge per capire come
+           funziona vedrebbe il tool «rotto». */
         make(ent, '1', 'Dipendenti', '16/09/2026', 'INPS', 'DM10', '', '2026', 28000, '', '1234', 'ABC123', 'Contributi dipendenti', '08/2026', '08/2026'),
         make(ent, '2', 'Autonomi', '16/09/2026', 'Erario', '1040', '0008', '2026', 5500, '', '', '', 'Ritenute lavoro autonomo'),
         make(ent, '2', 'Autonomi', '16/09/2026', 'Erario', '6099', '', '2025', '', 2000, '', '', 'Credito IVA in compensazione')
     ];
     if (mass) sample.push(make(ent2, '1', 'Dipendenti', '16/09/2026', 'Erario', '1001', '0008', '2026', 9000, '', '', '', 'Ritenute lavoro dipendente'));
-    const ws = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS, ...sample]);
+    return sample;
+}
+
+/* Il foglio che il tool importa: solo le intestazioni. Scaricare il template e
+   ricaricarlo senza compilarlo deve dare «nessun pagamento da importare». */
+function buildTemplateSheet() {
+    const ws = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS]);
     ws['!freeze'] = { xSplit: 0, ySplit: 1 };
-    ws['!autofilter'] = { ref: `A1:${XLSX.utils.encode_col(TEMPLATE_HEADERS.length - 1)}${sample.length + 1}` };
+    ws['!autofilter'] = { ref: `A1:${XLSX.utils.encode_col(TEMPLATE_HEADERS.length - 1)}1` };
+    ws['!cols'] = TEMPLATE_HEADERS.map(h => ({ wch: Math.max(12, Math.min(34, h.length + 4)) }));
+    return ws;
+}
+
+/* Gli esempi, in un foglio che l'importatore non guarda. La prima riga dice a
+   voce alta perché sta lì, così non serve aprire ISTRUZIONI per capirlo. */
+function buildExampleSheet(mass) {
+    const warn = Array(TEMPLATE_HEADERS.length).fill('');
+    warn[0] = 'ESEMPI — NON IMPORTATI. Questo foglio serve solo a mostrare come si compila una riga. '
+            + 'Il tool importa il foglio PAGAMENTI: copia lì i tuoi dati, non questi. '
+            + 'Le società ALFA S.R.L. e BETA S.P.A. sono inventate.';
+    const ws = XLSX.utils.aoa_to_sheet([warn, TEMPLATE_HEADERS, ...buildSampleRows(mass)]);
+    ws['!freeze'] = { xSplit: 0, ySplit: 2 };
     ws['!cols'] = TEMPLATE_HEADERS.map(h => ({ wch: Math.max(12, Math.min(34, h.length + 4)) }));
     return ws;
 }
@@ -3550,7 +3637,10 @@ function downloadPaymentTemplate(forceMass) {
         ['Codice tributo', 'Il tool riconosce i codici più usati e segnala quelli che non conosce o che risultano in una sezione diversa da quella prevista. L’avviso non blocca la generazione.'],
         ['Compensazioni', 'Il tool calcola la quadratura ma non certifica spettanza, disponibilità, visto di conformità né canale di utilizzo del credito.'],
         ['Capienza del modello', 'Erario 6 righe; INPS 4; Regioni 4; IMU e tributi locali 4; INAIL 3; Altri enti 2. Superato il limite, assegna un nuovo flusso.'],
-        ['Nessun identificativo interno', 'Il file non richiede codici propri del tool: può essere prodotto da un ERP, da un gestionale payroll o dalla tua AI.']
+        ['Nessun identificativo interno', 'Il file non richiede codici propri del tool: può essere prodotto da un ERP, da un gestionale payroll o dalla tua AI.'],
+        ['Foglio PAGAMENTI', 'Esce vuoto, con le sole intestazioni. Compilalo con i dati del tuo cliente: se lo ricarichi intatto il tool dice «nessun pagamento da importare», e va bene così.'],
+        ['Foglio ' + EXAMPLE_SHEET_NAME, 'Contiene righe di esempio su società inventate. Il tool non lo legge. Non spostare quelle righe in PAGAMENTI: servono a mostrare come si compila, non sono dati.'],
+        ['Riconciliazione', 'Prima di importare, confronta il numero di righe compilate in PAGAMENTI con i documenti da cui provengono. Il tool ti dice quante righe ha letto: i due numeri devono coincidere.']
     ];
     const legend = [
         ['Sezione', 'Campi normalmente utilizzati', 'Fonte tipica'],
@@ -3565,8 +3655,9 @@ function downloadPaymentTemplate(forceMass) {
         TAX_CODES.map(x => [x.c, SECTION_UI[x.s].section, x.l])
     );
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, buildTemplateSheet(mass), 'PAGAMENTI');
+    XLSX.utils.book_append_sheet(wb, buildTemplateSheet(), 'PAGAMENTI');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(instructions), 'ISTRUZIONI');
+    XLSX.utils.book_append_sheet(wb, buildExampleSheet(mass), EXAMPLE_SHEET_NAME);
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(legend), 'LEGENDA CAMPI');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(codes), 'CODICI RICONOSCIUTI');
     XLSX.writeFile(wb, mass ? 'Template_F24_Massivo.xlsx' : 'Template_F24_Singolo.xlsx');
@@ -4673,6 +4764,10 @@ function toggleSidebar(force) {
     const open = force === undefined ? !sb.classList.contains('open') : !!force;
     sb.classList.toggle('open', open);
     bd.classList.toggle('show', open);
+    /* Il comando resta visibile a menu aperto, quindi deve dire in che stato
+       è: senza questo un lettore di schermo annuncia sempre «chiuso». */
+    const tog = document.querySelector('.sb-toggle[data-action="toggle-sidebar"]');
+    if (tog) tog.setAttribute('aria-expanded', String(open));
 }
 
 function setMode(mode) {
@@ -6506,7 +6601,9 @@ async function handleFile(ev, labelId) {
     setText(labelId, file.name);
     try {
         const rows = await readSpreadsheet(file);
-        if (!rows.length) throw new Error('Nessuna riga utilizzabile trovata nel file');
+        /* Il template esce vuoto per scelta: ricaricarlo intatto non è un
+           errore del file, è solo un foglio ancora da compilare. */
+        if (!rows.length) throw new Error('nessun pagamento da importare. Il foglio PAGAMENTI è vuoto: compilalo con i dati del tuo cliente.');
         prepareImport(rows, file.name);
     } catch (e) {
         toast('Importazione non riuscita: ' + e.message, true);
@@ -6525,7 +6622,7 @@ function setupDropzone(zoneId, labelId) {
         if (!f) return;
         setText(labelId, f.name);
         readSpreadsheet(f)
-            .then(rows => { if (!rows.length) throw new Error('Nessuna riga utilizzabile'); prepareImport(rows, f.name); })
+            .then(rows => { if (!rows.length) throw new Error('nessun pagamento da importare. Il foglio PAGAMENTI è vuoto: compilalo con i dati del tuo cliente.'); prepareImport(rows, f.name); })
             .catch(err => toast('Importazione non riuscita: ' + err.message, true));
     });
 }

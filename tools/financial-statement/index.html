@@ -7,7 +7,7 @@ Official source: https://taxautomationlab.com/tools/financial-statement/
 -->
 
 
-<html class="tal-tool-page" data-tool-version="1.4.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.1" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -408,7 +408,10 @@ tr.raw-split .split-to{color:var(--fg);font-weight:600}
   .appbar#sidebar.open{transform:none}
   .app-main{margin-left:0}
   .app-main main{padding-top:60px}
-  .sb-toggle{display:inline-flex;align-items:center;gap:7px;position:fixed;top:12px;left:12px;z-index:70;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:9px;padding:9px 13px;font:600 12px var(--sans);cursor:pointer}
+  /* In basso a sinistra come negli altri quattro tool: era `top:12px`, cioè
+     sotto l'header, dove il pollice non arriva e dove l'header lo copre.
+     tal-app.css rifinisce forma e safe area; questi valori sono il fallback. */
+  .sb-toggle{display:inline-flex;align-items:center;gap:7px;position:fixed;top:auto;bottom:16px;left:12px;z-index:5105;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:12px;padding:9px 13px;font:600 12px var(--sans);cursor:pointer}
   .sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55;display:none}
   .sb-backdrop.show{display:block}
 }
@@ -494,7 +497,7 @@ tr.raw-split .split-to{color:var(--fg);font-weight:600}
   "operatingSystem": "Web browser",
   "browserRequirements": "JavaScript enabled; modern desktop or mobile browser",
   "isAccessibleForFree": true,
-  "softwareVersion": "1.4.0",
+  "softwareVersion": "1.4.1",
   "inLanguage": "it-IT",
   "author": {
     "@type": "Person",
@@ -615,11 +618,11 @@ footer a:hover{color:#F7F7F5!important}
 
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260814c">
-<script defer src="/assets/tal-app.js?v=20260814c"></script>
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260821c">
+<script defer src="/assets/tal-app.js?v=20260821c"></script>
 </head>
 <body class="tal-tool-page">
-<button aria-label="Apri o chiudi il menu" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di Bilancio civilistico ITA GAAP" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
 <div class="sb-brand">
 <span class="sb-logo">FS</span>
@@ -657,7 +660,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Bilancio civilistico ITA GAAP · v1.4.0</span>
+<span class="tal-publication-label" data-tal-key="label">Bilancio civilistico ITA GAAP · v1.4.1</span>
 <h2 data-tal-key="title">Bilancio civilistico italiano, da dati contabili IAS/IFRS o gestionali</h2>
 <p data-tal-key="lead">Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mapping, rettifiche, controlli e dettaglio per conto.</p>
 <div class="tal-publication-facts">
@@ -682,7 +685,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="grid">
 <div class="field wide"><label>Denominazione</label><input id="an_denom" placeholder="Es. Alfa Industriale S.r.l." type="text"/></div>
 <div class="field"><label>Forma giuridica</label><select id="an_forma"><option value="">—</option><option>S.r.l.</option><option>S.r.l.s.</option><option>S.p.A.</option><option>S.a.p.A.</option><option>S.n.c.</option><option>S.a.s.</option><option>Società cooperativa</option><option>Altra forma</option></select></div>
-<div class="field"><label>Schema di bilancio</label><select id="an_schema"><option value="abbrev">Abbreviato (art. 2435-bis)</option><option value="ordinary">Ordinario (art. 2424 e 2425)</option></select></div>
+<div class="field"><label>Schema di bilancio</label><select id="an_schema"><option value="">— da scegliere —</option><option value="abbrev">Abbreviato (art. 2435-bis)</option><option value="ordinary">Ordinario (art. 2424 e 2425)</option></select><div class="hint">Nessuno dei due è preselezionato: la scelta cambia lo schema di riclassifica e deve venire dal bilancio, non da un default.</div></div>
 <div class="field"><label>Codice fiscale</label><input id="an_cf" maxlength="16" placeholder="Es. 12345678901" type="text"/></div>
 <div class="field"><label>Partita IVA</label><input id="an_piva" maxlength="16" placeholder="Es. IT12345678901" type="text"/><div class="hint">Chiave per il mapping salvato</div></div>
 <div class="field"><label>Capitale sociale</label><input id="an_capitale" placeholder="Es. 10.000,00 €" type="text"/></div>
@@ -1905,7 +1908,7 @@ function downloadTemplate(){
     ['Denominazione',''],['Forma giuridica',''],['Codice fiscale',''],['Partita IVA',''],
     ['Capitale sociale',''],['Data costituzione',''],['Sede legale — indirizzo',''],['CAP',''],
     ['Comune',''],['Provincia',''],['Iscrizione REA — sigla',''],['Numero REA',''],['PEC',''],
-    ['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio','abbreviato'],['Redatto da','']];
+    ['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio',''],['Redatto da','']];
   const wsA=XLSX.utils.aoa_to_sheet(anag); wsA['!cols']=[{wch:30},{wch:40}];
   XLSX.utils.book_append_sheet(wb,wsA,'Anagrafica');
 
@@ -1991,7 +1994,12 @@ function parseWorkbook(wb){
 function fillAnagrafica(m){
   const map={'Denominazione':'an_denom','Forma giuridica':'an_forma','Codice fiscale':'an_cf','Partita IVA':'an_piva','Capitale sociale':'an_capitale','Data costituzione':'an_costituzione','Sede legale — indirizzo':'an_indirizzo','CAP':'an_cap','Comune':'an_comune','Provincia':'an_provincia','Iscrizione REA — sigla':'an_rea_prov','Numero REA':'an_rea_num','PEC':'an_pec','Periodo — dal':'an_periodo_da','Periodo — al':'an_periodo_a','Valuta':'an_valuta','Redatto da':'an_redattore'};
   Object.keys(map).forEach(k=>{ if(m[k]!==undefined&&m[k]!==''){ const el=document.getElementById(map[k]); if(el) el.value=m[k]; }});
-  if(m['Schema di bilancio']){ const s=String(m['Schema di bilancio']).toLowerCase(); $("#an_schema").value=s.includes('ordinar')?'ordinary':'abbrev'; }
+  /* Nessun default: se la fonte non dice quale schema è, il campo resta
+     vuoto e l'export si blocca chiedendolo (TAL-P1-03). Prima qualunque
+     valore non contenente «ordinar» diventava «abbreviato», compreso un
+     campo scritto male. */
+  if(m['Schema di bilancio']!==undefined){ const s=String(m['Schema di bilancio']).toLowerCase().trim();
+    $("#an_schema").value = s.includes('ordinar') ? 'ordinary' : (s.includes('abbrev') ? 'abbrev' : ''); }
 }
 
 // ====================================================================
@@ -2416,7 +2424,7 @@ function loadSampleData(){
   A('an_denom','Alfa Industriale S.r.l.'); A('an_forma','S.r.l.'); A('an_cf','01234567890'); A('an_piva','IT01234567890');
   A('an_capitale','50.000,00 €'); A('an_indirizzo','Via dell\'Industria, 12'); A('an_cap','20100'); A('an_comune','Milano');
   A('an_provincia','MI'); A('an_rea_prov','MI'); A('an_rea_num','1234567'); A('an_periodo_da','2025-01-01'); A('an_periodo_a','2025-12-31');
-  A('an_valuta','EUR'); A('an_schema','abbrev'); A('an_redattore','');
+  A('an_valuta','EUR'); A('an_schema',''); A('an_redattore','');
   STATE.accounts=[
     {code:'200002',desc:'Costi di impianto',importo:5000,importo_prev:6000,voce:'BI',source:'sp'},
     {code:'211000',desc:'Fabbricati',importo:350000,importo_prev:340000,voce:'BII',source:'sp'},
@@ -2841,7 +2849,8 @@ renderSavedList();
   fillAnagrafica = function(m){
     var map={'Denominazione':'an_denom','Forma giuridica':'an_forma','Codice fiscale':'an_cf','Partita IVA':'an_piva','Capitale sociale':'an_capitale','Data costituzione':'an_costituzione','Sede legale — indirizzo':'an_indirizzo','CAP':'an_cap','Comune':'an_comune','Provincia':'an_provincia','Iscrizione REA — sigla':'an_rea_prov','Numero REA':'an_rea_num','PEC':'an_pec','Periodo — dal':'an_periodo_da','Periodo — al':'an_periodo_a','Valuta':'an_valuta','Redatto da':'an_redattore'};
     Object.keys(map).forEach(function(k){if(m[k]!==undefined&&m[k]!==''){var el=document.getElementById(map[k]);if(!el)return;el.value=el.type==='date'?V13.isoDate(m[k]):m[k];}});
-    if(m['Schema di bilancio']){var s=String(m['Schema di bilancio']).toLowerCase();$('#an_schema').value=s.includes('ordinar')?'ordinary':'abbrev';}
+    /* Come sopra: senza indicazione esplicita nella fonte il campo resta vuoto. */
+    if(m['Schema di bilancio']!==undefined){var s=String(m['Schema di bilancio']).toLowerCase().trim();$('#an_schema').value=s.includes('ordinar')?'ordinary':(s.includes('abbrev')?'abbrev':'');}
   };
 
   parseWorkbook = function(wb){
@@ -2867,7 +2876,14 @@ renderSavedList();
   };
   handleUpload = function(evt){
     var file=evt.target.files&&evt.target.files[0];if(!file)return;
-    if(!/\.(xlsx|xls)$/i.test(file.name)){toast('Formato non supportato: carica un file .xlsx o .xls',true);evt.target.value='';return;}
+    /* Questo tool era l'unico dei cinque senza alcun limite di dimensione
+       (TAL-P1-08): su un file grande SheetJS blocca il thread principale e su
+       iPhone la scheda muore senza spiegazioni. Il controllo passa dal
+       contratto condiviso in tal-app.js e avviene prima della lettura. */
+    if(window.TAL_LIMITS){
+      var problema=window.TAL_LIMITS.check(file,'xlsx');
+      if(problema){toast(problema,true);evt.target.value='';return;}
+    }else if(!/\.(xlsx|xls)$/i.test(file.name)){toast('Formato non supportato: carica un file .xlsx o .xls',true);evt.target.value='';return;}
     var reader=new FileReader();reader.onload=function(e){try{V13.sheetGuard();parseWorkbook(XLSX.read(e.target.result,{type:'array',cellDates:true}));toast('Bilancio caricato e verificato');}catch(err){console.error(err);toast('Errore lettura file: '+err.message,true);} };reader.onerror=function(){toast('Impossibile leggere il file selezionato',true);};reader.readAsArrayBuffer(file);evt.target.value='';
   };
 
@@ -3098,7 +3114,10 @@ renderSavedList();
   'use strict';
   var VIEWS=['anagrafica','import','results','archive'];
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-  function setSidebar(open){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.toggle('open',open);if(!setSidebar._bd){var b=document.createElement('div');b.className='sb-backdrop';b.addEventListener('click',function(){setSidebar(false);});document.body.appendChild(b);setSidebar._bd=b;}setSidebar._bd.classList.toggle('show',open);}
+  function setSidebar(open){var sb=document.getElementById('sidebar');if(!sb)return;sb.classList.toggle('open',open);if(!setSidebar._bd){var b=document.createElement('div');b.className='sb-backdrop';b.addEventListener('click',function(){setSidebar(false);});document.body.appendChild(b);setSidebar._bd=b;}setSidebar._bd.classList.toggle('show',open);
+    /* Il comando resta visibile a menu aperto, quindi deve dichiarare lo
+       stato: prima aria-expanded restava «false» anche a sidebar aperta. */
+    var tg=document.getElementById('sb-toggle');if(tg)tg.setAttribute('aria-expanded',String(!!open));}
   function fsShowView(name){
     if(VIEWS.indexOf(name)<0)name='archive';
     document.querySelectorAll('.fs-view').forEach(function(v){v.classList.toggle('active',v.id==='view-'+name);});
@@ -3615,6 +3634,15 @@ function unbalancedAdjustments(){
    Quadratura precedente e coerenza CE restano avvisi: il comparativo può
    mancare per scelta, e non è materia di un blocco. */
 function exportGate(){
+  /* Lo schema di bilancio non ha più un default. Prima il menu partiva su
+     «Abbreviato» e il template scriveva «abbreviato» in Anagrafica: un
+     bilancio ordinario o ambiguo veniva classificato come abbreviato senza
+     che niente, nel file di partenza, lo dicesse (TAL-P1-03). Ora se la
+     scelta manca l'export si ferma e la chiede. */
+  const sc=(document.getElementById('an_schema')||{}).value;
+  if(!sc){toast('Export bloccato: indica lo schema di bilancio, abbreviato o ordinario. Non c’è un valore predefinito.',true);
+    const el=document.getElementById('an_schema');if(el){try{el.focus();}catch(_){ }}
+    return false;}
   if(pendingRows().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima dell’export.',true);goChecks();return false;}
   const r=(typeof RESULT!=='undefined'&&RESULT)?RESULT:null;
   if(!r){toast('Export bloccato: risultati non disponibili o non aggiornati.',true);return false;}
@@ -3846,7 +3874,9 @@ try{fillAnagrafica=window.fillAnagrafica;}catch(_){}
 function resetAll(){
   if(!confirm('Creare una nuova elaborazione? I dati non salvati andranno persi. I fascicoli già archiviati restano.'))return;
   clearIdentity();
-  var sc=document.getElementById('an_schema');if(sc)sc.value='abbrev';
+  /* Una nuova elaborazione riparte senza schema scelto: tornare su
+     «abbreviato» reintrodurrebbe il default che TAL-P1-03 chiede di togliere. */
+  var sc=document.getElementById('an_schema');if(sc)sc.value='';
   var vl=document.getElementById('an_valuta');if(vl)vl.value='EUR';
   STATE.accounts=[];STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.aiFindings=[];
   delete STATE.comparativeColumnPresent;delete STATE.comparativeHasValues;
@@ -3960,7 +3990,7 @@ window.downloadTemplate=function(){
       ['Denominazione',''],['Forma giuridica',''],['Codice fiscale',''],['Partita IVA',''],
       ['Capitale sociale',''],['Data costituzione',''],['Sede legale — indirizzo',''],['CAP',''],
       ['Comune',''],['Provincia',''],['Iscrizione REA — sigla',''],['Numero REA',''],['PEC',''],
-      ['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio','abbreviato'],['Redatto da',''],
+      ['Periodo — dal',''],['Periodo — al',''],['Valuta','EUR'],['Schema di bilancio',''],['Redatto da',''],
       ['',''],['DATI DEL PROSPETTO DI DEPOSITO',''],['',''],
       ['Capitale sociale interamente versato','si'],
       ['Settore di attività prevalente (ATECO)',''],

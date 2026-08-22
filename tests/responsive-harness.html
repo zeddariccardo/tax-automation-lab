@@ -141,6 +141,18 @@ function measure(frame){
     /* Sotto i 981px la sidebar e' fuori schermo: la sovrapposizione si misura
        solo quando e' visibile. */
     out.piedeSottoSidebar = !!(sr && sr.width > 0 && sr.right > 1 && fr.left < sr.right - 1);
+
+    /* Il piede senza il suo foglio di stile: e' arrivato due volte, in F24 e in
+       Confronto regimi, perche' lo stile stava scritto dentro ogni tool invece
+       che nel layer condiviso. Si vedeva come testo nudo sul fondo chiaro, col
+       nome del progetto attaccato al primo link. Le due firme di quel difetto
+       sono il fondo trasparente e gli span in linea. */
+    const cf = w.getComputedStyle(piede);
+    const bg = String(cf.backgroundColor);
+    const mm = bg.match(/[\d.]+/g);
+    out.piedeFondoTrasparente = !mm || (mm.length > 3 && Number(mm[3]) < 0.5);
+    const sp = piede.querySelector('span');
+    if (sp) out.piedeSpanInLinea = w.getComputedStyle(sp).display !== 'block';
   }
   const barra = d.querySelector('.tal-cmdbar, .cmdbar, .tal-session-bar');
   if (barra) {
@@ -210,6 +222,8 @@ function judge(width, m){
   else {
     if (!m.piedeDentroAppMain) fails.push('il piede sta fuori da .app-main');
     if (m.piedeSottoSidebar) fails.push('il piede passa sotto la sidebar');
+    if (m.piedeFondoTrasparente) fails.push('il piede non ha fondo: manca il suo foglio di stile');
+    if (m.piedeSpanInLinea) fails.push('le voci del piede sono in linea: manca il suo foglio di stile');
   }
   if (m.barraDietroHeader) fails.push('la barra di sessione si incolla dietro l’intestazione');
   if (m.navFlex === false) fails.push('la navigazione dell’intestazione non è flex: manca il suo foglio di stile');

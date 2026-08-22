@@ -999,3 +999,50 @@ html.tal-tool-page .tal-publication-inhelp{
   display:block !important;
   margin:22px 0 0 !important;
 }
+
+/* ---------- 12. Il piede dei tool ---------------------------------------- */
+
+/* Una definizione sola.
+
+   Lo stile del piede stava scritto dentro ogni tool: tre copie identiche, una
+   con due proprietà in più, e due tool senza niente — quelli in cui il piede è
+   arrivato per ultimo, F24 e Confronto regimi. Là il markup c'era e lo stile
+   no, quindi il piede si vedeva come testo nudo sul fondo chiaro, con «Tax
+   Automation Lab» attaccato a «Privacy» perché mancava anche il `display:block`
+   sugli span. È lo stesso difetto dell'intestazione senza il suo foglio: il
+   markup si copia, il foglio no.
+
+   Il fondo scuro non è decorazione: separa la chiusura legale dal lavoro. Le
+   pagine editoriali hanno un piede proprio, `.tal-standard-footer`, che questa
+   regola non tocca. */
+html.tal-tool-page .tal-site-footer{
+  font-family:var(--tal-sans);
+  background:#0E1624;
+  color:#F7F7F5;
+  padding:24px 18px;
+  border-top:1px solid rgba(247,247,245,.18);
+  font-size:13px;
+  line-height:1.5;
+}
+html.tal-tool-page .tal-site-footer>div{max-width:1180px;margin:0 auto}
+/* Ogni voce sulla sua riga: in linea, il nome del progetto e il primo link si
+   leggevano come una parola sola. */
+html.tal-tool-page .tal-site-footer span{display:block;margin:4px 0}
+html.tal-tool-page .tal-site-footer a{
+  color:#F7F7F5;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  font-size:13px;
+}
+html.tal-tool-page .tal-site-footer p{
+  max-width:900px;
+  margin:10px 0 0;
+  color:#C8CDD3;
+  line-height:1.55;
+  font-size:13px;
+}
+/* In stampa la chiusura legale non serve: occupa una pagina e non aggiunge
+   niente al foglio di lavoro. */
+@media print{
+  html.tal-tool-page .tal-site-footer{display:none}
+}

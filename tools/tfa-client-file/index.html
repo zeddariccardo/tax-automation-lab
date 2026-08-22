@@ -195,7 +195,7 @@ a{color:inherit}
 .nav-card h3{font-size:14.5px;font-weight:650;margin-bottom:5px}
 .nav-card p{font-size:12.5px;color:var(--g5);line-height:1.5;overflow-wrap:anywhere}
 .nav-card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.nav-card .chev{color:var(--g3);font-size:22px;font-weight:300;line-height:1}
+.nav-card .chev{color:var(--g4);font-size:22px;font-weight:300;line-height:1}
 
 .tag{display:inline-flex;align-items:center;border-radius:999px;background:var(--g1);color:var(--g5);padding:3px 9px;font-size:10px;font-weight:600;letter-spacing:.02em}
 .tag.ok{background:var(--ok-bg);color:var(--ok)}
@@ -209,7 +209,7 @@ a{color:inherit}
 .kv:last-child{border-bottom:0}
 .kv dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);font-weight:600;padding-top:2px}
 .kv dd{font-size:13.5px;overflow-wrap:anywhere}
-.kv dd.muted{color:var(--g3)}
+.kv dd.muted{color:var(--g4)}
 
 /* ---------- topic records ---------- */
 .record-list{display:flex;flex-direction:column;gap:10px}
@@ -1655,7 +1655,7 @@ function viewBusiness(){
       kv('Esercizio sociale',c.fiscalYearType==='calendar'?'Coincide con l’anno solare (1 gennaio – 31 dicembre)':'Chiusura al '+fmtDayMonth(c.fyEnd))+
       kv('Esercizio corrente effettivo',fyLabel(currentFYFor(c),c))+'</dl></section>'+
     '<section class="panel s-business"><h3>Attività e mercati</h3><dl class="kv-list">'+kv('Tipo di attività',listOr(c.businessType,''))+kv('Mercati',listOr(c.markets,''))+'</dl>'+
-      '<div style="margin-top:14px;font-size:13.5px;line-height:1.65;color:var(--g5)">'+(c.description?esc(c.description):'<span style="color:var(--g3)">Descrizione del business non ancora compilata.</span>')+'</div></section>'+
+      '<div style="margin-top:14px;font-size:13.5px;line-height:1.65;color:var(--g5)">'+(c.description?esc(c.description):'<span style="color:var(--g4)">Descrizione del business non ancora compilata.</span>')+'</div></section>'+
     sectionHead('Tematiche business rilevanti',topics.length,'<button class="btn sm add" data-act="add-topic" data-kind="business" type="button">＋ Aggiungi tematica</button>')+
     (topics.length?'<div class="record-list">'+topics.map(function(t){return topicCard(t,'business')}).join('')+'</div>':emptyBox('Nessuna tematica business','Usala per peculiarità strutturali che non stanno nella descrizione generale e che devono restare visibili negli anni.','＋ Aggiungi tematica','add-topic','data-kind="business"'));
 }
@@ -1728,7 +1728,7 @@ function viewTax(){
     '<div class="panel-sub">Solo ciò che distingue davvero il cliente: periodicità IVA, consolidato, TP, fiscalità internazionale o regimi particolari. IRES e IRAP ordinarie non sono riportate perché non aggiungono informazione.</div>'+
     (distinctiveTaxSummary(t.summary).length
       ? '<div class="tags">'+distinctiveTaxSummary(t.summary).map(function(x){return '<span class="tag ok">'+esc(x)+'</span>'}).join(' ')+'</div>'
-      : '<p style="color:var(--g3);font-size:13px">Nessun regime o peculiarità fiscale distintiva selezionata.</p>')+
+      : '<p style="color:var(--g4);font-size:13px">Nessun regime o peculiarità fiscale distintiva selezionata.</p>')+
     '</section>'+
     sectionHead('Aree fiscali',total+' '+plural(total,'tematica','tematiche'),
       '<button class="btn sm ghost" data-act="manage-areas" type="button">Gestisci aree</button>'+
@@ -2659,7 +2659,7 @@ function supportBlock(g){
   return '<div class="support-img"><b>Documento di supporto</b><p style="font-size:11.5px;color:var(--g4);margin-top:4px">Conserva un organigramma ricevuto dal cliente senza sostituire il diagramma modificabile.</p>'+
     (img?'<img alt="Organigramma di supporto" data-attachment-id="'+esc(img.attachmentId||'')+'"'+(img.data?' src="'+esc(img.data)+'"':'')+'/><p style="font-size:11px;color:var(--g4);text-align:center">Riferimento: '+fmtDate(img.date)+' · '+esc(nonEmpty(img.source,'fonte non indicata'))+'</p>'+
       (readOnly()?'':'<div class="btn-row" style="margin-top:9px"><button class="btn sm edit" data-act="replace-img" type="button">Sostituisci</button><button class="btn sm danger" data-act="remove-img" type="button">Elimina</button></div>'):
-      (readOnly()?'<p style="font-size:11.5px;color:var(--g3);margin-top:8px">Nessun documento caricato.</p>':'<button class="btn sm add" data-act="upload-img" style="margin-top:9px" type="button">Carica immagine</button>'))+'</div>';
+      (readOnly()?'<p style="font-size:11.5px;color:var(--g4);margin-top:8px">Nessun documento caricato.</p>':'<button class="btn sm add" data-act="upload-img" style="margin-top:9px" type="button">Carica immagine</button>'))+'</div>';
 }
 
 /* -------------------------------------------------------------- layout */
@@ -3393,7 +3393,7 @@ viewTax=function(){
     'Caratteristiche fiscali distintive del cliente e tematiche che meritano attenzione. Le aree ancora non esaminate restano esplicitamente “Da verificare”.',
     '<button class="btn edit" data-act="edit-tax" type="button">Modifica caratteristiche</button>')+
     '<section class="panel s-tax"><h3>Profilo fiscale sintetico</h3><div class="panel-sub">Regimi e peculiarità che distinguono il cliente, non imposte ordinarie applicabili alla generalità delle società.</div>'+
-    (t.summary.length?'<div class="tags">'+t.summary.map(function(x){return '<span class="tag ok">'+esc(x)+'</span>'}).join(' ')+'</div>':'<p style="color:var(--g3);font-size:13px">Nessuna peculiarità fiscale selezionata.</p>')+'</section>'+
+    (t.summary.length?'<div class="tags">'+t.summary.map(function(x){return '<span class="tag ok">'+esc(x)+'</span>'}).join(' ')+'</div>':'<p style="color:var(--g4);font-size:13px">Nessuna peculiarità fiscale selezionata.</p>')+'</section>'+
     sectionHead('Aree fiscali',total+' '+plural(total,'tematica','tematiche'),'<button class="btn sm ghost" data-act="manage-areas" type="button">Gestisci aree</button><button class="btn sm add" data-act="add-area" type="button">＋ Aggiungi area</button>')+
     areas.map(function(area){
       var arr=t.areas[area],a=taxAssessment(viewProfile(),area),preview;

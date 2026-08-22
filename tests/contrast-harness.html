@@ -107,16 +107,40 @@ function luminanza(colore) {
    misurabile» che dare un numero sbagliato. Quei casi restano da guardare a
    occhio, ed e' scritto nella pagina. */
 function fondoOpaco(el, w) {
+  // Il fondo effettivo, composto strato per strato come fa il browser.
+  //
+  // La prima versione si fermava al primo colore con alpha > 0,5 e lo trattava
+  // come opaco: un bianco al 60% sopra la barra scura risultava bianco pieno,
+  // cioe' un rapporto inventato in una direzione o nell'altra. Le pastiglie dei
+  // contatori nel Bilancio stanno esattamente cosi' - bianco al 14% su fondo
+  // scuro - e misurate senza comporre sembrano bianco su bianco a rapporto 1.
+  // Composte danno 10,63, che e' quello che si vede guardando la pagina.
+  const strati = [];
   let n = el;
   while (n && n.nodeType === 1) {
     const cs = w.getComputedStyle(n);
     if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
-    const c = cs.backgroundColor;
-    const m = String(c).match(/[\d.]+/g);
-    if (m && (m.length < 4 || Number(m[3]) > 0.5)) return c;
+    const m = String(cs.backgroundColor).match(/[\d.]+/g);
+    if (m) {
+      const a = m.length < 4 ? 1 : Number(m[3]);
+      if (a > 0) {
+        strati.push([Number(m[0]), Number(m[1]), Number(m[2]), a]);
+        if (a >= 1) break;
+      }
+    }
     n = n.parentElement;
   }
-  return 'rgb(255, 255, 255)';
+  // La base e' l'ultimo strato opaco trovato, o il bianco della pagina se la
+  // catena finisce senza incontrarne uno.
+  let sotto = strati.length && strati[strati.length - 1][3] >= 1
+    ? strati.pop() : [255, 255, 255, 1];
+  while (strati.length) {
+    const s = strati.pop();
+    sotto = [s[0] * s[3] + sotto[0] * (1 - s[3]),
+             s[1] * s[3] + sotto[1] * (1 - s[3]),
+             s[2] * s[3] + sotto[2] * (1 - s[3]), 1];
+  }
+  return 'rgb(' + sotto.slice(0, 3).map(Math.round).join(', ') + ')';
 }
 
 function analizza(frame, tool) {

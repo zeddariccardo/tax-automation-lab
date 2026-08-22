@@ -1343,6 +1343,146 @@ detrazioni IRPEF per categoria invece che per natura prevalente — oggi
 l'approssimazione è dichiarata fra le verifiche.
 
 
+## Confronto regimi 1.1.0 — il re-audit del 22 agosto 2026
+
+Secondo audit esterno sullo stesso tool, eseguito dopo le correzioni del
+mattino. Verificato rilievo per rilievo contro il codice vivo: uno era già
+chiuso, uno non si riproduce, gli altri erano veri.
+
+### Il difetto bloccante, e perché era invisibile
+
+`const tot = totaliCosti(cfNum(input.costFactor, 0, 100) || 1);`
+
+In JavaScript `0 || 1` fa 1. Il fattore di costo zero — «e se non avessi
+nessun costo?» — diventava «con i costi di adesso». La soglia di pareggio dei
+costi apre esattamente con quella domanda: `if (delta(0) >= 0) sogliaCosti = 0`
+confrontava i due regimi al livello di costo corrente e, trovando l'ordinario
+già avanti, concludeva che pareggia a costo zero senza cercare nulla. Nel caso
+dimostrativo a 90.001 la pagina diceva **€0** dove il pareggio vero è
+**€52.334,66**, e il valore finiva anche nell'Excel.
+
+Riprodotto prima di correggere, in sandbox: `f=0` e `f=1` restituivano
+entrambi 52.868 € di costi, mentre `f=1e-12` restituiva zero. È la firma del
+fallback che mangia lo zero.
+
+La correzione distingue «parametro assente» da «parametro uguale a zero», che
+con `||` non è possibile:
+
+```js
+const dichiarato = input.costFactor != null && input.costFactor !== '';
+const fattoreChiesto = dichiarato ? Number(input.costFactor) : NaN;
+const costFactor = Number.isFinite(fattoreChiesto) ? cfNum(fattoreChiesto, 0, 100) : 1;
+```
+
+Il secondo `!= null` non c'era nella prima stesura, e il test che avevo scritto
+per la correzione l'ha bocciata: `Number(null)` fa **0**, non NaN, quindi un
+fattore nullo veniva letto come «zero costi». Lo stesso genere di scorciatoia
+del difetto originale, in direzione opposta.
+
+### Gli altri rilievi veri
+
+- **«Annulla» avviava il merge.** `unisci = !confirm(...)`: il dialogo nativo ha
+  due risposte e ne servivano tre. Chi premeva Esc per non procedere aggiornava
+  la simulazione in corso. Ora c'è una finestra vera con tre pulsanti, il fuoco
+  intrappolato, Esc che annulla, e — prima di scegliere — il riepilogo di cosa
+  contiene il file: quanti campi, quali mancano, quante voci nuove, quanti campi
+  verrebbero sovrascritti. Quest'ultimo conteggio guarda solo le chiavi
+  effettivamente lette dal file: confrontando tutto lo stato diceva dodici dove
+  i campi nel file erano otto.
+- **Il compenso amministratore veniva ridotto in silenzio.** `Math.min(chiesto,
+  massimo)`: chiesti 40.000, usati 35.920,60. Ora l'esito porta
+  `compensoRichiesto` e `compensoRidotto`, la pagina mostra un riquadro con i
+  tre importi distinti, e l'Excel li tiene separati.
+- **Gli input a mano non avevano validazione.** `leggiNumero` trasforma
+  qualunque cosa in un numero e in ultima istanza in zero: «90.00O» con la O
+  maiuscola diventava zero. Ora c'è `valida()`, uno schema solo usato da form,
+  import, archivio ed export: `aria-invalid` sul campo, messaggio collegato con
+  `aria-describedby`, riepilogo con `role="alert"` che prende il fuoco, e il
+  risultato che **non compare** finché un dato non torna. Il fuoco va dato dopo
+  quello che `vaiA()` mette su `#cfMain`, altrimenti lo perde.
+- **Mancava l'eccezione del rapporto di lavoro cessato.** La soglia dei 35.000
+  sui redditi da lavoro dipendente dell'anno precedente non opera se quel
+  rapporto è cessato — ma l'eccezione cade se nell'anno arrivano redditi da un
+  nuovo rapporto o da pensione, altrimenti basterebbe cambiare datore. Campo
+  nuovo, deroga condizionata a entrambe le cose, e dichiarata nell'esito.
+- **Le regole salvate sovrascrivevano i default nuovi.** Il commento diceva che
+  si riallineano; `Object.assign({}, base, salvato)` con un record che porta
+  tutti i campi della regola faceva l'opposto. Ora si salvano gli importi e i
+  soli scostamenti, con la versione del ruleset: al ritorno, se è cambiata,
+  l'utente lo sa. I salvataggi in formato 1 vengono conservati come modifiche
+  manuali, con un avviso che invita a ripristinare i default.
+- **L'Excel non era ripercorribile.** Il foglio dei costi era un elenco di
+  importi: nessun modo di capire perché il totale deducibile differisse dal
+  costo di cassa. Ora ogni riga porta venti colonne — aliquote, uso
+  professionale, tetto in euro, se il tetto ha morso, importi dedotti per IRPEF,
+  IRES e IRAP, origine della regola — e c'è un foglio «Assunzioni e controlli»
+  con severità e stato. Gli importi dedotti per riga li calcola il motore, non
+  l'esportatore: ricalcolarli lì avrebbe creato una seconda verità.
+- **Le assunzioni erano due elenchi.** Uno scritto a mano in `renderVerifiche()`
+  e uno nell'Excel, e divergevano: il working paper non portava né il compenso
+  ridotto né la maternità non determinata, cioè le due voci che spostano il
+  risultato. Ora c'è `cfAssunzioni()` nel motore, letto da entrambi.
+
+### Il regime attuale, che era obbligatorio e non serviva a niente
+
+`currentRegime` compariva nello stato, nel gate, nelle etichette e
+nell'import/export, e non entrava in nessun calcolo. Il testo di «Configura con
+AI» prometteva che decide quali soglie contano: non è vero, le soglie valgono
+per tutti gli scenari.
+
+Scelta: resta obbligatorio e diventa il punto di partenza dichiarato. Il
+verdetto dice la differenza rispetto a lui, la sua card è marcata come baseline,
+le altre due misurano la distanza, e sotto compare cosa comporta il passaggio —
+notaio, iscrizione all'albo, IVA a cavallo, rettifica della detrazione. Il copy
+che prometteva il contrario è stato corretto nella pagina e nel prompt.
+
+### Cosa non era vero, e cosa era già chiuso
+
+- **Cloudflare Insights**: l'audit dice che il tool lo carica e che la frase «I
+  dati non vengono inviati» va ammorbidita. Misurato in produzione: **zero**
+  risorse fuori origine, nessuno script beacon. La frase resta com'è.
+- **Il disclaimer LIPE nel footer**: già corretto la mattina dello stesso
+  giorno, prima che l'audit venisse eseguito.
+- **Il minimo integrativo di Cassa Forense** era dichiarato «non confermato da
+  fonte citabile». La fonte c'è: la pagina dei contributi minimi obbligatori
+  espone 355,00 € per il 2026, e — dato che l'audit non riportava — li dimezza
+  entrambi (1.395 e 177,50) per chi si è iscritto prima dei 35 anni, nei primi
+  sei anni. Implementato per Cassa Forense; per CNPADC non ho trovato gli
+  importi ridotti in una fonte citabile, quindi la riduzione non è applicata ed
+  è dichiarata fra le assunzioni.
+
+### Cosa serve fare fuori dal repository
+
+**Redirect 301 del vecchio URL.** `/tools/convenienza-fiscale/` risponde HTTP
+200 con una pagina di rinomina che reindirizza via JavaScript. GitHub Pages non
+può emettere un 301 su un percorso: serve una regola su Cloudflare.
+
+In *Rules → Redirect Rules → Create rule*:
+
+- **Nome**: `convenienza-fiscale to confronto-regimi`
+- **Quando**: `URI Path` `equals` `/tools/convenienza-fiscale/`
+  (per coprire anche la forma senza slash finale: espressione personalizzata
+  `starts_with(http.request.uri.path, "/tools/convenienza-fiscale")`)
+- **Allora**: *Static redirect* → `https://taxautomationlab.com/tools/confronto-regimi/`
+- **Stato**: `301` permanente, *Preserve query string* attivo
+
+La pagina attuale può restare: con la regola attiva non viene più raggiunta, e
+se la regola viene rimossa il reindirizzamento JavaScript continua a funzionare.
+
+### Rimasto aperto per scelta
+
+CSP e HSTS più lungo (richiedono il pannello Cloudflare e convivono male con gli
+script inline), SheetJS incorporato, regole analitiche per auto, beni
+pluriennali, vitto e alloggio, e detrazioni IRPEF per categoria invece che per
+categoria prevalente. Tutte dichiarate a schermo e nel working paper.
+
+### Verifica
+
+68 test node (14 nuovi: la matrice di regressione del §13 del report), 42
+controlli responsive — con il controllo nuovo sull'hamburger del sito, che era
+la voce più vecchia rimasta aperta nel contesto — zero problemi di contrasto con
+la misura composta, e gli elementi nuovi misurati a mano fra 4,99 e 19,68.
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia
@@ -1381,17 +1521,6 @@ l'approssimazione è dichiarata fra le verifiche.
   esaustivo, con INPS e INAIL volutamente più stretti dell'Erario. Un codice
   fuori elenco produce un avviso, non un blocco, e l'utente può aggiungerlo.
   Vale la pena allargarlo con un elenco ufficiale, non a memoria.
-- **Navigazione del sito su telefono in `financial-analysis`**: manca il
-  pulsante `.tal-gh-menu-toggle`, quindi sotto i 1080px le voci
-  Home/Strumenti/… non sono raggiungibili. Si chiude copiando il pulsante e le
-  tre righe di gestione da `/tools/f24/` o da `/tools/financial-statement/`,
-  che l'ha avuto il 13 agosto.
-- **Contrasto delle freccette `.chev` nel Fascicolo**: il glifo «›» a 22px sta a
-  **2,40:1**. È decorativo — l'etichetta accanto porta il significato — quindi
-  non è testo informativo, ma resta sotto anche la soglia 3:1 dei componenti non
-  testuali. Sta nella CSS propria del Fascicolo, non nel layer condiviso: si
-  chiude portando il glifo a un grigio più scuro o dandogli `aria-hidden` e
-  trattandolo come pura decorazione.
 - **Traduzioni dei tool** in inglese e spagnolo, quando smetteranno di cambiare.
 - **Etichetta di release della suite**: per ora ogni tool tiene il suo numero
   reale, senza numerazione unica.

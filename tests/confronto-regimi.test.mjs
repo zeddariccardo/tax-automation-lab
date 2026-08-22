@@ -36,10 +36,11 @@ assert.ok(blocco, 'nella pagina non trovo <script id="cf-engine">');
 
 const sandbox = {};
 vm.createContext(sandbox);
-new vm.Script(blocco[1] + '\n;({cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI});')
+new vm.Script(blocco[1] + '\n;({cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI, CF_RULESET, cfAssunzioni});')
   .runInContext(sandbox);
-const {cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI} =
-  new vm.Script('({cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI})').runInContext(sandbox);
+const {cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI, CF_RULESET, cfAssunzioni} =
+  new vm.Script('({cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI, CF_RULESET, cfAssunzioni})')
+    .runInContext(sandbox);
 
 /* ---- un input di partenza ricco di default espliciti -------------------- */
 
@@ -332,4 +333,202 @@ test('il professionista non paga IRAP; la società sì', () => {
   assert.ok(soc(r).dettaglio.irap > 0, 'la società con base positiva deve avere IRAP');
   const senza = run({revenue: 200000, previousRevenue: 150000, irapRate: 0});
   assert.equal(soc(senza).dettaglio.irap, 0, 'ad aliquota zero l’IRAP è zero');
+});
+
+
+/* ---- 11. il re-audit del 22 agosto 2026 -------------------------------- */
+
+/* RE-001. Il difetto bloccante: `cfNum(input.costFactor, 0, 100) || 1` faceva
+   diventare 1 il fattore zero, perche' in JavaScript `0 || 1` fa 1. La soglia di
+   pareggio dei costi apre chiedendo «e se non avessi nessun costo?», quindi
+   rispondeva sull'ipotesi opposta. Il caso dimostrativo mostrava zero al posto
+   di 52.334,66. */
+
+const DEMO = { studio: 14000, utenze: 3200, telefonia: 1400, tecnologia: 4800,
+  assicurazioni: 2200, formazione: 1800, servizi: 6500, auto: 7200,
+  trasferte: 2600, rappresentanza: 1500, banca: 700, ordine: 900 };
+
+const casoDemo = (over = {}) => cfEngine({
+  ...BASE, profession: 'commercialista', currentRegime: 'forfettario',
+  revenue: 90001, previousRevenue: 84000, otherIncome: 15000,
+  ownership: 100, distribution: 70, admin: 40000, extractionMode: 'mix',
+  companyOverhead: 6000, ...over, costs: costi(DEMO)
+});
+
+test('il fattore di costo zero produce costi zero, non costi pieni', () => {
+  assert.equal(casoDemo({costFactor: 0}).totali.lordo, 0,
+    'con fattore 0 i costi devono essere zero: era il difetto RE-001');
+  const pieni = casoDemo().totali.lordo;
+  assert.ok(Math.abs(casoDemo({costFactor: 1}).totali.lordo - pieni) < 0.005,
+    'con fattore 1 i costi sono quelli inseriti');
+  assert.ok(Math.abs(casoDemo({costFactor: 0.5}).totali.lordo - pieni / 2) < 0.005,
+    'il fattore scala i costi in proporzione');
+  assert.ok(Math.abs(casoDemo({costFactor: 8}).totali.lordo - pieni * 8) < 0.005,
+    'il fattore vale anche verso l’alto');
+  assert.ok(casoDemo({costFactor: 1e-12}).totali.lordo < 1e-6,
+    'un fattore infinitesimo non deve tornare a uno');
+});
+
+test('senza fattore dichiarato i costi restano quelli inseriti', () => {
+  const pieni = casoDemo().totali.lordo;
+  for (const assente of [undefined, null, '', NaN]) {
+    assert.ok(Math.abs(casoDemo({costFactor: assente}).totali.lordo - pieni) < 0.005,
+      `costFactor ${String(assente)} deve valere «non dichiarato», quindi costi pieni`);
+  }
+});
+
+test('la soglia di pareggio dei costi non è zero quando i costi contano', () => {
+  /* La stessa ricerca che fa convenienza() nella pagina: se `delta(0)` non e'
+     davvero «zero costi», la scorciatoia mette la soglia a zero e non cerca. */
+  const delta = (f) => {
+    const sc = casoDemo({costFactor: f}).scenari;
+    return sc[1].netto - sc[0].netto;
+  };
+  assert.ok(delta(0) < 0,
+    'a costi zero il forfettario deve vincere: se non è così, lo zero non è zero');
+  assert.ok(delta(1) > 0, 'ai costi attuali l’ordinario è avanti nel caso dimostrativo');
+  let lo = 0, hi = 8;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (delta(m) >= 0) hi = m; else lo = m; }
+  const soglia = casoDemo().totali.lordo * hi;
+  assert.ok(Math.abs(soglia - 52334.66) < 1,
+    `la soglia deve essere circa 52.334,66, calcolata ${soglia.toFixed(2)}`);
+});
+
+/* RE-003. Il massimale erogabile riduceva il compenso amministratore in
+   silenzio: il risultato era costruito su un dato che l'utente non aveva
+   inserito e non poteva leggere. */
+
+test('il compenso amministratore ridotto dal massimale è rintracciabile', () => {
+  const d = casoDemo().scenari[2].dettaglio;
+  assert.equal(d.compensoRichiesto, 40000, 'il richiesto deve restare esposto');
+  assert.ok(d.compenso < d.compensoRichiesto, 'in questo caso il massimale morde');
+  assert.equal(d.compenso, d.compensoMax, 'quando morde, si usa il massimo erogabile');
+  assert.equal(d.compensoRidotto, true, 'la riduzione deve essere dichiarata');
+  const piccolo = casoDemo({admin: 10000}).scenari[2].dettaglio;
+  assert.equal(piccolo.compensoRidotto, false,
+    'sotto il massimo non si deve annunciare nessuna riduzione');
+  assert.equal(piccolo.compenso, 10000, 'sotto il massimo si eroga quanto chiesto');
+});
+
+/* RE-007. La soglia dei 35.000 sui redditi da lavoro dipendente dell'anno
+   precedente non opera se quel rapporto e' cessato — ma l'eccezione cade se
+   nell'anno arrivano redditi da un nuovo rapporto o da pensione. */
+
+test('il rapporto di lavoro cessato disattiva la soglia dei 35.000', () => {
+  const sopra = {employeeIncomePrev: 40000};
+  assert.equal(forf(run(sopra)).applicabile, false,
+    'oltre soglia col rapporto attivo il forfettario è escluso');
+  assert.equal(forf(run({...sopra, employmentEnded: true})).applicabile, true,
+    'col rapporto cessato la causa ostativa non opera');
+  assert.equal(run({...sopra, employmentEnded: true}).derogaCessazione, true,
+    'la deroga applicata va dichiarata nell’esito');
+});
+
+test('la deroga cade se nell’anno arrivano redditi da lavoro o pensione', () => {
+  const r = run({employeeIncomePrev: 40000, employmentEnded: true,
+    otherIncome: 12000, employeeIncomeCurr: 12000});
+  assert.equal(forf(r).applicabile, false,
+    'un nuovo rapporto nell’anno fa tornare operativa la causa ostativa');
+  assert.equal(r.derogaCessazione, false, 'e non c’è nessuna deroga da dichiarare');
+});
+
+test('sotto la soglia la dichiarazione di cessazione non cambia nulla', () => {
+  const a = run({employeeIncomePrev: 20000});
+  const b = run({employeeIncomePrev: 20000, employmentEnded: true});
+  assert.equal(forf(a).applicabile, forf(b).applicabile);
+  assert.equal(b.derogaCessazione, false,
+    'senza soglia superata non c’è nessuna deroga in gioco');
+});
+
+/* RE-008. Cassa Forense dimezza minimo soggettivo e integrativo per chi si e'
+   iscritto prima dei 35 anni, nei primi sei anni: 1.395 e 177,50 invece di
+   2.790 e 355. Per CNPADC la riduzione non e' modellata, e va dichiarata. */
+
+test('i minimi ridotti si applicano a Cassa Forense e solo dove mordono', () => {
+  const base = {profession: 'avvocato', revenue: 5000, previousRevenue: 5000};
+  const interi = forf(run(base)).contributi;
+  const ridotti = forf(run({...base, reducedMinimums: true})).contributi;
+  assert.ok(Math.abs(interi - 2945) < 0.01,
+    `minimi interi: 2.790 soggettivo + 155 integrativo, calcolati ${interi.toFixed(2)}`);
+  assert.ok(Math.abs(ridotti - 1395) < 0.01,
+    `minimi dimezzati: 1.395 soggettivo + 0 integrativo, calcolati ${ridotti.toFixed(2)}`);
+
+  const alto = {profession: 'avvocato', revenue: 90000, previousRevenue: 80000};
+  assert.equal(forf(run(alto)).contributi, forf(run({...alto, reducedMinimums: true})).contributi,
+    'dove il calcolato supera il minimo, la riduzione non deve spostare nulla');
+});
+
+test('per il commercialista la riduzione non è applicata ma è dichiarata', () => {
+  const base = {profession: 'commercialista', revenue: 5000, previousRevenue: 5000};
+  assert.equal(forf(run(base)).contributi, forf(run({...base, reducedMinimums: true})).contributi,
+    'senza fonte citabile per CNPADC il calcolo non cambia');
+  const input = {...BASE, ...base, reducedMinimums: true, costs: costi()};
+  const ids = cfAssunzioni(input, cfEngine(input)).map(a => a.id);
+  assert.ok(ids.includes('minimi-ridotti-non-modellati'),
+    'quello che non si calcola va detto: manca l’assunzione');
+});
+
+/* RE-011. Un elenco solo di assunzioni, letto dalla pagina e dall'Excel: erano
+   due, e il working paper ne portava una parte. */
+
+test('l’elenco delle assunzioni copre i casi che spostano il risultato', () => {
+  const input = {...BASE, profession: 'commercialista', currentRegime: 'forfettario',
+    revenue: 90001, previousRevenue: 84000, otherIncome: 15000, admin: 40000,
+    extractionMode: 'mix', distribution: 70, companyOverhead: 6000, costs: costi(DEMO)};
+  const ids = cfAssunzioni(input, cfEngine(input)).map(a => a.id);
+  for (const atteso of ['compenso-ridotto', 'maternita-non-determinata', 'redditi-misti',
+    'precheck-parziale', 'addizionali', 'irap-semplificata', 'costi-aggregati', 'ruleset']) {
+    assert.ok(ids.includes(atteso), `manca l’assunzione ${atteso}`);
+  }
+  const alte = cfAssunzioni(input, cfEngine(input)).filter(a => a.severita === 'alta');
+  assert.ok(alte.length >= 2, 'compenso ridotto e maternità non determinata sono ad alta severità');
+});
+
+test('una regola dei costi cambiata a mano finisce fra le assunzioni', () => {
+  const tocchi = costi(DEMO).map(c => c.id === 'auto' ? {...c, dedOrd: 1} : c);
+  const input = {...BASE, costs: tocchi};
+  const ids = cfAssunzioni(input, cfEngine(input)).map(a => a.id);
+  assert.ok(ids.includes('regole-modificate'),
+    'una percentuale diversa dal default va dichiarata nel working paper');
+  const intatti = {...BASE, costs: costi(DEMO)};
+  assert.ok(!cfAssunzioni(intatti, cfEngine(intatti)).map(a => a.id).includes('regole-modificate'),
+    'coi valori predefiniti non c’è niente da dichiarare');
+});
+
+test('la maternità non determinata è dichiarata finché resta a zero', () => {
+  const zero = {...BASE, maternity: 0, costs: costi()};
+  const dato = {...BASE, maternity: 120, costs: costi()};
+  assert.ok(cfAssunzioni(zero, cfEngine(zero)).some(a => a.id === 'maternita-non-determinata'));
+  assert.ok(!cfAssunzioni(dato, cfEngine(dato)).some(a => a.id === 'maternita-non-determinata'),
+    'con un importo inserito l’avviso non serve più');
+});
+
+/* Il ruleset accompagna il risultato: senza versione e data, un working paper
+   riletto fra sei mesi non e' ripercorribile. */
+
+test('ogni risultato porta la versione delle regole', () => {
+  const r = run();
+  assert.match(r.ruleset.versione, /^\d+\.\d+\.\d+$/, 'la versione deve essere leggibile');
+  assert.match(r.ruleset.aggiornato, /^\d{4}-\d{2}-\d{2}$/, 'e datata');
+  assert.equal(r.ruleset, CF_RULESET, 'una sola fonte per la versione');
+});
+
+/* Le voci di costo escono con la regola applicata, non solo con l'importo: e'
+   quello che rende il foglio «Costi» ricostruibile riga per riga. */
+
+test('ogni voce di costo espone dedotto, limite e tetto applicato', () => {
+  const r = casoDemo();
+  const rappresentanza = r.totali.voci.find(v => v.id === 'rappresentanza');
+  assert.ok(rappresentanza, 'la voce rappresentanza deve esserci');
+  assert.ok(rappresentanza.limite > 0, 'ha un tetto sui compensi, quindi un limite in euro');
+  assert.equal(rappresentanza.tettoApplicato, true,
+    'a 1.500 su 90.001 di compensi il tetto dell’1% morde: 900,01');
+  assert.ok(rappresentanza.dedottoOrd <= rappresentanza.limite + 1e-9,
+    'il dedotto non può superare il tetto');
+  const affitto = r.totali.voci.find(v => v.id === 'studio');
+  assert.equal(affitto.limite, null, 'una voce senza tetto dichiara limite nullo');
+  assert.equal(affitto.tettoApplicato, false, 'e nessun tetto applicato');
+  const somma = r.totali.voci.reduce((a, v) => a + v.dedottoOrd, 0);
+  assert.ok(Math.abs(somma - r.totali.dedOrd) < 0.005,
+    'la somma delle righe deve fare il totale: altrimenti il foglio non riconcilia');
 });

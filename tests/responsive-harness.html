@@ -168,6 +168,20 @@ function measure(frame){
       const primo = nav.querySelector('a');
       if (primo) out.linkNavSottolineati =
         w.getComputedStyle(primo).textDecorationLine.indexOf('underline') >= 0;
+    } else {
+      /* Nascosta: allora l'hamburger del sito deve esserci e deve essere
+         raggiungibile col dito, altrimenti da telefono le voci Home, Strumenti
+         e Configura con AI non sono raggiungibili in nessun modo. Era la voce
+         piu' vecchia rimasta aperta nel contesto — segnalata per Analisi di
+         bilancio, e nel frattempo chiusa senza che niente lo verificasse. */
+      const ham = d.querySelector('.tal-gh-menu-toggle');
+      out.hamburgerSito = !!ham;
+      if (ham) {
+        const rh = ham.getBoundingClientRect();
+        out.hamburgerVisibile = w.getComputedStyle(ham).display !== 'none' && rh.width > 0;
+        out.hamburgerTocco = Math.round(Math.min(rh.width, rh.height));
+        out.hamburgerAria = ham.getAttribute('aria-expanded');
+      }
     }
   }
   if (b){
@@ -200,6 +214,10 @@ function judge(width, m){
   if (m.barraDietroHeader) fails.push('la barra di sessione si incolla dietro l’intestazione');
   if (m.navFlex === false) fails.push('la navigazione dell’intestazione non è flex: manca il suo foglio di stile');
   if (m.linkNavSottolineati) fails.push('i link dell’intestazione sono sottolineati: manca il suo foglio di stile');
+  if (m.hamburgerSito === false) fails.push('navigazione del sito nascosta e nessun hamburger: le voci del sito non sono raggiungibili');
+  if (m.hamburgerVisibile === false) fails.push('l’hamburger del sito esiste ma non si vede');
+  if (m.hamburgerTocco != null && m.hamburgerTocco < 40) fails.push('hamburger del sito troppo piccolo per il dito: ' + m.hamburgerTocco + 'px');
+  if (m.hamburgerAria != null && m.hamburgerAria !== 'false' && m.hamburgerAria !== 'true') fails.push('hamburger del sito senza aria-expanded valido');
   if (m.skipCount !== 1) fails.push('salti al contenuto: ' + m.skipCount + ' (ne serve 1)');
   else {
     if (!m.skipTarget)    fails.push('il salto punta a un bersaglio che non esiste');

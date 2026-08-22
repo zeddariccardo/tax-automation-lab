@@ -125,6 +125,51 @@ function measure(frame){
     out.skipFocusable = !!(target && target.hasAttribute('tabindex'));
     out.skipOffscreen = Math.round(skips[0].getBoundingClientRect().top) < 0;
   }
+  /* Il guscio: intestazione, barra di sessione e piede.
+
+     Tre difetti di guscio sono passati inosservati in due giorni — l'header
+     senza stile, la barra di sessione dietro l'header, il piede sotto la
+     sidebar — perche' nessuna asserzione guardava il guscio. Ora lo guarda. */
+  const sidebar = d.querySelector('#sidebar, .appbar');
+  const appMain = d.querySelector('.app-main');
+  const piede = d.querySelector('footer');
+  out.piede = !!piede;
+  if (piede) {
+    out.piedeDentroAppMain = !!(appMain && appMain.contains(piede));
+    const fr = piede.getBoundingClientRect();
+    const sr = sidebar ? sidebar.getBoundingClientRect() : null;
+    /* Sotto i 981px la sidebar e' fuori schermo: la sovrapposizione si misura
+       solo quando e' visibile. */
+    out.piedeSottoSidebar = !!(sr && sr.width > 0 && sr.right > 1 && fr.left < sr.right - 1);
+  }
+  const barra = d.querySelector('.tal-cmdbar, .cmdbar, .tal-session-bar');
+  if (barra) {
+    const header = d.querySelector('.tal-global-header');
+    const cs2 = w.getComputedStyle(barra);
+    out.barraSticky = cs2.position === 'sticky';
+    if (out.barraSticky && header) {
+      /* Una barra appiccicata sopra il bordo inferiore dell'intestazione le
+         finisce dietro appena si scorre: l'intestazione ha z-index 5000. */
+      const top = parseFloat(cs2.top) || 0;
+      out.barraDietroHeader = top < Math.round(header.getBoundingClientRect().height) - 1;
+    }
+  }
+  const nav = d.querySelector('.tal-gh-nav');
+  if (nav) {
+    const dn = w.getComputedStyle(nav).display;
+    /* Solo quando la navigazione si vede: sotto 760px e' nascosta dietro
+       l'hamburger, quindi `display:none` e' il comportamento giusto e
+       controllare `flex` la' produce un fallimento su ogni tool a ogni
+       larghezza piccola — cinque su sette, tutti falsi. */
+    if (dn !== 'none') {
+      /* L'intestazione senza il suo foglio inline resta un blocco di link:
+         `display:block` invece di flex e' la firma di quel difetto. */
+      out.navFlex = dn.indexOf('flex') >= 0;
+      const primo = nav.querySelector('a');
+      if (primo) out.linkNavSottolineati =
+        w.getComputedStyle(primo).textDecorationLine.indexOf('underline') >= 0;
+    }
+  }
   if (b){
     const r = b.getBoundingClientRect(), cs = w.getComputedStyle(b);
     const bf = w.getComputedStyle(b, '::before');
@@ -147,6 +192,14 @@ function judge(width, m){
   const shouldShow = width <= 980;
   if (m.error) return ['—', ['iframe: ' + m.error]];
   if (m.overflow > 0) fails.push('scorrimento orizzontale di ' + m.overflow + 'px');
+  if (!m.piede) fails.push('manca il piede');
+  else {
+    if (!m.piedeDentroAppMain) fails.push('il piede sta fuori da .app-main');
+    if (m.piedeSottoSidebar) fails.push('il piede passa sotto la sidebar');
+  }
+  if (m.barraDietroHeader) fails.push('la barra di sessione si incolla dietro l’intestazione');
+  if (m.navFlex === false) fails.push('la navigazione dell’intestazione non è flex: manca il suo foglio di stile');
+  if (m.linkNavSottolineati) fails.push('i link dell’intestazione sono sottolineati: manca il suo foglio di stile');
   if (m.skipCount !== 1) fails.push('salti al contenuto: ' + m.skipCount + ' (ne serve 1)');
   else {
     if (!m.skipTarget)    fails.push('il salto punta a un bersaglio che non esiste');

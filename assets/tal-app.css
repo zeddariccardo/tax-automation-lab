@@ -1046,3 +1046,142 @@ html.tal-tool-page .tal-site-footer p{
 @media print{
   html.tal-tool-page .tal-site-footer{display:none}
 }
+
+/* ---------- 13. Le riclassificazioni --------------------------------------- */
+
+/* Il problema non era il contrasto: misurate, 140 celle stavano tutte sopra la
+   soglia. Era la gerarchia. Le voci di primo livello avevano lo stesso peso dei
+   conti sottostanti, i totali erano fasce quasi nere che sulla pagina chiara
+   sembravano buchi, e soprattutto non si vedeva dove finiscono gli impieghi e
+   dove cominciano le fonti: l'unico segnale era il totale che chiudeva il
+   blocco, e bisognava leggerlo per capirlo.
+
+   Qui la scala e' dichiarata, dal piu' quieto al piu' forte: conto di dettaglio,
+   voce riclassificata, subtotale, totale generale. Il colore e' quello della
+   famiglia contabile del catalogo — il petrolio #145368 — cosi' la tabella
+   appartiene visivamente al pannello che la contiene invece di essere un blocco
+   nero appoggiato sopra.
+
+   Vale per il Bilancio e per Analisi: le classi `xr-*` sono le stesse nei due
+   tool, e una riclassificazione deve avere lo stesso aspetto in entrambi. */
+
+/* I numeri incolonnati. In una tabella finanziaria le cifre a larghezza
+   variabile fanno ballare le colonne: `tabular-nums` le allinea, ed e' la
+   differenza fra scorrere una colonna e rileggerla. */
+html.tal-tool-page :is(.reclass-section, #reclass-content, .xr-table) td,
+html.tal-tool-page :is(.reclass-section, #reclass-content, .xr-table) th{
+  font-variant-numeric:tabular-nums;
+}
+
+/* 1. il conto di dettaglio: la riga piu' quieta, agganciata alla voce sopra da
+      una linea sottile sul bordo sinistro. */
+html.tal-tool-page tr.reclass-detail>td:first-child{
+  box-shadow:inset 3px 0 0 rgba(20,83,104,.18);
+}
+
+/* 2. la voce riclassificata: si legge come un'intestazione di gruppo, non come
+      una riga qualsiasi. Prima stava a peso 400, identica ai conti che
+      contiene. */
+html.tal-tool-page tr.xr-has-det>td{
+  font-weight:650;
+  font-size:13px;
+}
+html.tal-tool-page tr.xr-has-det>td:first-child{
+  box-shadow:inset 3px 0 0 rgba(20,83,104,.45);
+}
+html.tal-tool-page tr.xr-has-det:hover>td{
+  background:rgba(20,83,104,.045);
+}
+
+/* 2b. la profondita'. Nello schema civilistico le voci hanno tre livelli — «B)
+       Immobilizzazioni», «I - Immateriali», «esigibili entro l'esercizio» — e
+       col trattamento unico un livello 2 pesava come un livello 0: la gerarchia
+       si appiattiva invece di leggersi. Le regole vengono dopo quella base,
+       hanno la stessa specificita' e quindi vincono su una riga che porta
+       entrambe le classi. Nel tool di Analisi le righe non hanno livelli e
+       restano al trattamento base. */
+html.tal-tool-page tr.xr-lvl0>td{font-weight:650;font-size:13px}
+html.tal-tool-page tr.xr-lvl0>td:first-child{box-shadow:inset 3px 0 0 rgba(20,83,104,.45)}
+html.tal-tool-page tr.xr-lvl1>td{font-weight:600;font-size:12.5px}
+html.tal-tool-page tr.xr-lvl1>td:first-child{box-shadow:inset 3px 0 0 rgba(20,83,104,.26)}
+html.tal-tool-page tr.xr-lvl2>td{font-weight:500;font-size:12px}
+html.tal-tool-page tr.xr-lvl2>td:first-child{box-shadow:inset 3px 0 0 rgba(20,83,104,.13)}
+
+/* 3. il subtotale: fondo tenue nel petrolio di famiglia e una linea sopra che
+      chiude il gruppo. */
+html.tal-tool-page tr.xr-sub>td{
+  background:#EDF3F5 !important;
+  color:var(--tal-ink) !important;
+  /* Almeno quanto le voci che somma: a 11,5px un «Totale attivo» risultava
+     piu' piccolo delle righe che stava totalizzando. */
+  font-size:13px;
+  font-weight:700;
+  border-top:1.5px solid rgba(20,83,104,.38) !important;
+}
+
+/* 4. il totale generale: era `var(--ink)`, un quasi-nero che sulla carta chiara
+      sembra un buco. Ora e' il petrolio scuro della stessa famiglia: si vede
+      da lontano, sta insieme all'intestazione del pannello, e il bianco sopra
+      misura 9,4 di rapporto. */
+html.tal-tool-page tr.xr-grand>td{
+  background:#0E4C5F !important;
+  color:#FFFFFF !important;
+  font-weight:750;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  padding-top:11px !important;
+  padding-bottom:11px !important;
+  border-top:2px solid #0A3A47 !important;
+  border-bottom:0 !important;
+}
+
+/* 5. lo stacco fra un blocco e il successivo. Era la seconda meta' della
+      segnalazione: «non e' chiara la separazione fra le diverse tipologie».
+      Dopo un totale generale la riga che segue prende aria, quindi impieghi e
+      fonti si leggono come due blocchi invece che come un elenco continuo. */
+html.tal-tool-page tr.xr-grand + tr>td{
+  padding-top:20px !important;
+}
+
+/* 6. l'intestazione delle colonne: piccola, spaziata, con una linea sotto.
+      Serve a farla leggere come etichetta e non come prima riga di dati.
+
+      Scritta su `tr:first-child` colpiva anche la prima riga del tbody — la
+      voce «Attivo immobilizzato» diventava un'etichetta grigia da 10,5px — e
+      questa tabella ha un thead vero, quindi si tira sulle celle di
+      intestazione e basta. */
+html.tal-tool-page :is(.reclass-section, #reclass-content) thead th{
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--tal-ink-3) !important;
+  border-bottom:1.5px solid var(--tal-line) !important;
+}
+
+/* ---------- 14. Il selettore di lingua ------------------------------------- */
+
+/* In Analisi di bilancio le pastiglie erano 23x15, 32x15 e 28x15 con font 15px,
+   invece di 44x44 a 10px come negli altri tool: la regola locale stilava
+   `.tal-gh-lang span`, ma il markup dell'intestazione porta `<a>`. Non
+   colpendo niente, ogni voce si stringeva sulla propria parola e l'unica
+   differenza visibile restava il fondo bianco dell'attiva — che e' il motivo
+   per cui sembrava «ITA sempre selezionato».
+
+   La regola sta qui a specificita' piena (`.tal-gh-lang a`), la stessa dei
+   blocchi locali: dove il tool ha la sua, vince la sua perche' viene dopo;
+   dove manca, vale questa. Cosi' un tool nuovo non nasce senza. */
+.tal-gh-lang a{
+  min-width:44px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  color:#C9CDD5;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+.tal-gh-lang a.active{background:#F7F7F5;color:#11131A}

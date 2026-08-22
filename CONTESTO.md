@@ -1250,6 +1250,99 @@ Un test verifica che le dieci regole ci siano in tutti e cinque i prompt.
   l'E2E misura i 12/16px di fallback. iPhone e Android vanno provati a mano.
 
 
+## Confronto regimi — audit del 22 agosto e rinomina
+
+Il tool era uscito come «Convenienza fiscale». Il nome non diceva cosa fa, e
+Riccardo lo ha cambiato in **Confronto regimi** (sottotitolo «Forfettario,
+ordinario, STP/STA»). Rinominato anche l'indirizzo: `/tools/confronto-regimi/`,
+con un rimando `noindex` da `/tools/convenienza-fiscale/`. Il tool era pubblico
+da poche ore, quindi allinearlo ora è costato un rimando; farlo dopo sarebbe
+costato un rimando per sempre.
+
+**I tre difetti gravi dell'import, tutti miei.**
+
+- L'import partiva da `Object.assign(cfStatoDefault(), clone(cfStato()))`: un
+  file che non conteneva un campo lasciava dentro il valore della simulazione
+  precedente. Provato — dopo la demo, un file con solo «Compensi = 50.000»
+  conservava compenso amministratore 40.000, altri redditi 15.000 e
+  distribuzione al 70%. Ora si parte da stato pulito, l'unione con la
+  simulazione corrente è una scelta esplicita in una finestra, e i campi
+  assenti dal file vengono elencati.
+- Il filtro anti-demo usava un'impronta «nome + importo». Nel commento avevo
+  scritto che l'impronta completa evitava i falsi positivi: **era falso**. I
+  nomi delle voci vengono da un elenco fisso, quindi ogni utente ha una riga
+  «Affitto o coworking» e a distinguerla restava il solo importo: un affitto
+  vero da 14.000 veniva escluso in silenzio. L'impronta è stata rimossa. Il
+  presidio resta il nome del foglio (`ESEMPI_NON_IMPORTARE`), che non ha falsi
+  positivi possibili. **In F24 l'impronta resta** e va tenuta: là è la riga
+  intera — denominazione, codice fiscale, partita IVA, sezione, codice tributo,
+  anno e i due importi — e quella combinazione su un cliente vero è impossibile.
+- I valori non validi diventavano default plausibili: «commercialsta» scritto
+  male diventava «commercialista». Ora le enumerazioni sono chiuse, i negativi
+  e le percentuali fuori intervallo bloccano, l'anno si valida prima di caricare
+  i parametri, e l'errore dice quale cella correggere. Un foglio **assente** non
+  blocca: un file parziale deve funzionare.
+
+**La barra di sessione era nel layer condiviso.** `tal-app.css` la metteva a
+`top:0` con z-index 40, sotto un'intestazione sticky a z-index 5000: scorrendo
+finiva dietro. Riguardava LIPE, F24 e Confronto regimi. Il Fascicolo era
+l'unico giusto perché aveva un `top:104px` locale, cioè aveva corretto il
+sintomo per sé. Ora il `top` viene da `--tal-global-header-height`, che
+`tal-app.js` misura per tutti e sei, e i tre `top` locali del Fascicolo sono
+stati rimossi. La barra scura del Fascicolo **non è stata toccata**: la regola
+condivisa imposta solo il `top`.
+
+**Nero su nero nelle riclassificazioni.** `tal-app.css` aveva
+`html.tal-tool-page td{color:var(--tal-fg) !important}`. Un `!important` a
+specificità (0,1,2) batte `.xr-grand td{color:#fff!important}` che sta a
+(0,1,1), quindi le righe dei totali — fondo scuro e testo bianco per
+costruzione — si ritrovavano #0b0b0b su #0b0b0b: **rapporto di contrasto 1,0**.
+Ora il colore ha specificità (0,2,2) e nessun `!important`, così le regole
+scritte di proposito per abbinare fondo e testo vincono. È l'inverso della
+trappola già annotata sulla barra del Fascicolo: là schiarire tutto produceva
+bianco su bianco, qui scurire tutto produceva nero su nero.
+
+**`tests/contrast-harness.html`** è nata da qui: nessun controllo guardava il
+contrasto. Attenzione, al primo giro segnalava 90 problemi e 88 erano falsi
+positivi — intestazione e sidebar hanno fondo a **gradiente**, e
+`backgroundColor` non lo vede, quindi attribuiva al testo il fondo della pagina.
+Ora se incontra un gradiente dichiara «non misurabile» invece di dare un numero
+sbagliato: quei 310 elementi restano da guardare a occhio.
+
+**Rilievi dell'audit che non ho applicato, e perché.**
+
+- **Badge «Beta sperimentale» in ogni schermata**: contraddice la decisione del
+  14 agosto, che ha rimosso la striscia «Strumento sperimentale» da Fascicolo e
+  LIPE. Lo stato di maturità sta nel catalogo, dove chi scegle lo vede prima di
+  aprire.
+- **Skip link «assente»**: ce n'è uno per tool, misurato. Il rilievo è vecchio.
+- **«Il settimo tool»**: sono sei.
+- **Nascondere il break-even verso il forfettario non disponibile**: quel
+  controfattuale è una richiesta esplicita del brief. Il difetto era la cornice,
+  non la funzione: ora dice «Ipotesi: se ti fossi fermato a 85.000… quella
+  strada non c'è più».
+- **SheetJS estratto e caricato in differita** e **CSP**: refactor che toccano
+  tutti e sei i tool. Decisione di Riccardo: non adesso.
+
+**La pagina Strumenti ha tre famiglie.** Contabilità e bilancio, Fiscale e
+adempimenti, Organizzazione e decisioni. Un colore per famiglia, ripetuto nel
+tag di ogni card, con il testo sempre presente accanto: il colore non è mai la
+sola informazione. I tag hanno rapporti di contrasto fra 6,95 e 11,83.
+
+**`--tal-ink-4` (#AAA7A0) non è un colore da testo**: dà 2,40 su bianco, sotto
+la soglia di 3,0 del testo grande. In Confronto regimi era usato per tutte le
+etichette piccole ed è stato sostituito con `--tal-ink-3` (5,31). Il token
+**resta definito** e usato altrove: cambiarlo tocca sei tool e ventinove pagine
+editoriali, quindi è un punto aperto, non una correzione fatta.
+
+**Aperto su questo tool.** Lo screenshot della sequenza di caricamento in
+«Configura con AI» (la scheda 07 c'è, la figura no). Il PDF del confronto. Il
+profilo previdenziale con neo-iscritti, under 35 e riduzioni. Le regole dei
+costi separate fra professionista e società, con plafond e ammortamento. Le
+detrazioni IRPEF per categoria invece che per natura prevalente — oggi
+l'approssimazione è dichiarata fra le verifiche.
+
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia

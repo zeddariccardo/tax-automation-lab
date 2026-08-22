@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- Tax Automation Lab — armatura di verifica del contrasto
+     Copyright (c) 2026 Riccardo Zedda — MIT
+
+     Perché esiste. Il 22 agosto 2026 le righe dei totali delle tabelle di
+     riclassificazione sono risultate testo #0b0b0b su fondo #0b0b0b: rapporto
+     di contrasto 1,0, testo invisibile. Nessun controllo lo guardava — né
+     l'armatura responsive, che misura il comando del menu e lo scorrimento, né
+     i test node, che compilano gli script. Un difetto che si vede a occhio e
+     che nessuna asserzione stava osservando.
+
+     Cosa misura. Per ogni elemento con testo proprio calcola la luminanza
+     relativa del colore e quella del primo fondo opaco risalendo gli
+     antenati, e ne ricava il rapporto WCAG. Sotto 3,0 è un fallimento: 4,5 è
+     la soglia AA per il testo normale, 3,0 quella per il testo grande, e sotto
+     3,0 non è leggibile in nessun caso.
+
+     Come si usa. Servire il repository su HTTP e aprire
+     /tests/contrast-harness.html. `window.__TAL_CONTRAST` contiene l'esito in
+     forma leggibile da un programma.
+
+     Limite: misura i colori calcolati, non le immagini di sfondo né i
+     gradienti. Un testo sopra un gradiente può passare qui e non nella
+     realtà. -->
+<title>Verifica contrasto — Tax Automation Lab</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{--ok:#136b4a;--ok-bg:#e6f4ee;--ko:#8d2320;--ko-bg:#fbeceb;
+        --ink:#14171f;--mut:#5d6470;--line:#dfe1e6;--bg:#f7f7f5}
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  h1{font-size:19px;margin:0 0 4px}
+  p.lede{margin:0 0 18px;color:var(--mut);max-width:74ch}
+  #run{min-height:44px;padding:10px 18px;border:1px solid var(--ink);border-radius:9px;
+       background:var(--ink);color:#fff;font:700 12px/1 inherit;letter-spacing:.06em;
+       text-transform:uppercase;cursor:pointer}
+  #run[disabled]{opacity:.5;cursor:default}
+  #verdict{margin:18px 0;padding:12px 14px;border-radius:10px;font-weight:700;display:none}
+  #verdict.pass{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
+  #verdict.fail{background:var(--ko-bg);color:var(--ko);border:1px solid var(--ko)}
+  table{border-collapse:collapse;width:100%;font-size:12px;background:#fff;
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);background:#fbfbfa}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  tr.ko td{background:var(--ko-bg)}
+  .sw{display:inline-block;width:12px;height:12px;border:1px solid #0003;
+      vertical-align:-2px;margin-right:4px;border-radius:2px}
+  .wrap{overflow-x:auto}
+  #stage{position:fixed;left:-99999px;top:0}
+  #stage iframe{border:0;width:1280px;height:900px;display:block}
+</style>
+
+<h1>Verifica del contrasto nei tool</h1>
+<p class="lede">Cerca testo illeggibile sul proprio fondo. Fallisce sotto un
+rapporto di 3,0, che è la soglia minima per il testo grande: sotto quel valore
+non è leggibile in nessuna dimensione. Le celle dei totali con fondo scuro sono
+il caso che ha motivato questa pagina.</p>
+
+<button id="run" type="button">Esegui la verifica</button>
+<div id="verdict" role="status"></div>
+<div class="wrap"><table id="out"><thead><tr>
+  <th>Tool</th><th>Vista</th><th>Elemento</th><th>Testo</th>
+  <th>Testo/fondo</th><th class="n">Rapporto</th><th>Esito</th>
+</tr></thead><tbody></tbody></table></div>
+<div id="stage" aria-hidden="true"></div>
+
+<script>
+const TOOLS = [
+  ['Bilancio civilistico', '/tools/financial-statement/'],
+  ['Analisi di bilancio',  '/tools/financial-analysis/'],
+  ['LIPE',                 '/tools/lipe/'],
+  ['Fascicolo fiscale',    '/tools/tfa-client-file/'],
+  ['Generatore F24',       '/tools/f24/'],
+  ['Confronto regimi',     '/tools/confronto-regimi/']
+];
+/* 3,0 e' il minimo assoluto: sotto, il testo non e' leggibile nemmeno grande. */
+const SOGLIA = 3.0;
+
+const stage = document.getElementById('stage');
+const tbody = document.querySelector('#out tbody');
+const verdict = document.getElementById('verdict');
+const runBtn = document.getElementById('run');
+
+function luminanza(colore) {
+  const m = String(colore).match(/[\d.]+/g);
+  if (!m || m.length < 3) return null;
+  /* Un colore trasparente non e' un colore: chi lo usa eredita il fondo. */
+  if (m.length > 3 && Number(m[3]) < 0.95) return null;
+  const canale = (v) => { v = Number(v) / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  return 0.2126 * canale(m[0]) + 0.7152 * canale(m[1]) + 0.0722 * canale(m[2]);
+}
+
+/* Il primo fondo davvero opaco risalendo gli antenati: e' quello che l'occhio
+   vede dietro il testo.
+
+   Restituisce null se lungo la risalita incontra un'immagine di sfondo — un
+   gradiente, in questo sito. La luminanza di un gradiente non e' un numero
+   solo, e attribuire al testo il fondo della pagina dietro il gradiente
+   produce falsi positivi in massa: al primo giro questa pagina segnalava 90
+   problemi, e ottantotto erano l'intestazione e la sidebar, che hanno fondo a
+   gradiente e testo chiaro perfettamente leggibile. Meglio dichiarare «non
+   misurabile» che dare un numero sbagliato. Quei casi restano da guardare a
+   occhio, ed e' scritto nella pagina. */
+function fondoOpaco(el, w) {
+  let n = el;
+  while (n && n.nodeType === 1) {
+    const cs = w.getComputedStyle(n);
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
+    const c = cs.backgroundColor;
+    const m = String(c).match(/[\d.]+/g);
+    if (m && (m.length < 4 || Number(m[3]) > 0.5)) return c;
+    n = n.parentElement;
+  }
+  return 'rgb(255, 255, 255)';
+}
+
+function analizza(frame, tool) {
+  const d = frame.contentDocument, w = frame.contentWindow;
+  if (!d) return [{tool, vista: '—', sel: 'iframe', testo: 'documento non accessibile',
+                   coppia: '', rapporto: 0}];
+  const vista = (d.querySelector('.cf-stage.active, .fs-view.active, .lipe-view.active,'
+    + ' .workflow-stage.active, section.block.active') || {}).id || 'iniziale';
+  const trovati = [];
+  const visti = new Set();
+  let nonMisurabili = 0;
+  d.querySelectorAll('body *').forEach((el) => {
+    const cs = w.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) < 0.1) return;
+    /* Solo elementi con testo proprio: altrimenti si conta lo stesso testo
+       una volta per ogni antenato. */
+    const proprio = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!proprio) return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) return;
+    const lf = luminanza(cs.color);
+    const fondo = fondoOpaco(el, w);
+    if (fondo == null) { nonMisurabili++; return; }
+    const lb = luminanza(fondo);
+    if (lf == null || lb == null) return;
+    const rapporto = (Math.max(lf, lb) + 0.05) / (Math.min(lf, lb) + 0.05);
+    if (rapporto >= SOGLIA) return;
+    const chiave = el.tagName + '|' + (el.className || '') + '|' + cs.color + '|' + fondo;
+    if (visti.has(chiave)) return;
+    visti.add(chiave);
+    trovati.push({tool, vista,
+      sel: el.tagName + (typeof el.className === 'string' && el.className
+        ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : ''),
+      testo: el.textContent.trim().replace(/\s+/g, ' ').slice(0, 44),
+      colore: cs.color, fondo, rapporto: +rapporto.toFixed(2)});
+  });
+  trovati.nonMisurabili = nonMisurabili;
+  return trovati;
+}
+
+function carica(url) {
+  return new Promise((resolve) => {
+    const f = document.createElement('iframe');
+    f.src = url + '?contrasto=' + Date.now();
+    let fatto = false;
+    const fine = () => { if (!fatto) { fatto = true; resolve(f); } };
+    f.addEventListener('load', () => setTimeout(() => {
+      /* I dati dimostrativi popolano le tabelle: senza, le righe dei totali
+         non esistono e il difetto non si vede. */
+      try {
+        const d = f.contentDocument;
+        const b = [...d.querySelectorAll('button,a')]
+          .find((x) => /dimostrativ/i.test(x.textContent || ''));
+        if (b) b.click();
+      } catch (e) { /* niente */ }
+      setTimeout(fine, 1400);
+    }, 500));
+    setTimeout(fine, 9000);
+    stage.appendChild(f);
+  });
+}
+
+async function run() {
+  runBtn.disabled = true; tbody.innerHTML = ''; verdict.style.display = 'none';
+  const tutti = [];
+  let nonMisurabiliTotali = 0;
+  for (const [nome, url] of TOOLS) {
+    const f = await carica(url);
+    let trovati;
+    try { trovati = analizza(f, nome); } catch (e) { trovati = [{tool: nome, vista: '—',
+      sel: 'errore', testo: e.message, colore: '', fondo: '', rapporto: 0}]; }
+    f.remove();
+    nonMisurabiliTotali += (trovati.nonMisurabili || 0);
+    tutti.push(...trovati);
+    trovati.forEach((t) => {
+      const tr = document.createElement('tr');
+      tr.className = 'ko';
+      const cel = (v, cls) => { const td = document.createElement('td');
+        if (cls) td.className = cls; td.textContent = v; return td; };
+      const coppia = document.createElement('td');
+      if (t.colore) {
+        coppia.innerHTML = '<span class="sw" style="background:' + t.colore + '"></span>'
+          + '<span class="sw" style="background:' + t.fondo + '"></span>';
+      }
+      tr.append(cel(t.tool), cel(t.vista), cel(t.sel), cel(t.testo), coppia,
+        cel(String(t.rapporto).replace('.', ','), 'n'), cel('illeggibile'));
+      tbody.appendChild(tr);
+    });
+  }
+  window.__TAL_CONTRAST = tutti;
+  verdict.className = tutti.length ? 'fail' : 'pass';
+  verdict.textContent = (tutti.length
+    ? tutti.length + ' combinazioni testo/fondo sotto il rapporto ' + SOGLIA + '.'
+    : 'Nessun testo sotto il rapporto ' + SOGLIA + ' nei sei tool.')
+    + ' ' + nonMisurabiliTotali + ' elementi hanno fondo a gradiente e non sono misurabili qui: '
+    + 'vanno guardati a occhio.';
+  verdict.style.display = 'block';
+  runBtn.disabled = false;
+  return tutti;
+}
+
+runBtn.addEventListener('click', run);
+window.__talContrasto = run;
+</script>

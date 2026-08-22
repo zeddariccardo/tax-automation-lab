@@ -547,7 +547,35 @@
     }
   }
 
+  /* Altezza reale dell'intestazione globale, pubblicata come custom property.
+
+     La usano due cose: lo scroll-padding delle ancore e — dopo la correzione
+     del 22 agosto — il `top` della barra di sessione, che prima si incollava a
+     filo pagina e finiva dietro l'intestazione. Prima la misuravano solo
+     Analisi e LIPE, ognuno nel proprio script: gli altri quattro tool non
+     avevano il valore e usavano il ripiego. Ora la misura sta qui, una volta
+     per tutti e sei, e segue l'intestazione quando si compatta. */
+  function publishHeaderHeight() {
+    var header = document.querySelector('.tal-global-header');
+    if (!header) return;
+    var h = Math.ceil(header.getBoundingClientRect().height);
+    if (h > 0) root.style.setProperty('--tal-global-header-height', h + 'px');
+  }
+
+  function watchHeaderHeight() {
+    publishHeaderHeight();
+    var header = document.querySelector('.tal-global-header');
+    if (header && window.ResizeObserver) {
+      new ResizeObserver(publishHeaderHeight).observe(header);
+    }
+    /* Il resize serve comunque: l'intestazione può cambiare altezza per una
+       media query senza che il suo box venga riosservato in tempo. */
+    window.addEventListener('resize', publishHeaderHeight, { passive: true });
+    setTimeout(publishHeaderHeight, 400);
+  }
+
   function start() {
+    watchHeaderHeight();
     buildBar();
     watchStorage();
     movePublication(0);

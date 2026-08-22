@@ -216,6 +216,57 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-design.css?v=20260814">
 <script defer src="/assets/tal-experience.js?v=20260812"></script>
+
+<style id="tal-tool-families">
+/* Le famiglie di strumenti.
+
+   La suite e' arrivata a sei tool e l'elenco piatto non diceva piu' a cosa
+   serve ciascuno: chi arriva con «devo fare la LIPE» doveva leggerli tutti. Tre
+   famiglie, un colore per famiglia, e il tag ripetuto sulla card cosi' resta
+   riconoscibile anche quando la si guarda da sola.
+
+   Il colore non e' l'unica informazione: il tag porta sempre il testo, e la
+   famiglia ha il proprio titolo sopra le card. */
+.tool-family{margin:0 0 46px}
+.tool-family-head{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:0 0 12px;margin:0 0 18px;border-bottom:1px solid var(--tal-line,#e7e4dc)
+}
+.tool-family-head h2{
+  margin:0;font-size:clamp(17px,2.2vw,21px);line-height:1.2;
+  display:flex;align-items:center;gap:9px
+}
+/* Il quadratino colorato accanto al titolo lega la famiglia ai tag delle card. */
+.tool-family-head h2::before{
+  content:"";width:11px;height:11px;border-radius:3px;flex:0 0 auto;
+  background:var(--fam)
+}
+.tool-family-head p{margin:0;font-size:13px;color:var(--tal-ink-3,#6e6b65)}
+
+.tool-family--contabilita{--fam:#145368}
+.tool-family--adempimenti{--fam:#8B6A16}
+.tool-family--utilita{--fam:#59147D}
+
+.tool-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:999px;
+  font-size:10.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid transparent
+}
+.tool-tag::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;opacity:.75
+}
+/* Fondi tenui e testo scuro: i rapporti di contrasto stanno fra 5,5 e 7,5,
+   quindi il tag resta leggibile anche stampato in bianco e nero. */
+.tool-tag--contabilita{background:#EAF2F5;color:#0C3341;border-color:#BFD6DE}
+.tool-tag--adempimenti{background:#FFF8DF;color:#6B5211;border-color:#E8DCAE}
+.tool-tag--utilita{background:#F3EAF8;color:#4A116A;border-color:#DCC7E8}
+
+@media(max-width:640px){
+  .tool-family-head{flex-direction:column;gap:4px}
+}
+</style>
 </head><body><div class="wrap">
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -235,9 +286,14 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div><span class="label">CONFIGURAZIONE ASSISTITA DALL’AI</span><h2>Prepara i file di configurazione con la tua AI</h2><p>Template scaricabili, prompt guidati e istruzioni di caricamento per configurare gli strumenti con i dati che già possiedi.</p></div>
 <a class="button" href="/configura-con-ai/">Configura con AI →</a>
 </section>
-<section class="grid">
+<section aria-labelledby="fam-contabilita" class="tool-family tool-family--contabilita">
+<div class="tool-family-head">
+<h2 id="fam-contabilita">Contabilità e bilancio</h2>
+<p>Riclassificare, analizzare, depositare.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">Bilancio civilistico · v1.4.0</span><h2>Bilancio civilistico ITA GAAP</h2><span class="category-tag category-accounting">Contabilità</span>
+<span class="label">Bilancio civilistico · v1.4.0</span><h2>Bilancio civilistico ITA GAAP</h2><span class="tool-tag tool-tag--contabilita">Bilancio civilistico</span>
 <p>Riclassificazione IV Direttiva da bilancio di verifica IAS/IFRS, con schemi ordinari o abbreviati, mappatura, scadenze per categoria, rettifiche, quadrature e archivio annuale.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Bilancio di verifica Excel</div>
@@ -248,7 +304,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div class="actions"><a class="button" href="/tools/financial-statement/">Apri Bilancio civilistico →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="label">Analisi gestionale · v2.1.0</span><h2>Analisi di bilancio</h2><span class="category-tag category-controlling">Controlling</span>
+<span class="label">Analisi gestionale · v2.1.0</span><h2>Analisi di bilancio</h2><span class="tool-tag tool-tag--contabilita">Analisi e KPI</span>
 <p>Riclassificazioni gestionali, KPI, rendiconto finanziario, budget, forecast, centri di costo, benchmark e controlli di qualità.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Bilancio di verifica e moduli facoltativi</div>
@@ -258,19 +314,16 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 <div class="actions"><a class="button" href="/tools/financial-analysis/">Apri Analisi di bilancio →</a></div>
 </article>
-<article class="card tool-card-v614">
-<span class="label">Fascicolo cliente · v2.3.2</span><h2>Fascicolo fiscale cliente</h2><span class="category-tag category-client">Gestione clienti</span>
-<p>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</p>
-<div class="facts">
-<div><strong>Input</strong><br/>Anagrafica e documentazione fiscale</div>
-<div><strong>Output</strong><br/>Fascicolo analitico e discorsivo</div>
-<div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 10 agosto 2026 · elaborazione locale · solo online</div>
 </div>
-<div class="actions"><a class="button" href="/tools/tfa-client-file/">Apri Fascicolo fiscale →</a></div>
-</article>
+</section>
+<section aria-labelledby="fam-adempimenti" class="tool-family tool-family--adempimenti">
+<div class="tool-family-head">
+<h2 id="fam-adempimenti">Fiscale e adempimenti</h2>
+<p>Preparare e controllare quello che va trasmesso o versato.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">LIPE · v3.5.0</span><h2>Generatore LIPE</h2><span class="category-tag category-vat">Fiscalità · IVA</span>
+<span class="label">LIPE · v3.5.0</span><h2>Generatore LIPE</h2><span class="tool-tag tool-tag--adempimenti">IVA periodica</span>
 <p>Codici IVA, quadro VP e XML IVP18 per le comunicazioni delle liquidazioni periodiche IVA, con riporti controllati, PDF e working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Codiciario e importi Excel</div>
@@ -281,7 +334,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div class="actions"><a class="button" href="/tools/lipe/">Apri Generatore LIPE →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="label">F24 · v1.0.0</span><h2>Generatore F24</h2><span class="category-tag category-vat">Fiscalità · Versamenti</span>
+<span class="label">F24 · v1.0.0</span><h2>Generatore F24</h2><span class="tool-tag tool-tag--adempimenti">Versamenti</span>
 <p>Modelli F24 ministeriali per uno o più contribuenti, con raggruppamento per flusso di pagamento, controlli su saldi, capienza e codici tributo, archivio crediti e tracciato telematico.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel o CSV dei versamenti, o compilazione guidata</div>
@@ -291,8 +344,27 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 <div class="actions"><a class="button" href="/tools/f24/">Apri Generatore F24 →</a></div>
 </article>
+</div>
+</section>
+<section aria-labelledby="fam-utilita" class="tool-family tool-family--utilita">
+<div class="tool-family-head">
+<h2 id="fam-utilita">Organizzazione e decisioni</h2>
+<p>Tenere in ordine il cliente e scegliere come impostarlo.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">Convenienza fiscale · v1.0.0</span><h2>Convenienza fiscale</h2><span class="category-tag category-vat">Fiscalità · Scelta del regime</span>
+<span class="label">Fascicolo cliente · v2.3.2</span><h2>Fascicolo fiscale cliente</h2><span class="tool-tag tool-tag--utilita">Fascicolo cliente</span>
+<p>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</p>
+<div class="facts">
+<div><strong>Input</strong><br/>Anagrafica e documentazione fiscale</div>
+<div><strong>Output</strong><br/>Fascicolo analitico e discorsivo</div>
+<div>Interfaccia operativa in italiano</div>
+<div>Aggiornato il 10 agosto 2026 · elaborazione locale · solo online</div>
+</div>
+<div class="actions"><a class="button" href="/tools/tfa-client-file/">Apri Fascicolo fiscale →</a></div>
+</article>
+<article class="card tool-card-v614">
+<span class="label">Confronto regimi · v1.0.0</span><h2>Confronto regimi</h2><span class="tool-tag tool-tag--utilita">Scelta del regime</span>
 <p>Confronta la cassa personale netta di un avvocato o di un dottore commercialista fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l., con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e il mix fra compenso amministratore e dividendo.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel del profilo, dei compensi e dei costi, o compilazione guidata</div>
@@ -300,14 +372,16 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div>Interfaccia operativa in italiano</div>
 <div>Aggiornato il 22 agosto 2026 · elaborazione locale · solo online</div>
 </div>
-<div class="actions"><a class="button" href="/tools/convenienza-fiscale/">Apri Convenienza fiscale →</a></div>
-</article></section>
+<div class="actions"><a class="button" href="/tools/confronto-regimi/">Apri Confronto regimi →</a></div>
+</article>
+</div>
+</section>
 
 <section aria-label="Quale strumento scegliere per il bilancio?" class="compare-wrap">
 <table class="compare-table">
 <thead><tr><th>Strumento</th><th>Obiettivo</th><th>Input</th><th>Output</th><th>Accesso</th><th>Memoria</th></tr></thead>
 <tbody><tr><td><strong>Bilancio civilistico ITA GAAP</strong></td><td>Riclassificazione IV Direttiva da bilancio di verifica IAS/IFRS, con schemi ordinari o abbreviati, mappatura, scadenze per categoria, rettifiche, quadrature e archivio annuale.</td><td>Bilancio di verifica Excel</td><td>Stato patrimoniale, conto economico, Excel e PDF</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Analisi di bilancio</strong></td><td>Riclassificazioni gestionali, KPI, rendiconto finanziario, budget, forecast, centri di costo, benchmark e controlli di qualità.</td><td>Bilancio di verifica e moduli facoltativi</td><td>KPI, schemi gestionali, rendiconto e report</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Fascicolo fiscale cliente</strong></td><td>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</td><td>Anagrafica e documentazione fiscale</td><td>Fascicolo analitico e discorsivo</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Generatore LIPE</strong></td><td>Codici IVA, quadro VP e XML IVP18 per le comunicazioni delle liquidazioni periodiche IVA, con riporti controllati, PDF e working paper.</td><td>Codiciario e importi Excel</td><td>Quadro VP, PDF, Excel e XML</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Generatore F24</strong></td><td>Preparazione, raggruppamento per flusso, controllo e generazione di modelli F24 ministeriali singoli e massivi, con archivio contribuenti, archivio crediti e tracciato telematico.</td><td>Excel o CSV dei versamenti</td><td>PDF ministeriale, ZIP per società, Excel</td><td>Online</td><td>Browser locale</td></tr></tbody>
-</table>
+<tr><td><b>Confronto regimi</b></td><td>Confronto della cassa personale netta fra forfettario, partita IVA ordinaria e STP/STA, con la soglia di convenienza oltre 85.000 euro e il mix fra compenso amministratore e dividendo</td><td>Excel di profilo, compensi e costi, o compilazione guidata</td><td>Confronto, quattro grafici, working paper Excel</td><td>Online</td><td>Archivio locale delle simulazioni</td></tr></table>
 </section>
 <section class="safety-note"><strong>Avvertenza professionale:</strong> verifica sempre dati, regole e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.</section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/approfondimenti/">Casi e metodo</a><a href="/privacy/">Privacy</a><a href="/security/">Sicurezza</a><a href="/terms/">Termini e disclaimer</a><a href="/licenses/">Licenze</a></nav><p>Progetto personale e indipendente. I contenuti non costituiscono consulenza professionale e il progetto non è approvato, sponsorizzato o affiliato a datori di lavoro o terze parti.</p></div></footer></div>

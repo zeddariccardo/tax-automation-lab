@@ -1,4 +1,4 @@
-/* Tax Automation Lab — Convenienza fiscale: i casi limite del motore
+/* Tax Automation Lab — Confronto regimi: i casi limite del motore
    Copyright (c) 2026 Riccardo Zedda — MIT
 
    Perché esiste. Il brief del tool chiede espressamente di provare i casi
@@ -27,7 +27,7 @@ import {fileURLToPath} from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const html = fs.readFileSync(path.join(root, 'tools', 'convenienza-fiscale', 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'tools', 'confronto-regimi', 'index.html'), 'utf8');
 
 /* ---- estrazione del motore ---------------------------------------------- */
 
@@ -45,7 +45,8 @@ const {cfEngine, CF_PARAMS, CF_COSTI_DEFAULT, CF_FONTI} =
 
 const BASE = {
   profession: 'commercialista', year: 2026, revenue: 85000, previousRevenue: 80000,
-  otherIncome: 0, employeeIncome: 0, ownership: 100, distribution: 100, admin: 0,
+  otherIncome: 0, employeeIncomePrev: 0, employeeIncomeCurr: 0,
+  ownership: 100, distribution: 100, admin: 0,
   extractionMode: 'dividend', startup: false, incompatible: false, employer: false,
   pensionRate: 12, adminTreatment: 'cassa', inpsRate: 24, regionalRate: 1.23,
   municipalRate: 0.8, maternity: 0, companyOverhead: 0, irapRate: 3.9
@@ -107,11 +108,34 @@ test('senza requisiti dichiarati si applica l’aliquota ordinaria', () => {
 /* ---- 3. le cause ostative ---------------------------------------------- */
 
 test('ogni causa ostativa dichiarata esclude il forfettario', () => {
-  assert.equal(forf(run({employeeIncome: 35001})).applicabile, false, 'lavoro dipendente oltre soglia');
+  assert.equal(forf(run({employeeIncomePrev: 35001})).applicabile, false,
+    'lavoro dipendente dell’anno precedente oltre soglia');
   assert.equal(forf(run({incompatible: true})).applicabile, false, 'partecipazioni incompatibili');
   assert.equal(forf(run({employer: true})).applicabile, false, 'attività verso l’ex datore');
   assert.equal(forf(run({}, {personale: 20001})).applicabile, false, 'spese per personale oltre soglia');
   assert.equal(forf(run({}, {personale: 19999})).applicabile, true, 'sotto soglia resta applicabile');
+});
+
+test('i redditi da lavoro dipendente dei due anni non si confondono', () => {
+  /* CF-003. La causa ostativa guarda l'anno precedente; il reddito corrente
+     serve alle detrazioni. Prima era un campo solo, etichettato come quota
+     degli altri redditi correnti e usato per la causa ostativa: un dato
+     inserito secondo l'etichetta finiva in una regola di un altro periodo. */
+  assert.equal(forf(run({employeeIncomePrev: 40000, employeeIncomeCurr: 0})).applicabile, false,
+    'il reddito dell’anno precedente sopra soglia esclude il forfettario');
+  assert.equal(forf(run({employeeIncomePrev: 0, employeeIncomeCurr: 40000})).applicabile, true,
+    'il reddito dell’anno corrente non è una causa ostativa');
+});
+
+test('la detrazione segue la natura prevalente degli altri redditi', () => {
+  /* CF-004, nella forma dichiarata: con altri redditi in prevalenza da lavoro
+     dipendente si applica quella detrazione, altrimenti quella autonoma. */
+  const dip = run({otherIncome: 40000, employeeIncomeCurr: 30000});
+  const aut = run({otherIncome: 40000, employeeIncomeCurr: 0});
+  assert.equal(dip.detrazioneApplicata, 'dipendente');
+  assert.equal(aut.detrazioneApplicata, 'autonomo');
+  assert.notEqual(Math.round(ord(dip).netto), Math.round(ord(aut).netto),
+    'due detrazioni diverse non possono dare lo stesso netto');
 });
 
 /* ---- 4. il massimale limita la base, non il compenso -------------------- */

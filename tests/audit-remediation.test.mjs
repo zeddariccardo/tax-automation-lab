@@ -23,7 +23,7 @@ for(const relative of [
   'tools/lipe/index.html',
   'tools/f24/index.html',
   'tools/tfa-client-file/index.html',
-  'tools/convenienza-fiscale/index.html',
+  'tools/confronto-regimi/index.html',
   'configura-con-ai/index.html',
   'en/configure-with-ai/index.html',
   'es/configura-con-ia/index.html'

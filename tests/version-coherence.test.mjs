@@ -31,7 +31,7 @@ const TOOLS = {
   'lipe'               : 'Generatore LIPE',
   'tfa-client-file'    : 'Fascicolo fiscale cliente',
   'f24'                : 'Generatore F24',
-  'convenienza-fiscale': 'Convenienza fiscale'
+  'confronto-regimi': 'Confronto regimi'
 };
 
 /* Ogni voce è un posto in cui un tool dichiara la propria versione. Le

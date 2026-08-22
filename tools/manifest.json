@@ -55,10 +55,10 @@
       "license": "MIT"
     },
     {
-      "slug": "convenienza-fiscale",
-      "name": "Convenienza fiscale",
+      "slug": "confronto-regimi",
+      "name": "Confronto regimi",
       "version": "1.0.0",
-      "site_url": "https://taxautomationlab.com/tools/convenienza-fiscale/",
+      "site_url": "https://taxautomationlab.com/tools/confronto-regimi/",
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT"

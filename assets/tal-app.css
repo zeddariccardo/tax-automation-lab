@@ -382,8 +382,26 @@ html.tal-tool-page th{
 html.tal-tool-page td{
   padding:8px 7px !important;
   border-bottom:1px solid var(--tal-line) !important;
-  color:var(--tal-fg) !important;
   vertical-align:top;
+}
+
+/* Il colore del testo delle celle: specificità alta, ma NIENTE `!important`.
+
+   Com'era: `color:var(--tal-fg) !important` su ogni `td`. Un `!important` con
+   specificità (0,1,2) batte `.xr-grand td{color:#fff!important}` che sta a
+   (0,1,1), quindi le righe dei totali — fondo scuro e testo bianco per
+   costruzione — si ritrovavano testo #0b0b0b su fondo #0b0b0b: rapporto di
+   contrasto 1,0, testo invisibile. Riguardava il Bilancio e Analisi, cioè
+   proprio le tabelle di riclassificazione.
+
+   Ora la specificità (0,2,2) basta a vincere sulle regole `td` generiche dei
+   tool, ma qualunque regola con `!important` — cioè quelle scritte di
+   proposito per abbinare un fondo a un testo leggibile — vince su questa. È
+   l'inverso della trappola già annotata sulla barra del Fascicolo: là
+   schiarire tutto produceva bianco su bianco, qui scurire tutto produceva nero
+   su nero. */
+html.tal-tool-page.tal-tool-page td{
+  color:var(--tal-fg);
 }
 html.tal-tool-page tbody tr:hover td{background:var(--tal-accent-soft) !important}
 
@@ -566,7 +584,11 @@ html.tal-tool-page .tal-upload-limit{
   margin:7px 0 0 !important;
   font-size:10.5px !important;
   line-height:1.45 !important;
-  color:var(--tal-muted,#5d6470) !important;
+  /* Non `--tal-muted`: quel token risolve a #A5ACB8, che su fondo chiaro dà un
+     rapporto di contrasto di 2,09 — sotto la soglia di 3,0 del testo grande,
+     quindi illeggibile a quella dimensione. `--tal-ink-3` dà 5,31. Il ripiego
+     scritto qui accanto era già giusto: era il token a essere sbagliato. */
+  color:var(--tal-ink-3) !important;
 }
 
 /* ---------- 11-bis. Salto al contenuto ------------------------------------ */
@@ -710,9 +732,21 @@ html.tal-tool-page .tal-start-demo:hover{color:var(--tal-accent-deep)}
 
 /* Il Fascicolo ha la sua, scura e con i propri comandi. Questa la raggiunge
    sugli altri tre: chi è il cliente attivo e se il lavoro è al sicuro. */
+/* La barra si incolla SOTTO l'intestazione, non a filo pagina.
+
+   Com'era: `top:0` con z-index 40, sotto un'intestazione anch'essa sticky a
+   top:0 e z-index 5000. Scorrendo, la barra si incollava a zero e finiva
+   dietro l'intestazione: spariva. Riguardava LIPE, F24 e Confronto regimi; il
+   Fascicolo era l'unico giusto perché ha un `top:104px` locale, cioè aveva
+   corretto il sintomo da solo senza che nessuno guardasse la causa.
+
+   `--tal-global-header-height` la misura tal-app.js su ogni tool, quindi il
+   valore segue l'altezza vera anche quando l'intestazione si compatta. Il
+   ripiego a 92px è l'altezza a riposo: serve solo se lo script non è ancora
+   partito, e in quel frangente la pagina non è ancora scorsa. */
 html.tal-tool-page .tal-cmdbar{
   position:sticky;
-  top:0;
+  top:calc(var(--tal-global-header-height, 92px) + 8px);
   z-index:40;
   display:flex;
   align-items:center;
@@ -726,6 +760,14 @@ html.tal-tool-page .tal-cmdbar{
   color:#F7F7F5;
   box-shadow:var(--tal-sh-2);
 }
+/* Lo stesso offset vale per la barra del Fascicolo, che è `.cmdbar` e non
+   `.tal-cmdbar` perché ha comandi e colori propri. Qui si imposta SOLO il
+   `top`: il resto no, perché quella barra è scura di proposito e schiarirla
+   rende il sottotitolo bianco su bianco — è già successo. */
+html.tal-tool-page :is(.tal-cmdbar, .cmdbar){
+  top:calc(var(--tal-global-header-height, 92px) + 8px);
+}
+
 html.tal-tool-page .tal-cmdbar .cmd-context{min-width:0;flex:1 1 300px}
 html.tal-tool-page .tal-cmdbar .cmd-context b{
   display:block;

@@ -180,10 +180,15 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 .cf-stage{display:none}
 .cf-stage.active{display:block}
+/* Il contenuto sta in una colonna. Prima ogni riquadro era largo quanto lo
+   schermo e il testo dentro si fermava a metà per un max-width sul
+   paragrafo: sembrava troncato. Ora è il contenitore a essere della
+   larghezza giusta, e il testo lo riempie. */
+main#cfMain{max-width:1120px;margin:0 auto}
 .cf-head{margin-bottom:20px}
 .cf-head h2{font-family:var(--tal-serif,Georgia,serif);font-weight:400;font-style:italic;
   font-size:clamp(22px,3vw,29px);line-height:1.2;margin:0 0 6px}
-.cf-head p{color:var(--tal-ink-3);font-size:13px;max-width:74ch;margin:0}
+.cf-head p{color:var(--tal-ink-3);font-size:13.5px;margin:0}
 
 .cf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 20px}
 .cf-field{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -216,7 +221,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 .cf-verdict .cf-vname{font-size:clamp(19px,2.6vw,25px);font-weight:750;margin:4px 0 2px}
 .cf-verdict .cf-vnet{font-size:clamp(24px,3.4vw,34px);font-weight:800;
   font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.cf-verdict .cf-vwhy{font-size:12.5px;color:var(--tal-ink-3);margin-top:8px;max-width:72ch}
+.cf-verdict .cf-vwhy{font-size:13px;color:var(--tal-ink-3);margin-top:8px}
 
 .cf-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
 .cf-card{
@@ -251,7 +256,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
   background:var(--tal-gold-bg);border:1px solid var(--tal-gold-line)}
 .cf-alert.is-critical{background:#FBECEB;border-color:#E3BDB9}
 .cf-alert h3{font-size:13.5px;margin:0 0 4px}
-.cf-alert p{font-size:12.5px;margin:0;line-height:1.55;max-width:76ch}
+.cf-alert p{font-size:13px;margin:0;line-height:1.55}
 .cf-checks{list-style:none;margin:0;padding:0;display:grid;gap:7px}
 .cf-checks li{padding:9px 11px;border:1px solid var(--tal-line);border-radius:8px;
   background:var(--tal-sunken,#fbfaf8);font-size:11.5px;line-height:1.5}
@@ -283,9 +288,32 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
   letter-spacing:.05em;color:var(--tal-ink-4)}
 .cf-readout b{font-size:14px;font-variant-numeric:tabular-nums}
 
+/* ---------- cosa ribalta la scelta ------------------------------------- */
+
+/* Tre colonne: cosa cambia, quanto pesa, cosa ne viene. Il colpo d'occhio deve
+   dare la risposta senza leggere i numeri: le righe che ribaltano la scelta
+   hanno il bordo rosso, le altre no. */
+.cf-drivers{display:grid;gap:7px}
+.cf-driver{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(70px,1fr) minmax(140px,1fr);
+  gap:12px;align-items:center;padding:10px 13px;border:1px solid var(--tal-line);
+  border-radius:9px;background:var(--tal-card,#fff)}
+.cf-driver.ribalta{border-color:#E3BDB9;background:#FDF6F5;box-shadow:inset 3px 0 0 #8d2320}
+.cf-driver-what b{display:block;font-size:12.5px}
+.cf-driver-what span{display:block;font-size:11px;color:var(--tal-ink-4)}
+.cf-driver-bar{height:7px;border-radius:4px;background:var(--tal-sunken,#f0efeb);overflow:hidden}
+.cf-driver-bar i{display:block;height:100%;border-radius:4px}
+.cf-driver-out{text-align:right}
+.cf-driver-out b{display:block;font-size:12.5px;font-variant-numeric:tabular-nums}
+.cf-driver.ribalta .cf-driver-out b{color:#8d2320}
+.cf-driver-out span{display:block;font-size:10.5px;color:var(--tal-ink-4)}
+@media(max-width:640px){
+  .cf-driver{grid-template-columns:1fr auto;gap:6px 12px}
+  .cf-driver-bar{grid-column:1/-1;order:3}
+}
+
 .cf-section{margin-bottom:40px}
 .cf-section>h3{font-size:15px;margin:0 0 4px}
-.cf-section>p.cf-lead{font-size:12.5px;color:var(--tal-ink-3);margin:0 0 14px;max-width:76ch}
+.cf-section>p.cf-lead{font-size:13px;color:var(--tal-ink-3);margin:0 0 14px}
 
 .cf-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
 
@@ -296,6 +324,73 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 @media print{
   .sb-toggle,.appbar,.tal-global-header,.tal-publication,.cf-actions{display:none!important}
   .app-main{margin-left:0}
+}
+</style>
+<style id="tal-global-header-style">
+.tal-global-header,.tal-global-header *{box-sizing:border-box}
+.tal-global-header{position:sticky;top:0;z-index:5000;width:100%;padding:18px clamp(14px,3vw,42px) 0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#F7F7F5}
+.tal-gh-frame{width:min(1460px,100%);margin:0 auto;min-height:76px;padding:10px 12px 10px 14px;display:grid;grid-template-columns:minmax(220px,auto) minmax(0,1fr) auto;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(20,22,39,.97),rgba(17,28,43,.97));border:1px solid rgba(247,247,245,.16);border-radius:16px;box-shadow:0 18px 54px rgba(8,11,25,.24);backdrop-filter:blur(16px)}
+.tal-gh-brand{appearance:none;border:0;background:transparent;color:#F7F7F5;text-decoration:none;display:flex;align-items:center;gap:12px;min-width:0;padding:0;cursor:pointer;text-align:left}
+.tal-gh-logo{width:42px;height:47px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 8px 18px rgba(89,20,125,.30))}
+.tal-gh-brand-copy{max-width:300px;font-size:11px;font-weight:800;line-height:1.25;letter-spacing:.15em;text-transform:uppercase;white-space:normal}
+.tal-gh-nav{min-width:0;display:flex;justify-content:center;align-items:center;gap:4px}
+.tal-gh-nav a,.tal-gh-nav button{appearance:none;border:0;background:transparent;color:#CFD3DA;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 13px;border-radius:999px;font:700 12px/1 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;transition:background .16s ease,color .16s ease,transform .16s ease}
+.tal-gh-nav a:hover,.tal-gh-nav button:hover,.tal-gh-nav a.active,.tal-gh-nav button.active{background:rgba(114,93,106,.35);color:#fff}
+.tal-gh-nav a:hover,.tal-gh-nav button:hover{transform:translateY(-1px)}
+.tal-gh-lang{display:flex;align-items:center;gap:2px;padding:3px;border:1px solid rgba(247,247,245,.16);border-radius:999px;background:rgba(8,15,26,.42)}
+.tal-gh-lang a{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;color:#C9CDD5;text-decoration:none;font-size:10px;font-weight:850;letter-spacing:.08em}
+.tal-gh-lang a.active{background:#F7F7F5;color:#11131A}
+@media(max-width:1080px){
+ .tal-global-header{padding-top:12px}
+ .tal-gh-frame{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand lang" "nav nav";gap:10px;padding:10px 11px}
+ .tal-gh-brand{grid-area:brand}
+ .tal-gh-lang{grid-area:lang}
+ .tal-gh-nav{grid-area:nav;justify-content:flex-start;overflow-x:auto;padding-top:9px;border-top:1px solid rgba(247,247,245,.12);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .tal-gh-nav::-webkit-scrollbar{display:none}
+ .tal-gh-nav a,.tal-gh-nav button{flex:0 0 auto}
+}
+@media(max-width:620px){
+ .tal-global-header{padding:10px 10px 0}
+ .tal-gh-frame{border-radius:14px;min-height:auto}
+ .tal-gh-logo{width:37px;height:42px}
+ .tal-gh-brand{gap:9px}
+ .tal-gh-brand-copy{max-width:210px;font-size:10px;letter-spacing:.13em}
+ .tal-gh-lang a{min-width:39px;min-height:40px;font-size:9px}
+ .tal-gh-nav{gap:2px;overflow:visible;flex-wrap:wrap;justify-content:flex-start}
+ .tal-gh-nav a,.tal-gh-nav button{min-height:38px;padding:0 9px;font-size:10.5px}
+}
+@media(max-width:390px){
+ .tal-gh-brand-copy{max-width:150px;font-size:9px}
+ .tal-gh-lang a{min-width:35px;padding:0 5px}
+}
+</style><style id="tal-v614-global-polish">
+.tal-site-footer,.site-footer,footer{font-size:13px!important;line-height:1.5}
+.tal-site-footer a,.site-footer a,footer a{font-size:13px!important}
+.tal-gh-menu-toggle{display:none;appearance:none;border:1px solid rgba(247,247,245,.22);background:rgba(8,15,26,.42);color:#F7F7F5;border-radius:999px;min-width:44px;min-height:44px;padding:0 12px;font:800 11px/1 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer}
+.button,.btn,a.button,button.btn{min-height:44px;font-size:max(12px,inherit)}
+.intro-lang-switch{display:grid!important;grid-template-columns:repeat(3,42px)!important;gap:2px!important;width:auto!important;min-width:134px!important;padding:4px!important;align-items:center!important}
+.intro-lang-switch .lang-option{width:42px!important;min-width:42px!important;height:40px!important;display:grid!important;place-items:center!important;padding:0!important}
+@media(max-width:760px){
+ .tal-global-header{padding:8px 8px 0!important}
+ .tal-gh-frame{min-height:58px!important;padding:7px 8px!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"brand lang menu"!important;gap:7px!important;border-radius:13px!important}
+ .tal-gh-brand{grid-area:brand!important;min-width:0!important}
+ .tal-gh-logo{width:34px!important;height:38px!important}
+ .tal-gh-brand-copy{max-width:150px!important;font-size:9px!important;letter-spacing:.1em!important}
+ .tal-gh-lang{grid-area:lang!important;display:grid!important;grid-template-columns:repeat(3,34px)!important;gap:1px!important;padding:2px!important}
+ .tal-gh-lang a{width:34px!important;min-width:34px!important;min-height:36px!important;padding:0!important;font-size:8.5px!important}
+ .tal-gh-menu-toggle{display:inline-flex!important;grid-area:menu;align-items:center;justify-content:center}
+ .tal-gh-nav{grid-area:nav!important;display:none!important;overflow:visible!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important;width:100%!important;padding:8px 0 2px!important;border-top:1px solid rgba(247,247,245,.12)!important}
+ .tal-global-header.tal-menu-open .tal-gh-frame{grid-template-areas:"brand lang menu" "nav nav nav"!important}
+ .tal-global-header.tal-menu-open .tal-gh-nav{display:flex!important}
+ .tal-gh-nav a,.tal-gh-nav button{width:100%!important;justify-content:flex-start!important;min-height:44px!important;padding:0 13px!important;font-size:12px!important}
+}
+@media(max-width:390px){
+ .tal-gh-brand-copy{max-width:115px!important;font-size:8.5px!important}
+ .tal-gh-lang{grid-template-columns:repeat(3,31px)!important}
+ .tal-gh-lang a{width:31px!important;min-width:31px!important}
+ .tal-gh-menu-toggle{min-width:40px;padding:0 9px;font-size:10px}
+ .intro-lang-switch{grid-template-columns:repeat(3,39px)!important;min-width:125px!important}
+ .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
 </head>
@@ -358,12 +453,12 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <section class="cf-stage active" data-stage="profilo" id="stageProfilo">
 <div class="cf-head">
 <h2>Chi stiamo simulando</h2>
-<p>Il regime attuale serve prima dei numeri: cambia quali soglie contano e quali avvisi hanno senso. Tutti i campi di questa schermata sono obbligatori.</p>
+<p>Tre scelte, poi si passa ai numeri.</p>
 </div>
 
 <div class="cf-section">
 <h3>Professione</h3>
-<p class="cf-lead">Determina la Cassa di previdenza e la forma societaria confrontata.</p>
+<p class="cf-lead">Decide la Cassa e la forma societaria da confrontare.</p>
 <div class="cf-choices">
 <label class="cf-choice"><input checked name="cfProfession" type="radio" value="commercialista"><b>Dottore commercialista</b><small>CNPADC · si confronta la STP S.r.l.</small></label>
 <label class="cf-choice"><input name="cfProfession" type="radio" value="avvocato"><b>Avvocato</b><small>Cassa Forense · si confronta la STA S.r.l.</small></label>
@@ -372,7 +467,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <div class="cf-section">
 <h3>Regime attuale</h3>
-<p class="cf-lead">Da dove si parte. Serve a distinguere la convenienza nell'anno in corso da quella del periodo successivo.</p>
+<p class="cf-lead">Da dove parti oggi.</p>
 <div class="cf-choices">
 <label class="cf-choice"><input checked name="cfCurrentRegime" type="radio" value="forfettario"><b>Forfettario</b><small>Imposta sostitutiva, costi non deducibili</small></label>
 <label class="cf-choice"><input name="cfCurrentRegime" type="radio" value="ordinario"><b>Partita IVA ordinaria</b><small>IRPEF progressiva, costi analitici</small></label>
@@ -386,7 +481,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <div class="cf-field">
 <label for="cfYear">Anno fiscale</label>
 <select class="tal-input" id="cfYear"><option value="2026">2026</option><option value="2025">2025</option></select>
-<span class="cf-hint">Aliquote, massimali e minimi cambiano per anno. Sono elencati in «Come si usa».</span>
+<span class="cf-hint">Le aliquote dell'anno sono in «Come si usa».</span>
 </div>
 <div class="cf-field">
 <label for="cfSubjectKind">Per chi</label>
@@ -412,7 +507,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <section class="cf-stage" data-stage="compensi" id="stageCompensi">
 <div class="cf-head">
 <h2>Compensi e redditi</h2>
-<p>Gli importi sono sempre annuali. I compensi si intendono al netto dell'IVA e del contributo integrativo, perché l'integrativo lo paga il cliente e non è un tuo ricavo.</p>
+<p>Importi annuali. I compensi al netto di IVA e contributo integrativo: l'integrativo lo paga il cliente.</p>
 </div>
 
 <div class="cf-section">
@@ -431,7 +526,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <div class="cf-field">
 <label for="cfOtherIncome">Altri redditi personali</label>
 <input class="tal-input" id="cfOtherIncome" inputmode="decimal" type="text" value="0">
-<span class="cf-hint">Entrano nella progressività IRPEF e danno capienza alla deduzione dei contributi.</span>
+<span class="cf-hint">Alzano l'aliquota IRPEF sul reddito professionale.</span>
 </div>
 <div class="cf-field">
 <label for="cfEmployeeIncome">di cui lavoro dipendente o pensione</label>
@@ -443,7 +538,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <div class="cf-section">
 <h3>Requisiti e cause ostative del forfettario</h3>
-<p class="cf-lead">Il tool non può verificarli al posto tuo: quello che dichiari qui entra nel confronto e resta scritto negli avvisi.</p>
+<p class="cf-lead">Quello che dichiari qui entra nel confronto. Il tool non lo verifica.</p>
 <div class="cf-grid">
 <div class="cf-field full">
 <label class="cf-choice" style="border-radius:9px"><input id="cfStartup" type="checkbox"><b>Aliquota 5% per nuova attività</b><small>Ricorrono tutte le condizioni di legge. Il superamento degli 85.000 nell'anno non fa perdere il 5%.</small></label>
@@ -459,17 +554,17 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <div class="cf-section">
 <h3>Società professionale</h3>
-<p class="cf-lead">Serve solo al confronto con la STP/STA. Se non ti interessa, lascia i valori come sono.</p>
+<p class="cf-lead">Serve solo allo scenario societario. Se non ti interessa, lascia così.</p>
 <div class="cf-grid">
 <div class="cf-field">
 <label for="cfOwnership">Quota di partecipazione</label>
 <input class="tal-input" id="cfOwnership" inputmode="decimal" type="text" value="100">
-<span class="cf-hint">Percentuale. Determina utile attribuibile, dividendo e base contributiva.</span>
+<span class="cf-hint">La tua quota della società, in percentuale.</span>
 </div>
 <div class="cf-field">
 <label for="cfDistribution">Utile distribuito</label>
 <input class="tal-input" id="cfDistribution" inputmode="decimal" type="text" value="100">
-<span class="cf-hint">Percentuale dell'utile distribuibile. Ciò che resta è utile trattenuto, non cassa tua.</span>
+<span class="cf-hint">Quanto ne esce come dividendo. Il resto resta in società.</span>
 </div>
 <div class="cf-field">
 <label for="cfCompanyOverhead">Costi di struttura della società</label>
@@ -499,12 +594,12 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <div class="cf-field" id="cfAdminTreatmentBox">
 <label for="cfAdminTreatment">Previdenza sul compenso</label>
 <select class="tal-input" id="cfAdminTreatment"><option value="cassa">Cassa professionale</option><option value="inps">Gestione Separata INPS</option></select>
-<span class="cf-hint">La qualificazione va verificata nel caso concreto: dipende da autonomia e natura della carica.</span>
+<span class="cf-hint">Da verificare caso per caso.</span>
 </div>
 <div class="cf-field" id="cfInpsRateBox">
 <label for="cfInpsRate">Aliquota Gestione Separata</label>
 <select class="tal-input" id="cfInpsRate"><option value="24">24% · con altra copertura obbligatoria</option><option value="33.72">33,72% · senza altra copertura</option></select>
-<span class="cf-hint">Un terzo a carico dell'amministratore, due terzi della società.</span>
+<span class="cf-hint">Un terzo a te, due terzi alla società.</span>
 </div>
 </div>
 </div>
@@ -547,7 +642,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 <section class="cf-stage" data-stage="costi" id="stageCosti">
 <div class="cf-head">
 <h2>Costi annuali</h2>
-<p>Tutti gli importi sono annuali. Ogni voce porta le proprie regole di IVA e deducibilità, diverse fra ordinario e società: aprile e modificale se il caso concreto lo richiede. Le regole cambiate a mano restano segnate.</p>
+<p>Importi annuali. Ogni voce porta le sue regole di IVA e deducibilità: aprila per cambiarle. Quello che cambi resta segnato.</p>
 </div>
 <div id="cfCostList"></div>
 <div class="cf-actions">
@@ -580,7 +675,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <div class="cf-section">
 <h3>Cassa netta al variare dei compensi</h3>
-<p class="cf-lead">A costi invariati. La linea orizzontale è il netto che otterresti fermandoti a 85.000 nel forfettario; il punto segnato è dove l'ordinario lo raggiunge.</p>
+<p class="cf-lead">Passa il dito o il mouse sul grafico per leggere il netto a ogni livello di compensi. Da tastiera: frecce destra e sinistra.</p>
 <div class="cf-chart-wrap"><svg id="cfChartMain" role="img" aria-label="Cassa netta personale al variare dei compensi, per i tre regimi"></svg></div>
 <div class="cf-legend" id="cfLegendMain"></div>
 <div class="cf-readout" id="cfChartReadout"></div>
@@ -588,25 +683,25 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <div class="cf-section">
 <h3>Dai compensi alla cassa: cosa se ne va</h3>
-<p class="cf-lead">Lo stesso importo di partenza, i tre percorsi. Ogni barra scende di costi, contributi e imposte fino a ciò che ti resta.</p>
+<p class="cf-lead">Dai tuoi compensi si toglie quello che se ne va. In fondo, quello che ti resta.</p>
 <div class="cf-chart-wrap"><svg id="cfChartBridge" role="img" aria-label="Passaggio dai compensi alla cassa netta per ciascun regime"></svg></div>
 </div>
 
 <div class="cf-section">
 <h3>Cosa ribalta la scelta</h3>
-<p class="cf-lead">Quanto si muove il divario fra il regime migliore e il secondo, cambiando una variabile alla volta. Le barre a destra allargano il vantaggio, quelle a sinistra lo riducono.</p>
-<div class="cf-chart-wrap"><svg id="cfChartDrivers" role="img" aria-label="Sensibilità del divario di netto alle singole variabili"></svg></div>
+<p class="cf-lead">Cosa succede al vantaggio del primo sul secondo se una cosa cambia.</p>
+<div id="cfDrivers"></div>
 </div>
 
 <div class="cf-section">
 <h3>I due anni del passaggio</h3>
-<p class="cf-lead">L'anno simulato e il periodo successivo. Se supera 85.000, il forfettario cambia stato fra i due esercizi: è la distinzione che decide il momento del passaggio.</p>
+<p class="cf-lead">Se superi 85.000, quest'anno e il prossimo non si somigliano.</p>
 <div class="cf-chart-wrap"><svg id="cfChartYears" role="img" aria-label="Confronto fra anno simulato e periodo successivo"></svg></div>
 </div>
 
 <div class="cf-section">
 <h3>Da verificare prima di decidere</h3>
-<p class="cf-lead">Assunzioni del modello che dipendono dal caso concreto. Non sono errori: sono i punti su cui il tool si ferma e serve il tuo giudizio.</p>
+<p class="cf-lead">Dove il tool si ferma e serve il tuo giudizio.</p>
 <ul class="cf-checks" id="cfChecks"></ul>
 </div>
 
@@ -619,12 +714,12 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 
 <!-- ==================== ARCHIVIO / DATI / AIUTO ==================== -->
 <section class="cf-stage" data-stage="archivio" id="stageArchivio">
-<div class="cf-head"><h2>Archivio simulazioni</h2><p>Salvate in questo browser. Non vengono inviate da nessuna parte, e si perdono se cancelli i dati del browser: per conservarle, usa il backup in «Dati e backup».</p></div>
+<div class="cf-head"><h2>Archivio simulazioni</h2><p>Salvate in questo browser. Se lo svuoti si perdono: fai un backup da «Dati e backup».</p></div>
 <div id="cfArchiveList"></div>
 </section>
 
 <section class="cf-stage" data-stage="dati" id="stageDati">
-<div class="cf-head"><h2>Dati e backup</h2><p>Tutto quello che il tool tiene sta in questo browser. Da qui lo esporti, lo reimporti su un'altra macchina, o lo cancelli.</p></div>
+<div class="cf-head"><h2>Dati e backup</h2><p>Tutto sta in questo browser. Da qui esporti, reimporti o cancelli.</p></div>
 <div class="cf-actions">
 <button class="btn secondary" data-action="backup" type="button">Scarica un backup</button>
 <button class="btn secondary" data-action="restore" type="button">Ripristina da backup</button>
@@ -634,7 +729,7 @@ main{padding:clamp(22px,4vw,46px);max-width:1500px;margin:0 auto;width:100%}
 </section>
 
 <section class="cf-stage" data-stage="aiuto" id="stageAiuto">
-<div class="cf-head"><h2>Come si usa</h2><p>Cosa fa il tool, cosa non fa, e con quali parametri.</p></div>
+<div class="cf-head"><h2>Come si usa</h2><p>Cosa fa, cosa non fa, con quali numeri.</p></div>
 <div id="cfHelp"></div>
 </section>
 
@@ -1170,10 +1265,12 @@ window.cfRenderConfronto = function () {
     '<div class="cf-vnet">' + E(vincente.netto) + '</div>' +
     '<div class="cf-vwhy">' +
       (secondo
-        ? 'Lascia ' + E(divario) + ' in più di ' + X(secondo.nome).toLowerCase() +
-          ' (' + (Math.abs(secondo.netto) > 1 ? ((divario / Math.abs(secondo.netto)) * 100).toFixed(1).replace('.', ',') + '% in più' : 'divario') + ').'
-        : 'Unica alternativa applicabile nel periodo simulato.') +
-      ' La cifra è cassa personale netta: quello che resta dopo costi, contributi e imposte.' +
+        ? E(divario) + ' in più di ' + X(secondo.nome) +
+          (Math.abs(secondo.netto) > 1
+            ? ', il ' + ((divario / Math.abs(secondo.netto)) * 100).toFixed(0) + '% in più.'
+            : '.')
+        : 'È l’unica alternativa applicabile.') +
+      ' Cassa personale netta: quello che ti resta dopo costi, contributi e imposte.' +
     '</div>';
 
   $('cfCards').innerHTML = esito.scenari.map((s) => {
@@ -1359,12 +1456,86 @@ function graficoCurva(conv) {
     '<span><i style="border-top-color:#145368;border-top-style:dotted"></i>netto fermandosi a ' +
     mille(conv.soglia) + '</span>';
 
-  /* I numeri sotto il grafico: chi non legge il disegno legge questi. */
+  /* ---- il cursore ------------------------------------------------------
+     Il brief lo chiedeva: «cursore per esplorare il netto nei diversi livelli
+     di fatturato». Serve perche' tre curve vicine si leggono male a occhio: il
+     numero esatto lo si vuole vedere, non stimare. Funziona col mouse, col
+     dito e con le frecce della tastiera — quest'ultima non e' un extra, e'
+     l'unico modo di usarlo per chi non punta. */
+  const guida = el('g', {});
+  s.appendChild(guida);
   const E = euro();
-  const alTuo = window.cfCalcola().scenari;
-  $('cfChartReadout').innerHTML = alTuo.map((sc) =>
-    '<div><span>' + NOMI[sc.id] + ' a ' + mille(stato.revenue) + '</span><b>' +
-    (sc.applicabile ? E(sc.netto) : 'non applicabile') + '</b></div>').join('');
+
+  function mostra(indice, ancorato) {
+    while (guida.firstChild) guida.removeChild(guida.firstChild);
+    const p = punti[Math.max(0, Math.min(punti.length - 1, indice))];
+    if (!p) return;
+    const px = x(p.r);
+    guida.appendChild(el('line', { x1: px, x2: px, y1: T, y2: H - B,
+      stroke: '#0E1624', 'stroke-width': 1, 'stroke-dasharray': '2 2', opacity: .55 }));
+    serie.forEach((k) => {
+      if (p[k] == null) return;
+      guida.appendChild(el('circle', { cx: px, cy: y(p[k]), r: 4.5,
+        fill: COLORI[k], stroke: '#fff', 'stroke-width': 1.6 }));
+    });
+    /* La lettura sta sotto, in cifre grandi: il grafico mostra la forma, i
+       numeri li legge la riga qui sotto. */
+    $('cfChartReadout').innerHTML =
+      '<div style="grid-column:1/-1;padding:0 0 4px"><span>Compensi</span><b style="font-size:17px">' +
+      E(p.r) + (ancorato ? ' · dove sei adesso' : '') + '</b></div>' +
+      serie.map((k) => '<div style="border-left:3px solid ' + COLORI[k] + '"><span>' +
+        NOMI[k] + '</span><b>' + (p[k] == null ? 'non applicabile' : E(p[k])) + '</b></div>').join('');
+  }
+
+  /* L'indice piu' vicino ai compensi inseriti: e' da lì che parte il cursore,
+     così la prima lettura è la propria situazione e non un punto qualsiasi. */
+  let iCorrente = 0, minDist = Infinity;
+  punti.forEach((p, i) => {
+    const d = Math.abs(p.r - stato.revenue);
+    if (d < minDist) { minDist = d; iCorrente = i; }
+  });
+  const iAncora = iCorrente;
+  mostra(iAncora, true);
+
+  const dalPuntatore = (ev) => {
+    const box = s.getBoundingClientRect();
+    const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - box.left;
+    /* Dal pixel sullo schermo alla coordinata del disegno: il viewBox non
+       coincide con la larghezza resa. */
+    const vx = cx / box.width * W;
+    const r = conv.min + (vx - L) / (W - L - R) * (conv.max - conv.min);
+    let best = 0, bd = Infinity;
+    punti.forEach((p, i) => { const d = Math.abs(p.r - r); if (d < bd) { bd = d; best = i; } });
+    return best;
+  };
+
+  const zonaAttiva = el('rect', { x: L, y: T, width: W - L - R, height: H - T - B,
+    fill: 'transparent', style: 'cursor:crosshair;touch-action:pan-y' });
+  s.appendChild(zonaAttiva);
+
+  ['pointermove', 'pointerdown', 'touchmove'].forEach((tipo) =>
+    zonaAttiva.addEventListener(tipo, (ev) => {
+      iCorrente = dalPuntatore(ev);
+      mostra(iCorrente, iCorrente === iAncora);
+    }, { passive: true }));
+  zonaAttiva.addEventListener('pointerleave', () => {
+    iCorrente = iAncora; mostra(iAncora, true);
+  });
+
+  s.setAttribute('tabindex', '0');
+  s.setAttribute('role', 'application');
+  s.setAttribute('aria-label', 'Cassa netta per i tre regimi al variare dei compensi. '
+    + 'Usa le frecce destra e sinistra per esplorare i livelli di compensi.');
+  s.onkeydown = (ev) => {
+    const passo = ev.shiftKey ? 5 : 1;
+    if (ev.key === 'ArrowRight') iCorrente = Math.min(punti.length - 1, iCorrente + passo);
+    else if (ev.key === 'ArrowLeft') iCorrente = Math.max(0, iCorrente - passo);
+    else if (ev.key === 'Home') iCorrente = 0;
+    else if (ev.key === 'End') iCorrente = punti.length - 1;
+    else return;
+    ev.preventDefault();
+    mostra(iCorrente, iCorrente === iAncora);
+  };
 }
 
 /* ============================================================= 2. il ponte */
@@ -1449,85 +1620,88 @@ function graficoPonte(esito) {
    divario fra il primo e il secondo. È il modo più diretto per rispondere alla
    domanda «cosa dovrebbe succedere perché la decisione cambi». */
 function graficoDriver(esito, vincente, secondo) {
-  const W = 860, H = 300, L = 218, R = 96, T = 26, B = 34;
-  const s = svgPulito('cfChartDrivers', W, H);
+  /* Era un grafico a tornado: barre verde e rosse intorno a una linea centrale,
+     con lo scostamento del divario. Diceva la cosa giusta e non si capiva —
+     bisognava tenere a mente il divario di partenza e leggere una lunghezza.
+     La domanda vera e' binaria: questa cosa ribalta la scelta o no. Quindi si
+     risponde a parole, e la barra resta solo come ordine di grandezza. */
+  const host = $('cfDrivers'), E = euro(), X = esc();
   if (!secondo) {
-    s.appendChild(el('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle',
-      'font-size': 12, fill: '#6E6B65' }, 'Serve più di un regime applicabile per confrontare le leve.'));
+    host.innerHTML = '<p class="cf-lead">Serve piu’ di un regime applicabile per confrontare le leve.</p>';
     return;
   }
   const stato = window.cfStato();
   const divarioBase = vincente.netto - secondo.netto;
 
-  const leve = [
-    ['Costi annuali', { costFactor: 1.3 }, { costFactor: 0.7 }, '±30%'],
-    ['Compensi', { revenue: stato.revenue * 1.2 }, { revenue: stato.revenue * 0.8 }, '±20%'],
-    ['Utile distribuito', { distribution: Math.min(100, stato.distribution + 30) }, { distribution: Math.max(0, stato.distribution - 30) }, '±30 punti'],
-    ['Quota di partecipazione', { ownership: Math.min(100, stato.ownership + 20) }, { ownership: Math.max(1, stato.ownership - 20) }, '±20 punti'],
-    ['Compenso amministratore', { admin: stato.admin + 25000, extractionMode: 'mix' }, { admin: Math.max(0, stato.admin - 25000), extractionMode: 'mix' }, '±25.000'],
-    ['Addizionali locali', { regionalRate: stato.regionalRate + 1, municipalRate: stato.municipalRate + .4 }, { regionalRate: Math.max(0, stato.regionalRate - 1), municipalRate: Math.max(0, stato.municipalRate - .4) }, '±1,4 punti']
+  const LEVE = [
+    ['Costi annuali', 'un terzo in più', { costFactor: 1.3 }, 'un terzo in meno', { costFactor: 0.7 }],
+    ['Compensi', 'un quinto in più', { revenue: stato.revenue * 1.2 }, 'un quinto in meno', { revenue: stato.revenue * 0.8 }],
+    ['Utile distribuito', '30 punti in più', { distribution: Math.min(100, stato.distribution + 30) }, '30 punti in meno', { distribution: Math.max(0, stato.distribution - 30) }],
+    ['Quota nella società', '20 punti in più', { ownership: Math.min(100, stato.ownership + 20) }, '20 punti in meno', { ownership: Math.max(1, stato.ownership - 20) }],
+    ['Compenso amministratore', '25.000 in più', { admin: stato.admin + 25000, extractionMode: 'mix' }, '25.000 in meno', { admin: Math.max(0, stato.admin - 25000), extractionMode: 'mix' }],
+    ['Addizionali locali', 'un punto e mezzo in più', { regionalRate: stato.regionalRate + 1, municipalRate: stato.municipalRate + 0.4 }, 'un punto e mezzo in meno', { regionalRate: Math.max(0, stato.regionalRate - 1), municipalRate: Math.max(0, stato.municipalRate - 0.4) }]
   ];
   if (stato.profession === 'commercialista') {
-    leve.push(['Aliquota soggettiva CNPADC',
-      { pensionRate: Math.min(100, stato.pensionRate + 10) },
-      { pensionRate: Math.max(12, stato.pensionRate - 10) }, '±10 punti']);
+    LEVE.push(['Aliquota CNPADC', '10 punti in più', { pensionRate: Math.min(100, stato.pensionRate + 10) },
+      '10 punti in meno', { pensionRate: Math.max(12, stato.pensionRate - 10) }]);
   }
 
-  const misura = (extra) => {
+  /* Per ogni variante si guarda chi vince, non solo di quanto: il ribaltamento
+     e' l'unica informazione che cambia una decisione. */
+  const prova = (extra) => {
     const sc = window.cfCalcola(extra).scenari;
-    const a = sc.find((x) => x.id === vincente.id);
-    const b = sc.find((x) => x.id === secondo.id);
-    if (!a || !b || !a.applicabile) return null;
-    return a.netto - b.netto;
+    const amm = sc.filter((z) => z.applicabile);
+    if (!amm.length) return null;
+    const primo = amm.reduce((b, z) => (z.netto > b.netto ? z : b), amm[0]);
+    const dopo = amm.filter((z) => z.id !== primo.id)
+      .reduce((b, z) => (b == null || z.netto > b.netto ? z : b), null);
+    return { vince: primo, divario: dopo ? primo.netto - dopo.netto : 0 };
   };
 
-  const righe = leve.map(([nome, su, giu, quanto]) => {
-    const alto = misura(su), basso = misura(giu);
-    const dSu = alto == null ? 0 : alto - divarioBase;
-    const dGiu = basso == null ? 0 : basso - divarioBase;
-    return { nome, quanto, dSu, dGiu, ampiezza: Math.max(Math.abs(dSu), Math.abs(dGiu)) };
-  }).filter((r) => r.ampiezza > 1).sort((a, b) => b.ampiezza - a.ampiezza);
+  const righe = [];
+  LEVE.forEach(([nome, etSu, su, etGiu, giu]) => {
+    [[etSu, su], [etGiu, giu]].forEach(([etichetta, extra]) => {
+      const r = prova(extra);
+      if (!r) return;
+      const ribalta = r.vince.id !== vincente.id;
+      const scostamento = Math.abs(r.divario - divarioBase);
+      if (!ribalta && scostamento < 200) return;   // niente rumore
+      righe.push({ nome, etichetta, ribalta, vince: r.vince, divario: r.divario, scostamento });
+    });
+  });
+  /* Prima quello che ribalta, poi per impatto: chi legge la prima riga ha già
+     la risposta. */
+  righe.sort((a, b) => (b.ribalta - a.ribalta) || (b.scostamento - a.scostamento));
+
+  const ribaltanti = righe.filter((r) => r.ribalta);
+  const intestazione = ribaltanti.length
+    ? '<p class="cf-lead"><b>' + ribaltanti.length +
+      (ribaltanti.length === 1 ? ' cambiamento ribalta la scelta.' : ' cambiamenti ribaltano la scelta.') +
+      '</b> Oggi ' + X(vincente.nome) + ' è davanti di ' + E(divarioBase) + '.</p>'
+    : '<p class="cf-lead"><b>Nessuno di questi cambiamenti ribalta la scelta.</b> ' +
+      X(vincente.nome) + ' resta davanti in tutte le varianti provate. Oggi il vantaggio è di ' +
+      E(divarioBase) + '.</p>';
 
   if (!righe.length) {
-    s.appendChild(el('text', { x: W / 2, y: H / 2, 'text-anchor': 'middle',
-      'font-size': 12, fill: '#6E6B65' }, 'Nessuna delle leve considerate sposta il divario in modo apprezzabile.'));
+    host.innerHTML = intestazione +
+      '<p class="cf-lead">Nessuna delle leve provate sposta il vantaggio in modo apprezzabile.</p>';
     return;
   }
 
-  const massimo = Math.max(...righe.map((r) => r.ampiezza)) * 1.12;
-  const zero = L + (W - L - R) / 2;
-  const mezza = (W - L - R) / 2;
-  const hRiga = Math.min(30, (H - T - B) / righe.length);
-  const px = (v) => (v / massimo) * mezza;
-
-  s.appendChild(el('line', { x1: zero, x2: zero, y1: T - 8, y2: T + righe.length * hRiga + 4,
-    stroke: '#B9B4A8', 'stroke-width': 1 }));
-  s.appendChild(el('text', { x: zero, y: T - 14, 'text-anchor': 'middle',
-    'font-size': 10, fill: '#6E6B65' }, 'divario attuale ' + euro()(divarioBase)));
-
-  righe.forEach((r, i) => {
-    const yy = T + i * hRiga;
-    const h = Math.max(8, hRiga - 11);
-    s.appendChild(el('text', { x: L - 12, y: yy + h / 2 + 4, 'text-anchor': 'end',
-      'font-size': 11, fill: '#1D1B16' }, r.nome));
-    s.appendChild(el('text', { x: L - 12, y: yy + h / 2 + 15, 'text-anchor': 'end',
-      'font-size': 9, fill: '#8A8780' }, r.quanto));
-    [[r.dSu, '#2E6B3D'], [r.dGiu, '#8d2320']].forEach(([v, colore]) => {
-      if (Math.abs(v) < 1) return;
-      const w = Math.abs(px(v));
-      s.appendChild(el('rect', { x: v >= 0 ? zero : zero - w, y: yy, width: w, height: h,
-        fill: colore, opacity: .82, rx: 2 }));
-    });
-    const massimoRiga = Math.abs(r.dSu) >= Math.abs(r.dGiu) ? r.dSu : r.dGiu;
-    s.appendChild(el('text', {
-      x: massimoRiga >= 0 ? zero + Math.abs(px(massimoRiga)) + 7 : zero - Math.abs(px(massimoRiga)) - 7,
-      y: yy + h / 2 + 4, 'text-anchor': massimoRiga >= 0 ? 'start' : 'end',
-      'font-size': 10, 'font-weight': 700, fill: '#1D1B16' },
-      (massimoRiga > 0 ? '+' : '−') + mille(Math.abs(massimoRiga))));
-  });
-
-  s.appendChild(el('text', { x: L - 12, y: T + righe.length * hRiga + 24, 'text-anchor': 'end',
-    'font-size': 9.5, fill: '#8A8780' }, 'verde: allarga il vantaggio · rosso: lo riduce'));
+  const massimo = Math.max(...righe.map((r) => r.scostamento)) || 1;
+  host.innerHTML = intestazione +
+    '<div class="cf-drivers">' + righe.map((r) => {
+      const larghezza = Math.max(3, Math.round(r.scostamento / massimo * 100));
+      return '<div class="cf-driver' + (r.ribalta ? ' ribalta' : '') + '">' +
+        '<div class="cf-driver-what"><b>' + X(r.nome) + '</b><span>' + X(r.etichetta) + '</span></div>' +
+        '<div class="cf-driver-bar"><i style="width:' + larghezza + '%;background:' +
+          (r.ribalta ? '#8d2320' : '#B9B4A8') + '"></i></div>' +
+        '<div class="cf-driver-out">' +
+          (r.ribalta
+            ? '<b>Vince ' + X(r.vince.nome) + '</b><span>di ' + E(r.divario) + '</span>'
+            : '<b>' + E(r.divario) + '</b><span>vantaggio, da ' + E(divarioBase) + '</span>') +
+        '</div></div>';
+    }).join('') + '</div>';
 }
 
 /* ========================================================== 4. i due anni */
@@ -1802,10 +1976,14 @@ const KEY_ARCHIVE = 'tal.convenienza.archivio.v1';
 
 /* ------------------------------------------------------------- formattazione */
 
+/* `useGrouping:'always'`, non il default: in italiano un numero di quattro
+   cifre non viene raggruppato, quindi «6305» compariva accanto a «34.427».
+   Con i soldi il punto delle migliaia serve sempre. */
+const RAGGRUPPA = { useGrouping: 'always' };
 const euro = (n) => (n < 0 ? '−' : '') + '€' +
-  Math.abs(Math.round(n)).toLocaleString('it-IT');
+  Math.abs(Math.round(n)).toLocaleString('it-IT', RAGGRUPPA);
 const euroPreciso = (n) => (n < 0 ? '−' : '') + '€' +
-  Math.abs(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  Math.abs(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
 const pct = (n) => n.toLocaleString('it-IT', { maximumFractionDigits: 1 }) + '%';
 
 /* Accetta «85.000», «85000», «85.000,50» e «85000.50»: chi compila non deve
@@ -1817,7 +1995,7 @@ function leggiNumero(v) {
   if (/^-?\d+,\d+$/.test(s)) return Number(s.replace(',', '.')) || 0;
   return Number(s) || 0;
 }
-const scriviNumero = (n) => Number(n || 0).toLocaleString('it-IT', { maximumFractionDigits: 2 });
+const scriviNumero = (n) => Number(n || 0).toLocaleString('it-IT', { maximumFractionDigits: 2, useGrouping: 'always' });
 
 function toast(messaggio, errore) {
   let box = $('cfToast');

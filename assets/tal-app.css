@@ -715,9 +715,13 @@ html.tal-tool-page .tal-start-card>span:not(.tal-start-ic){
   line-height:1.5;
   color:var(--tal-ink-3);
 }
+/* «Prova con i dati dimostrativi» e' una delle tre strade d'ingresso di ogni
+   tool, ma con `padding:0` era un bersaglio alto 15px: sul telefono si
+   sbaglia. L'imbottitura lo porta a 27 e il margine scende di altrettanto,
+   cosi' non si sposta di un pixel. */
 html.tal-tool-page .tal-start-demo{
-  margin-top:12px;
-  padding:0;
+  margin-top:6px;
+  padding:6px 2px;
   border:0;
   background:none;
   color:var(--tal-accent);

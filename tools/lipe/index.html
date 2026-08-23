@@ -935,8 +935,8 @@ function num(v){
   }
   const n=parseFloat(s);return (Number.isFinite(n)?n:0)*(neg?-1:1)
 }
-const fmt=v=>new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(num(v));
-const fmtPct=v=>`${new Intl.NumberFormat('it-IT',{maximumFractionDigits:2}).format(num(v))}%`;
+const fmt=v=>new Intl.NumberFormat('it-IT',{useGrouping:'always',minimumFractionDigits:2,maximumFractionDigits:2}).format(num(v));
+const fmtPct=v=>`${new Intl.NumberFormat('it-IT',{useGrouping:'always',maximumFractionDigits:2}).format(num(v))}%`;
 function toast(msg,error=false){const t=$('toast');t.textContent=msg;t.className='toast show'+(error?' error':'');clearTimeout(toast._t);toast._t=setTimeout(()=>t.className='toast',3200)}
 function readStore(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'')||fallback}catch{return fallback}}
 function writeStore(key,value,quiet=false){

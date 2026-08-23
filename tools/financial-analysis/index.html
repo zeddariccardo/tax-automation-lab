@@ -430,8 +430,8 @@ function parseNumber(v){
   }
   s=s.replace(/[^0-9+.]/g,'');const n=Number(s);return Number.isFinite(n)?(neg?-Math.abs(n):n):0;
 }
-function fmt(v,dec=0){if(v==null||!Number.isFinite(v))return '—';const n=Math.abs(v)<1e-9?0:v;return new Intl.NumberFormat('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n);}
-function money(v,dec=0){if(v==null||!Number.isFinite(v))return '—';const n=Math.abs(v)<1e-9?0:v,cur=STATE.company.currency||'EUR';return new Intl.NumberFormat('it-IT',{style:'currency',currency:cur,minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n);}
+function fmt(v,dec=0){if(v==null||!Number.isFinite(v))return '—';const n=Math.abs(v)<1e-9?0:v;return new Intl.NumberFormat('it-IT',{useGrouping:'always',minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n);}
+function money(v,dec=0){if(v==null||!Number.isFinite(v))return '—';const n=Math.abs(v)<1e-9?0:v,cur=STATE.company.currency||'EUR';return new Intl.NumberFormat('it-IT',{style:'currency',currency:cur,useGrouping:'always',minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n);}
 function pct(v){return v==null||!Number.isFinite(v)?'—':fmt(v*100,1)+'%';}
 function ratio(n,d){return d&&Number.isFinite(n)&&Number.isFinite(d)?n/d:null;}
 function avg(a,b,previousAvailable=(STATE.periods&&STATE.periods.previous?STATE.periods.previous.available:true)){
@@ -2846,7 +2846,7 @@ function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
 function tol(rows,field){const base=(rows||[]).reduce((s,a)=>s+Math.abs(n(a[field])),0);return Math.max(.01,base*1e-9);}
 function iv(a){return String(a&&a.iv||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
 function isReservedTechnical(a){return /^TAL[_\- ]?AIX$/i.test(String(a&&a.code||''))||(/voce tecnica/i.test(String(a&&a.desc||''))&&iv(a)==='AIX');}
-function fmt(v){try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:(STATE&&STATE.company&&STATE.company.currency)||'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}catch(_){return Number(v||0).toFixed(2);}}
+function fmt(v){try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:(STATE&&STATE.company&&STATE.company.currency)||'EUR',useGrouping:'always',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}catch(_){return Number(v||0).toFixed(2);}}
 function fieldLabel(field){return field==='current'?'corrente':'precedente';}
 function parseResultReconciliation(parsed){
   const accounts=parsed.accounts||[], diagnostics=parsed.diagnostics||[];

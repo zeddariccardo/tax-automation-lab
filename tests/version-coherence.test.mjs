@@ -213,3 +213,31 @@ for (const [catalogo, formato] of Object.entries(DATE_ATTESE)) {
     assert.equal(problemi.length, 0, `${catalogo}: date non allineate\n${problemi.join('\n')}`);
   });
 }
+
+/* Il separatore delle migliaia va dichiarato, non lasciato al valore
+   predefinito. `useGrouping` vale 'auto', e 'auto' segue il CLDR: per
+   l'italiano il CLDR **non** raggruppa i numeri di quattro cifre. Nello stesso
+   elenco dell'F24 si leggeva «3500,00 €» accanto a «40.620,55 €», e le stesse
+   cifre nell'Excel uscivano sempre raggruppate, perché il formato `#,##0.00`
+   raggruppa comunque: schermo e file dicevano due cose diverse.
+
+   Il controllo guarda solo i formattatori con i decimali fissati a due, che
+   sono quelli monetari: un conteggio o un anno non c'entrano. */
+const FORMATTATORI = /(?:new Intl\.NumberFormat|\.toLocaleString)\(\s*'it-IT'\s*,\s*\{([^}]*)\}/g;
+
+for (const [dir, label] of Object.entries(TOOLS)) {
+  test(`${label}: i formattatori monetari dichiarano il separatore`, () => {
+    const html = fs.readFileSync(path.join(root, 'tools', dir, 'index.html'), 'utf8');
+    const senza = [];
+    for (const m of html.matchAll(FORMATTATORI)) {
+      const opzioni = m[1];
+      const monetario = /minimumFractionDigits\s*:\s*(2|dec)/.test(opzioni) || /style\s*:\s*'currency'/.test(opzioni);
+      if (!monetario) continue;
+      if (!/useGrouping/.test(opzioni)) {
+        senza.push(`  riga ${html.slice(0, m.index).split('\n').length}: {${opzioni.trim().slice(0, 80)}}`);
+      }
+    }
+    assert.equal(senza.length, 0,
+      `${senza.length} formattatori monetari senza useGrouping:\n${senza.join('\n')}`);
+  });
+}

@@ -3518,7 +3518,7 @@ function n(v){const x=Number(v||0);return Number.isFinite(x)?x:0;}
 function norm(v){return String(v==null?'':v).trim().toLowerCase().replace(/\s+/g,' ');}
 function normLeaf(v){return String(v==null?'':v).toUpperCase().replace(/[^A-Z0-9]/g,'');}
 function clone(v){return JSON.parse(JSON.stringify(v));}
-function fmtEuro(v){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}
+function fmtEuro(v){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',useGrouping:'always',minimumFractionDigits:2,maximumFractionDigits:2}).format(v);}
 function assignUids(rows){
   const occ={};
   (rows||[]).forEach((a,i)=>{

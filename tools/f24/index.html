@@ -2198,7 +2198,11 @@ const state = {
     pendingGroup: null
 };
 
-const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
+/* `useGrouping` va detto. Il valore predefinito 'auto' segue il CLDR, e per
+   l'italiano il CLDR non raggruppa i numeri di quattro cifre: nello stesso
+   elenco si leggeva «3500,00 €» accanto a «40.620,55 €». Il Bilancio e
+   Confronto regimi lo dichiaravano gia'. */
+const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', useGrouping: 'always' });
 let currentPdfUrl = null;
 let autosaveTimer = null;
 
@@ -5651,7 +5655,7 @@ function ensureRowAt(g, key, indice) {
 
 function fmtImporto(centesimi) {
     if (!centesimi) return '';
-    return (centesimi / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (centesimi / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
 }
 
 function boxStyle(box) {

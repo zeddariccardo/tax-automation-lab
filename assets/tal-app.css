@@ -1185,3 +1185,24 @@ html.tal-tool-page :is(.reclass-section, #reclass-content) thead th{
   letter-spacing:.08em;
 }
 .tal-gh-lang a.active{background:#F7F7F5;color:#11131A}
+
+/* ---------- 15. Sotto il comando del menu -------------------------------- */
+
+/* Il comando del menu galleggia in basso a sinistra su schermo piccolo, e
+   mentre si scorre passa sopra il contenuto: e' inevitabile per un controllo
+   flottante, ed e' il compromesso scelto. Quello che non deve capitare e' che
+   l'ultima riga della pagina resti sotto di lui — o sotto la barra del browser,
+   che su iOS mangia altri quaranta punti.
+
+   Misurato a 375x812: il pulsante sta a 12 punti dal bordo, e' 44x44, e con il
+   piede a padding 24 la sua ultima riga finiva esattamente sotto. Qui il piede
+   guadagna lo spazio del pulsante piu' la safe area, e `scroll-padding-bottom`
+   fa in modo che anche un salto a un'ancora non finisca la' sotto. */
+@media(max-width:980px){
+  html.tal-tool-page .tal-site-footer{
+    padding-bottom:calc(24px + 56px + env(safe-area-inset-bottom)) !important;
+  }
+  html.tal-tool-page{
+    scroll-padding-bottom:calc(56px + env(safe-area-inset-bottom));
+  }
+}

@@ -1598,6 +1598,118 @@ Microcopy e tooltip (P2 16-17) sono coperti dai suggerimenti sotto i campi e
 dalle note nel prospetto: non ho aggiunto tooltip al passaggio del mouse, che su
 telefono non esistono. Il resto del documento è implementato.
 
+## Confronto regimi 1.4.0 — la capienza della società, 23 agosto 2026
+
+Audit della versione appena pubblicata, con un P0 dichiarato «certo»: nella card
+STP il netto era identico a quello dell'ordinario, e non riconciliava con le sue
+voci. Diagnosi proposta: binding incrociato nel rendering, `stp.netPersonal`
+sostituito da `ordinary.netPersonal`.
+
+**Il numero era giusto, la diagnosi no, e la causa vera era peggiore.**
+
+### Perché la diagnosi era sbagliata
+
+Le card sono costruite in un `map` su `esito.scenari`: ogni card legge il proprio
+oggetto. Un incrocio fra scenari non è possibile per costruzione, e «correggere il
+binding» avrebbe cercato un difetto che non esiste.
+
+E il netto identico era **corretto**: in modalità automatica l'ottimizzatore
+erogava tutta la cassa come compenso amministratore, e una società che eroga
+tutto è un passante — stessi compensi, stessi costi deducibili, stessi contributi,
+stessa IRPEF. Il netto *deve* coincidere con l'esercizio individuale. La
+coincidenza non era il difetto: era il sintomo che copriva il difetto.
+
+### La causa
+
+`compensoMax` era la cassa della società al netto dei soli costi:
+
+```js
+const cassaPreCompenso = Math.max(0, compensi - tot.cassaSoc - struttura);
+```
+
+Non riservava le imposte societarie. L'IRAP si calcola su una base che **non
+deduce** il compenso amministratore, quindi è dovuta qualunque compenso si
+eroghi. Erogando tutta la cassa, l'utile distribuibile finiva negativo e il
+`Math.max(0, ...)` lo azzerava in silenzio: l'IRAP restava fra le imposte esposte
+e non veniva sottratta dal netto.
+
+Nel caso dell'audit — commercialista, 195.000 di compensi, 44.000 di costi,
+CNPADC al 12% — il confronto **sovrastimava la società di 5.889 euro**, che è
+esattamente l'IRAP dovuta. Riprodotto prima di correggere, e lo scarto coincideva
+al centesimo.
+
+La correzione dà al compenso un secondo tetto: il più alto che lascia la società
+in grado di pagare le proprie imposte. `distribuibileGrezzo` è decrescente nel
+compenso — la derivata è −(1 + quota INPS)(1 − aliquota IRES) — quindi una
+bisezione trova il limite. Se nemmeno a compenso zero c'è capienza, il fatto
+viene dichiarato fra le assunzioni invece di essere assorbito dal clamp.
+
+Dopo la correzione: 195.000 − 44.000 − 73.462 = **77.538**, e non coincide più con
+l'ordinario, che l'IRAP non la paga.
+
+### Le card devono quadrare, e una non poteva
+
+Le quattro righe — compensi, costi, imposte e contributi, quanto ti rimane —
+quadrano per il forfettario e per l'ordinario. Per la società **non possono**: il
+compenso amministratore è erogato al socio per intero, il dividendo solo pro
+quota, e nella card costi e imposte erano scalati alla quota. Con quota al 100%
+la differenza non si vedeva; al 50% lo scarto era di 25.874 euro.
+
+Quindi la card della società mostra il ponte dal lato del socio, che è esatto a
+qualunque quota: quello che la società ti eroga, meno le imposte e i contributi a
+tuo carico, fa quello che ti rimane. I numeri societari — costi, IRES, IRAP,
+distribuibile — restano nel dettaglio, dove c'è il ponte completo. E la prima
+riga si chiama «Ricavi della STP», non «Compensi»: nella stessa simulazione
+esiste anche il compenso del socio, e chiamarli allo stesso modo era ambiguo.
+
+### L'archivio non deve mostrare numeri di un motore che non c'è più
+
+All'apertura una simulazione salvata veniva già ricalcolata dagli input. Ma
+l'elenco mostrava i netti memorizzati al salvataggio: dopo questa correzione
+quelle cifre sono sbagliate di quanto valeva l'IRAP non finanziata. Ora l'elenco
+ricalcola dagli input come fa l'apertura, e quando la voce era stata salvata con
+un ruleset diverso lo dichiara. La voce registra `ruleset` e anno d'imposta, che
+prima non c'erano.
+
+### Mobile
+
+Il comando del menu galleggia in basso a sinistra e mentre si scorre passa sopra
+il contenuto: inevitabile per un controllo flottante, ed è il compromesso scelto.
+Quello che non deve capitare è che l'ultima riga della pagina resti sotto di lui.
+Misurato a 375×812: il piede finiva esattamente sotto il pulsante. Ora il piede
+guadagna lo spazio del pulsante più la safe area, e `scroll-padding-bottom` fa in
+modo che nemmeno un salto a un'ancora finisca là sotto.
+
+**La barra di sessione l'ho lasciata come è.** L'audit la segnala come «molto
+alta e sovrapposta al contenuto»: è `sticky`, quindi occupa spazio nel layout e
+non copre niente, e i suoi pulsanti a 30px superano il minimo AA di 24. Ridurla
+significherebbe togliere le azioni dalla vista su telefono, che è la scelta
+opposta a quella presa in giugno.
+
+### Un difetto del mio controllo nuovo
+
+L'asserzione sul piede sotto il pulsante ha dato sei fallimenti al primo giro,
+tutti su LIPE. Erano falsi: LIPE imposta `scroll-behavior: smooth`, quindi la
+misura presa subito dopo `scrollTo` legge la posizione di partenza. Con
+`behavior: 'instant'` la misura è giusta e i sei fallimenti scompaiono. È la
+seconda volta che un controllo nuovo dell'armatura sbaglia bersaglio prima di
+funzionare: vale la pena diffidare del primo giro verde tanto quanto del primo
+giro rosso.
+
+### Verifica
+
+83 test node, 8 nuovi: la riconciliazione come invariante su dodici
+configurazioni, il caso dell'audit al centesimo, la matrice completa delle soglie
+(84.999, 85.000, 85.001, 99.999, 100.000, 100.001, 120.000), il mix che cambia
+col livello dei compensi, il netto che scende al crescere della trattenuta, le
+due Casse che non condividono formule, l'aliquota CNPADC che muove il risultato.
+42 controlli responsive, col controllo nuovo sul piede. Zero problemi di
+contrasto.
+
+Due test esistenti hanno dovuto dichiarare `mixMode: 'manual'`: misuravano la
+meccanica del massimale INPS col compenso *chiesto*, e passavano per caso perché
+prima dell'ottimizzatore la cifra proposta era più alta del massimale.
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia

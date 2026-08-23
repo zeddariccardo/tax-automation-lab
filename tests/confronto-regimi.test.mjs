@@ -143,8 +143,10 @@ test('la detrazione segue la natura prevalente degli altri redditi', () => {
 
 test('il massimale INPS limita la base contributiva, non il compenso amministratore', () => {
   const massimale = CF_PARAMS[2026].inps.massimale;
-  const sopra = soc(run({revenue: 500000, admin: massimale + 60000, extractionMode: 'mix',
-    adminTreatment: 'inps', inpsRate: 24}));
+  /* Meccanica manuale: in automatico il compenso lo scegle l'ottimizzatore, e
+     quello che si misura qui e' cosa fa il motore col compenso CHIESTO. */
+  const sopra = soc(run({mixMode: 'manual', revenue: 500000, admin: massimale + 60000,
+    extractionMode: 'mix', adminTreatment: 'inps', inpsRate: 24}));
   assert.ok(sopra.dettaglio.compenso > massimale,
     `il compenso erogato (${Math.round(sopra.dettaglio.compenso)}) deve poter superare il massimale`);
   const atteso = massimale * 0.24 * (1 / 3);
@@ -153,7 +155,7 @@ test('il massimale INPS limita la base contributiva, non il compenso amministrat
 });
 
 test('il riparto della Gestione Separata è un terzo al socio e due terzi alla società', () => {
-  const s = soc(run({revenue: 400000, admin: 60000, extractionMode: 'mix',
+  const s = soc(run({mixMode: 'manual', revenue: 400000, admin: 60000, extractionMode: 'mix',
     adminTreatment: 'inps', inpsRate: 24}));
   const rapporto = s.dettaglio.inpsSocieta / s.dettaglio.inpsSocio;
   assert.ok(Math.abs(rapporto - 2) < 1e-6, `rapporto società/socio ${rapporto}, atteso 2`);
@@ -614,4 +616,171 @@ test('la modalità manuale continua a fare quello che l’utente chiede', () => 
   assert.ok(m.trattenuto > 0, 'con metà utile non distribuito qualcosa resta in società');
   assert.ok(m.netto <= mixDemo().scenari[2].netto + 0.5,
     'e non può battere l’ottimo, altrimenti l’ottimo non è ottimo');
+});
+
+
+/* ---- 13. l’audit del 23 agosto 2026: riconciliazione e soglie ----------- */
+
+/* Il rilievo era «il netto della STP è duplicato da quello dell’ordinario»,
+   con diagnosi di binding incrociato nel rendering. La diagnosi era sbagliata —
+   la card è costruita in un map sullo stesso oggetto scenario, un incrocio non è
+   possibile — ma il numero era giusto, e la causa era peggiore.
+
+   `compensoMax` era tutta la cassa della società: non riservava le imposte
+   societarie. L’IRAP si calcola su una base che NON deduce il compenso
+   amministratore, quindi è dovuta qualunque compenso si eroghi. Erogando tutto,
+   l’utile distribuibile andava negativo e il `Math.max(0, ...)` lo azzerava in
+   silenzio: l’IRAP restava fra le imposte esposte e non veniva sottratta dal
+   netto. E siccome l’ottimo erogava tutto come compenso, la società diventava un
+   passante e il netto coincideva con l’ordinario — cosa corretta in sé, che
+   però nascondeva il buco.
+
+   Il caso: commercialista, 195.000 di compensi, 44.000 di costi, CNPADC al 12%.
+   La card mostrava 80.844 con 76.045 di imposte e contributi: 195.000 − 44.000 −
+   76.045 fa 74.955, e lo scarto di 5.889 era esattamente l’IRAP. */
+
+const AUDIT = {
+  ...BASE, profession: 'commercialista', currentRegime: 'ordinario',
+  revenue: 195000, previousRevenue: 195000, otherIncome: 0,
+  ownership: 100, distribution: 100, admin: 0, extractionMode: 'dividend',
+  companyOverhead: 0, pensionRate: 12, irapRate: 3.9, mixMode: 'auto', retainInCompany: 0
+};
+const soloAffitto = (importo) => CF_COSTI_DEFAULT.map(d =>
+  ({...d, amount: d.id === 'studio' ? importo : 0, gross: false}));
+
+/* La riconciliazione, come funzione: è l’invariante che l’audit chiede al
+   paragrafo 25. Per il forfettario e per l’ordinario è il conto del
+   professionista; per la società è il ponte dal lato del socio, perché il
+   compenso amministratore gli è erogato per intero mentre il dividendo è pro
+   quota, quindi le voci scalate alla quota non possono quadrare. */
+function riconcilia(scenario, input) {
+  if (scenario.id === 'societa') {
+    const d = scenario.dettaglio;
+    return d.erogatoLordo - d.impostePersonali - d.contributiPersonali;
+  }
+  return input.revenue - scenario.costi - (scenario.imposte + scenario.contributi)
+    - scenario.trattenuto;
+}
+
+test('il caso dell’audit riconcilia in tutti e tre gli scenari', () => {
+  const input = {...AUDIT, costs: soloAffitto(44000)};
+  const r = cfEngine(input);
+  for (const s of r.scenari) {
+    assert.ok(Math.abs(riconcilia(s, input) - s.netto) < 0.51,
+      `${s.nome}: la card mostrerebbe ${riconcilia(s, input).toFixed(2)} e il netto è ${s.netto.toFixed(2)}`);
+  }
+  /* L’ordinario è il valore osservato nell’audit, ed era già corretto. */
+  assert.ok(Math.abs(r.scenari[1].netto - 80844) < 1,
+    `netto ordinario ${r.scenari[1].netto.toFixed(2)}, atteso circa 80.844`);
+  /* La società ora paga l’IRAP che prima svaniva: il netto scende sotto quello
+     dell’ordinario, che l’IRAP non la paga. */
+  assert.ok(r.scenari[2].netto < r.scenari[1].netto,
+    'la società sconta l’IRAP, quindi non può lasciare più netto dell’ordinario a parità di tutto');
+});
+
+test('la società non eroga la cassa che le serve per le proprie imposte', () => {
+  const input = {...AUDIT, costs: soloAffitto(44000)};
+  const d = cfEngine(input).scenari[2].dettaglio;
+  assert.ok(d.distribuibile >= -0.01,
+    `l’utile distribuibile non può essere negativo: ${d.distribuibile.toFixed(2)}`);
+  assert.ok(d.compenso <= d.compensoMax + 0.01, 'il compenso resta nel massimo erogabile');
+  assert.ok(d.compensoMax < d.tettoContributivo,
+    'con IRAP dovuta il tetto di capienza deve mordere prima di quello contributivo');
+  assert.ok(d.irap > 0, 'in questo caso l’IRAP è dovuta');
+});
+
+test('ogni scenario riconcilia su una matrice di casi', () => {
+  const casi = [
+    ['audit', {revenue: 195000, previousRevenue: 195000}, 44000],
+    ['quota 50%', {revenue: 195000, previousRevenue: 195000, ownership: 50}, 44000],
+    ['quota 30% con struttura', {revenue: 195000, previousRevenue: 195000, ownership: 30, companyOverhead: 12000}, 44000],
+    ['con trattenuta', {revenue: 195000, previousRevenue: 195000, retainInCompany: 20000}, 44000],
+    ['manuale dividendo', {revenue: 195000, previousRevenue: 195000, mixMode: 'manual', extractionMode: 'dividend'}, 44000],
+    ['manuale misto', {revenue: 195000, previousRevenue: 195000, mixMode: 'manual', extractionMode: 'mix', admin: 60000, distribution: 50}, 44000],
+    ['costi oltre i compensi', {revenue: 60000, previousRevenue: 60000}, 70000],
+    ['avvocato', {revenue: 120000, previousRevenue: 120000, profession: 'avvocato'}, 20000],
+    ['costi bassissimi', {revenue: 85000, previousRevenue: 80000}, 2000],
+    ['costi alti', {revenue: 85000, previousRevenue: 80000}, 45000],
+    ['start-up al 5%', {revenue: 85000, previousRevenue: 40000, startup: true}, 10000],
+    ['Gestione Separata', {revenue: 195000, previousRevenue: 195000, adminTreatment: 'inps', inpsRate: 24}, 44000]
+  ];
+  for (const [nome, over, importoCosti] of casi) {
+    const input = {...AUDIT, ...over, costs: soloAffitto(importoCosti)};
+    const r = cfEngine(input);
+    for (const s of r.scenari) {
+      const atteso = riconcilia(s, input);
+      assert.ok(Math.abs(atteso - s.netto) < 0.51,
+        `${nome} · ${s.nome}: riconciliazione ${atteso.toFixed(2)} contro netto ${s.netto.toFixed(2)}`);
+    }
+    assert.ok(r.scenari[2].dettaglio.distribuibile >= -0.01,
+      `${nome}: utile distribuibile negativo`);
+  }
+});
+
+/* La soglia: 100.000 esatti non sono «oltre 100.000». L’audit chiede la matrice
+   completa, e i due estremi mancavano. */
+test('la matrice delle soglie del forfettario', () => {
+  const casi = [
+    [84999, true, false], [85000, true, false], [85001, true, true],
+    [99999, true, true], [100000, true, true], [100001, false, false],
+    [120000, false, false]
+  ];
+  for (const [revenue, applicabile, uscitaDopo] of casi) {
+    const r = run({revenue, previousRevenue: 40000});
+    assert.equal(forf(r).applicabile, applicabile,
+      `a ${revenue} il forfettario dovrebbe ${applicabile ? 'essere' : 'non essere'} applicabile`);
+    if (applicabile) {
+      const dice = /periodo successivo/.test(forf(r).stato);
+      assert.equal(dice, uscitaDopo,
+        `a ${revenue} lo stato ${dice ? 'annuncia' : 'non annuncia'} l’uscita dal periodo successivo`);
+    }
+  }
+});
+
+/* L’ottimizzatore deve reagire ai compensi: un mix che non cambia mai è un
+   ottimizzatore che non ottimizza. */
+test('il mix ottimale cambia col livello dei compensi', () => {
+  const mix = (revenue) => {
+    const d = cfEngine({...AUDIT, revenue, previousRevenue: revenue, costs: soloAffitto(40000)})
+      .scenari[2].dettaglio;
+    return {compenso: d.compenso, dividendo: d.dividendo};
+  };
+  const a = mix(150000), b = mix(200000), c = mix(250000);
+  assert.notDeepEqual(a, b, 'da 150.000 a 200.000 il mix deve poter cambiare');
+  assert.notDeepEqual(b, c, 'da 200.000 a 250.000 il mix deve poter cambiare');
+  assert.ok(b.compenso > a.compenso, 'con più compensi la società può erogare di più');
+});
+
+/* Il vincolo di trattenuta: più si lascia in società, meno arriva alla persona. */
+test('il netto personale scende al crescere di quanto resta in società', () => {
+  const netto = (trattieni) => cfEngine({...AUDIT, retainInCompany: trattieni,
+    costs: soloAffitto(40000)}).scenari[2].netto;
+  const a = netto(0), b = netto(20000), c = netto(50000);
+  assert.ok(b < a, `con 20.000 in società il netto (${b.toFixed(0)}) deve scendere sotto ${a.toFixed(0)}`);
+  assert.ok(c < b, `con 50.000 in società il netto (${c.toFixed(0)}) deve scendere sotto ${b.toFixed(0)}`);
+});
+
+/* Le due Casse non devono condividere formule. */
+test('avvocato e commercialista non usano gli stessi parametri', () => {
+  const comune = {revenue: 120000, previousRevenue: 120000, costs: soloAffitto(20000)};
+  const av = cfEngine({...AUDIT, ...comune, profession: 'avvocato'});
+  const co = cfEngine({...AUDIT, ...comune, profession: 'commercialista'});
+  assert.notEqual(forf(av).contributi, forf(co).contributi,
+    'le due Casse hanno aliquote e minimi diversi: i contributi non possono coincidere');
+  assert.equal(av.scenari[2].nome, 'STA S.r.l.');
+  assert.equal(co.scenari[2].nome, 'STP S.r.l.');
+});
+
+/* L’aliquota soggettiva CNPADC è una scelta dell’iscritto: deve muovere il
+   risultato. */
+test('l’aliquota soggettiva CNPADC muove contributi e netto', () => {
+  const prova = (aliquota) => {
+    const r = cfEngine({...AUDIT, pensionRate: aliquota, costs: soloAffitto(40000)});
+    return {contributi: ord(r).contributi, netto: ord(r).netto};
+  };
+  const a = prova(12), b = prova(15), c = prova(20);
+  assert.ok(b.contributi > a.contributi && c.contributi > b.contributi,
+    'più alta l’aliquota, più alti i contributi');
+  assert.ok(b.netto < a.netto && c.netto < b.netto,
+    'e più bassa la cassa che resta, a parità di tutto il resto');
 });

@@ -153,6 +153,24 @@ function measure(frame){
     out.piedeFondoTrasparente = !mm || (mm.length > 3 && Number(mm[3]) < 0.5);
     const sp = piede.querySelector('span');
     if (sp) out.piedeSpanInLinea = w.getComputedStyle(sp).display !== 'block';
+
+    /* L'ultima riga della pagina non deve restare sotto il comando del menu.
+       Il pulsante galleggia in basso a sinistra e mentre si scorre passa sopra
+       il contenuto — e' il compromesso scelto — ma quello che sta in fondo deve
+       poter essere portato sopra di lui. Misurato a 375x812 prima della
+       correzione: il piede finiva esattamente sotto il pulsante. */
+    if (b && w.getComputedStyle(b).display !== 'none') {
+      /* `behavior: 'instant'` non e' un vezzo: LIPE imposta
+         `scroll-behavior: smooth`, quindi con lo scorrimento animato la misura
+         presa subito dopo legge la posizione di partenza. Il primo giro di
+         questo controllo dava sei fallimenti, tutti su LIPE, tutti falsi. */
+      w.scrollTo({ top: d.body.scrollHeight, behavior: 'instant' });
+      const rb = b.getBoundingClientRect();
+      const riga = piede.querySelector('p') || piede;
+      const rr = riga.getBoundingClientRect();
+      out.piedeSottoIlComando = rr.bottom > rb.top + 1;
+      w.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
   const barra = d.querySelector('.tal-cmdbar, .cmdbar, .tal-session-bar');
   if (barra) {
@@ -224,6 +242,7 @@ function judge(width, m){
     if (m.piedeSottoSidebar) fails.push('il piede passa sotto la sidebar');
     if (m.piedeFondoTrasparente) fails.push('il piede non ha fondo: manca il suo foglio di stile');
     if (m.piedeSpanInLinea) fails.push('le voci del piede sono in linea: manca il suo foglio di stile');
+    if (m.piedeSottoIlComando) fails.push('l’ultima riga del piede resta sotto il comando del menu');
   }
   if (m.barraDietroHeader) fails.push('la barra di sessione si incolla dietro l’intestazione');
   if (m.navFlex === false) fails.push('la navigazione dell’intestazione non è flex: manca il suo foglio di stile');

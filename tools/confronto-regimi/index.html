@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/confronto-regimi/
 -->
-<html class="tal-tool-page" data-tool-version="1.3.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.0" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -37,7 +37,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/inter-var-latin.woff2">
 <link rel="stylesheet" href="/assets/site-shell.css?v=20260810-v61510-header-1">
-<link rel="stylesheet" href="/assets/tal-app.css?v=20260822c">
+<link rel="stylesheet" href="/assets/tal-app.css?v=20260823a">
 <script defer src="/assets/tal-app.js?v=20260822a"></script>
 <script type="application/ld+json">
 {
@@ -48,7 +48,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
   "description": "Confronto del netto personale disponibile fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi e ottimizzazione automatica del mix compenso/dividendo.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Browser",
-  "softwareVersion": "1.3.0",
+  "softwareVersion": "1.4.0",
   "inLanguage": "it",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -717,6 +717,23 @@ main#cfMain{max-width:1120px;margin:0 auto}
   color: var(--tal-ink-3, #6e6b65);
 }
 .cf-calcolo dd { margin: 0; font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* La nota sotto l'etichetta nel conto della card: spiega la voce senza
+   allungare la riga. */
+.cf-mini-conto span em {
+  display: block;
+  margin-top: 1px;
+  font-size: 10.5px;
+  font-style: normal;
+  line-height: 1.4;
+  color: var(--tal-ink-3, #6e6b65);
+}
+.cf-mini-conto > div { align-items: start; }
+.cf-mini-conto b { padding-top: 1px; }
+
+/* Quando una simulazione in archivio e' stata salvata con parametri diversi da
+   quelli di oggi, l'elenco lo dice: il numero mostrato e' quello di oggi. */
+.cf-ric { color: #6B5211; font-weight: 650; }
 </style>
 <style id="tal-global-header-style">
 .tal-global-header,.tal-global-header *{box-sizing:border-box}
@@ -829,7 +846,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.3.0</span>
+<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.4.0</span>
 <h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
 <p data-tal-key="lead">Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra i tre assetti: quanto ti rimane dopo costi, contributi e imposte. Con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e l'ottimizzazione automatica del mix fra compenso amministratore e dividendo.</p>
 <div class="tal-publication-facts">
@@ -1329,7 +1346,7 @@ const CF_PARAMS = {
 /* La versione del ruleset accompagna ogni risultato e ogni Excel esportato:
    un working paper senza l'indicazione delle regole con cui e' stato prodotto
    non e' ripercorribile a distanza di mesi, quando i parametri sono cambiati. */
-const CF_RULESET = { versione: '2026.1.0', aggiornato: '2026-08-22' };
+const CF_RULESET = { versione: '2026.2.0', aggiornato: '2026-08-23' };
 
 const CF_FONTI = [
   ['Regime forfettario', 'Agenzia delle Entrate, circolare 32/E del 5 dicembre 2023', 'https://www.agenziaentrate.gov.it/portale/documents/20143/5763741/Circolare+n.+32+del+5+dicembre+2023.pdf'],
@@ -1646,11 +1663,57 @@ function cfEngine(input) {
   /* Il massimale limita la base contributiva, non il compenso: sopra il
      massimale la società non paga più contributi, quindi può erogare di più. */
   const compensoPrimaDelTetto = cassaPreCompenso / (1 + quotaSoc);
-  const compensoMax = inpsSuCompenso
+  const tettoContributivo = inpsSuCompenso
     ? (compensoPrimaDelTetto <= inpsMax
       ? compensoPrimaDelTetto
       : Math.max(0, cassaPreCompenso - inpsMax * quotaSoc))
     : cassaPreCompenso;
+
+  /* La capienza vera. Il tetto contributivo guarda solo i contributi: non
+     riservava la cassa per le imposte della società. L'IRAP si calcola su una
+     base che NON deduce il compenso amministratore, quindi è dovuta qualunque
+     compenso si eroghi; l'IRES dipende dal compenso ma non scende sotto zero.
+     Erogando tutta la cassa, l'utile distribuibile finiva negativo e il
+     `Math.max(0, ...)` lo azzerava in silenzio: l'IRAP restava fra le imposte
+     esposte e non veniva sottratta dal netto. Misurato a 195.000 di compensi e
+     44.000 di costi: il confronto sovrastimava la società di 5.889 euro,
+     esattamente l'IRAP dovuta.
+
+     Qui il compenso ha un secondo tetto: il più alto che lascia la società in
+     grado di pagare le proprie imposte. `distribuibileGrezzo` è decrescente nel
+     compenso — la derivata è −(1 + quota INPS)(1 − aliquota IRES) — quindi la
+     bisezione trova il limite. */
+  function distribuibileGrezzo(c) {
+    const bInps = Math.min(c, inpsMax);
+    const inpsSocGrezzo = bInps * inpsAliq * (1 - P.inps.quotaAmministratore);
+    const bIres = Math.max(0, compensi - tot.dedSoc - struttura - c - inpsSocGrezzo);
+    const iresGrezza = bIres * P.ires;
+    const bIrap = Math.max(0, compensi - tot.dedIrap - struttura);
+    const irapGrezza = bIrap * cfNum(input.irapRate) / 100;
+    return compensi - tot.cassaSoc - struttura - c - inpsSocGrezzo - iresGrezza - irapGrezza;
+  }
+
+  const capienzaAZero = distribuibileGrezzo(0);
+  let tettoCapienza;
+  if (capienzaAZero <= 0) {
+    /* La società non ha cassa nemmeno per le proprie imposte: non c'è compenso
+       erogabile, e il fatto va dichiarato invece di essere assorbito. */
+    tettoCapienza = 0;
+  } else if (distribuibileGrezzo(tettoContributivo) >= 0) {
+    tettoCapienza = tettoContributivo;
+  } else {
+    let lo = 0, hi = tettoContributivo;
+    for (let i = 0; i < 60 && hi - lo > 0.005; i++) {
+      const m = (lo + hi) / 2;
+      if (distribuibileGrezzo(m) >= 0) lo = m; else hi = m;
+    }
+    tettoCapienza = lo;
+  }
+  const compensoMax = Math.min(tettoContributivo, tettoCapienza);
+  /* Quanto manca alla società per pagare le proprie imposte, se manca. Zero nel
+     caso normale: serve a dichiarare il caso in cui nemmeno un compenso nullo
+     basta. */
+  const scopertoSocieta = Math.max(0, -capienzaAZero);
 
   /* Lo scenario societario come funzione delle due leve che lo governano: il
      compenso amministratore richiesto e quanto dell'utile distribuibile resta
@@ -1866,6 +1929,15 @@ function cfEngine(input) {
              ipotesi. */
           mix: mixInfo,
           quotaDistribuita: soc.quotaDistribuita,
+          scopertoSocieta: scopertoSocieta,
+          tettoContributivo: tettoContributivo,
+          /* Il ponte dal lato del socio, che quadra a qualunque quota: quello
+             che la societa' eroga meno quello che il socio paga fa il netto.
+             Serve alla card, che con le voci scalate alla quota non poteva
+             quadrare — il compenso al socio non e' pro quota. */
+          erogatoLordo: soc.compenso + soc.dividendo,
+          impostePersonali: soc.ritenuta + soc.socImposta,
+          contributiPersonali: soc.contributiPersonali,
           /* RE-003. Il massimale riduce il compenso in silenzio: chi chiede
              40.000 e ne vede erogare 35.920 deve poterlo leggere, altrimenti
              confronta una struttura che non e' quella che ha impostato. */
@@ -1923,6 +1995,15 @@ function cfAssunzioni(input, esito) {
       + 'dei minimi e\u2019 pubblicata e viene applicata; per CNPADC non ho trovato gli importi '
       + 'ridotti in una fonte citabile, quindi il calcolo usa i minimi interi. Verifica la '
       + 'tua posizione: se la riduzione ti spetta, i contributi qui sono sovrastimati.', 'alta');
+  }
+
+  const socScenario = (esito.scenari || []).find((x) => x.id === 'societa');
+  if (socScenario && socScenario.dettaglio && socScenario.dettaglio.scopertoSocieta > 0.5) {
+    agg('societa-senza-capienza', 'La societa\u2019 non ha cassa per le proprie imposte',
+      'Con questi compensi e questi costi, IRES e IRAP superano quello che resta in societa\u2019 '
+      + 'dopo i costi: mancano ' + Math.round(socScenario.dettaglio.scopertoSocieta) + ' euro. '
+      + 'Il compenso amministratore erogabile e\u2019 zero, e lo scenario societario richiederebbe '
+      + 'un apporto dei soci. Verificalo prima di considerarlo un\u2019alternativa.', 'alta');
   }
 
   if (esito.derogaCessazione) {
@@ -2103,13 +2184,12 @@ window.cfRenderConfronto = function () {
       '<h3>' + X(s.nome) + '</h3>' +
       '<p class="cf-status">' + X(s.stato) +
         (s.id === stato.currentRegime ? ' · regime attuale' : '') + '</p>' +
-      /* Le quattro righe che il documento chiede, nello stesso ordine per tutti e
-         tre gli scenari: si leggono in colonna e si confrontano a occhio. */
-      '<div class="cf-mini cf-mini-conto">' +
-        '<div><span>Compensi</span><b>' + E(stato.revenue) + '</b></div>' +
-        '<div><span>Costi effettivi</span><b>' + E(s.costi) + '</b></div>' +
-        '<div><span>Imposte e contributi</span><b>' + E(s.imposte + s.contributi) + '</b></div>' +
-      '</div>' +
+      /* Il conto sopra la riga del netto. Per il forfettario e per l'ordinario e'
+         il conto del professionista; per la societa' e' il ponte dal lato del
+         socio, perche' quello e' l'unico che quadra a qualunque quota. In
+         entrambi i casi le righe piu' il netto fanno un'identita' verificabile:
+         una card che non quadra e' una card di cui non si puo' fidarsi. */
+      contoDellaCard(s, esito, stato) +
       '<div class="cf-net"><span>Quanto ti rimane</span><strong>' +
         (s.applicabile ? E(s.netto) : 'Non applicabile') + '</strong></div>' +
       '<div class="cf-mini">' +
@@ -2449,6 +2529,11 @@ function renderMixSocieta(esito) {
   parti.push('<div class="cf-net"><span>Quanto arriva effettivamente a te</span><strong>' +
     E(soc.netto) + '</strong></div>');
 
+  if ((d.scopertoSocieta || 0) > 0.5) {
+    parti.push('<p class="cf-mix-nota"><b>La società non ha cassa per le proprie imposte.</b> ' +
+      'IRES e IRAP superano di ' + E(d.scopertoSocieta) + ' quello che resta dopo i costi: il ' +
+      'compenso erogabile è zero e lo scenario richiederebbe un apporto dei soci.</p>');
+  }
   if (mix.limitatoDallaCapienza) {
     parti.push('<p class="cf-mix-nota">Il compenso proposto coincide col massimo che la società ' +
       'può erogare con questi compensi e questi costi: è la capienza a fare da vincolo, non la ' +
@@ -2600,6 +2685,40 @@ function dettaglioCalcolo(scenario, esito, stato) {
     '<dl class="cf-calcolo">' + righe.map(([k, v, nota]) =>
       '<div><dt>' + X(k) + (nota ? '<small>' + X(nota) + '</small>' : '') + '</dt><dd>' + v + '</dd></div>'
     ).join('') + '</dl></details>';
+}
+
+
+/* Le righe sopra «quanto ti rimane». Il criterio e' uno: devono formare
+   un'identita' che chiunque puo' rifare a mente.
+
+   Forfettario e ordinario: compensi meno costi meno imposte e contributi.
+   Societa': quello che ti eroga meno quello che paghi tu. I numeri della
+   societa' — costi, IRES, IRAP, utile distribuibile — stanno nel dettaglio, col
+   ponte completo: nella card erano scalati alla quota e non quadravano, perche'
+   il compenso amministratore al socio non e' pro quota. */
+function contoDellaCard(s, esito, stato) {
+  const E = euro();
+  const righe = [];
+  if (s.id === 'societa') {
+    const d = s.dettaglio || {};
+    if (stato.ownership < 100) {
+      righe.push(['Ricavi della STP', E(stato.revenue), 'la tua quota è il ' + stato.ownership + '%']);
+    } else {
+      righe.push(['Ricavi della STP', E(stato.revenue), '']);
+    }
+    righe.push(['Quello che la società ti eroga', E(d.erogatoLordo || 0),
+      'compenso amministratore e dividendo lordo']);
+    righe.push(['Imposte e contributi a tuo carico',
+      E((d.impostePersonali || 0) + (d.contributiPersonali || 0)),
+      'ritenuta sul dividendo, IRPEF sul compenso, contributi']);
+  } else {
+    righe.push(['Compensi', E(stato.revenue), '']);
+    righe.push(['Costi effettivi', E(s.costi), '']);
+    righe.push(['Imposte e contributi', E(s.imposte + s.contributi), '']);
+  }
+  return '<div class="cf-mini cf-mini-conto">' + righe.map(([k, v, nota]) =>
+    '<div><span>' + esc()(k) + (nota ? '<em>' + esc()(nota) + '</em>' : '') +
+    '</span><b>' + v + '</b></div>').join('') + '</div>';
 }
 
 function renderAvviso(conv) {
@@ -3268,7 +3387,24 @@ window.cfRenderArchivio = function () {
     return;
   }
   host.innerHTML = a.map((s) => {
-    const meglio = (s.sintesi || []).filter((x) => x.applicabile)
+    /* Ricalcolato dagli input, non letto dal salvataggio: e' lo stesso motore
+       che gira all'apertura, quindi l'elenco non puo' mostrare un numero che
+       riaprendo cambia. Se il ricalcolo non riesce — una voce vecchia con dati
+       incompleti — si ripiega sulla sintesi memorizzata, dichiarandolo. */
+    let sintesi = null, ricalcolata = false;
+    try {
+      const costiSalvati = window.cfNuoviCosti().map((base) => {
+        const sv = (s.costi || []).find((c) => c.id === base.id);
+        return sv ? Object.assign({}, base, sv) : base;
+      }).concat((s.costi || []).filter((c) => c.custom));
+      const r = cfEngine(Object.assign({}, window.cfStatoDefault(), s.stato, { costs: costiSalvati }));
+      sintesi = r.scenari.map((x) => ({ id: x.id, netto: x.netto, applicabile: x.applicabile }));
+      ricalcolata = true;
+    } catch (e) {
+      sintesi = s.sintesi || [];
+    }
+    const vecchia = ricalcolata && s.ruleset && s.ruleset !== CF_RULESET.versione;
+    const meglio = sintesi.filter((x) => x.applicabile)
       .reduce((b, x) => (b == null || x.netto > b.netto ? x : b), null);
     return '<div class="cf-card" style="margin-bottom:9px">' +
       '<div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">' +
@@ -3279,6 +3415,8 @@ window.cfRenderArchivio = function () {
         (s.stato.profession === 'commercialista' ? 'Commercialista' : 'Avvocato') +
         ' · ' + s.stato.year + ' · ' + E(s.stato.revenue) + ' di compensi' +
         (meglio ? ' · migliore: ' + (meglio.id === 'societa' ? 'società' : meglio.id) + ' ' + E(meglio.netto) : '') +
+        (vecchia ? ' · <span class="cf-ric">ricalcolata coi parametri ' + X(CF_RULESET.versione) +
+          ', era stata salvata con i ' + X(s.ruleset) + '</span>' : '') +
       '</p>' +
       '<div class="cf-actions" style="margin:0">' +
         '<button class="btn secondary" data-open="' + X(s.id) + '" type="button">Riapri</button>' +
@@ -4150,6 +4288,10 @@ function salvaSimulazione() {
     stato: JSON.parse(JSON.stringify(stato)),
     costi: JSON.parse(JSON.stringify(costi)),
     esiti: JSON.parse(JSON.stringify(esitiAI)),
+    /* La versione delle regole e l'anno d'imposta viaggiano con la voce: senza,
+       non c'e' modo di sapere con che motore e' stata prodotta. */
+    ruleset: CF_RULESET.versione,
+    anno: stato.year,
     sintesi: esito.scenari.map((s) => ({ id: s.id, netto: s.netto, applicabile: s.applicabile }))
   };
   a.unshift(voce);

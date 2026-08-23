@@ -208,10 +208,13 @@
 
   function polishFinancialAnalysisDom(){
     if(!/\/tools\/financial-analysis\/?$/.test(window.location&&window.location.pathname||''))return;
+    /* I report che finiscono «in PDF» non scaricano un file: aprono la vista di
+       stampa del browser, da cui si stampa o si salva. Il pulsante lo dice nel
+       suggerimento, cosi' il nome resta corto e parallelo a «... Excel». */
     document.querySelectorAll('button,a').forEach(function(el){
-      if((el.textContent||'').trim()==='Riclassificazioni PDF'){
-        el.textContent='Stampa / Salva PDF';
-        el.setAttribute('title','Apre la vista di stampa, da cui puoi stampare o salvare in PDF.');
+      const testo=(el.textContent||'').trim();
+      if(/\bin PDF$/.test(testo)&&!el.getAttribute('title')){
+        el.setAttribute('title','Apre la vista di stampa: da lì puoi stampare o salvare in PDF.');
       }
     });
   }

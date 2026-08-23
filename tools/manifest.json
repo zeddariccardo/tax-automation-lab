@@ -42,7 +42,7 @@
     {
       "slug": "lipe",
       "name": "Generatore LIPE",
-      "version": "3.6.1",
+      "version": "3.6.2",
       "site_url": "https://taxautomationlab.com/tools/lipe/",
       "release_filename": null,
       "distribution": "online_only",
@@ -52,7 +52,7 @@
     {
       "slug": "f24",
       "name": "Generatore F24",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "site_url": "https://taxautomationlab.com/tools/f24/",
       "release_filename": null,
       "distribution": "online_only",

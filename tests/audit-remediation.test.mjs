@@ -49,11 +49,18 @@ assert.match(fa,/Da integrare/);
 assert.doesNotMatch(fa,/class="kpi-legend"/);
 
 const lipe=read('tools/lipe/index.html');
-assert.match(lipe,/data-tool-version="3\.6\.1"/);
-assert.match(lipe,/"softwareVersion":"3\.6\.1"/);
-assert.match(lipe,/const APP_VERSION='3\.6\.1'/);
-assert.match(lipe,/const PATCH_VERSION='3\.6\.1'/);
-assert.match(lipe,/var VERSION='3\.6\.1'/);
+/* Il numero non si scrive qui. Il 24 agosto 2026 questo controllo ha bocciato un
+   avanzamento di versione legittimo perche' cercava 3.6.1 alla lettera: il punto
+   non e' quale sia la versione, ma che le cinque dichiarazioni dicano la stessa
+   cosa dell'attributo sul tag html. */
+const vLipe=(lipe.match(/data-tool-version="([^"]+)"/)||[])[1];
+assert.ok(vLipe,'lipe: manca data-tool-version');
+for(const [dove,re] of [
+  ['JSON-LD softwareVersion',new RegExp('"softwareVersion":"'+vLipe.replace(/\./g,'\\.')+'"')],
+  ['APP_VERSION',new RegExp("const APP_VERSION='"+vLipe.replace(/\./g,'\\.')+"'")],
+  ['PATCH_VERSION',new RegExp("const PATCH_VERSION='"+vLipe.replace(/\./g,'\\.')+"'")],
+  ['VERSION',new RegExp("var VERSION='"+vLipe.replace(/\./g,'\\.')+"'")],
+]) assert.match(lipe,re,`lipe: ${dove} non dice ${vLipe}`);
 assert.match(lipe,/xmlPushMoney\(tags,'VersamentiAutoUE',v\.vp10\)/);
 assert.match(lipe,/if\(!q5\|\|sub\)xmlPushMoney\(tags,'CreditiImposta',v\.vp11\)/);
 assert.match(lipe,/if\(!q5\|\|sub\)\{if\(v\.vp14deb/);

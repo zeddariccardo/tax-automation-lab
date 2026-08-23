@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/f24/
 -->
-<html class="tal-tool-page" data-tool-version="1.0.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.0.1" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -36,7 +36,7 @@ Official source: https://taxautomationlab.com/tools/f24/
 <meta name="twitter:description" content="Prepara, controlla e genera modelli F24 ministeriali per uno o più contribuenti, direttamente nel browser.">
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta name="twitter:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Generatore F24","applicationCategory":"FinanceApplication","operatingSystem":"Browser","softwareVersion":"1.0.0","inLanguage":"it","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"url":"https://taxautomationlab.com/tools/f24/","author":{"@type":"Person","name":"Riccardo Zedda"},"description":"Preparazione, controllo e generazione di modelli F24 ministeriali singoli e massivi, con elaborazione interamente locale nel browser."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Generatore F24","applicationCategory":"FinanceApplication","operatingSystem":"Browser","softwareVersion":"1.0.1","inLanguage":"it","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"url":"https://taxautomationlab.com/tools/f24/","author":{"@type":"Person","name":"Riccardo Zedda"},"description":"Preparazione, controllo e generazione di modelli F24 ministeriali singoli e massivi, con elaborazione interamente locale nel browser."}</script>
 
 <!-- Guscio del sito: disegna l'intestazione globale (.tal-gh-*). tal-app.css la
      ritocca soltanto, quindi senza questo foglio il logo esce come immagine
@@ -1056,7 +1056,7 @@ html.tal-tool-page .modal .is-invalid{
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Generatore F24 · v1.0.0</span>
+<span class="tal-publication-label" data-tal-key="label">Generatore F24 · v1.0.1</span>
 <h2 data-tal-key="title">Modelli F24 ministeriali, singoli e massivi, da Excel o da compilazione guidata</h2>
 <p data-tal-key="lead">Prepara, raggruppa, controlla e produce F24 per uno o più contribuenti: PDF sovrapposto al modello ministeriale, ZIP per società, riepilogo Excel e tracciato telematico.</p>
 <div class="tal-publication-facts">
@@ -2161,7 +2161,7 @@ const F24_MINISTERIAL_TEMPLATES=["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA
    ========================================================================== */
 'use strict';
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const KEY_CLIENTS   = 'tal_f24_clients_v1';
 const KEY_CREDITS   = 'tal_f24_credits_v1';
 const KEY_CODES     = 'tal_f24_codes_v1';
@@ -4693,7 +4693,7 @@ function renderTelematicPanel() {
 
     host.innerHTML =
         `<div class="telematic-head"><div><span class="stage-kicker">File telematico</span>` +
-        `<h3>Tracciato ${esc(TELEMAT_SPEC.tracciato)}</h3><p>Record A/M/V/Z a lunghezza fissa di 1.900 caratteri.</p></div>` +
+        `<h3>Tracciato ${esc(TELEMAT_SPEC.tracciato)}</h3><p>Record A/M/V/Z a lunghezza fissa: 1.900 byte l’uno, CR-LF compreso.</p></div>` +
         `<span class="telematic-version">Da validare</span></div>` +
 
         `<div class="telematic-gate"><b>Questo tracciato non è ancora stato validato dal modulo di controllo dell’Agenzia delle Entrate.</b>` +
@@ -4729,7 +4729,7 @@ function renderTelematicPanel() {
 
         `<div class="telematic-actions">` +
         `<button class="btn" data-action="download-telematic" type="button"${blocked ? ' disabled' : ''}>${esc(primary)}</button>` +
-        `<span>${state.telematicAcknowledged ? 'Dopo il download: Desktop Telematico → modulo di controllo F24A0 → autenticazione → invio.' : 'Conferma l’avviso qui sopra per abilitare la generazione.'}</span></div>`;
+        `<span>${errors.length ? (errors.length === 1 ? 'Manca un dato: l’elenco è qui sopra.' : `Mancano ${errors.length} dati: l’elenco è qui sopra.`) : (state.telematicAcknowledged ? 'Dopo il download: Desktop Telematico → modulo di controllo F24A0 → autenticazione → invio.' : 'Conferma l’avviso qui sopra per abilitare la generazione.')}</span></div>`;
 }
 
 /* ==========================================================================

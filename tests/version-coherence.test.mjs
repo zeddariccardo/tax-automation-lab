@@ -241,3 +241,33 @@ for (const [dir, label] of Object.entries(TOOLS)) {
       `${senza.length} formattatori monetari senza useGrouping:\n${senza.join('\n')}`);
   });
 }
+
+/* Le etichette di pubblicazione — «Bilancio civilistico ITA GAAP · v1.4.1»,
+   «IVA · v3.6.1» — stanno dentro i dizionari di traduzione, cioè dentro
+   virgolette e non fra due tag. Il controllo qui sopra cerca `vX.Y.Z</`, quindi
+   quelle gli sfuggivano: il 24 agosto 2026 il Bilancio ne dichiarava tre a
+   1.4.0 e LIPE tre a 3.5.0, mentre giravano con 1.4.1 e 3.6.1. Non si vedevano
+   in pagina — un blocco le riscrive dalla versione viva — ma è proprio questo
+   il problema: un `grep` sul file rispondeva la versione sbagliata.
+
+   Restano fuori i marcatori interni dei blocchi di correzione (`'v1.6.0'` in
+   Analisi): sono numeri di quella patch, non del tool, e vivono in stringhe
+   senza nient'altro attorno. */
+const ETICHETTA = /["'][^"']{3,70}\sv(\d+\.\d+\.\d+)["']/g;
+
+for (const [dir, label] of Object.entries(TOOLS)) {
+  test(`${label}: le etichette di pubblicazione dichiarano la versione che gira`, () => {
+    const html = fs.readFileSync(path.join(root, 'tools', dir, 'index.html'), 'utf8');
+    const attesa = (html.match(/data-tool-version="([^"]+)"/) || [])[1];
+    assert.ok(attesa, `${dir}: manca data-tool-version sul tag html`);
+
+    const sbagliate = [];
+    for (const m of html.matchAll(ETICHETTA)) {
+      if (m[1] === attesa) continue;
+      const riga = html.slice(0, m.index).split('\n').length;
+      sbagliate.push(`  riga ${riga}: ${m[0].slice(0, 74)} — in esecuzione ${attesa}`);
+    }
+    assert.equal(sbagliate.length, 0,
+      `${sbagliate.length} etichette con una versione diversa da quella che gira:\n${sbagliate.join('\n')}`);
+  });
+}

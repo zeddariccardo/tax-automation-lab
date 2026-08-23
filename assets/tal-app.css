@@ -1028,7 +1028,13 @@ html.tal-tool-page .tal-site-footer>div{max-width:1180px;margin:0 auto}
 /* Ogni voce sulla sua riga: in linea, il nome del progetto e il primo link si
    leggevano come una parola sola. */
 html.tal-tool-page .tal-site-footer span{display:block;margin:4px 0}
+/* I quattro link del piede stanno su una riga sola, separati da un punto
+   mediano: erano alti 16px con 10px di spazio in mezzo, e sul telefono si
+   sbaglia bersaglio. Il riquadro cliccabile sale a 24px senza spostare
+   niente d'altro: e' l'altezza minima che le WCAG 2.2 chiedono. */
 html.tal-tool-page .tal-site-footer a{
+  display:inline-block;
+  padding:4px 2px;
   color:#F7F7F5;
   text-decoration:underline;
   text-underline-offset:3px;

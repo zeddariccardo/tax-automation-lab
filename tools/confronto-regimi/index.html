@@ -5,12 +5,12 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/confronto-regimi/
 -->
-<html class="tal-tool-page" data-tool-version="1.1.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.2.0" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>Confronto regimi: forfettario, ordinario, STP/STA | Tax Automation Lab</title>
-<meta name="description" content="Tool gratuito per confrontare la cassa personale netta di un avvocato o dottore commercialista fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l., con soglia di convenienza oltre 85.000 euro, contribuzione di Cassa e simulazione del mix compenso/dividendo.">
+<meta name="description" content="Tool gratuito per confrontare il netto personale disponibile di un avvocato o dottore commercialista fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l., con soglia di convenienza oltre 85.000 euro, contribuzione di Cassa e ottimizzazione automatica del mix compenso/dividendo.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -23,7 +23,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:site_name" content="Tax Automation Lab">
 <meta property="og:title" content="Confronto regimi: forfettario, ordinario, STP/STA | Tax Automation Lab">
-<meta property="og:description" content="Confronta la cassa personale netta fra forfettario, ordinario e società professionale, direttamente nel browser.">
+<meta property="og:description" content="Quanto ti rimane davvero fra forfettario, ordinario e società professionale. Nel browser, senza inviare dati.">
 <meta property="og:url" content="https://taxautomationlab.com/tools/confronto-regimi/">
 <meta property="og:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
@@ -33,7 +33,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
 <meta property="og:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Confronto regimi: forfettario, ordinario, STP/STA | Tax Automation Lab">
-<meta name="twitter:description" content="Confronta la cassa personale netta fra forfettario, ordinario e società professionale, direttamente nel browser.">
+<meta name="twitter:description" content="Quanto ti rimane davvero fra forfettario, ordinario e società professionale. Nel browser, senza inviare dati.">
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/inter-var-latin.woff2">
 <link rel="stylesheet" href="/assets/site-shell.css?v=20260810-v61510-header-1">
@@ -45,10 +45,10 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
   "@type": "SoftwareApplication",
   "name": "Confronto regimi",
   "url": "https://taxautomationlab.com/tools/confronto-regimi/",
-  "description": "Confronto della cassa personale netta fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi.",
+  "description": "Confronto del netto personale disponibile fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi e ottimizzazione automatica del mix compenso/dividendo.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Browser",
-  "softwareVersion": "1.1.0",
+  "softwareVersion": "1.2.0",
   "inLanguage": "it",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -467,6 +467,176 @@ main#cfMain{max-width:1120px;margin:0 auto}
 .cf-clamp div { min-width: 130px; }
 .cf-clamp dt { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--tal-ink-3, #6e6b65); }
 .cf-clamp dd { margin: 1px 0 0; font-weight: 700; }
+
+/* Le due modalita' di calcolo della societa': due scelte, non tre opzioni
+   tecniche. La griglia a due colonne le mette sullo stesso piano invece di
+   farle sembrare un elenco da scorrere. */
+.cf-choices-2 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+#cfManualBox[hidden], #cfAutoBox[hidden] { display: none; }
+
+/* ------------------------------------------- l'output orientato alla decisione */
+
+/* Il sottotitolo dei grafici. Il documento chiede che ogni grafico dica in una
+   frase cosa mostra: senza questo, un asse e una legenda non bastano. */
+.cf-sub {
+  margin: -6px 0 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--tal-ink-3, #6e6b65);
+}
+
+/* La frase conclusiva sotto il grafico: quello che l'utente dovrebbe aver
+   capito guardandolo. Se non si riesce a scriverla, il grafico non serve. */
+.cf-conclusione {
+  margin: 12px 0 0;
+  padding: 11px 14px;
+  border-left: 3px solid var(--tal-teal, #145368);
+  border-radius: 0 8px 8px 0;
+  background: rgba(20, 83, 104, .05);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* «Perche' conviene»: il passaggio dal numero al motivo. Sta in una scheda
+   propria perche' e' prosa, non dati, e va letta come tale. */
+.cf-perche {
+  margin: 22px 0 0;
+  padding: 20px 22px;
+  border: 1px solid var(--tal-line, #e7e4dc);
+  border-radius: 14px;
+  background: #fff;
+}
+.cf-perche[hidden] { display: none; }
+.cf-perche h3 { margin: 0 0 10px; font-size: 15px; }
+.cf-perche p { margin: 0 0 11px; font-size: 13.5px; line-height: 1.65; }
+.cf-perche p:last-child { margin-bottom: 0; }
+.cf-perche .cf-quando {
+  margin-top: 16px;
+  padding-top: 15px;
+  border-top: 1px solid var(--tal-line, #e7e4dc);
+}
+.cf-perche b { font-weight: 700; }
+
+/* Il costo del salto: due colonne affiancate, perche' il punto e' il confronto
+   fra due situazioni, non due numeri in fila. */
+.cf-salto {
+  margin: 22px 0 0;
+  padding: 20px 22px;
+  border: 1px solid #E8DCAE;
+  border-radius: 14px;
+  background: #FFFDF5;
+}
+.cf-salto[hidden] { display: none; }
+.cf-salto h3 { margin: 0 0 4px; font-size: 15px; }
+.cf-salto > p { margin: 0 0 16px; font-size: 12.5px; color: var(--tal-ink-3, #6e6b65); }
+.cf-salto-coppia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.cf-salto-lato {
+  padding: 14px 16px;
+  border-radius: 11px;
+  background: #fff;
+  border: 1px solid var(--tal-line, #e7e4dc);
+}
+.cf-salto-lato span {
+  display: block;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--tal-ink-3, #6e6b65);
+}
+.cf-salto-lato b { display: block; margin-top: 5px; font-size: 21px; letter-spacing: -.02em; }
+.cf-salto-lato small { display: block; margin-top: 4px; font-size: 12px; color: var(--tal-ink-2, #47443f); }
+.cf-salto-esito {
+  margin: 16px 0 0;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.55;
+}
+.cf-salto-pareggio { margin: 10px 0 0; font-size: 13px; line-height: 1.6; }
+
+/* Il mix della societa': tre quote e dove finiscono. */
+.cf-mix-righe { display: grid; gap: 9px; margin: 0 0 14px; }
+.cf-mix-riga {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 13px;
+  border-radius: 9px;
+  background: var(--tal-surface-2, #faf9f6);
+  font-size: 13px;
+}
+.cf-mix-riga b { font-variant-numeric: tabular-nums; }
+.cf-mix-riga small { display: block; margin-top: 3px; font-size: 11.5px; color: var(--tal-ink-3, #6e6b65); }
+.cf-mix-riga.fuori { background: #FFF8DF; }
+.cf-mix-nota { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--tal-ink-2, #47443f); }
+.cf-mix-manuale {
+  margin: 0 0 14px;
+  padding: 12px 15px;
+  border-left: 4px solid #8B6A16;
+  border-radius: 0 10px 10px 0;
+  background: #FFF8DF;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Il verdetto: la riga che nomina il regime, l'importo, cosa significa, e la
+   differenza dal punto di partenza. Quattro informazioni in ordine di
+   importanza, non quattro righe uguali. */
+.cf-verdict .cf-vsub {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--tal-ink-3, #6e6b65);
+}
+.cf-verdict .cf-vdelta {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--tal-info-line, #bfd6de);
+  font-size: 13.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* «Più conveniente» sulla card che vince: il documento chiede che non serva
+   interpretare nulla per capire quale sia. */
+.cf-card { position: relative; }
+.cf-badge {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--tal-teal, #145368);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Il conto sopra la riga del netto: compensi, costi, imposte e contributi,
+   nello stesso ordine in tutte e tre le card. */
+.cf-mini-conto {
+  grid-template-columns: 1fr;
+  gap: 5px;
+  margin-top: 0;
+  margin-bottom: 11px;
+}
+.cf-mini-conto > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+.cf-mini-conto span { font-size: 12px; color: var(--tal-ink-2, #47443f); }
+.cf-mini-conto b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
 </style>
 <style id="tal-global-header-style">
 .tal-global-header,.tal-global-header *{box-sizing:border-box}
@@ -579,9 +749,9 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.1.0</span>
+<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.2.0</span>
 <h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
-<p data-tal-key="lead">Confronta la cassa personale netta di un avvocato o di un dottore commercialista fra i tre assetti, con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e il mix fra compenso amministratore e dividendo.</p>
+<p data-tal-key="lead">Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra i tre assetti: quanto ti rimane dopo costi, contributi e imposte. Con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e l'ottimizzazione automatica del mix fra compenso amministratore e dividendo.</p>
 <div class="tal-publication-facts">
 <div class="tal-publication-fact" data-tal-fact="0">Input: Excel o compilazione guidata</div><div class="tal-publication-fact" data-tal-fact="1">Output: confronto, grafici, Excel</div><div class="tal-publication-fact" data-tal-fact="2">Parametri: 2025 e 2026, modificabili</div><div class="tal-publication-fact" data-tal-fact="3">Dati: elaborazione locale</div>
 </div>
@@ -716,11 +886,6 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <span class="cf-hint">La tua quota della società, in percentuale.</span>
 </div>
 <div class="cf-field">
-<label for="cfDistribution">Utile distribuito</label>
-<input aria-describedby="errCfDistribution" aria-invalid="false" class="tal-input" id="cfDistribution" inputmode="decimal" type="text" value="100"><span class="cf-error" hidden id="errCfDistribution"></span>
-<span class="cf-hint">Quanto ne esce come dividendo. Il resto resta in società.</span>
-</div>
-<div class="cf-field">
 <label for="cfCompanyOverhead">Costi di struttura della società</label>
 <input aria-describedby="errCfCompanyOverhead" aria-invalid="false" class="tal-input" id="cfCompanyOverhead" inputmode="decimal" type="text" value="0"><span class="cf-error" hidden id="errCfCompanyOverhead"></span>
 <span class="cf-hint">Amministrazione, revisione, adempimenti societari.</span>
@@ -735,15 +900,36 @@ main#cfMain{max-width:1120px;margin:0 auto}
 
 <div class="cf-section">
 <h3>Come esce la remunerazione dalla società</h3>
+<p class="cf-lead">Compenso amministratore, dividendo o un misto dei due: il risultato cambia, e la combinazione migliore dipende dai tuoi numeri. La cerca il tool.</p>
+<div class="cf-choices cf-choices-2">
+<label class="cf-choice"><input checked name="cfMixMode" type="radio" value="auto"><b>Ottimizza automaticamente</b><small>Consigliato. Il tool prova le combinazioni e usa quella che ti lascia più netto personale.</small></label>
+<label class="cf-choice"><input name="cfMixMode" type="radio" value="manual"><b>Personalizza</b><small>Imposti tu compenso e quota distribuita. Il risultato usa la tua ipotesi, non l'ottimo.</small></label>
+</div>
+
+<div class="cf-grid" id="cfAutoBox" style="margin-top:15px">
+<div class="cf-field">
+<label for="cfRetainInCompany">Quanto deve restare in società</label>
+<input aria-describedby="errCfRetainInCompany" aria-invalid="false" class="tal-input" id="cfRetainInCompany" inputmode="decimal" type="text" value="0"><span class="cf-error" hidden id="errCfRetainInCompany"></span>
+<span class="cf-hint">Capitale circolante, investimenti, prudenza. Il tool ottimizza rispettando questo vincolo: quello che resta in società non è denaro tuo disponibile, quindi non entra nel confronto.</span>
+</div>
+</div>
+
+<div id="cfManualBox" style="margin-top:15px">
 <div class="cf-choices">
 <label class="cf-choice"><input checked name="cfExtraction" type="radio" value="dividend"><b>Solo dividendo</b><small>Ritenuta 26%, fuori dall'IRPEF progressiva</small></label>
 <label class="cf-choice"><input name="cfExtraction" type="radio" value="admin"><b>Solo compenso amministratore</b><small>IRPEF e previdenza</small></label>
-<label class="cf-choice"><input name="cfExtraction" type="radio" value="mix"><b>Compenso e dividendo</b><small>Il tool cerca il mix migliore</small></label>
+<label class="cf-choice"><input name="cfExtraction" type="radio" value="mix"><b>Compenso e dividendo</b><small>Nelle proporzioni che indichi tu</small></label>
 </div>
 <div class="cf-grid" id="cfAdminBox" style="margin-top:15px">
 <div class="cf-field">
 <label for="cfAdmin">Compenso amministratore</label>
 <input aria-describedby="errCfAdmin" aria-invalid="false" class="tal-input" id="cfAdmin" inputmode="decimal" type="text" value="0"><span class="cf-error" hidden id="errCfAdmin"></span>
+<span class="cf-hint">Lordo annuale.</span>
+</div>
+<div class="cf-field">
+<label for="cfDistribution">Utile distribuito</label>
+<input aria-describedby="errCfDistribution" aria-invalid="false" class="tal-input" id="cfDistribution" inputmode="decimal" type="text" value="100"><span class="cf-error" hidden id="errCfDistribution"></span>
+<span class="cf-hint">Quanto ne esce come dividendo. Il resto resta in società.</span>
 </div>
 <div class="cf-field" id="cfAdminTreatmentBox">
 <label for="cfAdminTreatment">Previdenza sul compenso</label>
@@ -754,6 +940,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <label for="cfInpsRate">Aliquota Gestione Separata</label>
 <select class="tal-input" id="cfInpsRate"><option value="24">24% · con altra copertura obbligatoria</option><option value="33.72">33,72% · senza altra copertura</option></select>
 <span class="cf-hint">Un terzo a te, due terzi alla società.</span>
+</div>
 </div>
 </div>
 </div>
@@ -826,38 +1013,56 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <div class="cf-cards" id="cfCards"></div>
 <div class="cf-transizione" hidden id="cfTransizione"></div>
 
+<!-- La spiegazione in lingua naturale, generata dai numeri della simulazione:
+     il documento chiede che non sia testo generico, e infatti cita gli importi
+     effettivi. Sta subito dopo il confronto perche' e' la risposta alla
+     domanda che viene dopo «quanto mi rimane»: perche'. -->
+<section class="cf-perche" hidden id="cfPerche"></section>
+
+<!-- Il costo del salto. Superare la soglia non conviene appena la si supera, e
+     detto con due numeri accanto e' piu' chiaro di una curva. -->
+<section class="cf-salto" hidden id="cfCostoSalto"></section>
+
 <div class="cf-section" style="margin-top:40px">
-<h3>La soglia oltre 85.000</h3>
+<h3>Quanto devi fatturare per rendere conveniente uscire dal forfettario?</h3>
 <p class="cf-lead" id="cfThresholdLead"></p>
 <div class="cf-readout" id="cfThresholdReadout"></div>
 </div>
 
 <div class="cf-section">
-<h3>Cassa netta al variare dei compensi</h3>
+<h3>Quanto ti rimane nei tre regimi al crescere dei compensi</h3>
+<p class="cf-sub">Netto personale disponibile stimato, tenendo fermi i costi che hai inserito.</p>
 <p class="cf-lead">Passa il dito o il mouse sul grafico per leggere il netto a ogni livello di compensi. Da tastiera: frecce destra e sinistra.</p>
-<div class="cf-chart-wrap"><svg id="cfChartMain" role="img" aria-label="Cassa netta personale al variare dei compensi, per i tre regimi"></svg></div>
+<div class="cf-chart-wrap"><svg id="cfChartMain" role="img" aria-label="Netto personale disponibile al variare dei compensi, per i tre regimi"></svg></div>
 <div class="cf-legend" id="cfLegendMain"></div>
 <div class="cf-readout" id="cfChartReadout"></div>
 </div>
 
 <div class="cf-section">
-<h3>Dai compensi alla cassa: cosa se ne va</h3>
+<h3>Dai compensi a quello che ti rimane: cosa se ne va per strada</h3>
+<p class="cf-sub">Ogni colonna parte dai compensi e sottrae costi, contributi e imposte.</p>
 <p class="cf-lead">Dai tuoi compensi si toglie quello che se ne va. In fondo, quello che ti resta.</p>
-<div class="cf-chart-wrap"><svg id="cfChartBridge" role="img" aria-label="Passaggio dai compensi alla cassa netta per ciascun regime"></svg></div>
+<div class="cf-chart-wrap"><svg id="cfChartBridge" role="img" aria-label="Passaggio dai compensi al netto personale disponibile per ciascun regime"></svg></div>
+</div>
+
+<div class="cf-section" hidden id="cfMixSocietaBox">
+<h3>Come è stato composto il risultato della società</h3>
+<p class="cf-sub">Compenso, dividendo e utile lasciato in società: la combinazione usata nella simulazione.</p>
+<div id="cfMixSocieta"></div>
 </div>
 
 <div class="cf-section">
-<h3>Cosa ribalta la scelta</h3>
+<h3>Cosa potrebbe cambiare il risultato</h3>
 <p class="cf-lead">Cosa succede al vantaggio del primo sul secondo se una cosa cambia.</p>
 <div id="cfDrivers"></div>
 </div>
 
+
 <div class="cf-section">
-<h3>I due anni del passaggio</h3>
+<h3>Cosa succede nell’anno del superamento e in quello dopo</h3>
 <p class="cf-lead">Se superi 85.000, quest'anno e il prossimo non si somigliano.</p>
 <div class="cf-chart-wrap"><svg id="cfChartYears" role="img" aria-label="Confronto fra anno simulato e periodo successivo"></svg></div>
 </div>
-
 <div class="cf-section">
 <h3>Da verificare prima di decidere</h3>
 <p class="cf-lead">Dove il tool si ferma e serve il tuo giudizio.</p>
@@ -1366,38 +1571,172 @@ function cfEngine(input) {
       ? compensoPrimaDelTetto
       : Math.max(0, cassaPreCompenso - inpsMax * quotaSoc))
     : cassaPreCompenso;
-  const compensoRichiesto = input.extractionMode === 'dividend' ? 0 : cfNum(input.admin);
-  const compenso = Math.min(compensoRichiesto, compensoMax);
-  const baseInps = Math.min(compenso, inpsMax);
-  const inpsSocio = baseInps * inpsAliq * P.inps.quotaAmministratore;
-  const inpsSocieta = baseInps * inpsAliq * (1 - P.inps.quotaAmministratore);
 
-  const baseIres = Math.max(0, compensi - tot.dedSoc - struttura - compenso - inpsSocieta);
-  const ires = baseIres * P.ires;
-  const baseIrap = Math.max(0, compensi - tot.dedIrap - struttura);
-  const irap = baseIrap * cfNum(input.irapRate) / 100;
+  /* Lo scenario societario come funzione delle due leve che lo governano: il
+     compenso amministratore richiesto e quanto dell'utile distribuibile resta
+     in società. Prima questo blocco era codice lineare che leggeva `input`
+     direttamente, e non c'era modo di valutarlo a parametri diversi da quelli
+     inseriti: e' la ragione per cui l'ottimizzazione promessa a schermo non
+     esisteva. Qui e' una funzione pura, quindi si puo' cercare. */
+  function scenarioSocieta(compensoRichiesto, opzioni) {
+    const compenso = Math.min(Math.max(0, compensoRichiesto), compensoMax);
+    const baseInps = Math.min(compenso, inpsMax);
+    const inpsSocio = baseInps * inpsAliq * P.inps.quotaAmministratore;
+    const inpsSocieta = baseInps * inpsAliq * (1 - P.inps.quotaAmministratore);
 
-  const distribuibile = Math.max(0,
-    compensi - tot.cassaSoc - struttura - compenso - inpsSocieta - ires - irap);
-  const quotaDistribuita = input.extractionMode === 'admin' ? 0
-    : cfNum(input.distribution, 0, 100) / 100;
-  const dividendo = distribuibile * quotaDistribuita * quota;
-  const ritenuta = dividendo * P.ritenutaDividendo;
-  const trattenuto = distribuibile * (1 - quotaDistribuita) * quota;
+    const baseIres = Math.max(0, compensi - tot.dedSoc - struttura - compenso - inpsSocieta);
+    const ires = baseIres * P.ires;
+    const baseIrap = Math.max(0, compensi - tot.dedIrap - struttura);
+    const irap = baseIrap * cfNum(input.irapRate) / 100;
 
-  /* La contribuzione professionale grava sull'utile attribuibile, distribuito
-     o no. È il punto che il brief chiede di non perdere. */
-  const baseCassa = baseIres * quota + (inpsSuCompenso ? 0 : compenso);
-  const cassaSocio = contributi(baseCassa, compensi * quota, true);
+    const distribuibile = Math.max(0,
+      compensi - tot.cassaSoc - struttura - compenso - inpsSocieta - ires - irap);
 
-  const contributiPersonali = cassaSocio + inpsSocio;
-  const socLordo = altriRedditi + compenso;
-  const socDedotto = Math.min(contributiPersonali, socLordo);
-  const socImponibile = Math.max(0, socLordo - socDedotto);
-  const socImposta = impostaPersonale(socImponibile,
-    inpsSuCompenso ? 'dipendente' : 'autonomo') - impostaBase;
+    /* Due modi di dire la stessa cosa. In manuale l'utente fissa la quota
+       distribuita in percentuale, com'e' sempre stato. In automatico dichiara
+       quanti euro devono restare in società — capitale circolante, investimenti
+       — e la quota si ricava da quelli: un vincolo in euro e' quello che si sa,
+       una percentuale dell'utile distribuibile e' quello che si scopre dopo. */
+    let quotaDistribuita;
+    if (opzioni && opzioni.trattieni != null) {
+      const trattieni = Math.min(Math.max(0, opzioni.trattieni), distribuibile);
+      quotaDistribuita = distribuibile > 0 ? (distribuibile - trattieni) / distribuibile : 0;
+    } else {
+      quotaDistribuita = cfNum(opzioni && opzioni.quota, 0, 1);
+    }
 
-  const socNetto = dividendo - ritenuta + compenso - contributiPersonali - socImposta;
+    const dividendo = distribuibile * quotaDistribuita * quota;
+    const ritenuta = dividendo * P.ritenutaDividendo;
+    const trattenuto = distribuibile * (1 - quotaDistribuita) * quota;
+
+    /* La contribuzione professionale grava sull'utile attribuibile, distribuito
+       o no. È il punto che il brief chiede di non perdere. */
+    const baseCassa = baseIres * quota + (inpsSuCompenso ? 0 : compenso);
+    const cassaSocio = contributi(baseCassa, compensi * quota, true);
+
+    const contributiPersonali = cassaSocio + inpsSocio;
+    const socLordo = altriRedditi + compenso;
+    const socDedotto = Math.min(contributiPersonali, socLordo);
+    const socImponibile = Math.max(0, socLordo - socDedotto);
+    const socImposta = impostaPersonale(socImponibile,
+      inpsSuCompenso ? 'dipendente' : 'autonomo') - impostaBase;
+
+    return {
+      compenso, baseInps, inpsSocio, inpsSocieta, baseIres, ires, irap,
+      distribuibile, quotaDistribuita, dividendo, ritenuta, trattenuto,
+      baseCassa, cassaSocio, contributiPersonali, socDedotto, socImposta,
+      netto: dividendo - ritenuta + compenso - contributiPersonali - socImposta
+    };
+  }
+
+  /* L'ottimizzatore. Massimizza il netto personale disponibile al variare del
+     compenso, tenuto fermo il vincolo su quanto resta in società.
+
+     Non si deriva analiticamente: la funzione ha gomiti nel massimale della
+     Gestione Separata, negli scaglioni IRPEF e nei minimi di Cassa. Griglia
+     grossa piu' affinamento locale — 33 punti e poi una sezione aurea sul
+     tratto migliore — e' robusto sui gomiti e costa qualche decina di
+     valutazioni aritmetiche. */
+  /* Il vincolo e' un vincolo, non un desiderio.
+
+     L'utile distribuibile scende al crescere del compenso: se l'ottimizzatore
+     spinge il compenso fino a consumarlo, in societa' non resta niente e il
+     vincolo dichiarato dall'utente viene disatteso in silenzio. Provato: con
+     20.000 da trattenere l'ottimo proponeva 65.900 di compenso e lasciava zero.
+     Quindi il compenso ha un tetto: il piu' alto che lascia ancora in societa'
+     quello che deve restarci. Se nemmeno a compenso zero c'e' capienza, il
+     vincolo e' irrealizzabile e resta in societa' tutto quello che c'e'. */
+  function tettoDelVincolo(trattieni) {
+    if (trattieni <= 0) return compensoMax;
+    if (scenarioSocieta(0, { quota: 1 }).distribuibile < trattieni) return 0;
+    let lo = 0, hi = compensoMax;
+    for (let i = 0; i < 40 && hi - lo > 1; i++) {
+      const m = (lo + hi) / 2;
+      if (scenarioSocieta(m, { quota: 1 }).distribuibile >= trattieni) lo = m; else hi = m;
+    }
+    return lo;
+  }
+
+  function ottimizzaMix(trattieni) {
+    const limite = tettoDelVincolo(trattieni);
+    const valuta = (c) => scenarioSocieta(c, { trattieni: trattieni }).netto;
+    const passi = 32;
+    let migliore = 0, netto = valuta(0), valutazioni = 1;
+    for (let i = 1; i <= passi; i++) {
+      const c = limite * i / passi;
+      const n = valuta(c); valutazioni++;
+      if (n > netto) { netto = n; migliore = c; }
+    }
+    /* Affinamento fra i due punti adiacenti al migliore. */
+    const larghezza = limite / passi;
+    let lo = Math.max(0, migliore - larghezza);
+    let hi = Math.min(limite, migliore + larghezza);
+    const phi = (Math.sqrt(5) - 1) / 2;
+    let a = hi - phi * (hi - lo), b = lo + phi * (hi - lo);
+    let fa = valuta(a), fb = valuta(b);
+    valutazioni += 2;
+    for (let i = 0; i < 34 && hi - lo > 1; i++) {
+      if (fa > fb) { hi = b; b = a; fb = fa; a = hi - phi * (hi - lo); fa = valuta(a); }
+      else { lo = a; a = b; fa = fb; b = lo + phi * (hi - lo); fb = valuta(b); }
+      valutazioni++;
+    }
+    if (valuta((lo + hi) / 2) > netto) { migliore = (lo + hi) / 2; netto = valuta(migliore); }
+    valutazioni += 2;
+
+    /* Arrotondato ai 100 euro, perche' un compenso deliberato non ha i
+       centesimi e proporne 27.413,86 darebbe una precisione che il modello non
+       ha. Ma si sceglie fra il centinaio sotto e quello sopra invece di
+       arrotondare al piu' vicino: arrotondando per difetto si perdeva netto —
+       misurato, 10,78 euro sul caso dimostrativo — e proporre un ottimo che non
+       e' l'ottimo e' esattamente il difetto che questa funzione doveva chiudere. */
+    const candidati = [Math.floor(migliore / 100) * 100, Math.ceil(migliore / 100) * 100]
+      .map((c) => Math.max(0, Math.min(c, limite)));
+    let scelto = candidati[0], nettoScelto = valuta(candidati[0]);
+    valutazioni++;
+    candidati.slice(1).forEach((c) => {
+      const n = valuta(c); valutazioni++;
+      if (n > nettoScelto) { nettoScelto = n; scelto = c; }
+    });
+    return {
+      compenso: scelto,
+      limitatoDalVincolo: trattieni > 0 && limite < compensoMax - 1,
+      limitatoDallaCapienza: scelto >= limite - 1 && limite >= compensoMax - 1,
+      vincoloIrrealizzabile: trattieni > 0 && limite <= 0,
+      valutazioni: valutazioni
+    };
+  }
+
+  const mixAutomatico = input.mixMode !== 'manual';
+  const trattieniChiesto = cfNum(input.retainInCompany);
+  let soc, mixInfo;
+  if (mixAutomatico) {
+    const ott = ottimizzaMix(trattieniChiesto);
+    soc = scenarioSocieta(ott.compenso, { trattieni: trattieniChiesto });
+    mixInfo = { modo: 'auto', compensoProposto: ott.compenso,
+      trattieniChiesto: trattieniChiesto, valutazioni: ott.valutazioni,
+      limitatoDalVincolo: ott.limitatoDalVincolo,
+      limitatoDallaCapienza: ott.limitatoDallaCapienza,
+      vincoloIrrealizzabile: ott.vincoloIrrealizzabile };
+  } else {
+    const richiesto = input.extractionMode === 'dividend' ? 0 : cfNum(input.admin);
+    const quotaManuale = input.extractionMode === 'admin' ? 0
+      : cfNum(input.distribution, 0, 100) / 100;
+    soc = scenarioSocieta(richiesto, { quota: quotaManuale });
+    mixInfo = { modo: 'manuale', compensoRichiesto: richiesto,
+      quotaDistribuita: quotaManuale };
+  }
+
+  const compensoRichiesto = mixAutomatico
+    ? mixInfo.compensoProposto : mixInfo.compensoRichiesto;
+  const compenso = soc.compenso;
+  const inpsSocio = soc.inpsSocio, inpsSocieta = soc.inpsSocieta;
+  const baseIres = soc.baseIres, ires = soc.ires, irap = soc.irap;
+  const distribuibile = soc.distribuibile;
+  const dividendo = soc.dividendo, ritenuta = soc.ritenuta, trattenuto = soc.trattenuto;
+  const baseCassa = soc.baseCassa, cassaSocio = soc.cassaSocio;
+  const contributiPersonali = soc.contributiPersonali;
+  const socDedotto = soc.socDedotto, socImposta = soc.socImposta;
+  const socNetto = soc.netto;
 
   /* ---- esito -------------------------------------------------------- */
 
@@ -1442,6 +1781,11 @@ function cfEngine(input) {
         stato: 'IRES, IRAP e remunerazione del socio',
         dettaglio: {
           compenso, compensoMax, compensoRichiesto,
+          /* Il mix usato, e come e' stato scelto: senza questo l'utente non
+             puo' sapere se sta guardando un'ottimizzazione o la propria
+             ipotesi. */
+          mix: mixInfo,
+          quotaDistribuita: soc.quotaDistribuita,
           /* RE-003. Il massimale riduce il compenso in silenzio: chi chiede
              40.000 e ne vede erogare 35.920 deve poterlo leggere, altrimenti
              confronta una struttura che non e' quella che ha impostato. */
@@ -1651,43 +1995,47 @@ window.cfRenderConfronto = function () {
   const attuale = esito.scenari.find((sc) => sc.id === stato.currentRegime) || null;
   const confermaAttuale = attuale && attuale.id === vincente.id;
 
+  /* Il verdetto risponde alla domanda che l'utente ha in testa — «quindi, per
+     me, cosa conviene?» — e la risposta comincia col nome del regime, non con
+     una metrica. La differenza rispetto al punto di partenza sta subito sotto,
+     perche' e' quella che decide se muoversi vale la pena. */
+  const differenzaAttuale = attuale && attuale.applicabile
+    ? vincente.netto - attuale.netto : null;
+
   $('cfVerdict').innerHTML =
-    '<div class="cf-vlabel">Più cassa personale netta nel ' + stato.year + ' · l’utile trattenuto in società non è conteggiato</div>' +
-    '<div class="cf-vname">' + X(vincente.nome) + '</div>' +
+    '<div class="cf-vlabel">Con i dati che hai inserito, nel ' + stato.year + '</div>' +
+    '<div class="cf-vname">Ti conviene ' + X(articolo(vincente)) + '</div>' +
     '<div class="cf-vnet">' + E(vincente.netto) + '</div>' +
-    '<div class="cf-vwhy">' +
-      (secondo
-        ? E(divario) + ' in più di ' + X(secondo.nome) +
-          (Math.abs(secondo.netto) > 1
-            ? ', il ' + ((divario / Math.abs(secondo.netto)) * 100).toFixed(0) + '% in più.'
-            : '.')
-        : 'È l’unica alternativa applicabile.') +
-      ' Cassa personale netta: quello che ti resta dopo costi, contributi e imposte.' +
-      (attuale
-        ? ' Il tuo punto di partenza è ' + X(attuale.nome) + ': ' +
-          (confermaAttuale
-            ? 'il confronto lo conferma.'
-            : (attuale.applicabile
-              ? 'la differenza è ' + E(vincente.netto - attuale.netto) + ' l’anno.'
-              : 'con i dati inseriti non risulta applicabile.'))
-        : '') +
-    '</div>';
+    '<div class="cf-vsub">netto personale disponibile in un anno, dopo costi professionali, imposte e contributi</div>' +
+    (differenzaAttuale != null && Math.abs(differenzaAttuale) >= 1
+      ? '<div class="cf-vdelta">' + (differenzaAttuale > 0 ? '+' : '−') +
+        E(Math.abs(differenzaAttuale)) + ' rispetto a ' + X(attuale.nome) +
+        ', che è la tua situazione di partenza</div>'
+      : '') +
+    '<div class="cf-vwhy">' + frasePrincipale(esito, vincente, secondo, attuale, stato) + '</div>';
 
   $('cfCards').innerHTML = esito.scenari.map((s) => {
     const cls = 'cf-card' + (s.id === vincente.id ? ' is-winner' : '') +
       (s.id === stato.currentRegime ? ' is-baseline' : '') +
       (s.applicabile ? '' : ' not-eligible');
     return '<article class="' + cls + '" data-regime="' + s.id + '">' +
+      (s.id === vincente.id ? '<div class="cf-badge">Più conveniente</div>' : '') +
       '<h3>' + X(s.nome) + '</h3>' +
       '<p class="cf-status">' + X(s.stato) +
         (s.id === stato.currentRegime ? ' · regime attuale' : '') + '</p>' +
-      '<div class="cf-net"><span>Cassa personale netta</span><strong>' +
+      /* Le quattro righe che il documento chiede, nello stesso ordine per tutti e
+         tre gli scenari: si leggono in colonna e si confrontano a occhio. */
+      '<div class="cf-mini cf-mini-conto">' +
+        '<div><span>Compensi</span><b>' + E(stato.revenue) + '</b></div>' +
+        '<div><span>Costi effettivi</span><b>' + E(s.costi) + '</b></div>' +
+        '<div><span>Imposte e contributi</span><b>' + E(s.imposte + s.contributi) + '</b></div>' +
+      '</div>' +
+      '<div class="cf-net"><span>Quanto ti rimane</span><strong>' +
         (s.applicabile ? E(s.netto) : 'Non applicabile') + '</strong></div>' +
       '<div class="cf-mini">' +
-        '<div><span>Imposte</span><b>' + E(s.imposte) + '</b></div>' +
-        '<div><span>Contributi</span><b>' + E(s.contributi) + '</b></div>' +
-        '<div><span>Costi effettivi</span><b>' + E(s.costi) + '</b></div>' +
-        (s.trattenuto > 0 ? '<div><span>Utile trattenuto in società</span><b>' + E(s.trattenuto) + '</b></div>' : '') +
+        '<div><span>di cui imposte</span><b>' + E(s.imposte) + '</b></div>' +
+        '<div><span>di cui contributi</span><b>' + E(s.contributi) + '</b></div>' +
+        (s.trattenuto > 0 ? '<div><span>Resta in società, non è tuo</span><b>' + E(s.trattenuto) + '</b></div>' : '') +
         /* La distanza dal punto di partenza e' la domanda vera: «cambiare mi
            conviene?», non «quale dei tre e' il massimo». */
         (attuale && attuale.applicabile && s.id !== attuale.id && s.applicabile
@@ -1700,11 +2048,16 @@ window.cfRenderConfronto = function () {
   }).join('');
 
   renderTransizione(esito, vincente, attuale);
+  renderPerche(esito, conv, vincente, secondo, attuale);
+  renderCostoSalto(conv, esito);
+  renderMixSocieta(esito);
   renderClamp(esito);
   renderAvviso(conv);
   renderSoglia(conv);
   graficoCurva(conv);
+  concludiCurva(conv, esito);
   graficoPonte(esito);
+  concludiPonte(esito, vincente);
   graficoDriver(esito, vincente, secondo);
   graficoAnni(conv);
   renderVerifiche(esito);
@@ -1735,7 +2088,7 @@ function renderTransizione(esito, vincente, attuale) {
   if (!attuale) { box.hidden = true; return; }
   if (attuale.id === vincente.id) {
     box.innerHTML = '<h3>Il confronto conferma il tuo punto di partenza</h3>' +
-      '<p>Con questi dati ' + X(attuale.nome) + ' resta l’assetto con più cassa personale netta: ' +
+      '<p>Con questi dati ' + X(attuale.nome) + ' resta l’assetto che ti lascia più netto personale: ' +
       'non c’è nessun passaggio da valutare, e i costi di un cambiamento non entrano nel confronto.</p>';
     box.hidden = false;
     return;
@@ -1744,7 +2097,7 @@ function renderTransizione(esito, vincente, attuale) {
   if (!voce) { box.hidden = true; return; }
   box.innerHTML = '<h3>' + X(voce[0]) + '</h3>' +
     '<p>' + X(voce[1]) + '</p>' +
-    '<p>La differenza di cassa netta annua è ' +
+    '<p>La differenza di netto personale in un anno è ' +
     (attuale.applicabile ? E(vincente.netto - attuale.netto) : 'non calcolabile, perché il tuo regime attuale non risulta applicabile con questi dati') +
     '. È un confronto a regime: non contiene i costi una volta tanto del passaggio, né gli effetti fiscali della trasformazione.</p>';
   box.hidden = false;
@@ -1777,6 +2130,308 @@ function renderClamp(esito) {
       '<div><dt>Usato nel calcolo</dt><dd>' + E(d.compenso) + '</dd></div>' +
     '</dl>';
   box.hidden = false;
+}
+
+
+/* L'articolo giusto davanti al nome del regime: «Ti conviene il regime
+   forfettario», «Ti conviene la STP S.r.l.». Con un solo articolo fisso una
+   delle tre frasi risultava sgrammaticata, e una frase sgrammaticata nel punto
+   piu' letto della pagina si nota. */
+function articolo(scenario) {
+  if (scenario.id === 'forfettario') return 'il regime forfettario';
+  if (scenario.id === 'ordinario') return 'la partita IVA ordinaria';
+  return 'la ' + scenario.nome;
+}
+
+/* «passare a » + articolo dava «passare a la STP S.r.l.»: la preposizione va
+   articolata, e in una frase che sta nel punto piu' letto della pagina un
+   errore di grammatica si vede prima del numero. */
+function articoloA(scenario) {
+  if (scenario.id === 'forfettario') return 'al regime forfettario';
+  if (scenario.id === 'ordinario') return 'alla partita IVA ordinaria';
+  return 'alla ' + scenario.nome;
+}
+
+/* La frase sotto il verdetto cambia col punto di partenza, perche' la domanda
+   cambia: chi e' forfettario si chiede se convenga superare la soglia, chi e'
+   ordinario quanto risparmierebbe, chi ha una societa' se abbia ancora senso
+   tenerla. Una narrativa unica per tutti risponderebbe a nessuno. */
+function frasePrincipale(esito, vincente, secondo, attuale, stato) {
+  const E = euro(), X = esc();
+  const P = CF_PARAMS[stato.year];
+  const conferma = attuale && attuale.id === vincente.id;
+
+  if (!attuale) {
+    return 'Fra le alternative applicabili, ' + X(articolo(vincente)) + ' lascia il netto più alto' +
+      (secondo ? ', ' + E(vincente.netto - secondo.netto) + ' in più di ' + X(secondo.nome) : '') + '.';
+  }
+  /* Se il regime di partenza non e' applicabile con questi dati, non esiste
+     nessuna differenza da calcolare: sottrarre il suo netto produceva frasi come
+     «aumenterebbe di −8.441», che e' peggio di non dire niente. */
+  if (!attuale.applicabile) {
+    return 'Il tuo regime di partenza, ' + X(articolo(attuale)) + ', non risulta applicabile con ' +
+      'i dati inseriti: ' + (attuale.id === 'forfettario' && stato.revenue > P.sogliaCessazioneImmediata
+        ? 'i compensi superano ' + E(P.sogliaCessazioneImmediata) + ', quindi la cessazione opera ' +
+          'nello stesso anno. '
+        : '') + 'Fra le alternative, ' + X(articolo(vincente)) + ' è quella che ti lascia di più.';
+  }
+  const differenza = vincente.netto - attuale.netto;
+
+  if (attuale.id === 'forfettario') {
+    if (conferma) {
+      return stato.revenue > P.sogliaPermanenza
+        ? 'Con questi compensi il forfettario resta la soluzione migliore, ma sei oltre ' +
+          E(P.sogliaPermanenza) + ': l’uscita dal regime è una conseguenza di legge, non una scelta.'
+        : 'Con i dati inseriti non conviene superare volontariamente la soglia del forfettario: ' +
+          'le alternative lasciano meno netto personale.';
+    }
+    return 'Con i dati inseriti, passare ' + X(articoloA(vincente)) + ' aumenterebbe il netto ' +
+      'personale di ' + E(differenza) + ' l’anno.';
+  }
+  if (attuale.id === 'ordinario') {
+    if (conferma) {
+      return 'Con i dati inseriti la partita IVA ordinaria resta la soluzione migliore: né il ' +
+        'forfettario né la struttura societaria lascerebbero più netto personale.';
+    }
+    return vincente.id === 'forfettario'
+      ? 'Con i dati inseriti, applicare il regime forfettario porterebbe un aumento stimato del ' +
+        'netto personale di ' + E(differenza) + '. Restano da verificare i requisiti.'
+      : 'Con i dati inseriti, la struttura societaria lascerebbe ' + E(differenza) +
+        ' in più l’anno rispetto alla partita IVA ordinaria.';
+  }
+  return conferma
+    ? 'Con i dati inseriti mantenere la struttura societaria risulta ancora la soluzione con più ' +
+      'netto personale disponibile.'
+    : 'Con i dati inseriti la struttura societaria non risulta più la soluzione migliore: ' +
+      X(articolo(vincente)) + ' lascerebbe ' + E(differenza) + ' in più l’anno.';
+}
+
+/* «Perche'?» — la spiegazione che il documento chiede in lingua naturale, e che
+   deve venire dai numeri della simulazione, non da un testo di repertorio.
+   Il meccanismo vero e' uno: il forfettario riconosce i costi in misura fissa,
+   una quota dei compensi, e applica un'aliquota piatta; l'ordinario deduce i
+   costi effettivi e applica l'IRPEF progressiva. Confrontare quella quota coi
+   costi realmente sostenuti spiega il risultato meglio di qualunque metafora. */
+function renderPerche(esito, conv, vincente, secondo, attuale) {
+  const box = $('cfPerche');
+  const stato = window.cfStato(), E = euro(), X = esc();
+  const P = CF_PARAMS[stato.year];
+  const forf = esito.scenari[0], ord = esito.scenari[1];
+
+  const riconosciuti = stato.revenue * (1 - P.coefficiente);
+  const dichiarati = esito.totali.lordo;
+  const parti = [];
+
+  parti.push('<h3>Perché ' + X(articolo(vincente)) + ', nel tuo caso?</h3>');
+  /* Se il regime di partenza non e' applicabile, la spiegazione deve cominciare
+     da quello: e' l'informazione che l'utente non si aspetta. */
+  if (attuale && !attuale.applicabile) {
+    parti.push('<p>Prima di tutto: ' + X(articolo(attuale)) + ', da cui parti, non è applicabile ' +
+      'con questi dati. Il confronto che segue riguarda le alternative.</p>');
+  }
+
+  /* Il confronto fra costi riconosciuti e costi reali vale solo se il
+     forfettario e' in gioco: negli altri casi si spiega la leva societaria. */
+  if (forf.applicabile || vincente.id === 'forfettario') {
+    parti.push('<p>Hai indicato <b>' + E(stato.revenue) + '</b> di compensi e <b>' + E(dichiarati) +
+      '</b> di costi annuali. Il forfettario non guarda i costi che hai: te ne riconosce una quota ' +
+      'fissa, il ' + Math.round((1 - P.coefficiente) * 100) + '% dei compensi, cioè <b>' +
+      E(riconosciuti) + '</b>, e tassa il resto con un’aliquota unica.</p>');
+    parti.push('<p>' + (dichiarati < riconosciuti
+      ? 'I tuoi costi sono <b>inferiori</b> a quella quota di ' + E(riconosciuti - dichiarati) +
+        ': dedurli davvero, come fa il regime ordinario, ti farebbe risparmiare meno di quanto il ' +
+        'forfettario ti riconosce senza chiederti niente.'
+      : 'I tuoi costi <b>superano</b> quella quota di ' + E(dichiarati - riconosciuti) +
+        ': dedurli effettivamente, come fa il regime ordinario, abbassa la base imponibile più di ' +
+        'quanto faccia il forfettario con la sua quota fissa.') + '</p>');
+  }
+
+  if (vincente.id === 'societa' || (attuale && attuale.id === 'societa')) {
+    const d = esito.scenari[2].dettaglio;
+    parti.push('<p>Nella struttura societaria conta come esce il denaro: il dividendo paga prima ' +
+      'l’IRES al ' + Math.round(P.ires * 100) + '% in capo alla società e poi la ritenuta del ' +
+      Math.round(P.ritenutaDividendo * 100) + '%, mentre il compenso amministratore è deducibile ' +
+      'per la società ma porta IRPEF e contributi. Il tool ha cercato la combinazione migliore: ' +
+      'con i tuoi numeri conviene erogare <b>' + E(d.compenso) + '</b> come compenso' +
+      (d.dividendo > 0 ? ' e <b>' + E(d.dividendo) + '</b> come dividendo' : ' e nessun dividendo') +
+      '.</p>');
+  }
+
+  if (secondo && vincente.applicabile && secondo.applicabile) {
+    parti.push('<p>Il risultato: con questi dati ' + X(articolo(vincente)) + ' ti lascia <b>' +
+      E(vincente.netto - secondo.netto) + '</b> in più all’anno rispetto a ' + X(secondo.nome) + '.</p>');
+  }
+
+  /* «Quando cambierebbe il risultato»: le due soglie che il motore calcola
+     davvero, dette in euro e non in percentuale. */
+  const quando = [];
+  if (conv.pareggio != null && conv.applicabileA85 && conv.pareggio > stato.revenue) {
+    quando.push('Se i compensi salissero verso <b>' + E(conv.pareggio) + '</b>, tenendo i costi ' +
+      'fermi, il regime ordinario recupererebbe il vantaggio del forfettario.');
+  }
+  if (conv.sogliaCosti != null && conv.sogliaCosti > 0) {
+    quando.push('Se i costi annuali arrivassero a <b>' + E(conv.sogliaCosti) + '</b> — oggi sono ' +
+      E(conv.costiAttuali) + ' — l’ordinario pareggerebbe il forfettario a parità di compensi, ' +
+      'perché li dedurrebbe per intero.');
+  }
+  if (forf.applicabile && stato.revenue <= P.sogliaPermanenza) {
+    quando.push('Oltre <b>' + E(P.sogliaCessazioneImmediata) + '</b> di compensi il forfettario ' +
+      'cessa nello stesso anno: non è una scelta di convenienza, è una conseguenza di legge.');
+  }
+  if (quando.length) {
+    parti.push('<div class="cf-quando"><h3>Quando cambierebbe il risultato?</h3>' +
+      quando.map((q) => '<p>' + q + '</p>').join('') + '</div>');
+  }
+
+  box.innerHTML = parti.join('');
+  box.hidden = false;
+}
+
+/* Il costo del salto. Superare la soglia non conviene appena la si supera: la
+   curva lo mostra, ma due numeri accanto lo dicono. Il livello di confronto e'
+   quello dell'utente se ha gia' superato la soglia, altrimenti la soglia piu'
+   cinquemila — abbastanza per rendere visibile il salto senza inventare un caso
+   lontano dal suo. */
+function renderCostoSalto(conv, esito) {
+  const box = $('cfCostoSalto');
+  const stato = window.cfStato(), E = euro();
+  const P = CF_PARAMS[stato.year];
+  /* Svuotato quando si nasconde: un blocco invisibile che conserva i numeri di
+     una simulazione precedente e' una trappola per il prossimo che lo mostra. */
+  if (!conv.applicabileA85) { box.hidden = true; box.innerHTML = ''; return; }
+
+  const oltre = stato.revenue > P.sogliaPermanenza
+    ? stato.revenue : P.sogliaPermanenza + 5000;
+  const nettoOltre = cfEngine(window.cfInputMotore({ revenue: oltre })).scenari[1].netto;
+  const inPiu = oltre - P.sogliaPermanenza;
+  const differenza = nettoOltre - conv.nettoRiferimento;
+
+  box.innerHTML =
+    '<h3>Quanto costa superare la soglia adesso</h3>' +
+    '<p>Confronto fra fermarsi al limite del forfettario e fatturare di più in regime ordinario, ' +
+    'con gli stessi costi.</p>' +
+    '<div class="cf-salto-coppia">' +
+      '<div class="cf-salto-lato"><span>Ti fermi a ' + E(P.sogliaPermanenza) + ' nel forfettario</span>' +
+      '<b>' + E(conv.nettoRiferimento) + '</b><small>netto personale disponibile</small></div>' +
+      '<div class="cf-salto-lato"><span>Fatturi ' + E(oltre) + ' in ordinario</span>' +
+      '<b>' + E(nettoOltre) + '</b><small>netto personale disponibile</small></div>' +
+    '</div>' +
+    '<p class="cf-salto-esito">' + (differenza < 0
+      ? 'Fatturi ' + E(inPiu) + ' in più, ma ti rimangono ' + E(Math.abs(differenza)) + ' in meno.'
+      : 'Fatturi ' + E(inPiu) + ' in più e ti rimangono ' + E(differenza) + ' in più.') + '</p>' +
+    '<p class="cf-salto-pareggio">' + (conv.pareggio == null
+      ? 'Con questi costi, nell’intervallo esaminato l’ordinario non arriva a pareggiare il netto ' +
+        'del forfettario a ' + E(P.sogliaPermanenza) + '.'
+      : (conv.pareggio <= P.sogliaPermanenza
+        ? 'A parità di compensi l’ordinario è già davanti: il pareggio cade sotto la soglia.'
+        : 'Devi arrivare a <b>' + E(conv.pareggio) + '</b> di compensi per tornare allo stesso ' +
+          'netto personale. Fra ' + E(P.sogliaPermanenza) + ' e ' + E(conv.pareggio) +
+          ' fattureresti di più e ti rimarrebbe di meno.')) + '</p>';
+  box.hidden = false;
+}
+
+/* Il mix della societa': tre quote, e la distinzione fra quello che arriva alla
+   persona e quello che resta in societa'. Senza questa distinzione il confronto
+   fra regimi sarebbe fra cose diverse. */
+function renderMixSocieta(esito) {
+  const box = $('cfMixSocietaBox'), host = $('cfMixSocieta');
+  const soc = esito.scenari.find((x) => x.id === 'societa');
+  if (!soc) { box.hidden = true; return; }
+  const d = soc.dettaglio, mix = d.mix || {}, E = euro();
+  const parti = [];
+
+  if (mix.modo === 'manuale') {
+    parti.push('<div class="cf-mix-manuale"><b>Scenario personalizzato.</b> Il risultato usa il ' +
+      'compenso e la quota distribuita che hai impostato tu, non la combinazione ottimale. ' +
+      'Per confrontarlo con l’ottimo, torna su «Ottimizza automaticamente».</div>');
+  } else {
+    parti.push('<p class="cf-mix-nota">Il tool ha provato le combinazioni possibili e ha usato ' +
+      'quella che ti lascia più netto personale' +
+      (mix.trattieniChiesto > 0
+        ? ', rispettando i ' + E(mix.trattieniChiesto) + ' che hai chiesto di lasciare in società'
+        : '') + '.</p>');
+  }
+
+  parti.push('<div class="cf-mix-righe">' +
+    '<div class="cf-mix-riga"><div>Compenso amministratore<small>IRPEF e contributi, deducibile per la società</small></div><b>' + E(d.compenso) + '</b></div>' +
+    '<div class="cf-mix-riga"><div>Dividendo lordo<small>IRES in società, poi ritenuta del 26%</small></div><b>' + E(d.dividendo) + '</b></div>' +
+    (soc.trattenuto > 0
+      ? '<div class="cf-mix-riga fuori"><div>Resta in società<small>non è denaro tuo disponibile: non entra nel confronto</small></div><b>' + E(soc.trattenuto) + '</b></div>'
+      : '') +
+    '</div>');
+
+  parti.push('<div class="cf-net"><span>Quanto arriva effettivamente a te</span><strong>' +
+    E(soc.netto) + '</strong></div>');
+
+  if (mix.limitatoDallaCapienza) {
+    parti.push('<p class="cf-mix-nota">Il compenso proposto coincide col massimo che la società ' +
+      'può erogare con questi compensi e questi costi: è la capienza a fare da vincolo, non la ' +
+      'convenienza fiscale.</p>');
+  }
+  if (mix.vincoloIrrealizzabile) {
+    parti.push('<p class="cf-mix-nota">Quello che hai chiesto di lasciare in società è più ' +
+      'dell’utile disponibile: resta in società tutto quello che c’è, e non viene distribuito nulla.</p>');
+  }
+  /* Un netto personale negativo non e' un errore di calcolo, ed e' il caso in
+     cui il modello dice qualcosa che vale la pena sapere: la contribuzione
+     grava sull'utile attribuibile al socio anche quando quell'utile resta in
+     societa'. Senza questa riga sembrerebbe un difetto. */
+  if (soc.netto < 0) {
+    parti.push('<p class="cf-mix-nota"><b>Il netto personale è negativo.</b> Non è un errore: i ' +
+      'contributi previdenziali si calcolano sulla quota di utile che ti è attribuibile, anche se ' +
+      'quell’utile resta in società. Con questo vincolo la società trattiene la liquidità e i ' +
+      'contributi li versi comunque, quindi in quell’anno esci di tasca.</p>');
+  }
+
+  host.innerHTML = parti.join('');
+  box.hidden = false;
+}
+
+
+/* Le frasi sotto i grafici. Un grafico senza la sua conclusione chiede
+   all'utente di ricavarla da solo, e il documento parte proprio dal fatto che
+   chi non fa il fiscalista non ci riesce — o ci riesce sbagliando. */
+function conclusioneSotto(idGrafico, testo) {
+  const svg = $(idGrafico);
+  const wrap = svg && svg.parentElement ? svg.parentElement.parentElement : null;
+  if (!wrap) return;
+  let p = wrap.querySelector('.cf-conclusione');
+  if (!p) {
+    p = document.createElement('p');
+    p.className = 'cf-conclusione';
+    wrap.appendChild(p);
+  }
+  p.innerHTML = testo;
+}
+
+function concludiCurva(conv, esito) {
+  const stato = window.cfStato(), E = euro();
+  const P = CF_PARAMS[stato.year];
+  let testo;
+  if (!conv.applicabileA85) {
+    testo = 'Il forfettario non è applicabile con i dati inseriti: le due curve che restano sono ' +
+      'partita IVA ordinaria e società, e la distanza fra loro è quello che cambia al crescere dei compensi.';
+  } else if (conv.pareggio == null) {
+    testo = 'Con i tuoi costi, nell’intervallo mostrato l’ordinario non arriva a pareggiare il netto ' +
+      'del forfettario fermo a ' + E(P.sogliaPermanenza) + '.';
+  } else if (conv.pareggio <= P.sogliaPermanenza) {
+    testo = 'Con i tuoi costi l’ordinario è già davanti al forfettario a parità di compensi: la sua ' +
+      'curva sta sopra su tutto l’intervallo.';
+  } else {
+    testo = 'Con i tuoi dati, l’ordinario raggiunge il netto che avresti fermandoti a ' +
+      E(P.sogliaPermanenza) + ' nel forfettario quando i compensi arrivano a circa <b>' +
+      E(conv.pareggio) + '</b>. Prima di quel punto fatturi di più e ti rimane di meno.';
+  }
+  conclusioneSotto('cfChartMain', testo);
+}
+
+function concludiPonte(esito, vincente) {
+  const stato = window.cfStato(), E = euro();
+  const quota = stato.revenue > 0 ? Math.round((vincente.netto / stato.revenue) * 100) : 0;
+  conclusioneSotto('cfChartBridge',
+    'Nello scenario migliore, di ' + E(stato.revenue) + ' di compensi te ne restano <b>' +
+    E(vincente.netto) + '</b>: il <b>' + quota + '%</b>. Il resto sono costi che sostieni davvero, ' +
+    'contributi previdenziali e imposte.');
 }
 
 function renderAvviso(conv) {
@@ -1840,9 +2495,19 @@ function renderSoglia(conv) {
      300.000 compariva lo stesso numero. */
   celle.push(['Costi a cui l’ordinario pareggia, a ' + mille(conv.rifCosti) + ' di compensi',
     conv.sogliaCosti == null ? 'Nessuna soglia utile' : E(conv.sogliaCosti)]);
+  /* La frase conclusiva sotto il blocco: il documento chiede che ogni sezione
+     dica cosa se ne ricava, e questa e' la sezione piu' importante del tool. */
+  const conclusione = conv.applicabileA85 && conv.pareggio != null && conv.pareggio > conv.soglia
+    ? 'In pratica: fra ' + E(conv.soglia) + ' e ' + E(conv.pareggio) + ' di compensi fattureresti ' +
+      'di più e ti rimarrebbe di meno. Il vantaggio del forfettario si recupera solo oltre ' +
+      E(conv.pareggio) + '.'
+    : (conv.applicabileA85
+      ? 'In pratica: con i tuoi costi l’ordinario regge il confronto già a parità di compensi.'
+      : 'Il forfettario non è applicabile con i dati inseriti, quindi non c’è una soglia da valutare.');
 
   $('cfThresholdReadout').innerHTML = celle
-    .map(([k, v]) => '<div><span>' + esc()(k) + '</span><b>' + v + '</b></div>').join('');
+    .map(([k, v]) => '<div><span>' + esc()(k) + '</span><b>' + v + '</b></div>').join('') +
+    '<p class="cf-conclusione">' + conclusione + '</p>';
 }
 
 /* ============================================================ 1. la curva */
@@ -1887,7 +2552,7 @@ function graficoCurva(conv) {
   g.appendChild(el('text', { x: L, y: H - 10, 'font-size': 10.5, fill: '#8A8780' },
     'compensi annui'));
   g.appendChild(el('text', { x: 12, y: T - 6, 'font-size': 10.5, fill: '#8A8780' },
-    'cassa netta'));
+    'netto personale'));
   s.appendChild(g);
 
   /* Le soglie, collocate sulla scala reale. */
@@ -2015,7 +2680,7 @@ function graficoCurva(conv) {
 
   s.setAttribute('tabindex', '0');
   s.setAttribute('role', 'application');
-  s.setAttribute('aria-label', 'Cassa netta per i tre regimi al variare dei compensi. '
+  s.setAttribute('aria-label', 'Netto personale disponibile per i tre regimi al variare dei compensi. '
     + 'Usa le frecce destra e sinistra per esplorare i livelli di compensi.');
   s.onkeydown = (ev) => {
     const passo = ev.shiftKey ? 5 : 1;
@@ -2307,7 +2972,7 @@ function renderVerifiche(esito) {
   }
 
   v.push([false, 'Contribuzione della società calcolata sulla quota di reddito e di volume d’affari attribuibile al socio, distribuita o no. È il criterio della disciplina, ma la posizione individuale va verificata con la tua Cassa.']);
-  v.push([false, 'Il dividendo non genera IRPEF progressiva né contributi sulla distribuzione. L’utile trattenuto in società non è cassa disponibile al socio.']);
+  v.push([false, 'Il dividendo non genera IRPEF progressiva né contributi sulla distribuzione. L’utile trattenuto in società non è denaro disponibile al socio.']);
 
   /* RE-011. Le assunzioni del modello non sono più riscritte qui: arrivano da
      cfAssunzioni(), lo stesso elenco che finisce nel foglio «Assunzioni e
@@ -2402,8 +3067,8 @@ window.cfRenderAiuto = function () {
   const f = P.forense, c = P.cnpadc, i = P.inps;
   $('cfHelp').innerHTML =
     '<div class="cf-section"><h3>Cosa fa</h3>' +
-    '<p class="cf-lead">Confronta la cassa personale netta fra tre assetti: forfettario, partita IVA ordinaria e società professionale. ' +
-    'La cassa personale netta è ciò che resta dopo costi effettivi, contributi e imposte. Per la società, l’utile trattenuto è mostrato a parte: non è denaro tuo disponibile.</p></div>' +
+    '<p class="cf-lead">Confronta il netto personale disponibile fra tre assetti: forfettario, partita IVA ordinaria e società professionale. ' +
+    'Il netto personale disponibile è quello che ti rimane dopo costi effettivi, contributi e imposte — la parola «cassa» qui non si usa, per non confonderla con la Cassa di previdenza. Per la società, l’utile trattenuto è mostrato a parte: non è denaro tuo disponibile.</p></div>' +
 
     '<div class="cf-section"><h3>Cosa non fa</h3>' +
     '<p class="cf-lead">Non sostituisce il parere professionale, non verifica i requisiti che dichiari, non certifica la spettanza di crediti o deduzioni, ' +
@@ -2531,6 +3196,9 @@ function statoDefault() {
     employmentEnded: false, reducedMinimums: false,
     ownership: 100, distribution: 100, companyOverhead: 0, irapRate: 3.9,
     extractionMode: 'dividend', admin: 0, adminTreatment: 'cassa', inpsRate: 24,
+    /* L'ottimizzazione e' il default: chiedere all'utente il mix migliore
+       significava chiedergli la risposta che il tool deve dargli. */
+    mixMode: 'auto', retainInCompany: 0,
     pensionRate: 12, maternity: 0, regionalRate: 1.23, municipalRate: 0.8
   };
 }
@@ -2564,13 +3232,14 @@ function raccogliStato() {
   stato.profession = radio('cfProfession') || '';
   stato.currentRegime = radio('cfCurrentRegime') || '';
   stato.extractionMode = radio('cfExtraction') || stato.extractionMode;
+  stato.mixMode = radio('cfMixMode') || 'auto';
   stato.year = Number($('cfYear').value);
   stato.subjectKind = $('cfSubjectKind').value;
   stato.subjectName = $('cfSubjectName').value.trim();
   ['revenue', 'previousRevenue', 'otherIncome', 'employeeIncomePrev',
    'employeeIncomeCurr', 'ownership',
    'distribution', 'companyOverhead', 'irapRate', 'admin', 'pensionRate',
-   'maternity', 'regionalRate', 'municipalRate'].forEach((k) => {
+   'maternity', 'regionalRate', 'municipalRate', 'retainInCompany'].forEach((k) => {
     const el = $('cf' + k.charAt(0).toUpperCase() + k.slice(1));
     if (el) stato[k] = leggiNumero(el.value);
   });
@@ -2588,13 +3257,14 @@ function scriviStato() {
   qa('input[name="cfProfession"]').forEach((r) => { r.checked = !!stato.profession && r.value === stato.profession; });
   qa('input[name="cfCurrentRegime"]').forEach((r) => { r.checked = !!stato.currentRegime && r.value === stato.currentRegime; });
   qa('input[name="cfExtraction"]').forEach((r) => { r.checked = r.value === stato.extractionMode; });
+  qa('input[name="cfMixMode"]').forEach((r) => { r.checked = r.value === (stato.mixMode || 'auto'); });
   $('cfYear').value = String(stato.year);
   $('cfSubjectKind').value = stato.subjectKind;
   $('cfSubjectName').value = stato.subjectName || '';
   ['revenue', 'previousRevenue', 'otherIncome', 'employeeIncomePrev',
    'employeeIncomeCurr', 'ownership',
    'distribution', 'companyOverhead', 'irapRate', 'admin', 'pensionRate',
-   'maternity', 'regionalRate', 'municipalRate'].forEach((k) => {
+   'maternity', 'regionalRate', 'municipalRate', 'retainInCompany'].forEach((k) => {
     const el = $('cf' + k.charAt(0).toUpperCase() + k.slice(1));
     if (el) el.value = scriviNumero(stato[k]);
   });
@@ -2616,6 +3286,12 @@ function aggiornaCampiCondizionali() {
   $('cfAdminTreatmentBox').hidden = !soc;
   $('cfInpsRateBox').hidden = !(soc && $('cfAdminTreatment').value === 'inps');
   $('cfPensionRateBox').hidden = !soc;
+  /* Le leve manuali si vedono solo se l'utente ha chiesto di impostarle: in
+     automatico sarebbero campi che non entrano nel calcolo, e un campo che non
+     serve e' peggio di un campo assente perche' sembra che conti. */
+  const manuale = (stato.mixMode || 'auto') === 'manual';
+  $('cfManualBox').hidden = !manuale;
+  $('cfAutoBox').hidden = manuale;
   const senzaCompenso = stato.extractionMode === 'dividend';
   q('.cf-field', $('cfAdminBox')).hidden = senzaCompenso;
 }
@@ -2774,6 +3450,7 @@ const CF_CAMPI_VALIDATI = [
   { id: 'cfAdmin', chiave: 'admin', nome: 'Compenso amministratore', min: 0 },
   { id: 'cfCompanyOverhead', chiave: 'companyOverhead', nome: 'Costi di struttura della societa\u2019', min: 0 },
   { id: 'cfMaternity', chiave: 'maternity', nome: 'Contributo di maternita\u2019', min: 0 },
+  { id: 'cfRetainInCompany', chiave: 'retainInCompany', nome: 'Quanto deve restare in societa\u2019', min: 0 },
   { id: 'cfOwnership', chiave: 'ownership', nome: 'Quota di partecipazione', min: 0, max: 100, pct: true },
   { id: 'cfDistribution', chiave: 'distribution', nome: 'Quota di utile distribuita', min: 0, max: 100, pct: true },
   { id: 'cfIrapRate', chiave: 'irapRate', nome: 'Aliquota IRAP', min: 0, max: 100, pct: true },
@@ -3321,7 +3998,10 @@ function caricaDemo() {
     profession: 'commercialista', currentRegime: 'forfettario',
     subjectName: 'Studio dimostrativo', revenue: 120000, previousRevenue: 84000,
     otherIncome: 15000, ownership: 100, distribution: 70, companyOverhead: 6000,
-    extractionMode: 'mix', admin: 40000
+    /* La demo gira in automatico, come chi apre il tool per la prima volta.
+       Compenso e quota restano impostati: servono a chi passa a «Personalizza»
+       per vedere la differenza fra la propria ipotesi e l'ottimo. */
+    mixMode: 'auto', retainInCompany: 0, extractionMode: 'mix', admin: 40000
   });
   costi = nuoviCosti(); esitiAI = [];
   const demo = { studio: 14000, utenze: 3200, telefonia: 1400, tecnologia: 4800,
@@ -3411,7 +4091,9 @@ const CAMPI_COMPENSI = [
   ['Utile distribuito %', 'distribution', 'numero', 'il resto resta in società'],
   ['Costi di struttura della società', 'companyOverhead', 'numero', 'amministrazione, revisione, adempimenti'],
   ['Aliquota IRAP %', 'irapRate', 'numero', 'da verificare per la regione'],
-  ['Remunerazione dalla società', 'extractionMode', 'testo', 'dividendo, compenso oppure misto'],
+  ['Modalità di calcolo della società', 'mixMode', 'testo', 'automatico oppure manuale: in automatico il tool cerca il mix di compenso e dividendo che lascia più netto personale'],
+  ['Quanto deve restare in società', 'retainInCompany', 'numero', 'vincolo per l’ottimizzazione automatica: capitale circolante, investimenti'],
+  ['Remunerazione dalla società', 'extractionMode', 'testo', 'solo in manuale: dividendo, compenso oppure misto'],
   ['Compenso amministratore', 'admin', 'numero', 'lordo annuale'],
   ['Previdenza sul compenso', 'adminTreatment', 'testo', 'cassa oppure inps'],
   ['Aliquota Gestione Separata %', 'inpsRate', 'numero', '24 oppure 33,72'],
@@ -3471,7 +4153,11 @@ const ENUM = {
                      misto: 'mix', mix: 'mix' },
   adminTreatment:  { cassa: 'cassa', 'cassa professionale': 'cassa',
                      inps: 'inps', 'gestione separata': 'inps',
-                     'gestione separata inps': 'inps' }
+                     'gestione separata inps': 'inps' },
+  /* Automatico e' il default: un file che non dice niente ottiene
+     l'ottimizzazione, che e' il comportamento consigliato. */
+  mixMode: { auto: 'auto', automatico: 'auto', ottimizza: 'auto', ottimizzato: 'auto',
+    manual: 'manual', manuale: 'manual', personalizzato: 'manual' }
 };
 
 function leggiEnum(chiave, grezzo) {
@@ -4032,16 +4718,16 @@ function esportaExcel() {
        dati il file non e' ripercorribile quando i parametri sono cambiati. */
     ['Versione delle regole', esito.ruleset.versione + ' del ' + esito.ruleset.aggiornato],
     ['Estratto il', new Date().toLocaleString('it-IT')],
-    ['Metrica del confronto', 'cassa personale netta: quello che resta al professionista dopo costi, contributi e imposte. L’utile trattenuto in società non è conteggiato.'],
+    ['Metrica del confronto', 'netto personale disponibile: quello che resta al professionista dopo costi, contributi e imposte. L’utile trattenuto in società non è conteggiato.'],
     [],
     ['Compensi dell’anno', E(stato.revenue)],
     ['Compensi dell’anno precedente', E(stato.previousRevenue)],
     ['Altri redditi personali', E(stato.otherIncome)],
     [],
     /* RE-011. «Alternativa più conveniente» diceva più di quello che il tool
-       calcola: la metrica è una, ed è la cassa personale netta. */
-    ['Scenario con maggiore cassa personale netta', vincente.nome],
-    ['Cassa personale netta', E(vincente.netto)],
+       calcola: la metrica è una, ed è il netto personale disponibile. */
+    ['Scenario con più netto personale disponibile', vincente.nome],
+    ['Netto personale disponibile', E(vincente.netto)],
     ['Utile trattenuto in società, non conteggiato sopra', E(soc0 ? soc0.trattenuto : 0)],
     ['Differenza rispetto al regime attuale',
       attuale ? (attuale.applicabile ? E(vincente.netto - attuale.netto)
@@ -4061,7 +4747,7 @@ function esportaExcel() {
   formattaColonna(wsS, 1);
   XLSX.utils.book_append_sheet(wb, wsS, 'Sintesi');
 
-  const scen = [['Regime', 'Applicabile', 'Stato', 'Cassa personale netta',
+  const scen = [['Regime', 'Applicabile', 'Stato', 'Netto personale disponibile',
     'Imposte', 'Contributi', 'Costi effettivi', 'Utile trattenuto in società']];
   esito.scenari.forEach((s) => scen.push([s.nome, s.applicabile ? 'SI' : 'NO', s.stato,
     s.applicabile ? E(s.netto) : '', E(s.imposte), E(s.contributi), E(s.costi), E(s.trattenuto)]));
@@ -4077,11 +4763,21 @@ function esportaExcel() {
     ['DETTAGLIO DELLA SOCIETÀ PROFESSIONALE'], [],
     ['Quota di partecipazione %', E(stato.ownership)],
     ['Utile distribuito %', E(stato.distribution)],
+    /* Come e' stato composto il mix: senza questo, chi rilegge il file non sa
+       se sta guardando un'ottimizzazione o l'ipotesi di chi l'ha compilato. */
+    ['Modalità di composizione del mix', (d.mix || {}).modo === 'manuale'
+      ? 'impostata a mano dall’utente' : 'ottimizzata dal tool'],
+    ['Vincolo: quanto deve restare in società', E(((d.mix || {}).trattieniChiesto) || 0)],
+    ['Il vincolo ha limitato il compenso', (d.mix || {}).limitatoDalVincolo ? 'SI' : 'NO'],
+    ['Il vincolo era irrealizzabile con questo utile', (d.mix || {}).vincoloIrrealizzabile ? 'SI' : 'NO'],
+    ['Il compenso coincide col massimo erogabile', (d.mix || {}).limitatoDallaCapienza ? 'SI' : 'NO'],
+    [],
     /* RE-003. Tre importi distinti, perche' erano tre e uno era invisibile. */
     ['Compenso amministratore richiesto', E(d.compensoRichiesto)],
     ['Compenso massimo erogabile', E(d.compensoMax)],
     ['Compenso effettivamente usato nel calcolo', E(d.compenso)],
     ['Il compenso richiesto è stato ridotto', d.compensoRidotto ? 'SI' : 'NO'],
+    ['Quota di utile distribuita', E((d.quotaDistribuita || 0) * 100) + '%'],
     ['Base IRES', E(d.baseIres)],
     ['IRES', E(d.ires)],
     ['IRAP', E(d.irap)],

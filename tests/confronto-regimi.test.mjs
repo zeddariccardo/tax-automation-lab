@@ -175,21 +175,27 @@ test('la contribuzione grava sull’utile attribuibile, non sul dividendo distri
     `i contributi cambiano con la distribuzione: ${contributi.map(c => c.toFixed(2)).join(' / ')}`);
 });
 
-test('l’utile trattenuto è mostrato a parte e non entra nella cassa personale', () => {
-  const s = soc(run({revenue: 300000, distribution: 0, extractionMode: 'dividend'}));
+/* Questi quattro test misurano la meccanica del mix impostato a mano —
+   distribuzione, ritenuta, quota di partecipazione, riduzione dal massimale — e
+   da quando l'ottimizzazione automatica e' il default vanno dichiarati
+   `mixMode: 'manual'`: in automatico il compenso e la quota che impongono qui
+   non vengono usati, ed e' giusto cosi'. La meccanica che verificano non e'
+   cambiata, e' cambiato quale modalita' la esercita. */
+test('l’utile trattenuto è mostrato a parte e non entra nel netto personale', () => {
+  const s = soc(run({mixMode: 'manual', revenue: 300000, distribution: 0, extractionMode: 'dividend'}));
   assert.ok(s.trattenuto > 0, 'con distribuzione a zero l’utile trattenuto deve essere positivo');
   assert.equal(s.dettaglio.dividendo, 0, 'con distribuzione a zero non c’è dividendo');
 });
 
 test('la ritenuta sul dividendo è il 26% e non passa dall’IRPEF progressiva', () => {
-  const s = soc(run({revenue: 300000, distribution: 100, extractionMode: 'dividend'}));
+  const s = soc(run({mixMode: 'manual', revenue: 300000, distribution: 100, extractionMode: 'dividend'}));
   const aliquota = s.dettaglio.ritenuta / s.dettaglio.dividendo;
   assert.ok(Math.abs(aliquota - 0.26) < 1e-9, `ritenuta al ${(aliquota * 100).toFixed(2)}%, attesa 26%`);
 });
 
 test('la quota di partecipazione scala utile attribuibile e dividendo', () => {
-  const piena = soc(run({revenue: 300000, ownership: 100, extractionMode: 'dividend'}));
-  const meta = soc(run({revenue: 300000, ownership: 50, extractionMode: 'dividend'}));
+  const piena = soc(run({mixMode: 'manual', revenue: 300000, ownership: 100, extractionMode: 'dividend'}));
+  const meta = soc(run({mixMode: 'manual', revenue: 300000, ownership: 50, extractionMode: 'dividend'}));
   assert.ok(Math.abs(meta.dettaglio.dividendo * 2 - piena.dettaglio.dividendo) < 0.01,
     'il dividendo deve essere proporzionale alla quota');
   assert.ok(Math.abs(meta.dettaglio.baseCassa * 2 - piena.dettaglio.baseCassa) < 0.01,
@@ -399,12 +405,12 @@ test('la soglia di pareggio dei costi non è zero quando i costi contano', () =>
    inserito e non poteva leggere. */
 
 test('il compenso amministratore ridotto dal massimale è rintracciabile', () => {
-  const d = casoDemo().scenari[2].dettaglio;
+  const d = casoDemo({mixMode: 'manual'}).scenari[2].dettaglio;
   assert.equal(d.compensoRichiesto, 40000, 'il richiesto deve restare esposto');
   assert.ok(d.compenso < d.compensoRichiesto, 'in questo caso il massimale morde');
   assert.equal(d.compenso, d.compensoMax, 'quando morde, si usa il massimo erogabile');
   assert.equal(d.compensoRidotto, true, 'la riduzione deve essere dichiarata');
-  const piccolo = casoDemo({admin: 10000}).scenari[2].dettaglio;
+  const piccolo = casoDemo({mixMode: 'manual', admin: 10000}).scenari[2].dettaglio;
   assert.equal(piccolo.compensoRidotto, false,
     'sotto il massimo non si deve annunciare nessuna riduzione');
   assert.equal(piccolo.compenso, 10000, 'sotto il massimo si eroga quanto chiesto');
@@ -474,7 +480,8 @@ test('per il commercialista la riduzione non è applicata ma è dichiarata', () 
 test('l’elenco delle assunzioni copre i casi che spostano il risultato', () => {
   const input = {...BASE, profession: 'commercialista', currentRegime: 'forfettario',
     revenue: 90001, previousRevenue: 84000, otherIncome: 15000, admin: 40000,
-    extractionMode: 'mix', distribution: 70, companyOverhead: 6000, costs: costi(DEMO)};
+    mixMode: 'manual', extractionMode: 'mix', distribution: 70,
+    companyOverhead: 6000, costs: costi(DEMO)};
   const ids = cfAssunzioni(input, cfEngine(input)).map(a => a.id);
   for (const atteso of ['compenso-ridotto', 'maternita-non-determinata', 'redditi-misti',
     'precheck-parziale', 'addizionali', 'irap-semplificata', 'costi-aggregati', 'ruleset']) {
@@ -531,4 +538,80 @@ test('ogni voce di costo espone dedotto, limite e tetto applicato', () => {
   const somma = r.totali.voci.reduce((a, v) => a + v.dedottoOrd, 0);
   assert.ok(Math.abs(somma - r.totali.dedOrd) < 0.005,
     'la somma delle righe deve fare il totale: altrimenti il foglio non riconcilia');
+});
+
+
+/* ---- 12. l’ottimizzazione automatica del mix STA/STP -------------------- */
+
+/* La pagina prometteva già «il tool cerca il mix migliore» sulla terza opzione,
+   ma nel motore non c'era nessuna ricerca: quella modalità usava il compenso e
+   la percentuale inseriti a mano. Questi test bloccano la promessa.
+
+   Cosa massimizza: il netto personale disponibile, con il vincolo dichiarato su
+   quanto deve restare in società. Senza vincolo l'ottimo distribuisce tutto,
+   perché l'utile trattenuto non arriva alla persona e nella metrica non conta. */
+
+const mixDemo = (over = {}) => cfEngine({
+  ...BASE, profession: 'commercialista', currentRegime: 'forfettario',
+  revenue: 120000, previousRevenue: 84000, otherIncome: 15000,
+  ownership: 100, distribution: 70, admin: 40000, extractionMode: 'mix',
+  companyOverhead: 6000, ...over, costs: costi(DEMO)
+});
+
+test('nessun mix impostato a mano batte quello scelto dall’ottimizzatore', () => {
+  const auto = mixDemo().scenari[2];
+  let migliore = -Infinity, dove = null;
+  for (let c = 0; c <= 130000; c += 500) {
+    const n = mixDemo({mixMode: 'manual', extractionMode: 'mix', admin: c, distribution: 100})
+      .scenari[2].netto;
+    if (n > migliore) { migliore = n; dove = c; }
+  }
+  assert.ok(auto.netto >= migliore - 0.5,
+    `l’automatico dà ${auto.netto.toFixed(2)} e una griglia manuale trova ${migliore.toFixed(2)} a compenso ${dove}`);
+  assert.ok(Math.abs(auto.dettaglio.compenso - dove) < 600,
+    `il compenso proposto (${auto.dettaglio.compenso}) deve stare vicino al massimo della griglia (${dove})`);
+});
+
+test('in automatico il compenso inserito a mano non entra nel calcolo', () => {
+  const a = mixDemo({admin: 5000}).scenari[2].netto;
+  const b = mixDemo({admin: 90000}).scenari[2].netto;
+  assert.equal(a, b, 'due compensi manuali diversi devono dare lo stesso risultato ottimizzato');
+  assert.equal(mixDemo().scenari[2].dettaglio.mix.modo, 'auto', 'la modalità va dichiarata nell’esito');
+});
+
+test('senza vincolo non resta nulla in società: non sarebbe denaro della persona', () => {
+  assert.equal(mixDemo().scenari[2].trattenuto, 0);
+});
+
+test('il vincolo su quanto resta in società viene rispettato', () => {
+  const v = mixDemo({retainInCompany: 20000}).scenari[2];
+  assert.ok(Math.abs(v.trattenuto - 20000) < 1,
+    `chiesti 20.000 in società, trattenuti ${v.trattenuto.toFixed(2)}`);
+  assert.ok(v.netto < mixDemo().scenari[2].netto,
+    'trattenere in società costa netto personale: se non costasse, il vincolo non servirebbe');
+  assert.equal(v.dettaglio.mix.limitatoDalVincolo, true,
+    'il vincolo che morde va dichiarato');
+});
+
+test('un vincolo più grande dell’utile disponibile è dichiarato irrealizzabile', () => {
+  const v = mixDemo({retainInCompany: 9999999}).scenari[2];
+  assert.equal(v.dettaglio.dividendo, 0, 'non si distribuisce nulla');
+  assert.ok(Math.abs(v.trattenuto - v.dettaglio.distribuibile) < 1,
+    'resta in società tutto il distribuibile');
+  assert.equal(v.dettaglio.mix.vincoloIrrealizzabile, true);
+});
+
+test('l’ottimizzatore è deterministico', () => {
+  assert.equal(JSON.stringify(mixDemo().scenari[2]), JSON.stringify(mixDemo().scenari[2]));
+});
+
+test('la modalità manuale continua a fare quello che l’utente chiede', () => {
+  const m = mixDemo({mixMode: 'manual', admin: 30000, distribution: 50}).scenari[2];
+  assert.equal(m.dettaglio.mix.modo, 'manuale');
+  assert.equal(m.dettaglio.compensoRichiesto, 30000);
+  assert.ok(m.dettaglio.compenso === 30000 || m.dettaglio.compensoRidotto,
+    'o eroga quanto chiesto, o dichiara di averlo ridotto');
+  assert.ok(m.trattenuto > 0, 'con metà utile non distribuito qualcosa resta in società');
+  assert.ok(m.netto <= mixDemo().scenari[2].netto + 0.5,
+    'e non può battere l’ottimo, altrimenti l’ottimo non è ottimo');
 });

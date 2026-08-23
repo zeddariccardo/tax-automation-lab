@@ -1,8 +1,8 @@
 THIRD-PARTY NOTICES
 Tax Automation Lab — https://taxautomationlab.com
-Last reviewed: 21 August 2026
+Last reviewed: 23 August 2026
 
-The five operational tools are single HTML files that vendor their JavaScript
+The six operational tools are single HTML files that vendor their JavaScript
 dependencies inline, so that each application runs locally in the browser with
 no network calls. The original copyright and licence notices of those libraries
 are preserved inside the distributed HTML and are not relicensed by the Tax
@@ -12,7 +12,7 @@ Automation Lab MIT licence.
 1. VENDORED LIBRARIES, PER TOOL
 --------------------------------------------------------------------------------
 
-Verified by inspecting the published HTML on 21 August 2026. A dash means the
+Verified by inspecting the published HTML on 23 August 2026. A dash means the
 library is not present in that file.
 
   Tool (path under /tools/)   SheetJS   jsPDF    AutoTable   JSZip
@@ -22,6 +22,7 @@ library is not present in that file.
   lipe                        0.20.3    4.2.1    5.0.8       -
   tfa-client-file             0.20.3    -        -           -
   f24                         0.20.3    4.2.1    -           3.10.1
+  confronto-regimi            0.20.3    -        -           -
 
 Licences and upstream projects:
 
@@ -42,6 +43,12 @@ Vendored SheetJS CE build verification:
   File:    xlsx.full.min.js 0.20.3 (embedded in each operational tool HTML)
   MD5:     6b3130af1ceadf07caa0ec08af7addff
   SHA-256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41
+
+  On 23 August 2026 the six embedded copies were measured and found to differ:
+  the signature above matched only one of them. They were realigned to that
+  single build, so the six tools now embed byte-identical copies and the
+  signature holds for all of them. `tests/vendored-libraries.test.mjs` checks
+  this on every run and fails if a copy diverges again.
 
 --------------------------------------------------------------------------------
 2. REFERENCED BUT NOT DISTRIBUTED

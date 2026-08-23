@@ -10,28 +10,28 @@ distingue due piani:
 - l'ESERCIZIO, cioè soltanto ciò che cambia o merita attenzione in un anno.
 
 MATERIALI DISPONIBILI
-Ti allego il template e uno o piu' documenti: possono essere visure, organigrammi,
+Ti allego il template e uno o più documenti: possono essere visure, organigrammi,
 bilanci, trial balance, tax computation, dichiarativi, working paper, contratti,
-atti di verifica, memo interni. Non e' richiesto un elenco preciso: usa quello che
-c'e'. Se un documento e' illeggibile o ambiguo, non tentare di indovinarne il
+atti di verifica, memo interni. Non è richiesto un elenco preciso: usa quello che
+c'è. Se un documento è illeggibile o ambiguo, non tentare di indovinarne il
 contenuto.
 
 REGOLE ASSOLUTE
-1. Non inventare. Compila solo cio' che e' sostenuto da un documento allegato.
-2. Lascia vuoto cio' che non e' disponibile o non e' verificabile. Una cella vuota
-   e' un risultato corretto; un dato plausibile ma non documentato e' un errore.
+1. Non inventare. Compila solo ciò che è sostenuto da un documento allegato.
+2. Lascia vuoto ciò che non è disponibile o non è verificabile. Una cella vuota
+   è un risultato corretto; un dato plausibile ma non documentato è un errore.
 3. Non scrivere "nessun rilievo", "non applicabile" o formule equivalenti se i
    documenti non permettono di concluderlo. Lascia vuoto.
 4. Non modificare la struttura del workbook: non rinominare, aggiungere o
    eliminare fogli e colonne, non spostare le intestazioni, non inserire righe
    sopra la prima riga di intestazione.
 5. Un solo cliente per workbook.
-6. Il file puo' restare parziale. Fogli interi vuoti non bloccano l'importazione:
-   e' preferibile un file incompleto e affidabile a uno completo e inventato.
-7. Nel foglio FISCALE non indicare IRES e IRAP come peculiarita': sono ordinarie.
+6. Il file può restare parziale. Fogli interi vuoti non bloccano l'importazione:
+   è preferibile un file incompleto e affidabile a uno completo e inventato.
+7. Nel foglio FISCALE non indicare IRES e IRAP come peculiarità: sono ordinarie.
    Inserisci soltanto regimi, caratteristiche o tematiche distintive.
-8. Nel foglio FY registra solo le novita' dell'esercizio. Non duplicare cio' che
-   e' gia' nel profilo permanente.
+8. Nel foglio FY registra solo le novità dell'esercizio. Non duplicare ciò che
+   è già nel profilo permanente.
 
 FORMATI
 - Date: YYYY-MM-DD (esempio 2026-03-31).
@@ -53,7 +53,7 @@ ANAGRAFICA — una sola riga di dati.
   Agricolo, Energia, Finanziario, Altro.
   Mercati: fra Italia, UE, Extra UE.
 
-TEMATICHE_BUSINESS — peculiarita' del modello di business.
+TEMATICHE_BUSINESS — peculiarità del modello di business.
   Titolo | Stato | Descrizione | Fonte | Aggiornato_al
   Una riga per tematica. Righe senza Titolo vengono scartate.
 
@@ -67,27 +67,27 @@ SOCIETA_GRUPPO — una sola riga di dati.
   Gruppo_di_appartenenza | Direzione_e_coordinamento | Consolidato_civilistico |
   Parti_correlate
 
-TEMATICHE_GRUPPO — peculiarita' societarie non deducibili dal solo organigramma.
+TEMATICHE_GRUPPO — peculiarità societarie non deducibili dal solo organigramma.
   Titolo | Stato | Descrizione | Fonte | Aggiornato_al
 
 CARATTERISTICHE_FISCALI — una riga per caratteristica, una sola colonna.
   Caratteristica
   Esempi ammessi: IVA mensile, IVA trimestrale, Consolidato fiscale,
-  Transfer Pricing, Fiscalita' internazionale, Regime di adempimento
+  Transfer Pricing, Fiscalità internazionale, Regime di adempimento
   collaborativo, Gruppo IVA, Pro-rata IVA, CFC, Pillar Two.
 
-GRUPPO_ENTITA — entita' da mostrare nell'organigramma.
+GRUPPO_ENTITA — entità da mostrare nell'organigramma.
   ID | Denominazione | Tipo | Forma | Colore | Cliente | Note
   ID: un identificativo breve e stabile (E1, E2, HOLD, OPCO...). Serve solo a
   collegare le relazioni: inventalo tu se i documenti non ne hanno uno.
-  Tipo: Societa', Persona fisica, Fondo / Trust, JV / Partnership, Stabile
+  Tipo: Società, Persona fisica, Fondo / Trust, JV / Partnership, Stabile
   organizzazione, Altro.
   Forma: rounded, rect, circle, triangle, diamond (facoltativo).
   Colore: teal, purple, navy, green, amber, rust, gray (facoltativo).
-  Cliente: scrivi SI sulla riga dell'entita' che e' il cliente del fascicolo.
+  Cliente: scrivi SI sulla riga dell'entità che è il cliente del fascicolo.
   Righe senza Denominazione vengono scartate.
 
-GRUPPO_RELAZIONI — rapporti fra le entita'.
+GRUPPO_RELAZIONI — rapporti fra le entità.
   Da_ID | A_ID | Quota_percentuale | Diritti_voto_percentuale | Tipo_relazione |
   Etichetta
   Da_ID e A_ID devono corrispondere agli ID del foglio GRUPPO_ENTITA.
@@ -99,7 +99,7 @@ GRUPPO_RELAZIONI — rapporti fra le entita'.
 FISCALE — aree e tematiche fiscali rilevanti.
   Area | Esito_area | Titolo | Stato | Descrizione | Fonte | Aggiornato_al
   Area: Imposte dirette, IVA, Ritenute, Transfer Pricing, Consolidato fiscale,
-  Fiscalita' internazionale, Agevolazioni & crediti, Altro.
+  Fiscalità internazionale, Agevolazioni & crediti, Altro.
   Una riga per tematica; ripeti il nome dell'Area su ogni riga che le appartiene.
   Esito_area: compilalo solo se i documenti sostengono una conclusione sull'area.
 
@@ -114,14 +114,14 @@ OPERAZIONI — operazioni straordinarie.
 ALTRI_ASPETTI — altri elementi permanenti rilevanti che non rientrano altrove.
   Titolo | Stato | Descrizione | Fonte | Aggiornato_al
 
-FY — novita' di uno specifico esercizio.
+FY — novità di uno specifico esercizio.
   Esercizio | Data | Sezione | Area | Titolo | Stato | Descrizione |
   Riporta_nel_profilo
   Esercizio: l'anno, esempio 2026.
-  Sezione: la sezione del profilo a cui la novita' si riferisce (Anagrafica &
-  Business, Contabilita' & Reporting, Societa' & Gruppo, Fiscale, Contenzioso &
+  Sezione: la sezione del profilo a cui la novità si riferisce (Anagrafica &
+  Business, Contabilità & Reporting, Società & Gruppo, Fiscale, Contenzioso &
   Controlli, Operazioni straordinarie, Altri aspetti rilevanti).
-  Riporta_nel_profilo: scrivi SI solo se la novita' e' strutturale, cioe' cambia
+  Riporta_nel_profilo: scrivi SI solo se la novità è strutturale, cioè cambia
   il profilo permanente e non riguarda solo quell'anno.
 
 COSA CONSEGNARE
@@ -132,5 +132,5 @@ COSA CONSEGNARE
    - i punti in cui i documenti erano ambigui o in contraddizione;
    - le voci che richiedono una verifica professionale prima dell'uso.
 
-Il file sara' controllato dal professionista prima dell'importazione. Il tuo
-compito e' preparare una base di lavoro tracciabile, non un fascicolo definitivo.
+Il file sarà controllato dal professionista prima dell'importazione. Il tuo
+compito è preparare una base di lavoro tracciabile, non un fascicolo definitivo.

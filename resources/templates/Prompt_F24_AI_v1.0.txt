@@ -4,38 +4,38 @@ REGOLE COMUNI A TUTTI I TEMPLATE DI TAX AUTOMATION LAB
 Valgono prima e sopra le istruzioni specifiche che seguono.
 1.  Leggi per primo il foglio ISTRUZIONI del template: contiene le regole di
     questo file e prevalgono su qualunque abitudine.
-2.  Usa solo le evidenze contenute nei documenti allegati. Se un dato non c'e',
-    non c'e': non ricostruirlo, non stimarlo, non completarlo per analogia.
+2.  Usa solo le evidenze contenute nei documenti allegati. Se un dato non c'è,
+    non c'è: non ricostruirlo, non stimarlo, non completarlo per analogia.
 3.  Non correggere e non completare gli identificativi: codici fiscali, partite
     IVA, codici tributo, codici IVA, codici conto. Riportali come stanno e
-    segnalali. Il controllo formale lo fa il tool, ed e' giusto cosi'.
+    segnalali. Il controllo formale lo fa il tool, ed è giusto così.
 4.  Cancella o ignora ogni riga di esempio. Se il template ha un foglio di
     esempi, non copiarne il contenuto nei fogli di lavoro.
 5.  Non lasciare valori predefiniti che il documento non sostiene. Se un campo
-    ammette una scelta - schema di bilancio, periodicita', sezione - e la fonte
+    ammette una scelta - schema di bilancio, periodicità, sezione - e la fonte
     non la dichiara, lascialo vuoto: non scegliere tu.
-6.  Se un dato e' ambiguo, lascia la cella vuota e apri un esito bloccante nel
+6.  Se un dato è ambiguo, lascia la cella vuota e apri un esito bloccante nel
     foglio "Esiti AI". Una cella vuota si vede; un dato inventato con sicurezza
     no, e arriva fino alla dichiarazione.
 7.  Cita la fonte di ogni dato non ovvio: documento, foglio, riga o pagina.
 8.  Riconcilia i conteggi: quante righe hai letto, quante ne hai scritte,
-    quante aggregate, quante escluse e perche'. I totali devono tornare.
+    quante aggregate, quante escluse e perché. I totali devono tornare.
 9.  Non rinominare fogli, colonne o intestazioni, non aggiungerne e non
     riordinarle: il tool le riconosce per nome.
 10. Non dichiarare completo un lavoro che ha esiti bloccanti aperti.
 
 OBIETTIVO
 Compilare il foglio PAGAMENTI del file "Template_F24_Configura_AI_v1.0.xlsx" per
-predisporre uno o piu' modelli F24, per uno o piu' contribuenti. Il file non deve
+predisporre uno o più modelli F24, per uno o più contribuenti. Il file non deve
 contenere nessun identificativo interno al tool: solo dati che si trovano nei
 documenti allegati.
 
 PRIMA DI COMINCIARE
 1. Leggi il foglio ISTRUZIONI del template: contiene le regole di compilazione
    che valgono per questo file e prevalgono su qualunque abitudine.
-2. Il foglio PAGAMENTI arriva vuoto, con le sole intestazioni. E' corretto: e'
+2. Il foglio PAGAMENTI arriva vuoto, con le sole intestazioni. È corretto: è
    il foglio che devi compilare tu.
-3. Il foglio ESEMPI_NON_IMPORTARE contiene righe di esempio su societa'
+3. Il foglio ESEMPI_NON_IMPORTARE contiene righe di esempio su società
    inventate (ALFA S.R.L., BETA S.P.A.). Servono solo a mostrarti la forma di
    una riga corretta. Non copiarle in PAGAMENTI, non modificarle, non
    cancellarle: il tool non legge quel foglio, e riconosce e scarta quelle
@@ -44,32 +44,32 @@ PRIMA DI COMINCIARE
    allegati.
 
 MATERIALI DISPONIBILI
-Ti allego il template e uno o piu' documenti: possono essere prospetti di calcolo
+Ti allego il template e uno o più documenti: possono essere prospetti di calcolo
 delle ritenute, cedolini riepilogativi, DM10 o estratti UniEmens, liquidazioni
 IVA, calcoli IMU, avvisi di enti locali, autoliquidazioni INAIL, prospetti di
-ravvedimento, estratti da gestionale o da ERP. Usa quello che c'e'. Se un
-documento e' illeggibile o ambiguo, non tentare di indovinarne il contenuto.
+ravvedimento, estratti da gestionale o da ERP. Usa quello che c'è. Se un
+documento è illeggibile o ambiguo, non tentare di indovinarne il contenuto.
 
 REGOLE ASSOLUTE
-1. Non inventare. Compila solo cio' che e' sostenuto da un documento allegato.
+1. Non inventare. Compila solo ciò che è sostenuto da un documento allegato.
 2. Non correggere e non "aggiustare" codici fiscali, partite IVA, codici tributo
-   o causali. Se un identificativo ha una lunghezza anomala, riportalo com'e' e
-   segnalalo nel riepilogo finale: sara' il tool a rifiutarlo, ed e' giusto cosi'.
+   o causali. Se un identificativo ha una lunghezza anomala, riportalo com'è e
+   segnalalo nel riepilogo finale: sarà il tool a rifiutarlo, ed è giusto così.
 3. Non compilare Importo debito e Importo credito sulla stessa riga. Se un
    documento espone un saldo netto e non distingue la gamba a debito da quella
    a credito, lascia vuote entrambe le colonne, compila il resto della riga e
    scrivi il caso nel riepilogo come punto bloccante. Non dedurre il segno da
-   un saldo: sbagliarlo produce un versamento sbagliato, ed e' esattamente cio'
+   un saldo: sbagliarlo produce un versamento sbagliato, ed è esattamente ciò
    che accade se scegli tu una delle due colonne.
 4. Non modificare l'intestazione del foglio, non aggiungere colonne, non
    riordinarle e non rinominarle: il tool le riconosce per nome.
-5. Non arrotondare. Riporta gli importi con i centesimi cosi' come stanno nel
+5. Non arrotondare. Riporta gli importi con i centesimi così come stanno nel
    documento di origine.
 
 COME COMPILARE LE COLONNE
 - Denominazione, Codice fiscale, Partita IVA: servono quando il file contiene
-  piu' societa'. Se lavori su una sola societa' gia' selezionata nel tool,
-  lasciale vuote: le righe verranno attribuite a quella societa'.
+  più società. Se lavori su una sola società già selezionata nel tool,
+  lasciale vuote: le righe verranno attribuite a quella società.
 - Flusso e Descrizione flusso: il tipo di versamento (Dipendenti, Autonomi, IVA,
   Imposte, IMU, Ravvedimenti). Righe con lo stesso contribuente, la stessa Data
   pagamento e lo stesso Flusso finiscono nello stesso F24. Usa flussi diversi per
@@ -77,7 +77,7 @@ COME COMPILARE LE COLONNE
 - Data pagamento: la scadenza del versamento, in formato GG/MM/AAAA.
 - Sezione: una tra Erario, INPS, Regioni, IMU e altri tributi locali, INAIL,
   Altri enti previdenziali e assicurativi. Scrivila per esteso.
-- Codice tributo / causale: il codice cosi' come compare nelle istruzioni del
+- Codice tributo / causale: il codice così come compare nelle istruzioni del
   tributo o nel documento di origine.
 - Periodo / rateazione: quattro cifre. 0008 per il mese di agosto; 0101 quando le
   istruzioni del tributo prevedono il pagamento in unica soluzione. Per i tributi
@@ -93,19 +93,19 @@ COME COMPILARE LE COLONNE
   e Altri enti), in formato MM/AAAA.
 - Le restanti colonne (codice ufficio, codice atto, flag IMU, numero immobili,
   detrazione, dati INAIL, coobbligato, note) vanno compilate solo quando il
-  documento le sostiene. Vuote e' un risultato accettabile.
+  documento le sostiene. Vuote è un risultato accettabile.
 
 CAPIENZA DEL MODELLO
 Un singolo F24 ha un numero fisso di righe per sezione: Erario 6, INPS 4,
 Regioni 4, IMU e tributi locali 4, INAIL 3, Altri enti 2. Se per un contribuente
-e una data superi il limite di una sezione, distribuisci le righe su piu' flussi:
+e una data superi il limite di una sezione, distribuisci le righe su più flussi:
 ogni flusso diventa un F24 distinto. Segnala nel riepilogo quando lo hai fatto.
 
 COMPENSAZIONI
 Se un documento espone un credito da utilizzare in compensazione, riportalo nella
 colonna Importo credito con il suo codice tributo e il suo anno. Non verificare
-la spettanza, la disponibilita' residua, il visto di conformita' o i limiti
-annuali: non e' un giudizio che puoi dare dai documenti allegati. Elencali invece
+la spettanza, la disponibilità residua, il visto di conformità o i limiti
+annuali: non è un giudizio che puoi dare dai documenti allegati. Elencali invece
 nel riepilogo come punti da verificare.
 
 RIEPILOGO FINALE
@@ -115,12 +115,12 @@ Dopo il file, produci un elenco puntato con:
 - le righe per cui hai dovuto interpretare un documento ambiguo;
 - gli identificativi che ti sono sembrati anomali;
 - i crediti riportati, con la loro origine documentale;
-- cio' che nei documenti non hai trovato e che il professionista deve aggiungere;
+- ciò che nei documenti non hai trovato e che il professionista deve aggiungere;
 - la riconciliazione delle righe: quante righe hai letto nei documenti, quante
   ne hai scritte in PAGAMENTI, quante hai aggregato e quante hai escluso, con
-  il motivo. I due totali devono tornare, e se non tornano devi dire perche'.
+  il motivo. I due totali devono tornare, e se non tornano devi dire perché.
   Il tool dichiara quante righe ha importato: quel numero e il tuo devono
   coincidere.
 
-Il file sara' controllato dal professionista prima dell'importazione e il tool
-eseguira' i propri controlli formali su saldi, capienza, codici e identificativi.
+Il file sarà controllato dal professionista prima dell'importazione e il tool
+eseguirà i propri controlli formali su saldi, capienza, codici e identificativi.

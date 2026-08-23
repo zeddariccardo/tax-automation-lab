@@ -1,4 +1,4 @@
-/* Tax Automation Lab — XLSX binary/download and output polish guard v1.2.0
+/* Tax Automation Lab — XLSX binary/download and output polish guard v1.5.0
  * Loaded after each tool's own scripts. Tool-specific polish is path/sheet gated.
  */
 (function(){
@@ -124,6 +124,67 @@
     dash['!cols']=[{wch:42},{wch:20},{wch:20},{wch:18}];
   }
 
+  /* Due dichiarazioni che i fogli portano gia' addosso, e che bastano a sapere
+     che cosa e' un importo senza indovinarlo:
+     1. l'intestazione di colonna finisce con «€» (working paper del Bilancio:
+        «Corrente €», «Importo precedente €»);
+     2. l'intestazione porta due date in formato gg-mm-aaaa (prospetto di
+        deposito: «Stato patrimoniale — Attivo | 31-12-2025 | 31-12-2024»).
+     In entrambi i casi le colonne sotto sono euro. Il codice conto in prima
+     colonna resta fuori, perche' la regola guarda l'intestazione, non il tipo. */
+  /* Nomi di colonna che in un foglio contabile sono importi senza bisogno di
+     dirlo. Elencati invece che indovinati: «% imponibile» contiene 100, non
+     0,01, e formattarlo come percentuale scriverebbe 10.000%. */
+  const COL_IMPORTO=/^(importo|imponibile|imposta|iva(?: esigibile| detraibile| a debito| a credito)?|debito|credito|saldo|totale|corrente|precedente)\b/i;
+  const COL_PERCENTO=/^%\s/;
+
+  function polishDeclaredMoney(ws){
+    const range=sheetRange(ws);
+    if(!range)return false;
+    let fatto=false;
+    for(let head=range.s.r;head<=Math.min(range.e.r,range.s.r+8);head++){
+      const colonne=[],percento=[];
+      let date=0;
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const t=textAt(ws,head,c);
+        if(!t)continue;
+        if(COL_PERCENTO.test(t))percento.push(c);
+        else if(/€\s*$/.test(t)||COL_IMPORTO.test(t))colonne.push(c);
+        else if(c>range.s.c&&/^\d{2}-\d{2}-\d{4}$/.test(t)){colonne.push(c);date++;}
+      }
+      for(let r=head+1;r<=range.e.r;r++)percento.forEach(function(c){fmtAt(ws,r,c,'0"%"');});
+      if(percento.length)fatto=true;
+      if(!colonne.length||(date&&date<2&&colonne.length===date))continue;
+      for(let r=head+1;r<=range.e.r;r++)colonne.forEach(function(c){fmtAt(ws,r,c,MONEY_FMT);});
+      fatto=true;
+      if(date)break;
+    }
+    return fatto;
+  }
+
+  /* Fogli a due colonne, etichetta e valore: «Parametri», «Sintesi»,
+     «Informazioni». Qui l'intestazione non c'e', la dichiarazione sta
+     nell'etichetta della riga. Un anno resta un anno: e' l'unico numero che
+     non va mai formattato, e si riconosce dall'etichetta *e* dall'intervallo,
+     cosi' «Compensi dell'anno = 120.000» non viene scambiato per una data. */
+  const ETICHETTA_IMPORTO=/(soglia|minim|massim|compens|importo|costo|costi|ricav|utile|netto|impost|contribut|saldo|credit|debit|cassa|reddit|spesa|spese|valore|totale|acconto|iva|oltre|fatturato|volume)/i;
+  const ETICHETTA_ANNO=/\b(anno|esercizio|periodo)\b/i;
+
+  function polishKeyValue(ws){
+    const range=sheetRange(ws);
+    if(!range||range.e.c>2)return false;
+    let fatto=false;
+    for(let r=range.s.r;r<=range.e.r;r++){
+      const etichetta=textAt(ws,r,0);
+      const cell=cellAt(ws,r,1);
+      if(!etichetta||!cell||typeof cell.v!=='number'||cell.z)continue;
+      if(/%\s*$/.test(etichetta)||/\(%\)\s*$/.test(etichetta)){cell.z='0"%"';fatto=true;continue;}
+      if(ETICHETTA_ANNO.test(etichetta)&&cell.v>=1900&&cell.v<=2100&&Number.isInteger(cell.v))continue;
+      if(ETICHETTA_IMPORTO.test(etichetta)){cell.z=MONEY_FMT;fatto=true;}
+    }
+    return fatto;
+  }
+
   function polishSimpleTables(wb){
     Object.keys(wb.Sheets||{}).forEach(function(nome){
       const ws=wb.Sheets[nome];
@@ -166,7 +227,19 @@
     try{
       polishDashboard(wb);
       polishSimpleTables(wb);
-      Object.keys(wb.Sheets).forEach(function(n){polishByUnit(wb.Sheets[n]);});
+      Object.keys(wb.Sheets).forEach(function(n){
+        polishByUnit(wb.Sheets[n]);
+        polishDeclaredMoney(wb.Sheets[n]);
+        polishKeyValue(wb.Sheets[n]);
+        /* Larghezze solo dove non ci sono: il prospetto di deposito usciva senza,
+           e le voci del bilancio finivano tagliate a meta'. */
+        const ws=wb.Sheets[n],range=sheetRange(ws);
+        if(ws&&range&&!ws['!cols']){
+          const cols=[{wch:52}];
+          for(let c=range.s.c+1;c<=range.e.c;c++)cols.push({wch:18});
+          ws['!cols']=cols;
+        }
+      });
       const kpi=wb.Sheets.KPI;
       if(kpi&&!kpi['!cols'])kpi['!cols']=[{wch:22},{wch:18},{wch:32},{wch:46},{wch:16},{wch:11},{wch:34},{wch:18},{wch:44}];
     }catch(_){/* una rifinitura mancata non deve impedire l'export */}
@@ -259,7 +332,7 @@
     if(originalWriteFileXLSX)window.XLSX.writeFileXLSX=guardedWriteFile;
     Object.defineProperty(window.XLSX,'__talBinaryGuardInstalled',{value:true,configurable:false});
     window.TALXlsxGuard=Object.freeze({
-      version:'1.2.0',
+      version:'1.5.0',
       toBytes:toBytes,
       assertXlsx:assertXlsx,
       downloadBytes:downloadBytes,

@@ -126,3 +126,43 @@ test('catalogo: nome e URL del manifest coincidono con le pagine', () => {
   }
   assert.equal(problems.length, 0, `catalogo non allineato:\n${problems.join('\n')}`);
 });
+
+/* Le pagine di catalogo — /tools/, /en/tools/, /es/tools/ — mostrano la versione
+   di ogni tool in un badge accanto al nome. Erano fuori da ogni controllo, e
+   l'audit del 23 agosto 2026 le ha trovate ferme: il catalogo inglese e quello
+   spagnolo dichiaravano 1.3.6 per il Bilancio (che gira con 1.4.1), 2.0.6 per
+   Analisi (2.1.0) e 3.4.3 per LIPE (3.6.1); anche quello italiano era indietro
+   su due tool. Il test qui sopra non poteva accorgersene, perché confronta
+   manifest.json con le pagine dei tool, e il badge non sta né nell'uno né nelle
+   altre: è una terza voce, quella che legge chi arriva dal sito. */
+const CATALOGHI = ['tools/index.html', 'en/tools/index.html', 'es/tools/index.html'];
+
+for (const catalogo of CATALOGHI) {
+  test(`catalogo: i badge di ${catalogo} dichiarano le versioni che girano`, () => {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'manifest.json'), 'utf8'));
+    const atteso = new Map(manifest.tools.map(t => [t.slug, t.version]));
+    const html = fs.readFileSync(path.join(root, catalogo), 'utf8');
+
+    const problemi = [];
+    let schede = 0;
+    for (const card of html.split('<article').slice(1)) {
+      const badge = card.match(/<span class="label">([^<]*?·\s*v(\d+\.\d+\.\d+))<\/span>/);
+      const link = card.match(/href="\/tools\/([a-z0-9-]+)\/"/);
+      if (!badge || !link) continue;
+      schede++;
+      const slug = link[1];
+      if (!atteso.has(slug)) {
+        problemi.push(`  ${slug}: la scheda punta a un tool che non sta nel manifest`);
+        continue;
+      }
+      if (badge[2] !== atteso.get(slug)) {
+        problemi.push(`  ${slug}: la scheda dice «${badge[1]}», in esecuzione ${atteso.get(slug)}`);
+      }
+    }
+
+    assert.equal(schede, atteso.size,
+      `${catalogo}: ho letto ${schede} schede con badge di versione, i tool sono ${atteso.size}`);
+    assert.equal(problemi.length, 0,
+      `${catalogo}: badge non allineati al manifest\n${problemi.join('\n')}`);
+  });
+}

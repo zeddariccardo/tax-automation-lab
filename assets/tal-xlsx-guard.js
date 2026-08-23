@@ -135,7 +135,7 @@
   /* Nomi di colonna che in un foglio contabile sono importi senza bisogno di
      dirlo. Elencati invece che indovinati: «% imponibile» contiene 100, non
      0,01, e formattarlo come percentuale scriverebbe 10.000%. */
-  const COL_IMPORTO=/^(importo|imponibile|imposta|iva(?: esigibile| detraibile| a debito| a credito)?|debito|credito|saldo|totale|corrente|precedente)\b/i;
+  const COL_IMPORTO=/^(importo|imponibile|imposta|detrazione|ritenut|iva(?: esigibile| detraibile| a debito| a credito)?|debito|credito|saldo|totale|corrente|precedente)\b/i;
   const COL_PERCENTO=/^%\s/;
 
   function polishDeclaredMoney(ws){
@@ -167,7 +167,7 @@
      nell'etichetta della riga. Un anno resta un anno: e' l'unico numero che
      non va mai formattato, e si riconosce dall'etichetta *e* dall'intervallo,
      cosi' «Compensi dell'anno = 120.000» non viene scambiato per una data. */
-  const ETICHETTA_IMPORTO=/(soglia|minim|massim|compens|importo|costo|costi|ricav|utile|netto|impost|contribut|saldo|credit|debit|cassa|reddit|spesa|spese|valore|totale|acconto|iva|oltre|fatturato|volume)/i;
+  const ETICHETTA_IMPORTO=/(soglia|minim|massim|compens|importo|costo|costi|ricav|utile|netto|impost|contribut|saldo|credit|debit|cassa|reddit|spesa|spese|valore|totale|acconto|iva|detrazione|ritenut|oltre|fatturato|volume)/i;
   const ETICHETTA_ANNO=/\b(anno|esercizio|periodo)\b/i;
 
   function polishKeyValue(ws){

@@ -1483,6 +1483,121 @@ controlli responsive — con il controllo nuovo sull'hamburger del sito, che era
 la voce più vecchia rimasta aperta nel contesto — zero problemi di contrasto con
 la misura composta, e gli elementi nuovi misurati a mano fra 4,99 e 19,68.
 
+## Confronto regimi 1.3.0 — l'output che risponde, 23 agosto 2026
+
+Specifiche UX per l'output. Il documento chiede di passare da «ecco tutti gli
+elementi per capire cosa conviene» a «ecco cosa ti conviene, quanto cambia,
+perché», per un lettore che non fa il fiscalista — un avvocato, in primo luogo.
+
+### La promessa che non era vera
+
+La terza opzione della remunerazione societaria diceva a schermo **«il tool cerca
+il mix migliore»**. Nel motore non c'era nessuna ricerca: quella modalità usava
+il compenso e la percentuale di distribuzione inseriti a mano. Chi apriva il tool
+doveva conoscere in anticipo la risposta che il tool dovrebbe dargli.
+
+Ora la cerca. Lo scenario societario è diventato una funzione pura delle due leve
+che lo governano — prima era codice lineare che leggeva `input`, quindi non c'era
+modo di valutarlo a parametri diversi da quelli inseriti, ed è la ragione tecnica
+per cui l'ottimizzazione non esisteva. Sopra, griglia a 32 punti più affinamento
+a sezione aurea: 55 valutazioni, e nessun mix su una griglia manuale da 500 euro
+di passo la batte.
+
+**Cosa massimizza:** il netto personale disponibile, col vincolo di quanto deve
+restare in società. Senza vincolo l'ottimo distribuisce tutto, perché l'utile
+trattenuto non arriva alla persona e nella metrica non conta — quindi il vincolo
+è un campo dichiarato, non un'ipotesi nascosta. La decisione è stata presa prima
+di scrivere il codice: l'esempio del documento (compenso 30.000, dividendi
+22.000, trattenuto 18.000) non potrebbe uscire da un ottimizzatore che guarda
+solo la cassa personale, e valeva la pena dirlo invece di implementare a caso.
+
+Due difetti miei, trovati dai test scritti per la correzione:
+
+- l'ottimo arrotondato ai 100 euro **perdeva 10,78 euro**, perché arrotondavo al
+  più vicino invece di scegliere fra il centinaio sotto e quello sopra. Proporre
+  un ottimo che non è l'ottimo era il difetto da chiudere, non da spostare;
+- **il vincolo non vincolava**: l'ottimizzatore spingeva il compenso fino a
+  consumare l'utile distribuibile, e con 20.000 da trattenere ne restavano zero.
+  Ora il compenso ha un tetto — il più alto che lascia in società quello che deve
+  restarci — e se nemmeno a compenso zero c'è capienza il vincolo è dichiarato
+  irrealizzabile.
+
+### «Cassa netta» esce dalla lingua del tool
+
+Per un avvocato «Cassa» è la Cassa Forense, e la metrica principale non può
+chiamarsi come l'ente previdenziale che compare tre righe sotto. **La metrica non
+cambia**: il nome diventa «netto personale disponibile», e nelle card «quanto ti
+rimane». Sostituita in pagina, nei grafici, nei meta, nel JSON-LD, nell'Excel,
+nel catalogo, nelle pagine EN/ES e nella pagina di rinomina del vecchio URL.
+
+Questo rovescia una scelta di parole fatta dopo il primo audit (CF-010), quando
+la metrica era stata chiamata «cassa personale netta» proprio per distinguerla
+dall'utile trattenuto. La sostanza resta quella; cambia la parola, per la ragione
+che il documento porta ed è buona.
+
+### L'output riordinato
+
+Ordine nuovo, dal paragrafo 18 del documento: verdetto, quanto ti rimane,
+differenza dal regime attuale, perché, soglia, costo del salto, grafico
+principale, cosa potrebbe cambiare, mix della società, i due anni, dettaglio
+fiscale, assunzioni.
+
+- **Il verdetto nomina il regime prima della metrica**: «Ti conviene la partita
+  IVA ordinaria», poi l'importo, poi la differenza dal punto di partenza in una
+  pastiglia. La frase che segue cambia col regime attuale, perché la domanda
+  cambia: chi è forfettario si chiede se convenga superare la soglia, chi è
+  ordinario quanto risparmierebbe, chi ha una società se abbia ancora senso.
+- **Le card mostrano il conto per intero** nello stesso ordine per tutti e tre —
+  compensi, costi effettivi, imposte e contributi, quanto ti rimane — e quella
+  che vince porta scritto «Più conveniente».
+- **«Perché, nel tuo caso?»** spiega il meccanismo vero coi numeri della
+  simulazione: il forfettario riconosce una quota fissa dei compensi, tu hai
+  questi costi, la differenza è questa. E dice a quali soglie il risultato
+  cambierebbe, usando le due che il motore calcola davvero.
+- **«Quanto costa superare la soglia adesso»** affianca i due netti e conclude
+  con quanto fattureresti in più rimanendoci meno.
+- **Il mix della società** elenca compenso, dividendo e quello che resta in
+  società, dicendo che quest'ultimo non è denaro disponibile. In modalità manuale
+  lo dichiara: «scenario personalizzato», non l'ottimo.
+- **Ogni grafico** ha titolo orientato alla domanda, sottotitolo e frase
+  conclusiva: quattro conclusioni generate dai dati.
+- **Progressive disclosure**: il prospetto del calcolo sta dentro un `details`
+  chiuso in ogni card — dai compensi alla base imponibile, contributi, imposta,
+  cassa — e la tabella delle leve sta sotto «Tutte le leve provate».
+- **I due anni** sono raccontati come due tappe prima che disegnati, con «Perché
+  i due anni sono diversi?» che spiega le due soglie.
+
+### Trappole trovate scrivendo il testo
+
+- «passare a » più l'articolo dava **«passare a la STP S.r.l.»**: la preposizione
+  va articolata, e un errore di grammatica nel punto più letto della pagina si
+  vede prima del numero.
+- La differenza dal regime attuale veniva calcolata anche quando **quel regime
+  non è applicabile**, e produceva «aumenterebbe di −8.441 euro». Ora la frase
+  dice che il punto di partenza non è applicabile, invece di sottrarne il netto.
+- Il **netto personale negativo** capita davvero, col vincolo di trattenuta: i
+  contributi sulla quota di utile attribuibile si pagano anche se l'utile resta
+  in società. Va spiegato, altrimenti sembra un difetto di calcolo.
+- Le leve provate in «Cosa potrebbe cambiare il risultato» dipendono dalla
+  modalità: in automatico compenso e quota distribuita non entrano nel calcolo,
+  quindi provarli darebbe righe che non cambiano niente. In automatico la leva è
+  quanto resta in società.
+
+### Verifica
+
+75 test node, 7 nuovi sull'ottimizzatore: nessun mix manuale lo batte, il vincolo
+è rispettato, è deterministico, e in automatico il compenso inserito a mano non
+entra nel calcolo. I cinque test che misuravano la meccanica manuale ora
+dichiarano `mixMode: 'manual'` — quella meccanica non è cambiata, è cambiato
+quale modalità la esercita. 42 controlli responsive, zero problemi di contrasto,
+e i quattordici elementi nuovi misurati a mano stanno fra 4,68 e 19,68.
+
+### Cosa resta del documento
+
+Microcopy e tooltip (P2 16-17) sono coperti dai suggerimenti sotto i campi e
+dalle note nel prospetto: non ho aggiunto tooltip al passaggio del mouse, che su
+telefono non esistono. Il resto del documento è implementato.
+
 ## Aperto
 
 - **LIPE**: far passare un file generato nel **software di controllo dell'Agenzia

@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/confronto-regimi/
 -->
-<html class="tal-tool-page" data-tool-version="1.2.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.3.0" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -48,7 +48,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
   "description": "Confronto del netto personale disponibile fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi e ottimizzazione automatica del mix compenso/dividendo.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Browser",
-  "softwareVersion": "1.2.0",
+  "softwareVersion": "1.3.0",
   "inLanguage": "it",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -637,6 +637,86 @@ main#cfMain{max-width:1120px;margin:0 auto}
 }
 .cf-mini-conto span { font-size: 12px; color: var(--tal-ink-2, #47443f); }
 .cf-mini-conto b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+/* I tre casi in lingua naturale, prima della tabella delle leve. */
+.cf-casi { display: grid; gap: 12px; margin: 0 0 16px; }
+.cf-caso {
+  padding: 13px 16px;
+  border-left: 3px solid var(--tal-teal, #145368);
+  border-radius: 0 10px 10px 0;
+  background: var(--tal-surface-2, #faf9f6);
+}
+.cf-caso h4 { margin: 0 0 5px; font-size: 13.5px; }
+.cf-caso p { margin: 0; font-size: 13px; line-height: 1.6; }
+
+/* Progressive disclosure: il dettaglio si apre se lo si chiede. Il triangolino
+   nativo resta, perche' e' il segnale che tutti riconoscono. */
+.cf-dettaglio { margin: 4px 0 0; }
+.cf-dettaglio > summary {
+  cursor: pointer;
+  padding: 9px 0;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--tal-teal, #145368);
+}
+.cf-dettaglio > summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.cf-dettaglio > summary:focus-visible { outline: 3px solid #246bfd; outline-offset: 2px; }
+.cf-dettaglio[open] > summary { margin-bottom: 8px; }
+.cf-dettaglio p { margin: 0; font-size: 13px; line-height: 1.65; }
+
+/* I due anni come tappe, non come grafico da interpretare. */
+.cf-timeline { display: grid; gap: 12px; margin: 0 0 18px; }
+.cf-tl-tappa {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border: 1px solid var(--tal-line, #e7e4dc);
+  border-radius: 11px;
+  background: #fff;
+}
+.cf-tl-tappa span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tal-teal, #145368);
+  padding-top: 2px;
+}
+.cf-tl-tappa p { margin: 0; font-size: 13px; line-height: 1.6; }
+@media (max-width: 520px) {
+  .cf-tl-tappa { grid-template-columns: 1fr; gap: 5px; }
+}
+
+/* Il prospetto dentro la card: righe etichetta/valore, cifre incolonnate. */
+.cf-dettaglio-card { margin-top: 10px; }
+.cf-dettaglio-card > summary { font-size: 12px; }
+.cf-calcolo { margin: 0; display: grid; gap: 6px; }
+.cf-calcolo > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted var(--tal-line, #e7e4dc);
+}
+.cf-calcolo > div:last-child {
+  border-bottom: 0;
+  border-top: 1.5px solid var(--tal-ink, #1d1b16);
+  margin-top: 3px;
+  padding-top: 7px;
+  font-weight: 750;
+}
+.cf-calcolo dt { margin: 0; font-size: 12px; line-height: 1.4; }
+.cf-calcolo dt small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--tal-ink-3, #6e6b65);
+}
+.cf-calcolo dd { margin: 0; font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 </style>
 <style id="tal-global-header-style">
 .tal-global-header,.tal-global-header *{box-sizing:border-box}
@@ -749,7 +829,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.2.0</span>
+<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.3.0</span>
 <h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
 <p data-tal-key="lead">Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra i tre assetti: quanto ti rimane dopo costi, contributi e imposte. Con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e l'ottimizzazione automatica del mix fra compenso amministratore e dividendo.</p>
 <div class="tal-publication-facts">
@@ -890,11 +970,6 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <input aria-describedby="errCfCompanyOverhead" aria-invalid="false" class="tal-input" id="cfCompanyOverhead" inputmode="decimal" type="text" value="0"><span class="cf-error" hidden id="errCfCompanyOverhead"></span>
 <span class="cf-hint">Amministrazione, revisione, adempimenti societari.</span>
 </div>
-<div class="cf-field">
-<label for="cfIrapRate">Aliquota IRAP</label>
-<input aria-describedby="errCfIrapRate" aria-invalid="false" class="tal-input" id="cfIrapRate" inputmode="decimal" type="text" value="3,9"><span class="cf-error" hidden id="errCfIrapRate"></span>
-<span class="cf-hint">Percentuale. Verifica la disciplina regionale.</span>
-</div>
 </div>
 </div>
 
@@ -947,7 +1022,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 
 <div class="cf-section">
 <details>
-<summary style="cursor:pointer;font-size:13px;font-weight:650;padding:9px 0">Impostazioni previdenziali e locali</summary>
+<summary style="cursor:pointer;font-size:13px;font-weight:650;padding:9px 0">Impostazioni avanzate: previdenza, IRAP e addizionali</summary>
 <div class="cf-grid" style="margin-top:14px">
 <div class="cf-field" id="cfPensionRateBox">
 <label for="cfPensionRate">Aliquota soggettiva CNPADC</label>
@@ -961,6 +1036,11 @@ main#cfMain{max-width:1120px;margin:0 auto}
 </div>
 <div class="cf-field full" id="cfReducedMinimumsBox">
 <label class="cf-choice" style="border-radius:9px"><input id="cfReducedMinimums" type="checkbox"><b>Prima iscrizione alla Cassa prima dei 35 anni, entro i primi sei anni</b><small>Cassa Forense dimezza il minimo soggettivo (1.395 invece di 2.790) e quello integrativo (177,50 invece di 355). Per CNPADC non ho trovato gli importi ridotti in una fonte citabile: la riduzione non viene applicata e il risultato lo dichiara.</small></label>
+</div>
+<div class="cf-field">
+<label for="cfIrapRate">Aliquota IRAP</label>
+<input aria-describedby="errCfIrapRate" aria-invalid="false" class="tal-input" id="cfIrapRate" inputmode="decimal" type="text" value="3,9"><span class="cf-error" hidden id="errCfIrapRate"></span>
+<span class="cf-hint">Percentuale. Verifica la disciplina regionale.</span>
 </div>
 <div class="cf-field">
 <label for="cfRegionalRate">Addizionale regionale</label>
@@ -2044,7 +2124,11 @@ window.cfRenderConfronto = function () {
             (s.netto >= attuale.netto ? '+' : '−') + E(Math.abs(s.netto - attuale.netto)) +
             '</b></div>'
           : '') +
-      '</div></article>';
+      '</div>' +
+      /* Progressive disclosure: il prospetto da commercialista non deve invadere
+         la schermata, ma deve esserci. Chi vuole controllare il numero apre. */
+      (s.applicabile ? dettaglioCalcolo(s, esito, stato) : '') +
+      '</article>';
   }).join('');
 
   renderTransizione(esito, vincente, attuale);
@@ -2060,6 +2144,8 @@ window.cfRenderConfronto = function () {
   concludiPonte(esito, vincente);
   graficoDriver(esito, vincente, secondo);
   graficoAnni(conv);
+  timelineAnni(conv, esito);
+  concludiAnni(conv);
   renderVerifiche(esito);
 };
 
@@ -2404,6 +2490,18 @@ function conclusioneSotto(idGrafico, testo) {
   p.innerHTML = testo;
 }
 
+function concludiAnni(conv) {
+  const stato = window.cfStato(), E = euro();
+  const P = CF_PARAMS[stato.year];
+  const oltre = stato.revenue > P.sogliaPermanenza;
+  conclusioneSotto('cfChartYears', oltre
+    ? 'La decisione riguarda il secondo anno: nel ' + stato.year + ' il confronto tiene ancora conto ' +
+      'del forfettario, nel ' + (stato.year + 1) + ' quell’alternativa non c’è più. Se i due anni ' +
+      'dicono cose diverse, è il secondo quello su cui decidere.'
+    : 'Sotto ' + E(P.sogliaPermanenza) + ' i due anni raccontano la stessa cosa: nessun superamento, ' +
+      'nessun cambio di regime. Il grafico serve quando la soglia viene superata.');
+}
+
 function concludiCurva(conv, esito) {
   const stato = window.cfStato(), E = euro();
   const P = CF_PARAMS[stato.year];
@@ -2432,6 +2530,76 @@ function concludiPonte(esito, vincente) {
     'Nello scenario migliore, di ' + E(stato.revenue) + ' di compensi te ne restano <b>' +
     E(vincente.netto) + '</b>: il <b>' + quota + '%</b>. Il resto sono costi che sostieni davvero, ' +
     'contributi previdenziali e imposte.');
+}
+
+
+/* Il dettaglio del calcolo, per scenario. Le righe sono quelle che un
+   professionista rifarebbe a mano per controllare il numero: dai compensi alla
+   base imponibile, i contributi, l'imposta, e quello che esce di cassa.
+
+   Sta dentro un `details` chiuso: il documento chiede rigore fiscale senza
+   trasformare la prima schermata in un prospetto. */
+function dettaglioCalcolo(scenario, esito, stato) {
+  const E = euro(), X = esc();
+  const P = CF_PARAMS[stato.year];
+  const d = scenario.dettaglio || {};
+  const t = esito.totali;
+  const righe = [];
+  const riga = (etichetta, valore, nota) => righe.push([etichetta, valore, nota || '']);
+
+  if (scenario.id === 'forfettario') {
+    riga('Compensi dell’anno', E(stato.revenue));
+    riga('Coefficiente di redditività', Math.round(P.coefficiente * 100) + '%',
+      'il reddito si determina in misura fissa, i costi reali non si deducono');
+    riga('Reddito forfettario', E(d.reddito));
+    riga('Contributi previdenziali', '− ' + E(scenario.contributi), 'deducibili dal reddito');
+    riga('Base imponibile', E(d.base));
+    riga('Imposta sostitutiva', '− ' + E(d.base * (stato.startup ? P.sostitutivaStartup : P.sostitutivaOrdinaria)),
+      (stato.startup ? Math.round(P.sostitutivaStartup * 100) : Math.round(P.sostitutivaOrdinaria * 100)) +
+      '% al posto di IRPEF e addizionali');
+    if (d.sgravio > 0) {
+      riga('Risparmio d’imposta sugli altri redditi', '+ ' + E(d.sgravio),
+        'i contributi eccedenti il reddito forfettario deducono dagli altri redditi');
+    }
+    riga('Costi che escono di cassa', '− ' + E(t.lordo),
+      'inclusa l’IVA non detraibile: nel forfettario l’IVA sugli acquisti non si recupera');
+  } else if (scenario.id === 'ordinario') {
+    riga('Compensi dell’anno', E(stato.revenue));
+    riga('Costi deducibili', '− ' + E(t.dedOrd), 'al netto di tetti, uso professionale e IVA detraibile');
+    riga('Utile professionale', E(d.utile));
+    riga('Contributi previdenziali', '− ' + E(scenario.contributi), 'calcolati sull’utile');
+    riga('Contributi dedotti dal reddito', E(d.contributiDedotti), 'la quota che trova capienza');
+    riga('Base imponibile IRPEF', E(d.imponibile));
+    riga('IRPEF e addizionali', '− ' + E(scenario.imposte),
+      'scaglioni ' + P.scaglioni.map((x) => Math.round(x[1] * 100) + '%').join(' · ') +
+      ', più addizionale regionale ' + stato.regionalRate + '% e comunale ' + stato.municipalRate + '%');
+    riga('Costi che escono di cassa', '− ' + E(t.cassaOrd), 'l’IVA detraibile non è un costo');
+  } else {
+    riga('Compensi della società', E(stato.revenue));
+    riga('Costi della società', '− ' + E(t.cassaSoc));
+    riga('Costi di struttura', '− ' + E(stato.companyOverhead), 'amministrazione, revisione, adempimenti');
+    riga('Compenso amministratore', '− ' + E(d.compenso), 'deducibile per la società, tassato in capo a te');
+    riga('Base IRES', E(d.baseIres));
+    riga('IRES', '− ' + E(d.ires), Math.round(P.ires * 100) + '% sull’utile della società');
+    riga('IRAP', '− ' + E(d.irap), stato.irapRate + '% su base semplificata');
+    riga('Utile distribuibile', E(d.distribuibile));
+    riga('Dividendo lordo', E(d.dividendo),
+      'quota distribuita ' + Math.round((d.quotaDistribuita || 0) * 100) + '%, per la tua quota del ' + stato.ownership + '%');
+    riga('Ritenuta sul dividendo', '− ' + E(d.ritenuta), Math.round(P.ritenutaDividendo * 100) + '%, a titolo d’imposta');
+    riga('Contributi di Cassa del socio', '− ' + E(d.cassaSocio),
+      'sulla quota di utile attribuibile, distribuita o no');
+    if (d.inpsSocio > 0) riga('Gestione Separata a tuo carico', '− ' + E(d.inpsSocio), 'un terzo del contributo');
+    riga('IRPEF sul compenso', '− ' + E(d.socImposta), 'al netto dei contributi dedotti');
+    if (scenario.trattenuto > 0) {
+      riga('Resta in società', E(scenario.trattenuto), 'non è denaro tuo disponibile: fuori dal confronto');
+    }
+  }
+  riga('Quanto ti rimane', E(scenario.netto));
+
+  return '<details class="cf-dettaglio cf-dettaglio-card"><summary>Vedi il dettaglio del calcolo</summary>' +
+    '<dl class="cf-calcolo">' + righe.map(([k, v, nota]) =>
+      '<div><dt>' + X(k) + (nota ? '<small>' + X(nota) + '</small>' : '') + '</dt><dd>' + v + '</dd></div>'
+    ).join('') + '</dl></details>';
 }
 
 function renderAvviso(conv) {
@@ -2789,14 +2957,25 @@ function graficoDriver(esito, vincente, secondo) {
   const stato = window.cfStato();
   const divarioBase = vincente.netto - secondo.netto;
 
+  const automatico = (stato.mixMode || 'auto') !== 'manual';
   const LEVE = [
     ['Costi annuali', 'un terzo in più', { costFactor: 1.3 }, 'un terzo in meno', { costFactor: 0.7 }],
     ['Compensi', 'un quinto in più', { revenue: stato.revenue * 1.2 }, 'un quinto in meno', { revenue: stato.revenue * 0.8 }],
-    ['Utile distribuito', '30 punti in più', { distribution: Math.min(100, stato.distribution + 30) }, '30 punti in meno', { distribution: Math.max(0, stato.distribution - 30) }],
     ['Quota nella società', '20 punti in più', { ownership: Math.min(100, stato.ownership + 20) }, '20 punti in meno', { ownership: Math.max(1, stato.ownership - 20) }],
-    ['Compenso amministratore', '25.000 in più', { admin: stato.admin + 25000, extractionMode: 'mix' }, '25.000 in meno', { admin: Math.max(0, stato.admin - 25000), extractionMode: 'mix' }],
     ['Addizionali locali', 'un punto e mezzo in più', { regionalRate: stato.regionalRate + 1, municipalRate: stato.municipalRate + 0.4 }, 'un punto e mezzo in meno', { regionalRate: Math.max(0, stato.regionalRate - 1), municipalRate: Math.max(0, stato.municipalRate - 0.4) }]
   ];
+  /* Le leve dipendono dalla modalita': in automatico il compenso e la quota
+     distribuita non entrano nel calcolo — li scegli il tool — quindi provarli
+     produrrebbe righe che non cambiano niente, e una riga che non cambia niente
+     e' rumore. La leva vera diventa quanto resta in societa'. */
+  if (automatico) {
+    LEVE.push(['Quanto resta in società', '20.000 in più',
+      { retainInCompany: stato.retainInCompany + 20000 },
+      '20.000 in meno', { retainInCompany: Math.max(0, stato.retainInCompany - 20000) }]);
+  } else {
+    LEVE.push(['Utile distribuito', '30 punti in più', { distribution: Math.min(100, stato.distribution + 30) }, '30 punti in meno', { distribution: Math.max(0, stato.distribution - 30) }]);
+    LEVE.push(['Compenso amministratore', '25.000 in più', { admin: stato.admin + 25000, extractionMode: 'mix' }, '25.000 in meno', { admin: Math.max(0, stato.admin - 25000), extractionMode: 'mix' }]);
+  }
   if (stato.profession === 'commercialista') {
     LEVE.push(['Aliquota CNPADC', '10 punti in più', { pensionRate: Math.min(100, stato.pensionRate + 10) },
       '10 punti in meno', { pensionRate: Math.max(12, stato.pensionRate - 10) }]);
@@ -2844,8 +3023,39 @@ function graficoDriver(esito, vincente, secondo) {
     return;
   }
 
+  /* Prima a parole, poi la tabella. Il documento chiede lingua naturale e
+     nessuna formula sintetica senza spiegazione: le tre domande che un
+     professionista si fa davvero sono cosa succede se cambiano i costi, se
+     cambiano i compensi, e come si distribuisce il reddito in societa'. Le
+     risposte vengono dalle leve appena provate, non da un testo di repertorio. */
+  const perNome = (n) => righe.filter((r) => r.nome === n);
+  const prosa = [];
+  const raccontaLeva = (nome, titolo, spiegazione) => {
+    const trovate = perNome(nome);
+    if (!trovate.length) return;
+    const ribalta = trovate.find((r) => r.ribalta);
+    prosa.push('<div class="cf-caso"><h4>' + X(titolo) + '</h4><p>' + spiegazione +
+      (ribalta
+        ? ' Con i tuoi numeri basta <b>' + X(ribalta.etichetta) + '</b> perché passi davanti ' +
+          X(ribalta.vince.nome) + '.'
+        : ' Con i tuoi numeri, nelle variazioni provate la scelta non cambia.') + '</p></div>');
+  };
+  raccontaLeva('Costi annuali', 'Se i tuoi costi aumentano',
+    'Il regime ordinario deduce i costi effettivamente sostenuti, il forfettario ne riconosce ' +
+    'una quota fissa: più i costi crescono, più l’ordinario diventa interessante.');
+  raccontaLeva('Compensi', 'Se i tuoi compensi aumentano',
+    'Il vantaggio del forfettario si riduce al crescere dei compensi, perché l’imposta ' +
+    'sostitutiva si applica a una base che cresce con essi e le soglie si avvicinano.');
+  raccontaLeva(automatico ? 'Quanto resta in società' : 'Utile distribuito',
+    'Se cambia quanto lasci in società',
+    'Nella struttura societaria la convenienza dipende da come il reddito esce: quello che ' +
+    'resta in società non è denaro tuo disponibile, e i contributi sulla quota di utile ' +
+    'attribuibile si pagano comunque.');
+
   const massimo = Math.max(...righe.map((r) => r.scostamento)) || 1;
   host.innerHTML = intestazione +
+    (prosa.length ? '<div class="cf-casi">' + prosa.join('') + '</div>' : '') +
+    '<details class="cf-dettaglio"><summary>Tutte le leve provate, con l’impatto</summary>' +
     '<div class="cf-drivers">' + righe.map((r) => {
       const larghezza = Math.max(3, Math.round(r.scostamento / massimo * 100));
       return '<div class="cf-driver' + (r.ribalta ? ' ribalta' : '') + '">' +
@@ -2857,10 +3067,59 @@ function graficoDriver(esito, vincente, secondo) {
             ? '<b>Vince ' + X(r.vince.nome) + '</b><span>di ' + E(r.divario) + '</span>'
             : '<b>' + E(r.divario) + '</b><span>vantaggio, da ' + E(divarioBase) + '</span>') +
         '</div></div>';
-    }).join('') + '</div>';
+    }).join('') + '</div></details>';
 }
 
 /* ========================================================== 4. i due anni */
+
+/* I due anni, raccontati prima che disegnati. Il grafico resta — dice l'ordine
+   di grandezza — ma quello che serve sapere e' cosa accade nell'anno in cui si
+   supera la soglia e cosa nell'anno dopo, e sono due regole diverse. */
+function timelineAnni(conv, esito) {
+  const stato = window.cfStato(), E = euro();
+  const P = CF_PARAMS[stato.year];
+  const svg = $('cfChartYears');
+  const sezione = svg ? svg.closest('.cf-section') : null;
+  if (!sezione) return;
+  let host = sezione.querySelector('.cf-timeline');
+  if (!host) {
+    host = document.createElement('div');
+    host.className = 'cf-timeline';
+    sezione.insertBefore(host, svg.parentElement);
+  }
+  const oltre = stato.revenue > P.sogliaPermanenza;
+  const oltreDiMolto = stato.revenue > P.sogliaCessazioneImmediata;
+
+  const anno1 = oltreDiMolto
+    ? 'I compensi superano ' + E(P.sogliaCessazioneImmediata) + ': il forfettario cessa <b>in ' +
+      'questo stesso anno</b>. Il reddito dell’anno si determina con le regole ordinarie, con ' +
+      'l’IVA da applicare dal momento del superamento.'
+    : (oltre
+      ? 'I compensi stanno fra ' + E(P.sogliaPermanenza) + ' e ' + E(P.sogliaCessazioneImmediata) +
+        ': <b>quest’anno resti nel forfettario</b>, con l’imposta sostitutiva su tutto il reddito ' +
+        'dell’anno. Il superamento non retroagisce.'
+      : 'I compensi restano sotto ' + E(P.sogliaPermanenza) + ': <b>nessun superamento</b>, il ' +
+        'forfettario prosegue senza conseguenze.');
+  const anno2 = oltreDiMolto
+    ? 'Il regime ordinario è già quello dell’anno precedente: nessun cambio ulteriore, ma restano ' +
+      'gli adempimenti pieni — registri, liquidazioni IVA, dichiarazione con i quadri d’impresa.'
+    : (oltre
+      ? '<b>Esci dal forfettario</b>. Dal primo gennaio: IVA da addebitare e liquidare, ritenute ' +
+        'da subire e versare, registri e contabilità, e la rettifica della detrazione IVA sui beni ' +
+        'già acquistati.'
+      : 'Il forfettario resta applicabile, a condizione che nulla cambi nei requisiti.');
+
+  host.innerHTML =
+    '<div class="cf-tl-tappa"><span>Anno ' + stato.year + '</span><p>' + anno1 + '</p></div>' +
+    '<div class="cf-tl-tappa"><span>Anno ' + (stato.year + 1) + '</span><p>' + anno2 + '</p></div>' +
+    '<details class="cf-dettaglio"><summary>Perché i due anni sono diversi?</summary>' +
+    '<p>Il regime forfettario ha due soglie che funzionano in modo diverso. Fino a ' +
+    E(P.sogliaCessazioneImmediata) + ' il superamento produce effetto <b>dal periodo d’imposta ' +
+    'successivo</b>: l’anno in cui accade si chiude con le regole del forfettario. Oltre quella ' +
+    'cifra la cessazione è <b>immediata</b> e vale per lo stesso anno. È la ragione per cui il ' +
+    'confronto va letto su due esercizi: il primo può essere ancora conveniente e il secondo no, ' +
+    'e la decisione riguarda il secondo.</p></details>';
+}
 
 function graficoAnni(conv) {
   const stato = window.cfStato(), E = euro();

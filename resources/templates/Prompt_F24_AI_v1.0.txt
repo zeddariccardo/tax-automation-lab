@@ -4,8 +4,8 @@ REGOLE COMUNI A TUTTI I TEMPLATE DI TAX AUTOMATION LAB
 Valgono prima e sopra le istruzioni specifiche che seguono.
 1.  Leggi per primo il foglio ISTRUZIONI del template: contiene le regole di
     questo file e prevalgono su qualunque abitudine.
-2.  Usa solo le evidenze contenute nei documenti allegati. Se un dato non c'è,
-    non c'è: non ricostruirlo, non stimarlo, non completarlo per analogia.
+2.  Usa solo le evidenze contenute nei documenti allegati. Se un dato non c’è,
+    non c’è: non ricostruirlo, non stimarlo, non completarlo per analogia.
 3.  Non correggere e non completare gli identificativi: codici fiscali, partite
     IVA, codici tributo, codici IVA, codici conto. Riportali come stanno e
     segnalali. Il controllo formale lo fa il tool, ed è giusto così.
@@ -47,13 +47,13 @@ MATERIALI DISPONIBILI
 Ti allego il template e uno o più documenti: possono essere prospetti di calcolo
 delle ritenute, cedolini riepilogativi, DM10 o estratti UniEmens, liquidazioni
 IVA, calcoli IMU, avvisi di enti locali, autoliquidazioni INAIL, prospetti di
-ravvedimento, estratti da gestionale o da ERP. Usa quello che c'è. Se un
+ravvedimento, estratti da gestionale o da ERP. Usa quello che c’è. Se un
 documento è illeggibile o ambiguo, non tentare di indovinarne il contenuto.
 
 REGOLE ASSOLUTE
 1. Non inventare. Compila solo ciò che è sostenuto da un documento allegato.
 2. Non correggere e non "aggiustare" codici fiscali, partite IVA, codici tributo
-   o causali. Se un identificativo ha una lunghezza anomala, riportalo com'è e
+   o causali. Se un identificativo ha una lunghezza anomala, riportalo com’è e
    segnalalo nel riepilogo finale: sarà il tool a rifiutarlo, ed è giusto così.
 3. Non compilare Importo debito e Importo credito sulla stessa riga. Se un
    documento espone un saldo netto e non distingue la gamba a debito da quella
@@ -61,7 +61,7 @@ REGOLE ASSOLUTE
    scrivi il caso nel riepilogo come punto bloccante. Non dedurre il segno da
    un saldo: sbagliarlo produce un versamento sbagliato, ed è esattamente ciò
    che accade se scegli tu una delle due colonne.
-4. Non modificare l'intestazione del foglio, non aggiungere colonne, non
+4. Non modificare l’intestazione del foglio, non aggiungere colonne, non
    riordinarle e non rinominarle: il tool le riconosce per nome.
 5. Non arrotondare. Riporta gli importi con i centesimi così come stanno nel
    documento di origine.
@@ -82,7 +82,7 @@ COME COMPILARE LE COLONNE
 - Periodo / rateazione: quattro cifre. 0008 per il mese di agosto; 0101 quando le
   istruzioni del tributo prevedono il pagamento in unica soluzione. Per i tributi
   che non lo richiedono, lascia vuoto.
-- Anno: l'anno di riferimento del tributo, non l'anno del pagamento.
+- Anno: l’anno di riferimento del tributo, non l’anno del pagamento.
 - Importo debito / Importo credito: valori positivi, in una sola delle due
   colonne.
 - Codice ente / sede / regione / comune: codice sede INPS, codice regione, codice
@@ -122,5 +122,5 @@ Dopo il file, produci un elenco puntato con:
   Il tool dichiara quante righe ha importato: quel numero e il tuo devono
   coincidere.
 
-Il file sarà controllato dal professionista prima dell'importazione e il tool
+Il file sarà controllato dal professionista prima dell’importazione e il tool
 eseguirà i propri controlli formali su saldi, capienza, codici e identificativi.

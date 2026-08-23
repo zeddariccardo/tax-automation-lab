@@ -7,13 +7,13 @@ distingue due piani:
 - il PROFILO PERMANENTE, cioè ciò che resta valido negli anni (anagrafica,
   business, impostazione contabile, gruppo, aree fiscali, contenzioso,
   operazioni straordinarie, altri aspetti);
-- l'ESERCIZIO, cioè soltanto ciò che cambia o merita attenzione in un anno.
+- l’ESERCIZIO, cioè soltanto ciò che cambia o merita attenzione in un anno.
 
 MATERIALI DISPONIBILI
 Ti allego il template e uno o più documenti: possono essere visure, organigrammi,
 bilanci, trial balance, tax computation, dichiarativi, working paper, contratti,
 atti di verifica, memo interni. Non è richiesto un elenco preciso: usa quello che
-c'è. Se un documento è illeggibile o ambiguo, non tentare di indovinarne il
+c’è. Se un documento è illeggibile o ambiguo, non tentare di indovinarne il
 contenuto.
 
 REGOLE ASSOLUTE
@@ -26,11 +26,11 @@ REGOLE ASSOLUTE
    eliminare fogli e colonne, non spostare le intestazioni, non inserire righe
    sopra la prima riga di intestazione.
 5. Un solo cliente per workbook.
-6. Il file può restare parziale. Fogli interi vuoti non bloccano l'importazione:
+6. Il file può restare parziale. Fogli interi vuoti non bloccano l’importazione:
    è preferibile un file incompleto e affidabile a uno completo e inventato.
 7. Nel foglio FISCALE non indicare IRES e IRAP come peculiarità: sono ordinarie.
    Inserisci soltanto regimi, caratteristiche o tematiche distintive.
-8. Nel foglio FY registra solo le novità dell'esercizio. Non duplicare ciò che
+8. Nel foglio FY registra solo le novità dell’esercizio. Non duplicare ciò che
    è già nel profilo permanente.
 
 FORMATI
@@ -76,7 +76,7 @@ CARATTERISTICHE_FISCALI — una riga per caratteristica, una sola colonna.
   Transfer Pricing, Fiscalità internazionale, Regime di adempimento
   collaborativo, Gruppo IVA, Pro-rata IVA, CFC, Pillar Two.
 
-GRUPPO_ENTITA — entità da mostrare nell'organigramma.
+GRUPPO_ENTITA — entità da mostrare nell’organigramma.
   ID | Denominazione | Tipo | Forma | Colore | Cliente | Note
   ID: un identificativo breve e stabile (E1, E2, HOLD, OPCO...). Serve solo a
   collegare le relazioni: inventalo tu se i documenti non ne hanno uno.
@@ -84,7 +84,7 @@ GRUPPO_ENTITA — entità da mostrare nell'organigramma.
   organizzazione, Altro.
   Forma: rounded, rect, circle, triangle, diamond (facoltativo).
   Colore: teal, purple, navy, green, amber, rust, gray (facoltativo).
-  Cliente: scrivi SI sulla riga dell'entità che è il cliente del fascicolo.
+  Cliente: scrivi SI sulla riga dell’entità che è il cliente del fascicolo.
   Righe senza Denominazione vengono scartate.
 
 GRUPPO_RELAZIONI — rapporti fra le entità.
@@ -100,8 +100,8 @@ FISCALE — aree e tematiche fiscali rilevanti.
   Area | Esito_area | Titolo | Stato | Descrizione | Fonte | Aggiornato_al
   Area: Imposte dirette, IVA, Ritenute, Transfer Pricing, Consolidato fiscale,
   Fiscalità internazionale, Agevolazioni & crediti, Altro.
-  Una riga per tematica; ripeti il nome dell'Area su ogni riga che le appartiene.
-  Esito_area: compilalo solo se i documenti sostengono una conclusione sull'area.
+  Una riga per tematica; ripeti il nome dell’Area su ogni riga che le appartiene.
+  Esito_area: compilalo solo se i documenti sostengono una conclusione sull’area.
 
 CONTENZIOSO — verifiche, accertamenti, contenziosi, interpelli.
   Titolo | Tipo | Autorita | Periodo | Tema | Stato | Rischio | Descrizione |
@@ -117,12 +117,12 @@ ALTRI_ASPETTI — altri elementi permanenti rilevanti che non rientrano altrove.
 FY — novità di uno specifico esercizio.
   Esercizio | Data | Sezione | Area | Titolo | Stato | Descrizione |
   Riporta_nel_profilo
-  Esercizio: l'anno, esempio 2026.
+  Esercizio: l’anno, esempio 2026.
   Sezione: la sezione del profilo a cui la novità si riferisce (Anagrafica &
   Business, Contabilità & Reporting, Società & Gruppo, Fiscale, Contenzioso &
   Controlli, Operazioni straordinarie, Altri aspetti rilevanti).
   Riporta_nel_profilo: scrivi SI solo se la novità è strutturale, cioè cambia
-  il profilo permanente e non riguarda solo quell'anno.
+  il profilo permanente e non riguarda solo quell’anno.
 
 COSA CONSEGNARE
 1. Il workbook compilato, con lo stesso nome e la stessa struttura.
@@ -130,7 +130,7 @@ COSA CONSEGNARE
    - i fogli che hai compilato e quelli lasciati vuoti, con il motivo;
    - le informazioni che hai trovato ma non hai saputo collocare;
    - i punti in cui i documenti erano ambigui o in contraddizione;
-   - le voci che richiedono una verifica professionale prima dell'uso.
+   - le voci che richiedono una verifica professionale prima dell’uso.
 
-Il file sarà controllato dal professionista prima dell'importazione. Il tuo
+Il file sarà controllato dal professionista prima dell’importazione. Il tuo
 compito è preparare una base di lavoro tracciabile, non un fascicolo definitivo.

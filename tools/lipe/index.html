@@ -7,7 +7,7 @@ Licensed under the MIT License. See /legal-docs/MIT.txt.
 
 
 <html class="tal-tool-page" data-tool-version="3.6.1" lang="it"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
-<meta content="index,follow,max-image-preview:large" name="robots"/><title>Generatore LIPE | Tax Automation Lab</title><style>:root{--bg:#f7f6f3;--fg:#0b0b0b;--ink2:#202020;--g1:#f0efeb;--g2:#dcdad4;--g3:#aaa7a0;--g4:#6e6b65;--g5:#47443f;--warn:#a53d28;--warn-bg:#fff3ee;--warn-line:#e8b9aa;--ok:#2e6b3d;--ok-bg:#edf6ef;--gold:#8b6a16;--gold-bg:#fff8df;--focus:#246bfd;--shadow:0 10px 30px rgba(0,0,0,.07);--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:"SF Mono","Menlo","Monaco","Consolas",monospace}
+<meta content="index,follow,max-image-preview:large" name="robots"/><title>Generatore LIPE: mapping IVA, quadro VP e XML | Tax Automation Lab</title><style>:root{--bg:#f7f6f3;--fg:#0b0b0b;--ink2:#202020;--g1:#f0efeb;--g2:#dcdad4;--g3:#aaa7a0;--g4:#6e6b65;--g5:#47443f;--warn:#a53d28;--warn-bg:#fff3ee;--warn-line:#e8b9aa;--ok:#2e6b3d;--ok-bg:#edf6ef;--gold:#8b6a16;--gold-bg:#fff8df;--focus:#246bfd;--shadow:0 10px 30px rgba(0,0,0,.07);--serif:"Newsreader","Iowan Old Style","Baskerville","Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:"SF Mono","Menlo","Monaco","Consolas",monospace}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}html,body{font-family:var(--sans);color:var(--fg);background:var(--bg);font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased;overflow-x:hidden}header.top{background:var(--fg);color:#fff;padding:34px clamp(20px,4vw,48px) 30px;border-bottom:1px solid #242424}header.top .kicker{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--g3);margin-bottom:8px}header.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,43px);line-height:1.08;font-style:italic}header.top .subtitle{margin-top:10px;font-size:14px;color:#dedede;max-width:940px;line-height:1.55;font-style:italic}header.top .privacy{margin-top:12px;font-size:11px;color:#bababa;letter-spacing:.04em}.status-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.status-chip{font-size:10px;line-height:1;letter-spacing:.1em;text-transform:uppercase;border:1px solid #5a5a5a;border-radius:999px;padding:7px 10px;color:#fff;background:#171717}.status-chip.subtle{color:#c9c9c9;background:transparent}
 main{padding:clamp(24px,4vw,48px);max-width:1500px;margin:0 auto}section.block{margin-bottom:48px}h2.bt{font-family:var(--serif);font-weight:400;font-size:clamp(23px,3vw,30px);font-style:italic}h2.bt .num{font-size:12px;font-style:normal;letter-spacing:.2em;color:var(--g4);text-transform:uppercase;display:block;margin-bottom:6px}.bd{color:var(--g5);font-size:13.5px;max-width:980px;margin:8px 0 18px}.rule{height:1px;background:var(--g2);margin:10px 0 20px}
 .flow-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.choice-card{background:#fff;border:1px solid var(--g2);border-top:4px solid var(--fg);border-radius:9px;padding:25px;box-shadow:0 3px 16px rgba(0,0,0,.035)}.choice-card .choice-num{font-family:var(--mono);font-size:11px;color:var(--g4)}.choice-card h3,.panel h3{font-family:var(--serif);font-style:italic;font-weight:400;font-size:20px;margin:7px 0 4px}.choice-card p,.panel p{font-size:13px;color:var(--g5);margin-bottom:14px;max-width:980px}.panel{background:#fff;border:1px solid var(--g2);border-left:4px solid var(--fg);border-radius:8px;padding:24px 26px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.025)}.panel.error-panel{border-left-color:var(--warn);background:#fffaf7}.panel-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.panel-heading h3{margin-top:0}.panel-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -283,7 +283,7 @@ footer a:hover{color:#F7F7F5!important}
  .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
 }
 </style>
-<link href="/assets/site-shell.css?v=20260810-v61510-header-1" rel="stylesheet"/>
+<link href="/assets/site-shell.css?v=20260823" rel="stylesheet"/>
 <meta name="description" content="Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
@@ -296,7 +296,7 @@ footer a:hover{color:#F7F7F5!important}
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:site_name" content="Tax Automation Lab">
-<meta property="og:title" content="Generatore LIPE | Tax Automation Lab">
+<meta property="og:title" content="Generatore LIPE: mapping IVA, quadro VP e XML | Tax Automation Lab">
 <meta property="og:description" content="Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.">
 <meta property="og:url" content="https://taxautomationlab.com/tools/lipe/">
 <meta property="og:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
@@ -306,7 +306,7 @@ footer a:hover{color:#F7F7F5!important}
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Generatore LIPE | Tax Automation Lab">
+<meta name="twitter:title" content="Generatore LIPE: mapping IVA, quadro VP e XML | Tax Automation Lab">
 <meta name="twitter:description" content="Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.">
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta name="twitter:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
@@ -330,8 +330,8 @@ footer a:hover{color:#F7F7F5!important}
 <a class="lipe-link" href="/configura-con-ai/#lipe"><span aria-hidden="true" class="ws-ic">AI</span>Configura con AI</a>
 <span class="sb-cap sb-groupcap">Lavoro</span>
 <button class="lipe-link" data-lipeview="start" type="button"><span aria-hidden="true" class="ws-ic">◧</span>Panoramica</button>
-<button class="lipe-link" data-lipeview="period-processing" type="button"><span aria-hidden="true" class="ws-ic">I</span>Elaborazione periodica</button>
-<button class="lipe-link" data-lipeview="results-section" type="button"><span aria-hidden="true" class="ws-ic">II</span>Quadro VP</button>
+<button class="lipe-link" data-lipeview="period-processing" type="button"><span aria-hidden="true" class="ws-ic">1</span>Elaborazione periodica</button>
+<button class="lipe-link" data-lipeview="results-section" type="button"><span aria-hidden="true" class="ws-ic">2</span>Quadro VP</button>
 <span class="sb-cap sb-groupcap">Risultati e dati</span>
 <button class="lipe-link" data-lipeview="exports-section" type="button"><span aria-hidden="true" class="ws-ic">↧</span>Esporta e storico</button>
 </div>
@@ -369,7 +369,7 @@ footer a:hover{color:#F7F7F5!important}
 </header>
 <main>
 <section class="block intro lipe-view" id="start">
-<h2 class="bt"><span class="num">I · Flusso operativo</span>Configura il cliente una volta, prepara ogni comunicazione</h2><div class="rule"></div>
+<h2 class="bt"><span class="num">Panoramica</span>Configura il cliente una volta, prepara ogni comunicazione</h2><div class="rule"></div>
 <div class="flow-choice">
 <article class="choice-card"><span class="choice-num">1</span><h3>Gestisci un cliente</h3><p>Inserisci l’anagrafica, configura il codiciario IVA oppure riapri un cliente già salvato.</p><button class="btn" data-scroll="client-config">Apri gestione clienti</button></article>
 <article class="choice-card"><span class="choice-num">2</span><h3>Elabora una LIPE</h3><p>Seleziona un cliente già configurato e carica soltanto codice IVA, imponibile, IVA e mese.</p><button class="btn secondary" data-scroll="period-processing">Apri elaborazione</button></article>
@@ -434,7 +434,7 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 </section>
 <section class="block lipe-view" id="period-processing">
-<h2 class="bt"><span class="num">III · Elaborazione periodica</span>Carica soltanto gli importi del periodo</h2><div class="rule"></div>
+<h2 class="bt"><span class="num">Elaborazione periodica</span>Carica soltanto gli importi del periodo</h2><div class="rule"></div>
 <p class="bd">Il file periodico può contenere righe aggregate o il dettaglio completo. Le righe duplicate per codice e mese vengono sommate automaticamente.</p>
 <div class="panel">
 <h3>1. Seleziona cliente e periodo</h3>
@@ -463,7 +463,7 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 </section>
 <section class="block lipe-view" id="results-section">
-<h2 class="bt"><span class="num">IV · Quadro VP</span>Raccordi, risultati e controlli</h2><div class="rule"></div>
+<h2 class="bt"><span class="num">Quadro VP</span>Raccordi, risultati e controlli</h2><div class="rule"></div>
 <div class="demo-guide" hidden="" id="demo-guide">
 <div><span class="badge demo-badge">Esempio dimostrativo</span><h3>Alfa Bioenergia Demo S.r.l. · 2° trimestre 2026</h3><p>I dati sono interamente fittizi. L’esempio mostra vendite al 22% e al 10%, acquisti, reverse charge, operazioni non imponibili, operazioni escluse e alcuni valori manuali del quadro VP.</p></div>
 <div class="demo-guide-actions"><button class="btn small secondary" data-scroll="client-config" type="button">Vedi codiciario</button><button class="btn small secondary" data-scroll="period-processing" type="button">Vedi importi</button><button class="btn small" data-scroll="exports-section" type="button">Prova gli output</button></div>
@@ -477,7 +477,7 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 </section>
 <section class="block lipe-view" id="exports-section">
-<h2 class="bt"><span class="num">V · Output e storico</span>Documenta l’elaborazione</h2><div class="rule"></div>
+<h2 class="bt"><span class="num">Esporta</span>Documenta l’elaborazione</h2><div class="rule"></div>
 <div class="panel"><h3>Esportazioni</h3><p>Il PDF è sempre disponibile come prospetto di lavoro e riproduce frontespizio e quadro VP, senza informativa privacy né istruzioni. Se i controlli ufficiali non sono superati viene dichiarato non presentabile. L’XML IVP18 è invece bloccato finché i dati e il caso dichiarativo non risultano supportati; prima dell’invio deve comunque essere controllato e firmato o sigillato con gli strumenti ufficiali vigenti.</p><div class="btn-row"><button class="btn" id="export-pdf">Esporta PDF · prospetto di lavoro</button><button class="btn secondary" id="export-excel">Esporta working paper Excel</button><button class="btn ghost" id="export-xml">Genera XML IVP18</button><button class="btn ghost" id="save-history">Salva riepilogo</button><button class="btn danger" id="clear-period">Rimuovi importi del periodo</button></div><div id="export-status"></div></div>
 <div class="panel"><h3>Storico locale</h3><div class="history-list" id="history-list"></div></div>
 </section>

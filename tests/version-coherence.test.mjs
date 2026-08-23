@@ -166,3 +166,50 @@ for (const catalogo of CATALOGHI) {
       `${catalogo}: badge non allineati al manifest\n${problemi.join('\n')}`);
   });
 }
+
+/* Le date «Aggiornato il» stavano scritte a mano in tre pagine e in tre lingue:
+   quattro tool su sei dicevano ancora «10 agosto 2026» dopo essere stati
+   modificati il 14, il 21, il 22 e il 23. Ora la data sta in `updated` dentro
+   tools/manifest.json, accanto alla versione, e qui si controlla che le tre
+   pagine la rispettino. Aggiornare una data e' una riga sola nel manifest. */
+const MESI_IT = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio',
+                 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+const MESI_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                 'August', 'September', 'October', 'November', 'December'];
+
+const DATE_ATTESE = {
+  'tools/index.html':    (g, m, a) => `Aggiornato il ${g} ${MESI_IT[m - 1]} ${a}`,
+  'en/tools/index.html': (g, m, a) => `Updated ${g} ${MESI_EN[m - 1]} ${a}`,
+  'es/tools/index.html': (g, m, a) => `Actualizado el ${g} de ${MESI_IT[m - 1]} de ${a}`
+};
+
+for (const [catalogo, formato] of Object.entries(DATE_ATTESE)) {
+  test(`catalogo: le date di ${catalogo} vengono dal manifest`, () => {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'tools', 'manifest.json'), 'utf8'));
+    const html = fs.readFileSync(path.join(root, catalogo), 'utf8');
+    const problemi = [];
+    let schede = 0;
+
+    for (const card of html.split('<article').slice(1)) {
+      const link = card.match(/href="\/tools\/([a-z0-9-]+)\/"/);
+      if (!link) continue;
+      const voce = manifest.tools.find(t => t.slug === link[1]);
+      if (!voce) continue;
+      schede++;
+      if (!voce.updated) {
+        problemi.push(`  ${voce.slug}: il manifest non dichiara \`updated\``);
+        continue;
+      }
+      const [a, m, g] = voce.updated.split('-').map(Number);
+      const attesa = formato(g, m, a);
+      if (!card.includes(attesa)) {
+        const trovata = (card.match(/(?:Aggiornato il|Updated|Actualizado el)[^<·]{0,45}/) || ['(nessuna)'])[0].trim();
+        problemi.push(`  ${voce.slug}: la scheda dice «${trovata}», il manifest dice «${attesa}»`);
+      }
+    }
+
+    assert.equal(schede, manifest.tools.length,
+      `${catalogo}: ho letto ${schede} schede, i tool sono ${manifest.tools.length}`);
+    assert.equal(problemi.length, 0, `${catalogo}: date non allineate\n${problemi.join('\n')}`);
+  });
+}

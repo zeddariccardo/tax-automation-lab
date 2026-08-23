@@ -1,6 +1,6 @@
 {
-  "release": "v6.17.0",
-  "date": "2026-08-22",
+  "release": "v6.18.0",
+  "date": "2026-08-23",
   "privacy_model": {
     "processing": "local_in_browser",
     "server_upload": false,
@@ -16,7 +16,8 @@
       "site_url": "https://taxautomationlab.com/tools/financial-statement/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     },
     {
       "slug": "financial-analysis",
@@ -25,7 +26,8 @@
       "site_url": "https://taxautomationlab.com/tools/financial-analysis/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     },
     {
       "slug": "tfa-client-file",
@@ -34,7 +36,8 @@
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     },
     {
       "slug": "lipe",
@@ -43,7 +46,8 @@
       "site_url": "https://taxautomationlab.com/tools/lipe/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     },
     {
       "slug": "f24",
@@ -52,7 +56,8 @@
       "site_url": "https://taxautomationlab.com/tools/f24/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     },
     {
       "slug": "confronto-regimi",
@@ -61,7 +66,8 @@
       "site_url": "https://taxautomationlab.com/tools/confronto-regimi/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT"
+      "license": "MIT",
+      "updated": "2026-08-23"
     }
   ]
 }

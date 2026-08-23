@@ -112,6 +112,19 @@ crediti, Configura con AI, Dati e backup, Come si usa — e tutto il resto
 (colori, controlli, tabelle, finestre, barra comandi) viene da `tal-app.css`.
 Se in futuro si uniformasse, il lavoro è sostituire la sola `.workspace-nav`.
 
+**Il percorso numerato non è più un'eccezione: è una regola (23 agosto 2026).**
+Anche Confronto regimi lo usa (`PERCORSO`: Profilo · Compensi e redditi · Costi
+annuali · Confronto). Deciso da Riccardo: **i tool che preparano qualcosa con un
+ordine vincolante usano il percorso numerato; gli altri la sidebar
+Configurazione/Lavoro/Risultati e dati.** Sotto al percorso restano comunque le
+voci comuni, e tutto il resto del concept vale identico. Quindi in produzione i
+concept sono due, e sono entrambi voluti:
+
+| Struttura | Tool |
+|---|---|
+| `CONFIGURAZIONE` · `LAVORO` · `RISULTATI E DATI` | Bilancio, Analisi, LIPE, Fascicolo |
+| `PERCORSO` (1·2·3·4) · `RISULTATI E DATI` | F24, Confronto regimi |
+
 Versioni reali (allineate ovunque, anche nei dati strutturati):
 `1.4.1` Bilancio ITA GAAP · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
 cliente · `3.6.0` LIPE · `1.0.0` Generatore F24.
@@ -1725,8 +1738,11 @@ prima dell'ottimizzatore la cifra proposta era più alta del massimale.
 - **Ripartizione entro/oltre esercizio** per singola controparte nello schema
   ordinario: serve per un XBRL ordinario pienamente analitico.
 - **Nota integrativa e rendiconto finanziario**: fuori perimetro oggi.
-- **Concept condiviso**: resta **LIPE** — gruppo «Risultati e dati» completo
-  (mancano Dati e backup e Come si usa) e deep link. Vedi la tabella sopra.
+- ~~**Concept condiviso**: resta LIPE~~ — **chiuso il 23 agosto 2026.** Provato
+  nel browser: LIPE ha «Dati e backup», «Come si usa» e i deep link
+  (`#/clienti` → `#/quadro-vp`, con Indietro e Avanti che camminano fra le
+  sezioni). Era stato allineato senza aggiornare questo file. Prima di riaprire
+  un punto «da allineare», provarlo in pagina.
 - **Foglio «Esiti AI» negli altri tool**: il Bilancio ora lo importa e lo
   trasforma in eccezioni da chiudere prima dell'export. Analisi, LIPE, F24 e
   Fascicolo hanno lo stesso foglio nel template di «Configura con AI» e lo

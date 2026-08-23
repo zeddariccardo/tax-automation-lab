@@ -134,7 +134,7 @@ concept sono due, e sono entrambi voluti:
 
 Versioni reali (allineate ovunque, anche nei dati strutturati):
 `1.4.1` Bilancio ITA GAAP · `2.1.0` Analisi di bilancio · `2.3.2` Fascicolo
-cliente · `3.6.0` LIPE · `1.0.0` Generatore F24.
+cliente · `3.6.1` LIPE · `1.0.0` Generatore F24 · `1.4.1` Confronto regimi.
 
 ## Trappole verificate sul campo
 

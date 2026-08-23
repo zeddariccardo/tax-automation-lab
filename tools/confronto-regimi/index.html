@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/confronto-regimi/
 -->
-<html class="tal-tool-page" data-tool-version="1.4.0" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.1" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -48,7 +48,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
   "description": "Confronto del netto personale disponibile fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi e ottimizzazione automatica del mix compenso/dividendo.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Browser",
-  "softwareVersion": "1.4.0",
+  "softwareVersion": "1.4.1",
   "inLanguage": "it",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -846,7 +846,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.4.0</span>
+<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.4.1</span>
 <h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
 <p data-tal-key="lead">Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra i tre assetti: quanto ti rimane dopo costi, contributi e imposte. Con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e l'ottimizzazione automatica del mix fra compenso amministratore e dividendo.</p>
 <div class="tal-publication-facts">
@@ -864,6 +864,17 @@ main#cfMain{max-width:1120px;margin:0 auto}
 
 <!-- ==================== 1. PROFILO ==================== -->
 <section class="cf-stage active" data-stage="profilo" id="stageProfilo">
+<!-- Le tre strade per cominciare stavano in fondo alla prima tappa, in una fila di quattro pulsanti sotto tre gruppi di scelte: chi apriva il tool non sapeva che ci fosse un esempio da provare finché non aveva compilato il profilo. Ora sono in testa, come negli altri quattro tool. -->
+<div class="tal-start">
+<p class="tal-start-lead">Da dove vuoi partire?</p>
+<div class="tal-start-cards">
+<button class="tal-start-card" type="button" data-action="open-import"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI: profilo, compensi e costi in un file solo.</span></button>
+<button class="tal-start-card" type="button" data-start="manuale"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Tre scelte qui sotto, poi i compensi. È il percorso più breve.</span></button>
+<button class="tal-start-card" type="button" data-start="archivio"><span class="tal-start-ic" aria-hidden="true">⌸</span><b>Riprendi una simulazione</b><span>Apri una simulazione già salvata in questo browser.</span></button>
+</div>
+<button class="tal-start-demo" type="button" data-action="load-demo">Prova con i dati dimostrativi</button>
+</div>
+
 <div class="cf-head">
 <h2>Chi stiamo simulando</h2>
 <p>Tre scelte, poi si passa ai numeri.</p>
@@ -910,9 +921,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 
 <div class="cf-actions">
 <button class="btn" data-go="compensi" type="button">Continua con i compensi</button>
-<button class="btn secondary" data-action="load-demo" type="button">Prova con i dati dimostrativi</button>
 <button class="btn secondary" data-action="download-template" type="button">Scarica il template Excel</button>
-<button class="btn secondary" data-action="open-import" type="button">Importa da Excel</button>
 </div>
 </section>
 
@@ -4386,6 +4395,22 @@ function collega() {
     if (a === 'save-simulation') b.addEventListener('click', () => { raccogliStato(); salvaSimulazione(); });
     if (a === 'load-demo') b.addEventListener('click', caricaDemo);
   });
+
+  /* Il blocco d'apertura. «Inizia a mano» porta il fuoco sulla prima scelta,
+     «Riprendi una simulazione» preme la voce di menu che apre l'archivio: due
+     strade per la stessa cosa diventerebbero due comportamenti diversi. */
+  qa('[data-start]').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.start === 'archivio') {
+      const voce = document.querySelector('.cf-link[data-stage="archivio"]');
+      if (voce) voce.click();
+      return;
+    }
+    const prima = document.querySelector('#stageProfilo input[name="cfProfession"]');
+    if (!prima) return;
+    const sezione = prima.closest('.cf-section') || prima;
+    sezione.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    prima.focus({ preventScroll: true });
+  }));
 
   /* Indirizzi delle sezioni: il tasto Indietro non deve uscire dal tool. */
   window.addEventListener('popstate', () => {

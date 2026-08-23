@@ -51,9 +51,8 @@ Documentazione di dettaglio: `assets/tal-design.README.md`.
   leggibile: `Scarica un backup` / `Ripristina da backup`, con l'oggetto
   esplicito quando ce n'è più d'uno (`Scarica un backup dell'archivio`,
   `Scarica un backup di questa società`). Analisi ne aveva **cinque** di nomi
-  per due sole azioni. Ancora da allineare: Bilancio («Esporta archivio
-  (JSON)»), LIPE («Esporta backup completo»), Fascicolo («Esporta backup
-  JSON»), F24 («Esporta backup»).
+  per due sole azioni. **Allineati tutti e sei il 23 agosto 2026**: la parola
+  JSON non compare piu’ su nessun pulsante.
 - **Verde = aggiungi, arancio = modifica, viola→petrolio = salva**
   (`.btn.add`, `.btn.edit`, `.btn.save`). Dalla 2.0 le classi le mette
   `tal-app.js` leggendo l'etichetta; per forzare o escludere un pulsante,

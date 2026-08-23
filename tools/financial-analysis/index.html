@@ -213,7 +213,7 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 <span class="tal-publication-label">Analisi di bilancio · v2.1.0</span>
 <h2>Riclassificazioni gestionali, KPI e analisi integrate</h2>
 <p>Trasforma il bilancio già classificato secondo gli schemi civilistici italiani in prospetti finanziari e gestionali, con eccezioni tracciate, KPI, scenari, centri di costo e benchmark documentati.</p>
-<div class="tal-publication-facts"><div class="tal-publication-fact">Input: template Financial Statement</div><div class="tal-publication-fact">Output: riclassificazioni, KPI, Excel e PDF</div><div class="tal-publication-fact">Controlli: quadrature, mapping e riconciliazioni</div><div class="tal-publication-fact">Dati: elaborazione locale</div></div>
+<div class="tal-publication-facts"><div class="tal-publication-fact">Input: template del Bilancio civilistico</div><div class="tal-publication-fact">Output: riclassificazioni, KPI, Excel e PDF</div><div class="tal-publication-fact">Controlli: quadrature, mappatura e riconciliazioni</div><div class="tal-publication-fact">Dati: elaborazione locale</div></div>
 <p class="tal-publication-note">Budget, forecast, centri di costo e benchmark sono moduli facoltativi; l’analisi principale resta utilizzabile senza completarli.</p>
 </div>
 </details>
@@ -234,7 +234,7 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 <div class="panel"><h2>Percorso guidato</h2><p>Il flusso principale è lineare. Budget, centri di costo e benchmark sono moduli facoltativi e non bloccano l’analisi del bilancio.</p><div class="checks-grid" id="dash-metrics" style="margin-top:15px"></div><div id="dash-next" style="margin-top:14px"></div><div class="optional-note" id="dash-optional" style="margin-top:14px"></div></div>
 </section>
 <section class="fs-view" id="view-import">
-<span class="step-label">Importa</span><h2 class="page-title">Carica il bilancio civilistico</h2><p class="page-lead">L’import è identico a quello del Financial Statement Tool: stessi fogli, stesse colonne, stessi codici e stessa convenzione dei segni.</p><div class="rule"></div>
+<span class="step-label">Importa</span><h2 class="page-title">Carica il bilancio civilistico</h2><p class="page-lead">Il caricamento è identico a quello del Bilancio civilistico Tool: stessi fogli, stesse colonne, stessi codici e stessa convenzione dei segni.</p><div class="rule"></div>
 <div class="panel"><h2>1. Template comune</h2><p>Il file può essere utilizzato indifferentemente nei due tool. Non esiste un secondo template per la riclassificazione gestionale.</p><div class="btn-row"><button class="btn" onclick="downloadMainTemplate()">Scarica template Financial Statement</button></div></div>
 <div class="panel"><h2>2. Carica il file compilato</h2><label class="upload-zone"><span class="upload-icon">↑</span><span><b>Seleziona il bilancio Excel</b><span>Fogli obbligatori: Stato Patrimoniale e Conto Economico</span><small>.xlsx o .xls · elaborazione locale</small></span><input accept=".xlsx,.xls" onchange="importMain(event)" type="file"/></label><div class="btn-row"><button class="btn ghost" onclick="loadDemo()">Carica esempio dimostrativo</button><button class="btn danger" onclick="resetSession()">Nuova elaborazione</button></div></div>
 <div id="import-status"></div>
@@ -250,7 +250,7 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 </section>
 <section class="fs-view" id="view-reclass">
 <span class="step-label">Risultati</span><h2 class="page-title">Bilanci riclassificati</h2><p class="page-lead">Tutti i prospetti si aggiornano in tempo reale. Le differenze di riconciliazione restano visibili e non vengono nascoste dal motore.</p><div class="rule"></div>
-<div id="reclass-warning"></div><div id="reclass-content"></div><div class="btn-row"><button class="btn" onclick="exportExcel()">Esporta working paper Excel</button><button class="btn secondary" onclick="printReport()">Esporta / stampa report completo PDF</button></div>
+<div id="reclass-warning"></div><div id="reclass-content"></div><div class="btn-row"><button class="btn" onclick="exportExcel()">Esporta working paper Excel</button><button class="btn secondary" onclick="printReport()">Report completo in PDF</button></div>
 </section>
 <section class="fs-view" id="view-kpi">
 <span class="step-label">KPI</span><h2 class="page-title">Analisi per indici</h2><p class="page-lead">Gli indicatori sono organizzati per famiglia. I colori descrivono l’<b>affidabilità del dato</b>, non la qualità economico-finanziaria della società. Le anomalie oggettive sono esposte separatamente.</p><div class="rule"></div>

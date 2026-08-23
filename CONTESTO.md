@@ -46,6 +46,14 @@ Documentazione di dettaglio: `assets/tal-design.README.md`.
   viola era al 47% e schiacciava tutto: non riportarlo su.
 - **Accento unico dei tool**: petrolio `#145368`. Niente lime, niente blu, niente
   viola: erano tre accenti diversi in quattro tool.
+- **Il backup si «scarica» e si «ripristina», e non si chiama JSON.** Canone
+  fissato il 23 agosto 2026 sul vocabolario di Confronto regimi, che era il più
+  leggibile: `Scarica un backup` / `Ripristina da backup`, con l'oggetto
+  esplicito quando ce n'è più d'uno (`Scarica un backup dell'archivio`,
+  `Scarica un backup di questa società`). Analisi ne aveva **cinque** di nomi
+  per due sole azioni. Ancora da allineare: Bilancio («Esporta archivio
+  (JSON)»), LIPE («Esporta backup completo»), Fascicolo («Esporta backup
+  JSON»), F24 («Esporta backup»).
 - **Verde = aggiungi, arancio = modifica, viola→petrolio = salva**
   (`.btn.add`, `.btn.edit`, `.btn.save`). Dalla 2.0 le classi le mette
   `tal-app.js` leggendo l'etichetta; per forzare o escludere un pulsante,
@@ -168,6 +176,18 @@ Queste sono costate errori veri. Vale la pena leggerle prima di toccare i tool.
    `computeFrom` in più è avvolta da `realignResult`, quindi il suo `String()`
    mostra il wrapper: la definizione vera è la terza, alla riga 3294 per il
    loop degli storni.
+12. **`typeof X === 'function'` non vede dentro un altro IIFE.** In
+   `financial-analysis` **cinque** blocchi di correzione sono protetti così, e
+   `X` sta in un IIFE diverso: `typeof` risponde `'undefined'` e il blocco non
+   viene mai eseguito. Nessun errore, nessun segno: la correzione è scritta nel
+   file e non gira. Il 23 agosto 2026 ne sono stati trovati cinque
+   (`v20DashboardRows`, `v18Write`, `v18WorkbookLineage`, `v20AddIncidence`,
+   `v18RequireExportGate`), di cui due nascondevano difetti veri — un nome
+   inglese nell'Excel e l'unico export del tool che non dava conferma.
+   **Come si trova:** in pagina, `['nome1','nome2'].filter(n=>{try{return typeof eval(n)!=='function'}catch(e){return true}})`.
+   **Come si corregge:** scrivere la correzione alla fonte, non sperare che il
+   blocco parta. Vale la pena cercarle anche negli altri tool.
+
 10. **Il vecchio `fsShowView` è chiuso dentro il suo IIFE** e la sidebar è
    agganciata a quello. Sostituire `window.fsShowView` non basta: serve un
    listener in fase di cattura su `#sidebar` che fermi la propagazione.

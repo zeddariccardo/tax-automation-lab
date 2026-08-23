@@ -1,4 +1,4 @@
-/* Tax Automation Lab — XLSX binary/download and output polish guard v1.1.1
+/* Tax Automation Lab — XLSX binary/download and output polish guard v1.2.0
  * Loaded after each tool's own scripts. Tool-specific polish is path/sheet gated.
  */
 (function(){
@@ -43,32 +43,133 @@
 
   function setFmt(sheet,address,format){
     const cell=sheet&&sheet[address];
-    if(cell&&typeof cell.v==='number')cell.z=format;
+    if(cell&&typeof cell.v==='number'&&!cell.z)cell.z=format;
   }
 
-  function polishFinancialAnalysisWorkbook(wb){
-    if(!wb||!wb.Sheets)return wb;
-    const dash=wb.Sheets['Executive Dashboard'];
-    if(!dash)return wb;
+  /* Formati per unita' di misura. I KPI dichiarano l'unita' in una colonna
+     apposita: e' l'unico modo esatto di sapere se 0,48 e' «48,4%» o «0,48x». */
+  const FMT_BY_UNIT={'%':'0.0%','eur':MONEY_FMT,'euro':MONEY_FMT,'€':MONEY_FMT,
+                     'giorni':'0.0','gg':'0.0','x':'0.00"x"'};
+  const FMT_DUPONT={'net margin':'0.0%','ros':'0.0%','roe':'0.0%','roi':'0.0%',
+                    'roic':'0.0%','asset turnover':'0.00"x"','leverage medio':'0.00"x"'};
 
-    /* AOA contract in FA 2.0.6:
-       rows 7-12 = primary financial KPIs, D7:D10 = percentage changes. */
-    for(let r=7;r<=12;r++){
-      setFmt(dash,'B'+r,MONEY_FMT);
-      setFmt(dash,'C'+r,MONEY_FMT);
-    }
-    for(let r=7;r<=10;r++)setFmt(dash,'D'+r,'0.00%');
-    setFmt(dash,'B14','0');
+  function sheetRange(ws){
+    if(!ws||!ws['!ref']||!window.XLSX||!window.XLSX.utils)return null;
+    try{return window.XLSX.utils.decode_range(ws['!ref']);}catch(_){return null;}
+  }
 
-    if(window.XLSX&&window.XLSX.utils&&dash['!ref']){
-      const range=window.XLSX.utils.decode_range(dash['!ref']);
-      for(let row=15;row<=range.e.r;row++)setFmt(dash,'B'+(row+1),'0');
+  function cellAt(ws,r,c){
+    return ws[window.XLSX.utils.encode_cell({r:r,c:c})]||null;
+  }
+
+  function textAt(ws,r,c){
+    const cell=cellAt(ws,r,c);
+    return cell==null?'':String(cell.v==null?'':cell.v).trim();
+  }
+
+  function fmtAt(ws,r,c,format){
+    const cell=cellAt(ws,r,c);
+    if(cell&&typeof cell.v==='number'&&!cell.z)cell.z=format;
+  }
+
+  /* Cerca la riga di intestazione che comincia con una delle etichette date.
+     Le tabelle qui hanno sempre poche righe di testata sopra, e cercarla invece
+     di contarla evita che una riga in piu' scompagini tutti i formati - che e'
+     esattamente quello che era successo con gli indirizzi fissi B7:D12. */
+  function findHeaderRow(ws,range,first,second){
+    for(let r=range.s.r;r<=Math.min(range.e.r,range.s.r+12);r++){
+      if(new RegExp(first,'i').test(textAt(ws,r,0))&&
+         (!second||new RegExp(second,'i').test(textAt(ws,r,1))))return r;
     }
+    return -1;
+  }
+
+  /* Qualunque foglio che dichiari «Unita'» accanto a «Valore»: i KPI, dovunque
+     finiscano. Vale per tutti i tool, perche' il contratto e' nel foglio. */
+  function polishByUnit(ws){
+    const range=sheetRange(ws);
+    if(!range)return false;
+    const head=findHeaderRow(ws,range,'^(codice|indicatore|kpi)$');
+    if(head<0)return false;
+    let iu=-1,iv=-1;
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const t=textAt(ws,head,c).toLowerCase();
+      if(/^unit/.test(t))iu=c;
+      if(t==='valore')iv=c;
+    }
+    if(iu<0||iv<0)return false;
+    for(let r=head+1;r<=range.e.r;r++){
+      const fmt=FMT_BY_UNIT[textAt(ws,r,iu).toLowerCase()];
+      if(fmt)fmtAt(ws,r,iv,fmt);
+    }
+    return true;
+  }
+
+  function polishDashboard(wb){
+    const dash=wb.Sheets['Dashboard']||wb.Sheets['Executive Dashboard'];
+    const range=sheetRange(dash);
+    if(!range)return;
+    const head=findHeaderRow(dash,range,'^indicatore$','^corrente$');
+    if(head>=0){
+      for(let r=head+1;r<=range.e.r;r++){
+        if(!textAt(dash,r,0))break;
+        fmtAt(dash,r,1,MONEY_FMT);
+        fmtAt(dash,r,2,MONEY_FMT);
+        fmtAt(dash,r,3,'0.0%');
+      }
+    }
+    /* Le righe sotto la tabella (punteggio, copertura, pesi) sono numeri interi:
+       senza formato Excel le mostrerebbe con la virgola mobile. */
+    for(let r=range.s.r;r<=range.e.r;r++)fmtAt(dash,r,1,'0');
     dash['!cols']=[{wch:42},{wch:20},{wch:20},{wch:18}];
+  }
 
-    /* Keep the KPI workbook usable without changing values/formulas. */
-    const kpi=wb.Sheets.KPI;
-    if(kpi)kpi['!cols']=[{wch:22},{wch:18},{wch:32},{wch:46},{wch:16},{wch:11},{wch:34},{wch:18},{wch:44}];
+  function polishSimpleTables(wb){
+    Object.keys(wb.Sheets||{}).forEach(function(nome){
+      const ws=wb.Sheets[nome];
+      const range=sheetRange(ws);
+      if(!range)return;
+      const h0=textAt(ws,range.s.r,0),h1=textAt(ws,range.s.r,1);
+      let r,c;
+      if(/^bridge/i.test(h0)&&/^effetto$/i.test(h1)){
+        for(r=range.s.r+1;r<=range.e.r;r++)fmtAt(ws,r,1,MONEY_FMT);
+      }else if(/^voce$/i.test(h0)&&/^valore$/i.test(h1)){
+        for(r=range.s.r+1;r<=range.e.r;r++)fmtAt(ws,r,1,MONEY_FMT);
+      }else if(/^fattore$/i.test(h0)&&/^valore$/i.test(h1)){
+        for(r=range.s.r+1;r<=range.e.r;r++){
+          fmtAt(ws,r,1,FMT_DUPONT[textAt(ws,r,0).toLowerCase()]||'0.00"x"');
+        }
+      }else if(/^anno$/i.test(h0)){
+        for(r=range.s.r+1;r<=range.e.r;r++)
+          for(c=range.s.c+1;c<=range.e.c;c++)fmtAt(ws,r,c,MONEY_FMT);
+      }else if(/^indicatore$/i.test(h0)&&/^valore$/i.test(h1)){
+        /* La Diagnostica non dichiara l'unita': gli importi si riconoscono
+           dall'ordine di grandezza, i rapporti restano a tre decimali invece
+           che a sedici. Non e' una regola bella, ma e' meglio di 1,8873239. */
+        for(r=range.s.r+1;r<=range.e.r;r++){
+          const cell=cellAt(ws,r,1);
+          if(cell&&typeof cell.v==='number')fmtAt(ws,r,1,Math.abs(cell.v)>=1000?MONEY_FMT:'0.000');
+        }
+      }else if(/mappatura conti/i.test(nome)){
+        for(r=range.s.r+1;r<=range.e.r;r++)
+          for(c=range.s.c;c<=range.e.c;c++)fmtAt(ws,r,c,MONEY_FMT);
+      }
+    });
+  }
+
+  /* Rifinitura degli Excel prodotti dai tool.
+     Perche' sta qui e non nei generatori: i fogli nascono in punti diversi del
+     file - e in Analisi in piu' definizioni sovrapposte - mentre la scrittura
+     passa da un punto solo. Nessun formato gia' impostato viene sovrascritto. */
+  function polishFinancialAnalysisWorkbook(wb){
+    if(!wb||!wb.Sheets||!window.XLSX||!window.XLSX.utils)return wb;
+    try{
+      polishDashboard(wb);
+      polishSimpleTables(wb);
+      Object.keys(wb.Sheets).forEach(function(n){polishByUnit(wb.Sheets[n]);});
+      const kpi=wb.Sheets.KPI;
+      if(kpi&&!kpi['!cols'])kpi['!cols']=[{wch:22},{wch:18},{wch:32},{wch:46},{wch:16},{wch:11},{wch:34},{wch:18},{wch:44}];
+    }catch(_){/* una rifinitura mancata non deve impedire l'export */}
     return wb;
   }
 
@@ -155,7 +256,7 @@
     if(originalWriteFileXLSX)window.XLSX.writeFileXLSX=guardedWriteFile;
     Object.defineProperty(window.XLSX,'__talBinaryGuardInstalled',{value:true,configurable:false});
     window.TALXlsxGuard=Object.freeze({
-      version:'1.1.1',
+      version:'1.2.0',
       toBytes:toBytes,
       assertXlsx:assertXlsx,
       downloadBytes:downloadBytes,

@@ -2668,12 +2668,12 @@ function v20ReclassRows(section){
 }
 function v20DashboardRows(){
   const c=ceCore(),s=spCore(),prev=v20FirstYear()?null:ceCore(STATE.accounts,'previous'),score=v20Health();
-  const rows=[['EXECUTIVE DASHBOARD — ANALISI DI BILANCIO v2.1.0'],['Società',STATE.company.name],['Periodo',`${STATE.company.periodFrom||''} / ${STATE.company.periodTo||''}`],['Primo esercizio',v20FirstYear()?'Sì':'No'],[],['Indicatore','Corrente','Precedente','Variazione %'],['Ricavi',c.rev,prev?prev.rev:'',prev&&prev.rev?(c.rev-prev.rev)/Math.abs(prev.rev):''],['EBITDA',c.ebitda,prev?prev.ebitda:'',prev&&prev.ebitda?(c.ebitda-prev.ebitda)/Math.abs(prev.ebitda):''],['EBIT',c.ebit,prev?prev.ebit:'',prev&&prev.ebit?(c.ebit-prev.ebit)/Math.abs(prev.ebit):''],['Risultato netto',c.net,prev?prev.net:'',prev&&prev.net?(c.net-prev.net)/Math.abs(prev.net):''],['PFN',s.pfn,'',''],['CCN',s.ccn,'',''],[],['Business Health Score sperimentale',score.score],['Nota','Indicatore sintetico gestionale; non è rating, giudizio di merito creditizio o previsione.']];
+  const rows=[['DASHBOARD — ANALISI DI BILANCIO v2.1.0'],['Società',STATE.company.name],['Periodo',`${STATE.company.periodFrom||''} / ${STATE.company.periodTo||''}`],['Primo esercizio',v20FirstYear()?'Sì':'No'],[],['Indicatore','Corrente','Precedente','Variazione %'],['Ricavi',c.rev,prev?prev.rev:'',prev&&prev.rev?(c.rev-prev.rev)/Math.abs(prev.rev):''],['EBITDA',c.ebitda,prev?prev.ebitda:'',prev&&prev.ebitda?(c.ebitda-prev.ebitda)/Math.abs(prev.ebitda):''],['EBIT',c.ebit,prev?prev.ebit:'',prev&&prev.ebit?(c.ebit-prev.ebit)/Math.abs(prev.ebit):''],['Risultato netto',c.net,prev?prev.net:'',prev&&prev.net?(c.net-prev.net)/Math.abs(prev.net):''],['PFN',s.pfn,'',''],['CCN',s.ccn,'',''],[],['Indice comparativo benchmark (sperimentale)',score.score==null?'Non calcolato':score.score],['Copertura benchmark',(score.coverage||0)+'%'],['Nota','Confronto relativo ai benchmark esterni caricati; non è rating, giudizio di merito creditizio o previsione.']];
   score.parts.forEach(p=>rows.push([p[0],Math.round(p[1]),'',`Peso ${p[2]}`]));return rows;
 }
 exportExcel=async function(){
   if(!STATE.loaded){toast('Carica un bilancio.',true);return;}if(typeof v18RequireExportGate==='function'&&!v18RequireExportGate())return;
-  const wb=XLSX.utils.book_new(),dash=XLSX.utils.aoa_to_sheet(v20DashboardRows());dash['!cols']=[{wch:42},{wch:22},{wch:22},{wch:22}];XLSX.utils.book_append_sheet(wb,dash,'Executive Dashboard');
+  const wb=XLSX.utils.book_new(),dash=XLSX.utils.aoa_to_sheet(v20DashboardRows());dash['!cols']=[{wch:42},{wch:22},{wch:22},{wch:22}];XLSX.utils.book_append_sheet(wb,dash,'Dashboard');
   mappedSections().forEach((s,i)=>{const rows=v20ReclassRows(s),ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:58},{wch:18},{wch:18},{wch:18},{wch:13},{wch:15},{wch:15}];for(let r=2;r<=rows.length;r++){['B','C','D'].forEach(col=>{if(ws[col+r])ws[col+r].z='#,##0.00;[Red]-#,##0.00';});['E','F','G'].forEach(col=>{if(ws[col+r])ws[col+r].z='0.0%';});}XLSX.utils.book_append_sheet(wb,ws,v20SheetName(`${i+1}_${s[0]}`));});
   const ks=makeKpis(),desc=typeof v20KpiDescription==='function'?v20KpiDescription:()=>'';const wsK=XLSX.utils.aoa_to_sheet([['Codice','Famiglia','Indicatore','Descrizione operativa','Valore','Unità','Formula','Affidabilità','Note'],...ks.map(k=>[k.code,k.family,k.name,desc(k),k.value,k.unit,k.formula,kpiStatusLabel(k.status),k.note||''])]);wsK['!cols']=[{wch:24},{wch:20},{wch:38},{wch:70},{wch:16},{wch:12},{wch:50},{wch:20},{wch:70}];XLSX.utils.book_append_sheet(wb,wsK,'KPI');
   const wsM=XLSX.utils.aoa_to_sheet([['Chiave tecnica','Codice ERP','Descrizione','Sezione','Voce IV','Corrente','Precedente'],...STATE.accounts.map(a=>[accountKey(a),a.code,a.desc,a.type,a.iv,a.current,v20FirstYear()?'':a.previous])]);wsM['!cols']=[{wch:55},{wch:18},{wch:50},{wch:12},{wch:18},{wch:18},{wch:18}];XLSX.utils.book_append_sheet(wb,wsM,'Mappatura conti');
@@ -2687,7 +2687,7 @@ exportExcel=async function(){
    const wsA=XLSX.utils.aoa_to_sheet(rows);wsA['!cols']=[{wch:16},{wch:20},{wch:52},{wch:18},{wch:60},{wch:34}];
    XLSX.utils.book_append_sheet(wb,wsA,'Esiti AI');}
   if(typeof v18WorkbookLineage==='function')v18WorkbookLineage(wb);
-  if(typeof v18Write==='function')await v18Write(wb,`Analisi_Bilancio_v2_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Working paper v2.1.0 generato.');else XLSX.writeFile(wb,`Analisi_Bilancio_v2_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`);
+  if(typeof v18Write==='function')await v18Write(wb,`Analisi_Bilancio_v2_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Working paper v2.1.0 generato.');else {XLSX.writeFile(wb,`Analisi_Bilancio_v2_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`);toast('Working paper Excel esportato.');}
 };
 function v20InstallExportButton(){const host=document.querySelector('#view-executive .v20-exec-head');if(host&&!document.getElementById('v20-print-dashboard')){const b=document.createElement('button');b.id='v20-print-dashboard';b.className='btn ghost';b.textContent='Stampa dashboard';b.onclick=()=>window.print();host.appendChild(b);}}
 const oldInstall=window.v20Install; if(typeof oldInstall==='function'){window.v20Install=function(){oldInstall();v20InstallExportButton();};}
@@ -3607,5 +3607,5 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<script src="/assets/tal-xlsx-guard.js?v=20260810-1"></script>
+<script src="/assets/tal-xlsx-guard.js?v=20260823"></script>
 </body></html>

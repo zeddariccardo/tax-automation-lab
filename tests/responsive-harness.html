@@ -116,6 +116,26 @@ function measure(frame){
      ma non il fuoco, e il salto sembra funzionare senza servire a niente.
      Lo stato visibile al fuoco non si misura qui: in una finestra non a fuoco
      `:focus` non corrisponde, e verrebbe un falso negativo. */
+  /* Il bersaglio più piccolo. Un pulsante vestito da link con `padding:0` è
+     alto quindici pixel: si legge bene e col dito si sbaglia. Le WCAG 2.2
+     chiedono 24×24, con l'eccezione dei link dentro a un testo — che qui non
+     si applica, perché si misurano solo i pulsanti e i link dei riquadri.
+     Il salto al contenuto resta fuori: è 1×1 finché non lo si mette a fuoco. */
+  let piccolo = null;
+  d.querySelectorAll('button, .tal-start-demo, .text-button').forEach(el => {
+    if (el.closest('.tal-skip-link, .skip-link')) return;
+    const cs = w.getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none') return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return;
+    const lato = Math.min(Math.round(r.width), Math.round(r.height));
+    if (!piccolo || lato < piccolo.lato) {
+      piccolo = {lato, t: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 28),
+                 w: Math.round(r.width), h: Math.round(r.height)};
+    }
+  });
+  out.bersaglioMinimo = piccolo;
+
   const skips = d.querySelectorAll('.tal-skip-link, .skip-link');
   out.skipCount = skips.length;
   if (skips.length === 1) {
@@ -243,6 +263,10 @@ function judge(width, m){
     if (m.piedeFondoTrasparente) fails.push('il piede non ha fondo: manca il suo foglio di stile');
     if (m.piedeSpanInLinea) fails.push('le voci del piede sono in linea: manca il suo foglio di stile');
     if (m.piedeSottoIlComando) fails.push('l’ultima riga del piede resta sotto il comando del menu');
+  }
+  if (m.bersaglioMinimo && m.bersaglioMinimo.lato < 24) {
+    fails.push('bersaglio troppo piccolo per il dito: «' + m.bersaglioMinimo.t + '» '
+      + m.bersaglioMinimo.w + '×' + m.bersaglioMinimo.h);
   }
   if (m.barraDietroHeader) fails.push('la barra di sessione si incolla dietro l’intestazione');
   if (m.navFlex === false) fails.push('la navigazione dell’intestazione non è flex: manca il suo foglio di stile');

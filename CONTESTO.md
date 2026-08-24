@@ -1796,3 +1796,19 @@ prima dell'ottimizzatore la cifra proposta era più alta del massimale.
   reale, senza numerazione unica.
 - L'animazione WebGL della landing usa ancora fucsia e magenta puri
   (`#f967fb`, `#ff008a`): è il punto più viola rimasto.
+
+## Analisi di bilancio: trentasei versioni, 24 agosto 2026
+
+`financial-analysis` dichiara la propria versione in **trentasei punti**:
+`data-tool-version`, i dati strutturati, l'etichetta di pubblicazione,
+`toolVersion` nei due salvataggi, le stringhe «versione 2.1.0» dei report, e una
+costante (`V15_VERSION`, `V16_VERSION`, `V17_VERSION`, `V17F`, `V18_VERSION`,
+`V20_VERSION`, `TAL_VERSION`, più cinque `VERSION` anonime) in ognuno dei blocchi
+di correzione sovrapposti.
+
+Il Bilancio ha **una sola costante**, letta da tutte le altre dichiarazioni: è la
+correzione descritta nella sezione del 14 agosto, e qui non è mai stata portata.
+Finché resta così, alzare la versione di Analisi è un intervento a sé — trentasei
+sostituzioni di cui alcune dentro prosa storica («retained inside Financial
+Analysis 2.1.0») e una dentro il nome del template scaricabile, che vanno
+distinte a mano. Non farlo come coda di un'altra correzione.

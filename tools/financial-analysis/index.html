@@ -2568,7 +2568,9 @@ function v20HeaderIndex(headers,aliases){const hs=(headers||[]).map(v=>v20Norm(v
 function v20Snapshot(){return {company:v20Clone(STATE.company||{}),accounts:v20Clone(STATE.accounts||[]),attrs:v20Clone(STATE.attrs||{}),selected:new Set(Array.from(STATE.selected||[])),adjustments:v20Clone(STATE.adjustments||[]),scenarios:v20Clone(STATE.scenarios||{budget:[],forecast:[]}),scenarioMeta:v20Clone(STATE.scenarioMeta||{}),centers:v20Clone(STATE.centers||[]),centerCatalog:v20Clone(STATE.centerCatalog||[]),benchmark:v20Clone(STATE.benchmark||[]),history:v20Clone(STATE.history||[]),reclassMap:v20Clone(STATE.reclassMap||{}),extra:v20Clone(STATE.extra||{}),periods:v20Clone(STATE.periods||{}),files:v20Clone(STATE.files||{}),fileMeta:v20Clone(STATE.fileMeta||{}),diagnostics:v20Clone(STATE.diagnostics||[]),loaded:!!STATE.loaded,mappingScheme:STATE.mappingScheme};}
 function v20Restore(s){if(!s)return;Object.assign(STATE,s);STATE.selected=s.selected instanceof Set?s.selected:new Set(s.selected||[]);buildProposals();syncCompanyInputs();updateAll();}
 function v20Identity(c){c=c||{};if(!c.uuid)c.uuid=(crypto&&crypto.randomUUID)?crypto.randomUUID():`fa-${Date.now()}-${Math.random().toString(16).slice(2)}`;return c;}
-function v20Reject(diags,title='Importazione rifiutata'){STATE.diagnostics=[...(STATE.diagnostics||[]),...(diags||[])];toast(`${title}: ${(diags||[]).filter(d=>d.level==='error').length} errori. La sessione precedente non è stata modificata.`,true);updateAll();setView('import');}
+function v20Reject(diags,title='Importazione rifiutata'){/* Sostituisce, non accoda: gli errori del file precedente riferiti a un file
+   nuovo mandano a cercare il problema sbagliato. */
+STATE.diagnostics=[...(diags||[])];toast(`${title}: ${(diags||[]).filter(d=>d.level==='error').length} errori. La sessione precedente non è stata modificata.`,true);updateAll();setView('import');}
 
 function v20Norm(v){return String(v==null?'':v).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
 function v20BaseKey(a){return `${a.type}|${String(a.code||'').trim()}|${v20Norm(a.desc)}`;}
@@ -3715,6 +3717,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<script src="/assets/tal-xlsx-guard.js?v=20260824a"></script>
+<script src="/assets/tal-xlsx-guard.js?v=20260824b"></script>
 <script src="/assets/tal-focus-guard.js?v=20260824"></script>
 </body></html>

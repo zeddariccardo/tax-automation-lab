@@ -334,10 +334,48 @@
     }
   }
 
+  /* `XLSX.read` non si lamenta di niente: su otto byte a caso restituisce una
+     cartella con un foglio «Sheet1», e il tool poi dice «fogli obbligatori
+     mancanti» a chi ha caricato un PDF rinominato. Meglio dirglielo subito.
+
+     Passano le cartelle .xlsx (zip, `PK\x03\x04`), i vecchi .xls (OLE
+     `D0CF11E0`) e il testo, perche' due input accettano anche il CSV. */
+  function primiByte(dati,quanti){
+    try{
+      if(dati instanceof ArrayBuffer)return new Uint8Array(dati,0,Math.min(quanti,dati.byteLength));
+      if(dati&&dati.buffer instanceof ArrayBuffer)return new Uint8Array(dati.buffer,dati.byteOffset||0,Math.min(quanti,dati.length||dati.byteLength||0));
+      if(Array.isArray(dati))return new Uint8Array(dati.slice(0,quanti));
+      return null;
+    }catch(_){return null;}
+  }
+  function nonEUnaCartella(dati){
+    const b=primiByte(dati,512);
+    if(!b||b.length<4)return '';
+    if(b[0]===0x50&&b[1]===0x4B&&(b[2]===0x03||b[2]===0x05||b[2]===0x07))return '';
+    if(b[0]===0xD0&&b[1]===0xCF&&b[2]===0x11&&b[3]===0xE0)return '';
+    let stampabili=0;
+    for(let i=0;i<b.length;i++){
+      const c=b[i];
+      if(c===9||c===10||c===13||(c>=32&&c!==127))stampabili++;
+    }
+    if(stampabili/b.length>=0.95)return '';
+    return 'Il file non è una cartella Excel: non ne ha il formato. '
+      +'Controlla di aver scelto il file giusto — un PDF o un documento rinominato '
+      +'.xlsx non basta — oppure riscarica il template.';
+  }
+
   function install(){
     installPdfOrphanGuard();
     installFaDomObserver();
     if(!window.XLSX || typeof window.XLSX.write!=='function' || window.XLSX.__talBinaryGuardInstalled)return false;
+    const originalRead=typeof window.XLSX.read==='function'?window.XLSX.read.bind(window.XLSX):null;
+    if(originalRead){
+      window.XLSX.read=function(dati,opts){
+        const problema=nonEUnaCartella(dati);
+        if(problema)throw new Error(problema);
+        return originalRead(dati,opts);
+      };
+    }
     const originalWrite=window.XLSX.write.bind(window.XLSX);
     const originalWriteFile=typeof window.XLSX.writeFile==='function'?window.XLSX.writeFile.bind(window.XLSX):null;
     const originalWriteFileXLSX=typeof window.XLSX.writeFileXLSX==='function'?window.XLSX.writeFileXLSX.bind(window.XLSX):null;
@@ -364,7 +402,7 @@
     if(originalWriteFileXLSX)window.XLSX.writeFileXLSX=guardedWriteFile;
     Object.defineProperty(window.XLSX,'__talBinaryGuardInstalled',{value:true,configurable:false});
     window.TALXlsxGuard=Object.freeze({
-      version:'1.6.0',
+      version:'1.7.0',
       toBytes:toBytes,
       assertXlsx:assertXlsx,
       downloadBytes:downloadBytes,

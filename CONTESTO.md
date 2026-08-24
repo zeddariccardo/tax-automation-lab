@@ -1797,21 +1797,29 @@ prima dell'ottimizzatore la cifra proposta era più alta del massimale.
 - L'animazione WebGL della landing usa ancora fucsia e magenta puri
   (`#f967fb`, `#ff008a`): è il punto più viola rimasto.
 
-## Analisi di bilancio: trentasei versioni, 24 agosto 2026
+## Analisi di bilancio: una sola versione, 24 agosto 2026
 
-`financial-analysis` dichiara la propria versione in **trentasei punti**:
-`data-tool-version`, i dati strutturati, l'etichetta di pubblicazione,
-`toolVersion` nei due salvataggi, le stringhe «versione 2.1.0» dei report, e una
-costante (`V15_VERSION`, `V16_VERSION`, `V17_VERSION`, `V17F`, `V18_VERSION`,
-`V20_VERSION`, `TAL_VERSION`, più cinque `VERSION` anonime) in ognuno dei blocchi
-di correzione sovrapposti.
+`financial-analysis` dichiarava la propria versione in **trentasei punti**:
+l'attributo, i dati strutturati, l'etichetta, due `toolVersion` nei salvataggi,
+le stringhe «versione 2.1.0» dei report, il nome del template scaricabile e una
+costante in ognuno dei dodici blocchi di correzione sovrapposti. Alzarla voleva
+dire trentasei sostituzioni, alcune dentro prosa storica.
 
-Il Bilancio ha **una sola costante**, letta da tutte le altre dichiarazioni: è la
-correzione descritta nella sezione del 14 agosto, e qui non è mai stata portata.
-Finché resta così, alzare la versione di Analisi è un intervento a sé — trentasei
-sostituzioni di cui alcune dentro prosa storica («retained inside Financial
-Analysis 2.1.0») e una dentro il nome del template scaricabile, che vanno
-distinte a mano. Non farlo come coda di un'altra correzione.
+Ora c'è **una sorgente sola**: un blocco in testa al `<head>` legge
+`data-tool-version` dal tag `html` e la mette in `window.FA_VERSION`; le dodici
+costanti dei blocchi (`V15_VERSION` … `TAL_VERSION`, le tre `VERSION` anonime,
+`V17F`) ci puntano, e così i titoli dei report, il nome del template e la riga
+di testa della Dashboard nell'Excel. È la stessa soluzione che il Bilancio ha
+con `FS_VERSION`, ma senza ripetere il numero.
+
+**Alzare la versione di Analisi è ora un lavoro da sei sostituzioni**, come per
+gli altri cinque tool: attributo, JSON-LD, etichetta di pubblicazione,
+`manifest.json` e i tre badge dei cataloghi. Provato passando a 2.1.1: cambiati
+quei sei, in pagina si sono mossi da soli la costante, l'etichetta e il titolo
+del foglio Excel.
+
+I commenti storici («retained inside Financial Analysis 2.1.0», «Fino alla
+2.1.0 questo foglio…») restano com'erano: raccontano quando una cosa è successa.
 
 ## Cosa arriva davvero dentro un .xlsx, 24 agosto 2026
 

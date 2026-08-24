@@ -472,8 +472,19 @@ html.tal-tool-page :is(.demo-card,.demo-guide,.mapping-help,.factor-box.result,.
   border-color:rgba(20,83,104,.20) !important;
 }
 html.tal-tool-page .demo-card{border-top-color:var(--tal-accent) !important}
-html.tal-tool-page :is(.advanced-head.purple,.reclass-section.sp .reclass-head){
+html.tal-tool-page .advanced-head.purple{
   background:linear-gradient(110deg,var(--tal-accent),var(--tal-accent-deep)) !important;
+}
+
+/* Una tonalita' per tematica. Prima stato patrimoniale e conto economico erano
+   lo stesso petrolio, e in un export che li contiene entrambi non si vedeva
+   dove finiva l'uno e cominciava l'altro. Le stesse quattro tinte sono nel
+   foglio di stampa di Analisi, ricavate dal titolo con la stessa regola. */
+html.tal-tool-page .reclass-section.sp .reclass-head{
+  background:linear-gradient(110deg,#164E61,var(--tal-accent-deep)) !important;
+}
+html.tal-tool-page .reclass-section.ce .reclass-head{
+  background:linear-gradient(110deg,var(--tal-accent-2),var(--tal-accent)) !important;
 }
 html.tal-tool-page .v16-scope-tag.advanced{background:var(--tal-accent-soft) !important;color:var(--tal-accent-deep) !important}
 

@@ -67,10 +67,11 @@ Documentazione di dettaglio: `assets/tal-design.README.md`.
 - **Sidebar dei tool**: petrolio, stato attivo in pastiglia bianca.
 - Tutto il movimento rispetta `prefers-reduced-motion`.
 
-## I cinque tool
+## I sei tool
 
 `/tools/financial-statement/` · `/tools/financial-analysis/` · `/tools/lipe/` ·
-`/tools/tfa-client-file/` · `/tools/f24/`
+`/tools/tfa-client-file/` · `/tools/f24/` · `/tools/confronto-regimi/`
+(più `/tools/convenienza-fiscale/`, che è solo il rimando dal vecchio nome).
 
 Sono **solo in italiano**. Le pagine `/en/tools/<slug>/` e `/es/tools/<slug>/`
 sono pagine di avviso in `noindex` che spiegano perché e rimandano alla versione

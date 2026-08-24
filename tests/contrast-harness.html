@@ -19,9 +19,16 @@
      /tests/contrast-harness.html. `window.__TAL_CONTRAST` contiene l'esito in
      forma leggibile da un programma.
 
-     Limite: misura i colori calcolati, non le immagini di sfondo né i
-     gradienti. Un testo sopra un gradiente può passare qui e non nella
-     realtà. -->
+     Dal 24 agosto 2026 misura anche i **gradienti fra colori pieni**: prende
+     la fermata che dà il rapporto peggiore, perché il testo deve reggere su
+     tutta la larghezza del banner. I gradienti con fermate translucide restano
+     non misurabili: sono velature sopra altro, e il colore che si vede dipende
+     dalla geometria.
+
+     Limite di copertura, importante: si misura la **schermata d’ingresso** di
+     ogni tool. I titoli neri sui banner scuri delle riclassificazioni di
+     Analisi stavano in una vista interna e qui non si vedevano: quel caso lo
+     tiene `tests/banner-scuri.test.mjs`, che lavora sul CSS. -->
 <title>Verifica contrasto — Tax Automation Lab</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -119,7 +126,25 @@ function fondoOpaco(el, w) {
   let n = el;
   while (n && n.nodeType === 1) {
     const cs = w.getComputedStyle(n);
-    if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+      /* Un gradiente fra colori pieni si misura: si prende la fermata che
+         darebbe il rapporto peggiore, cioe' quella piu' vicina al colore del
+         testo. Se non ci sono fermate leggibili (un'immagine vera, un
+         `conic-gradient` con `var()` non risolte) resta «non misurabile». */
+      const crude = [...String(cs.backgroundImage).matchAll(/rgba?\(([^)]+)\)/g)]
+        .map((m) => m[1].split(',').map(Number));
+      /* Solo i gradienti fra colori **pieni** si misurano. Se anche una sola
+         fermata e' translucida, il gradiente e' una velatura sopra qualcos'altro
+         e il colore che si vede dipende dalla geometria: la sidebar dei tool e'
+         cosi' - due radiali `rgba(...,.3)` e `rgba(...,.62)` sopra il fondo -
+         e prendendo le fermate alla lettera risultava ciano chiaro, con
+         quarantacinque falsi allarmi in un colpo. */
+      if (!crude.length) return null;
+      if (crude.some((c) => c.length > 3 && c[3] < 1)) return null;
+      const fermate = crude.map((c) => c.slice(0, 3)).filter((c) => c.length === 3 && c.every((v) => !isNaN(v)));
+      if (!fermate.length) return null;
+      return fermate.map((c) => 'rgb(' + c.join(', ') + ')');
+    }
     const m = String(cs.backgroundColor).match(/[\d.]+/g);
     if (m) {
       const a = m.length < 4 ? 1 : Number(m[3]);
@@ -162,11 +187,20 @@ function analizza(frame, tool) {
     const r = el.getBoundingClientRect();
     if (r.width < 4 || r.height < 4) return;
     const lf = luminanza(cs.color);
-    const fondo = fondoOpaco(el, w);
-    if (fondo == null) { nonMisurabili++; return; }
-    const lb = luminanza(fondo);
-    if (lf == null || lb == null) return;
-    const rapporto = (Math.max(lf, lb) + 0.05) / (Math.min(lf, lb) + 0.05);
+    const risposta = fondoOpaco(el, w);
+    if (risposta == null) { nonMisurabili++; return; }
+    /* Un gradiente restituisce piu' fermate: vale la peggiore, cioe' quella
+       che da' il rapporto piu' basso. Il testo deve reggere su tutta la
+       larghezza del banner, non solo dove il fondo aiuta. */
+    const fondi = Array.isArray(risposta) ? risposta : [risposta];
+    let rapporto = Infinity, fondo = fondi[0];
+    for (const f of fondi) {
+      const lb = luminanza(f);
+      if (lf == null || lb == null) continue;
+      const r2 = (Math.max(lf, lb) + 0.05) / (Math.min(lf, lb) + 0.05);
+      if (r2 < rapporto) { rapporto = r2; fondo = f; }
+    }
+    if (!isFinite(rapporto)) return;
     if (rapporto >= SOGLIA) return;
     const chiave = el.tagName + '|' + (el.className || '') + '|' + cs.color + '|' + fondo;
     if (visti.has(chiave)) return;

@@ -116,7 +116,7 @@ html.tal-tool-page :is(h1,h2,h3):not(:is(header.top,footer.foot,.tal-site-footer
   background:none !important;
   border-radius:0 !important;
 }
-html.tal-tool-page h1:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) *){
+html.tal-tool-page h1:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid,.reclass-head,.advanced-head,.tal-on-dark) *){
   font-size:clamp(24px,3vw,30px) !important;
   font-weight:600 !important;
   line-height:1.15 !important;
@@ -126,7 +126,7 @@ html.tal-tool-page h1:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publi
   padding:0 !important;
   margin:0 0 6px !important;
 }
-html.tal-tool-page h2:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) *){
+html.tal-tool-page h2:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid,.reclass-head,.advanced-head,.tal-on-dark) *){
   font-size:18px !important;
   font-weight:650 !important;
   line-height:1.25 !important;
@@ -136,7 +136,7 @@ html.tal-tool-page h2:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publi
   padding:0 !important;
   margin:22px 0 8px !important;
 }
-html.tal-tool-page h3:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid) *){
+html.tal-tool-page h3:not(:is(header.top,footer.foot,.tal-site-footer,.tal-publication,.summary-bar,.toast,#sidebar,.vp-grid,.reclass-head,.advanced-head,.tal-on-dark) *){
   font-size:14.5px !important;
   font-weight:650 !important;
   color:var(--tal-ink) !important;

@@ -1812,3 +1812,30 @@ Finché resta così, alzare la versione di Analisi è un intervento a sé — tr
 sostituzioni di cui alcune dentro prosa storica («retained inside Financial
 Analysis 2.1.0») e una dentro il nome del template scaricabile, che vanno
 distinte a mano. Non farlo come coda di un'altra correzione.
+
+## Cosa arriva davvero dentro un .xlsx, 24 agosto 2026
+
+Misurato aprendo `xl/styles.xml` di una cartella scaricata e ripetuto in
+`tests/excel-cosa-arriva.test.mjs`, che **esegue la libreria vera estratta dal
+tool**. La copia di SheetJS che incorporiamo:
+
+| proprietà | arriva nel file? |
+|---|---|
+| formati numerici (`cell.z`) | **sì** |
+| larghezze di colonna (`!cols`) | **sì** |
+| celle unite (`!merges`) | **sì** |
+| filtro automatico (`!autofilter`) | **sì** |
+| stili di cella (`cell.s`: riempimenti, grassetto) | **no** |
+| blocco riquadri (`!freeze`) | **no** |
+
+Quindi: le dodici assegnazioni di `cell.s` in `financial-analysis` — l'intestazione
+scura, la scala di affidabilità dei KPI — e le tredici `!freeze` fra LIPE, F24 e
+Confronto regimi **non si vedono nel file scaricato**. Non sono un difetto dei
+tool: la libreria in scrittura le ignora. Si lasciano perché sono corrette e
+diventano vere il giorno in cui si passa a una build che gli stili li scrive.
+
+**Conseguenza pratica:** i colori per tematica, chiesti il 24 agosto, si possono
+dare nel PDF ma **non** nella cartella Excel. Lì la differenza la fanno il titolo
+in testa al foglio (unito per tutta la larghezza), il nome della scheda e il
+filtro automatico. Prima di aggiungere altre righe di stile aspettandosi un
+effetto, va cambiata la libreria — e il test lo dirà da solo.

@@ -2428,7 +2428,7 @@ function v18HardGate(){if(!STATE.loaded)return {ok:false,message:'Carica un bila
   if(aiBlocking.length)return {ok:false,message:`Export bloccato: ${aiBlocking.length} ${aiBlocking.length===1?'eccezione':'eccezioni'} bloccanti nel foglio «Esiti AI». Risolvile nel file e reimporta, oppure marcale come risolte.`};
   return {ok:true};}
 function v18RequireExportGate(){const g=v18HardGate();if(!g.ok){toast(g.message,true);return false;}return true;}
-function v18CleanPrintHtml(html,detail){let out=String(html||'').replace(/\s(onclick|ondragover|ondragleave|ondrop|ondragstart|ondragend)="[^"]*"/g,'').replace(/\sdraggable="true"/g,'');if(!detail)out=out.replace(/<tr class="reclass-detail[\s\S]*?<\/tr>/g,'');return out;}
+function v18CleanPrintHtml(html,detail){let out=String(html||'').replace(/\s(onclick|ondragover|ondragleave|ondrop|ondragstart|ondragend)="[^"]*"/g,'').replace(/\sdraggable="true"/g,'').replace(/<span class="caret">[^<]*<\/span>/g,'');if(!detail)out=out.replace(/<tr class="reclass-detail[\s\S]*?<\/tr>/g,'');return out;}
 function v18StatusStyle(status){const fill={green:'FFDDEEDD',yellow:'FFFFF0B8',orange:'FFFFD7C2',gray:'FFE6E6E6'}[status]||'FFFFFFFF';return {fill:{fgColor:{rgb:fill}},font:{color:{rgb:'FF17202A'}},alignment:{vertical:'center',wrapText:true}};}
 function v18FormatNumberCell(cell,unit){if(!cell||cell.t!=='n')return;if(unit==='%')cell.z='0.0%';else if(unit==='x')cell.z='0.00"x"';else if(unit==='giorni')cell.z='0.0';else cell.z='#,##0.00;[Red]-#,##0.00';}
 /* Le colonne si trovano leggendo l'intestazione, non contandole: questo
@@ -2482,7 +2482,7 @@ function v18WorkbookLineage(wb){if(!STATE.loaded)return;const input=[['Tipo','Co
 function v18Style(ws,headerRow=0){const range=ws['!ref']&&XLSX.utils.decode_range(ws['!ref']);if(!range)return;for(let c=range.s.c;c<=range.e.c;c++){const cell=ws[XLSX.utils.encode_cell({r:headerRow,c})];if(cell)cell.s={font:{bold:true,color:{rgb:'FFFFFFFF'}},fill:{fgColor:{rgb:'FF0E1624'}},alignment:{vertical:'center',wrapText:true}};}}
 async function v18Write(wb,filename,success){if(V18_EXPORT_BUSY){toast('Attendi il completamento dell’export in corso.',true);return false;}V18_EXPORT_BUSY=true;try{const ok=await writeWorkbookFile(wb,filename);if(ok)toast(success);return ok;}finally{V18_EXPORT_BUSY=false;}}
 exportExcel=async function(){if(!v18RequireExportGate())return;if(!STATE.loaded){toast('Carica un bilancio.',true);return;}const wb=XLSX.utils.book_new(),c=ceCore(),s=spCore(),syn=[['FINANCIAL ANALYSIS — SINTESI'],['Versione',V18_VERSION],['Società',STATE.company.name],['Identificativo',STATE.company.vat||STATE.company.cf||STATE.company.uuid],['Periodo',`${STATE.company.periodFrom} / ${STATE.company.periodTo}`],['File origine',STATE.files.main],['Validazione import','SUPERATA'],[],['Ricavi',c.rev],['EBITDA',c.ebitda],['EBIT',c.ebit],['Risultato netto',c.net],['CCN',s.ccn],['CCNO',s.ccno],['PFN',s.pfn],['CIN operativo',s.cin],['Riconciliazione CIN-fonti',s.reconciliation],['Quadratura SP',s.balanceDifference]],wsS=XLSX.utils.aoa_to_sheet(syn);wsS['!cols']=[{wch:40},{wch:34}];v18Style(wsS,0);XLSX.utils.book_append_sheet(wb,wsS,'Sintesi');mappedSections().forEach((sec,i)=>{const rows=v18WorkbookReclassRows(sec),ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:58},{wch:18},{wch:18},{wch:18},{wch:14}];v18Style(ws,0);v18FormatReclassSheet(ws,rows);XLSX.utils.book_append_sheet(wb,ws,safeSheet(`${i+1}_${sec[0]}`));});const ks=makeKpis(),kpiRows=[['Codice','Famiglia','KPI','Valore','Unità','Formula','Affidabilità','Nota','Segnalazione'],...ks.map(k=>[k.code,k.family,k.name,k.value??'',k.unit,k.formula,kpiStatusLabel(k.status),k.note||'',k.issue||''])],wsK=XLSX.utils.aoa_to_sheet(kpiRows);wsK['!cols']=[{wch:24},{wch:18},{wch:42},{wch:16},{wch:10},{wch:65},{wch:20},{wch:90},{wch:90}];v18Style(wsK,0);v18FormatKpiSheet(wsK,kpiRows);XLSX.utils.book_append_sheet(wb,wsK,'KPI');const map=[['Metodologia','Codice','Descrizione','Voce IV','Destinazione','Corrente','Precedente','Origine']];Array.from(STATE.selected).filter(x=>SCHEME_TARGETS[x]).forEach(scheme=>relevantGroups(STATE.accounts,SCHEME_TARGETS[scheme].type).forEach(g=>{const custom=!!(STATE.reclassMap&&STATE.reclassMap[scheme]&&STATE.reclassMap[scheme][g.key]);getAllocations(scheme,g,false).forEach(a=>map.push([SCHEME_TARGETS[scheme].label||scheme,g.code,g.desc,g.iv,TARGET_LABELS[a.target]||a.target,a.current,a.previous,custom?'Manuale':'Automatica']));}));const wsM=XLSX.utils.aoa_to_sheet(map);wsM['!cols']=[{wch:38},{wch:18},{wch:48},{wch:18},{wch:45},{wch:18},{wch:18},{wch:14}];v18Style(wsM,0);XLSX.utils.book_append_sheet(wb,wsM,'Mappatura analitica');v18WorkbookLineage(wb);await v18Write(wb,`FinancialAnalysis_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Working paper Excel generato e verificato lato browser.');};
-exportKpiExcel=async function(){if(!v18RequireExportGate())return;if(!STATE.loaded){toast('Carica un bilancio.',true);return;}const ks=makeKpis(),desc=typeof v20KpiDescription==='function'?v20KpiDescription:()=>'',wb=XLSX.utils.book_new(),rows=[['Codice','Famiglia','Indicatore','Descrizione operativa','Valore','Unità','Formula','Affidabilità','Nota','Segnalazione'],...ks.map(k=>[k.code,k.family,k.name,desc(k),k.value??'',k.unit,k.formula,kpiStatusLabel(k.status),k.note||'',k.issue||''])],ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:24},{wch:20},{wch:38},{wch:70},{wch:16},{wch:12},{wch:55},{wch:20},{wch:80},{wch:80}];v18Style(ws,0);v18FormatKpiSheet(ws,rows);XLSX.utils.book_append_sheet(wb,ws,'KPI');await v18Write(wb,`KPI_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Report KPI Excel generato.');};
+exportKpiExcel=async function(){if(!v18RequireExportGate())return;if(!STATE.loaded){toast('Carica un bilancio.',true);return;}const ks=makeKpis(),desc=typeof v20KpiDescription==='function'?v20KpiDescription:()=>'',wb=XLSX.utils.book_new(),rows=[['Codice','Famiglia','Indicatore','Descrizione operativa','Valore','Unità','Formula','Affidabilità','Nota','Segnalazione'],...ks.map(k=>[k.code,k.family,k.name,desc(k),k.value??'',k.unit,k.formula,kpiStatusLabel(k.status),k.note||'',k.issue||''])],ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:24},{wch:20},{wch:38},{wch:70},{wch:16},{wch:12},{wch:55},{wch:20},{wch:80},{wch:80}];v18Style(ws,0);v18FormatKpiSheet(ws,rows);/* Stesso filtro del foglio KPI dentro il working paper: gli stessi 42 indicatori si filtrano allo stesso modo da qualunque pulsante escano. */{const rif=XLSX.utils.decode_range(ws['!ref']||'A1:A1');if(rif.e.r>0)ws['!autofilter']={ref:'A1:'+XLSX.utils.encode_cell({r:rif.e.r,c:rif.e.c})};}XLSX.utils.book_append_sheet(wb,ws,'KPI');await v18Write(wb,`KPI_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Report KPI Excel generato.');};
 exportCashFlowExcel=async function(){if(!v18RequireExportGate())return;const m=cashFlowModel();if(!m.available){toast(m.reason,true);return;}const wb=XLSX.utils.book_new(),rows=[['CASH-CONVERSION PROXY — NON OIC 10'],['Società',STATE.company.name],['Periodo',`${STATE.company.periodFrom} / ${STATE.company.periodTo}`],[],['Voce','Importo','Base'],['Cassa iniziale',m.openingCash,'Bilancio comparativo'],['Flusso operativo',m.cfo,'Proxy gestionale'],['Flusso investimento',m.cfi,'Proxy / input'],['Flusso finanziamento',m.cff,'Proxy / input'],['Altri movimenti documentati',m.otherUnreconstructed,'Solo input utente'],['Variazione calcolata',m.calculatedChange],['Variazione effettiva',m.actualChange],['Differenza non spiegata',m.residual],['Cassa finale',m.closingCash],[],['Assunzioni'],...m.assumptions.map(x=>[x])],ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:52},{wch:20},{wch:90}];v18Style(ws,4);XLSX.utils.book_append_sheet(wb,ws,'Cash conversion proxy');await v18Write(wb,`Cash_Conversion_Proxy_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Prospetto cash-conversion Excel generato.');};
 exportAdequacyExcel=async function(){if(!v18RequireExportGate())return;const m=adequacyModel();if(!m.available){toast(m.reason,true);return;}const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([['DIAGNOSTICA PRELIMINARE — NON PARERE LEGALE'],['Società',STATE.company.name],['Periodo',`${STATE.company.periodFrom} / ${STATE.company.periodTo}`],[],['Indicatore','Valore','Unità','Formula','Qualità','Nota'],...m.metrics.map(x=>[x.name,x.value??'',x.unit,x.formula,kpiStatusLabel(x.quality),x.note])]);ws['!cols']=[{wch:50},{wch:18},{wch:12},{wch:72},{wch:20},{wch:95}];v18Style(ws,4);XLSX.utils.book_append_sheet(wb,ws,'Diagnostica preliminare');await v18Write(wb,`Diagnostica_Preliminare_${safeFile(STATE.company.name)}_${STATE.company.yearCurrent}.xlsx`,'Diagnostica Excel generata.');};
 exportHistoryExcel=async function(){if(!v18RequireExportGate())return;const rows=historyMetrics();if(!rows.length){toast('Nessuna serie storica.',true);return;}const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([['Anno','Fonte','Ricavi','EBITDA','EBIT','Utile','PN','PFN','CCN','ROE','PFN/EBITDA','Base'],...rows.map(x=>[x.year,x.source,x.revenue,x.ebitda,x.ebit,x.net,x.equity,x.pfn,x.ccn,x.roe??'',x.pfnEbitda??'',x.basis])]);ws['!cols']=[{wch:12},{wch:48},...Array(9).fill({wch:18}),{wch:50}];v18Style(ws,0);XLSX.utils.book_append_sheet(wb,ws,'Serie storica');await v18Write(wb,`Serie_Storica_${safeFile(STATE.company.name)}.xlsx`,'Serie storica Excel generata.');};
@@ -2492,7 +2492,7 @@ exportAdvancedExcel=async function(){if(!v18RequireExportGate())return;const wb=
    per usare il tool non ci devono stare. Si tengono le frasi di metodo, si
    buttano quelle che parlano dell'interfaccia. */
 const TAL_FRASE_OPERATIVA=/^(apri |trascina |clicca|premi |seleziona |usa (il|la|le) |passa il mouse|doppio clic|le modifiche sono salvate|il lavoro (viene|e') salvat|stampa browser)/i;
-window.talNotaDiMetodo=talNotaDiMetodo;
+window.talNotaDiMetodo=talNotaDiMetodo;window.talTemaSezione=function(t){return talTemaSezione(t);};
 function talNotaDiMetodo(nota){
   return String(nota||'').split(/(?<=[.!?])\s+/)
     .filter(function(f){return f.trim() && !TAL_FRASE_OPERATIVA.test(f.trim());})
@@ -2714,11 +2714,46 @@ centerAccounts=function(center){
 /* Il working paper vivo passa di qui, non da `safeSheet`: la regola pero' e'
    una sola, quindi si delega. Cosi' non torna a divergere. */
 function v20SheetName(v){return safeSheet(String(v||'Foglio'))||'Foglio';}
+/* Le stesse quattro tinte dello schermo e del PDF: in una cartella che contiene
+   stato patrimoniale, conto economico e posizione finanziaria, le schede si
+   devono distinguere anche da chiuse. */
+function v20MettiFiltro(ws){
+  const rif=XLSX.utils.decode_range(ws['!ref']||'A1:A1');
+  if(rif.e.r<1)return ws;
+  ws['!autofilter']={ref:'A1:'+XLSX.utils.encode_cell({r:rif.e.r,c:rif.e.c})};
+  return ws;
+}
+const V20_TINTE={sp:'FF0C3341',ce:'FF1D6A7F',pfn:'FF244C45',adjusted:'FF704116'};
+function v20VestiFoglio(ws,titolo,salto,nota){
+  const tema=window.talTemaSezione?window.talTemaSezione(titolo):'sp';
+  const tinta=V20_TINTE[tema]||V20_TINTE.sp;
+  const rif=XLSX.utils.decode_range(ws['!ref']||'A1:A1');
+  const t=ws['A1'];
+  if(t)t.s={font:{bold:true,sz:13,color:{rgb:'FFFFFFFF'}},fill:{fgColor:{rgb:tinta}},alignment:{vertical:'center'}};
+  ws['!merges']=(ws['!merges']||[]).concat([{s:{r:0,c:0},e:{r:0,c:rif.e.c}}]);
+  ws['!rows']=ws['!rows']||[];ws['!rows'][0]={hpt:24};
+  if(nota&&ws['A2']){ws['A2'].s={font:{italic:true,color:{rgb:'FF4A4A4A'}},alignment:{vertical:'center'}};
+    ws['!merges'].push({s:{r:1,c:0},e:{r:1,c:rif.e.c}});}
+  for(let c=0;c<=rif.e.c;c++){const cell=ws[XLSX.utils.encode_cell({r:salto,c})];
+    if(cell)cell.s={font:{bold:true,color:{rgb:'FFFFFFFF'}},fill:{fgColor:{rgb:tinta}},alignment:{vertical:'center',wrapText:true}};}
+  /* Il filtro sulla riga di intestazione: e' la cosa che di un prospetto si usa
+     davvero - ordinare, filtrare, copiare via - ed e' fra le poche che la
+     libreria scrive per davvero. */
+  if(rif.e.r>salto)ws['!autofilter']={ref:XLSX.utils.encode_cell({r:salto,c:0})+':'+XLSX.utils.encode_cell({r:rif.e.r,c:rif.e.c})};
+  /* Gli `s` qui sopra oggi **non arrivano nel file**: la copia di SheetJS che
+     incorporiamo non scrive gli stili - verificato leggendo `xl/styles.xml`
+     della cartella prodotta, che contiene i due riempimenti di sistema e basta.
+     Si lasciano perche' sono corretti e diventano veri il giorno in cui si
+     passa a una build che li scrive; quello che oggi si vede davvero e' il
+     titolo in testa al foglio, unito per tutta la larghezza. Non aggiungere
+     altre righe di stile aspettandosi un effetto: prima va cambiata la libreria.
+     Anche `!freeze` non sopravvive, ed e' per questo che qui non c'e'. */
+}
 function v20ReclassRows(section){
   const first=v20FirstYear(),rows=[['Voce',STATE.company.yearCurrent,first?'N/D':STATE.company.yearPrevious,'Variazione','Var. %','Inc. corrente','Inc. precedente']];
   const table=document.createElement('table');table.innerHTML=`<tbody>${String(section?.[1]||'')}</tbody>`;
   const sec=String(section?.[0]||'').toLowerCase(),denCur=sec.includes('patrimon')?Math.abs(spCore().totalAssets):Math.abs(ceCore().production||ceCore().rev),denPrev=sec.includes('patrimon')?Math.abs(spCore(STATE.accounts,'previous').totalAssets):Math.abs(ceCore(STATE.accounts,'previous').production||ceCore(STATE.accounts,'previous').rev);
-  table.querySelectorAll('tr').forEach(tr=>{if(tr.classList.contains('reclass-detail'))return;const td=Array.from(tr.children).filter(x=>x.tagName==='TD');if(td.length<5)return;const cur=parseNumber(td[1].textContent),prev=first?'':parseNumber(td[2].textContent),variation=first?'':parseNumber(td[3].textContent),vp=first?'':(td[4].textContent.trim()==='—'?'':parseNumber(td[4].textContent)/100);rows.push([td[0].textContent.replace(/\s+/g,' ').trim(),cur,prev,variation,vp,denCur?cur/denCur:'',!first&&denPrev?prev/denPrev:'']);});
+  table.querySelectorAll('tr').forEach(tr=>{if(tr.classList.contains('reclass-detail'))return;const td=Array.from(tr.children).filter(x=>x.tagName==='TD');if(td.length<5)return;const cur=parseNumber(td[1].textContent),prev=first?'':parseNumber(td[2].textContent),variation=first?'':parseNumber(td[3].textContent),vp=first?'':(td[4].textContent.trim()==='—'?'':parseNumber(td[4].textContent)/100);rows.push([td[0].textContent.replace(/\s+/g,' ').replace(/^[▸▾▪●·]\s*/,'').trim(),cur,prev,variation,vp,denCur?cur/denCur:'',!first&&denPrev?prev/denPrev:'']);});
   return rows;
 }
 function v20DashboardRows(){
@@ -2729,9 +2764,22 @@ function v20DashboardRows(){
 exportExcel=async function(){
   if(!STATE.loaded){toast('Carica un bilancio.',true);return;}if(typeof v18RequireExportGate==='function'&&!v18RequireExportGate())return;
   const wb=XLSX.utils.book_new(),dash=XLSX.utils.aoa_to_sheet(v20DashboardRows());dash['!cols']=[{wch:42},{wch:22},{wch:22},{wch:22}];XLSX.utils.book_append_sheet(wb,dash,'Dashboard');
-  mappedSections().forEach((s,i)=>{const rows=v20ReclassRows(s),ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:58},{wch:18},{wch:18},{wch:18},{wch:13},{wch:15},{wch:15}];for(let r=2;r<=rows.length;r++){['B','C','D'].forEach(col=>{if(ws[col+r])ws[col+r].z='#,##0.00;[Red]-#,##0.00';});['E','F','G'].forEach(col=>{if(ws[col+r])ws[col+r].z='0.0%';});}XLSX.utils.book_append_sheet(wb,ws,v20SheetName(`${i+1}_${s[0]}`));});
-  const ks=makeKpis(),desc=typeof v20KpiDescription==='function'?v20KpiDescription:()=>'';const kpiRighe=[['Codice','Famiglia','Indicatore','Descrizione operativa','Valore','Unità','Formula','Affidabilità','Nota','Segnalazione'],...ks.map(k=>[k.code,k.family,k.name,desc(k),k.value??'',k.unit,k.formula,kpiStatusLabel(k.status),k.note||'',k.issue||''])];const wsK=XLSX.utils.aoa_to_sheet(kpiRighe);wsK['!cols']=[{wch:24},{wch:20},{wch:38},{wch:70},{wch:16},{wch:12},{wch:55},{wch:20},{wch:80},{wch:80}];XLSX.utils.book_append_sheet(wb,wsK,'KPI');
-  const wsM=XLSX.utils.aoa_to_sheet([['Chiave tecnica','Codice ERP','Descrizione','Sezione','Voce IV','Corrente','Precedente'],...STATE.accounts.map(a=>[accountKey(a),a.code,a.desc,a.type,a.iv,a.current,v20FirstYear()?'':a.previous])]);wsM['!cols']=[{wch:55},{wch:18},{wch:50},{wch:12},{wch:18},{wch:18},{wch:18}];XLSX.utils.book_append_sheet(wb,wsM,'Mappatura conti');
+  mappedSections().forEach((s,i)=>{
+    /* Un foglio e' un documento: prima il titolo per esteso - il nome della
+       scheda e' abbreviato per stare nei 31 caratteri di Excel - poi la nota di
+       metodo se ce n'e' una, poi una riga vuota, poi la tabella. */
+    const griglia=v20ReclassRows(s);
+    const nota=window.talNotaDiMetodo?window.talNotaDiMetodo(s[2]):'';
+    const testa=[[s[0]]];if(nota)testa.push([nota]);testa.push([]);
+    const salto=testa.length,rows=testa.concat(griglia);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:58},{wch:18},{wch:18},{wch:18},{wch:13},{wch:15},{wch:15}];
+    for(let r=salto+2;r<=rows.length;r++){['B','C','D'].forEach(col=>{if(ws[col+r])ws[col+r].z='#,##0.00;[Red]-#,##0.00';});
+      ['E','F','G'].forEach(col=>{if(ws[col+r])ws[col+r].z='0.0%';});}
+    v20VestiFoglio(ws,s[0],salto,nota);
+    XLSX.utils.book_append_sheet(wb,ws,v20SheetName(`${i+1}_${s[0]}`));});
+  const ks=makeKpis(),desc=typeof v20KpiDescription==='function'?v20KpiDescription:()=>'';const kpiRighe=[['Codice','Famiglia','Indicatore','Descrizione operativa','Valore','Unità','Formula','Affidabilità','Nota','Segnalazione'],...ks.map(k=>[k.code,k.family,k.name,desc(k),k.value??'',k.unit,k.formula,kpiStatusLabel(k.status),k.note||'',k.issue||''])];const wsK=XLSX.utils.aoa_to_sheet(kpiRighe);wsK['!cols']=[{wch:24},{wch:20},{wch:38},{wch:70},{wch:16},{wch:12},{wch:55},{wch:20},{wch:80},{wch:80}];XLSX.utils.book_append_sheet(wb,v20MettiFiltro(wsK),'KPI');
+  const wsM=XLSX.utils.aoa_to_sheet([['Chiave tecnica','Codice ERP','Descrizione','Sezione','Voce IV','Corrente','Precedente'],...STATE.accounts.map(a=>[accountKey(a),a.code,a.desc,a.type,a.iv,a.current,v20FirstYear()?'':a.previous])]);wsM['!cols']=[{wch:55},{wch:18},{wch:50},{wch:12},{wch:18},{wch:18},{wch:18}];XLSX.utils.book_append_sheet(wb,v20MettiFiltro(wsM),'Mappatura conti');
   /* Le eccezioni dell'AI escono col working paper: se non le riporti qui, chi
      legge il file non sa che il dato di partenza era dichiarato incerto. Il
      foglio c'è anche quando è vuoto, così l'assenza di dubbi è dichiarata e

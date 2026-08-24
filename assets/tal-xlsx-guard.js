@@ -222,6 +222,37 @@
      Perche' sta qui e non nei generatori: i fogli nascono in punti diversi del
      file - e in Analisi in piu' definizioni sovrapposte - mentre la scrittura
      passa da un punto solo. Nessun formato gia' impostato viene sovrascritto. */
+  /* Il filtro sulla riga di intestazione. Fra le proprieta' di foglio, questa la
+     libreria la scrive davvero: `!freeze` e gli stili no (vedi CONTESTO e
+     `tests/excel-cosa-arriva.test.mjs`).
+
+     Conservativa: intestazione fatta solo di testo, almeno due colonne, almeno
+     quattro righe di dati. Su un elenco chiave/valore o su tre righe il filtro
+     e' rumore. */
+  function mettiFiltro(ws){
+    if(!ws||ws['!autofilter'])return;
+    const range=sheetRange(ws);
+    if(!range||range.e.c<2)return;
+    for(let r=range.s.r;r<=Math.min(range.s.r+4,range.e.r);r++){
+      let testo=0,piene=0;
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=cellAt(ws,r,c);
+        if(!cell||cell.v==null||cell.v==='')continue;
+        piene++;
+        if(cell.t==='s')testo++;
+      }
+      /* Tre colonne come minimo: un elenco chiave/valore - «Parametri usati»,
+         «Sintesi» - non e' una tabella da filtrare, e con due sole colonne il
+         filtro finiva anche li'. */
+      if(piene<3||piene!==testo)continue;
+      /* trovata: sotto devono esserci abbastanza righe da filtrare */
+      if(range.e.r-r<4)return;
+      ws['!autofilter']={ref:window.XLSX.utils.encode_cell({r:r,c:range.s.c})+':'
+        +window.XLSX.utils.encode_cell({r:range.e.r,c:range.e.c})};
+      return;
+    }
+  }
+
   function polishFinancialAnalysisWorkbook(wb){
     if(!wb||!wb.Sheets||!window.XLSX||!window.XLSX.utils)return wb;
     try{
@@ -231,6 +262,7 @@
         polishByUnit(wb.Sheets[n]);
         polishDeclaredMoney(wb.Sheets[n]);
         polishKeyValue(wb.Sheets[n]);
+        mettiFiltro(wb.Sheets[n]);
         /* Larghezze solo dove non ci sono: il prospetto di deposito usciva senza,
            e le voci del bilancio finivano tagliate a meta'. */
         const ws=wb.Sheets[n],range=sheetRange(ws);
@@ -332,7 +364,7 @@
     if(originalWriteFileXLSX)window.XLSX.writeFileXLSX=guardedWriteFile;
     Object.defineProperty(window.XLSX,'__talBinaryGuardInstalled',{value:true,configurable:false});
     window.TALXlsxGuard=Object.freeze({
-      version:'1.5.0',
+      version:'1.6.0',
       toBytes:toBytes,
       assertXlsx:assertXlsx,
       downloadBytes:downloadBytes,

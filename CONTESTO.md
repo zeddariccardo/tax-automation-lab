@@ -23,18 +23,25 @@ Sono mutuamente esclusivi e non possono contaminarsi:
 |---|---|---|
 | `assets/tal-design.css` | 58 pagine editoriali | `html:not(.tal-tool-page)` |
 | `assets/tal-experience.js` | idem | sfondo animato, comparsa allo scroll |
-| `assets/tal-app.css` | 5 applicazioni | `html.tal-tool-page` |
+| `assets/tal-app.css` | 6 applicazioni | `html.tal-tool-page` |
 | `assets/tal-app.js` | idem | barra comandi condivisa |
+| `assets/tal-xlsx-guard.js` | idem | rifinisce le cartelle Excel in uscita |
+| `assets/tal-focus-guard.js` | idem | tastiera e nome delle finestre di dialogo |
 
-Gli indirizzi portano `?v=20260812` (`?v=20260814` su `tal-app.css` e
-`tal-app.js` nei cinque tool): **va incrementato a ogni modifica dei
-fogli**, altrimenti i browser di chi ha già visitato il sito servono la versione
-vecchia.
+Gli indirizzi portano tutti un `?v=` con la data: **va incrementato a ogni
+modifica**, altrimenti i browser di chi ha già visitato il sito servono la
+versione vecchia. Vale anche per le due guardie.
 
 `tal-app.js` non è più solo la barra comandi: dalla 2.0 tiene anche la barra di
 sessione unica, lo spostamento di «Informazioni sullo strumento» dentro «Come si
 usa», la tinta dei pulsanti per etichetta e l'apertura di «Configura con AI» in
 scheda nuova. Vedi la sezione del 14 agosto in fondo.
+
+Le due **guardie** non conoscono i tool: si agganciano a quello che trovano in
+pagina — `XLSX.writeFile` l’una, un `role="dialog"` visibile l’altra — e
+correggono in un posto solo quello che altrimenti andrebbe corretto sei volte.
+Se un tool nuovo non le carica, `tests/finestre.test.mjs` e
+`tests/vendored-libraries.test.mjs` se ne accorgono.
 
 Documentazione di dettaglio: `assets/tal-design.README.md`.
 

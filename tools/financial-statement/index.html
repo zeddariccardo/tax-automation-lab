@@ -7,7 +7,7 @@ Official source: https://taxautomationlab.com/tools/financial-statement/
 -->
 
 
-<html class="tal-tool-page" data-tool-version="1.4.1" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.2" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -497,7 +497,7 @@ tr.raw-split .split-to{color:var(--fg);font-weight:600}
   "operatingSystem": "Web browser",
   "browserRequirements": "JavaScript enabled; modern desktop or mobile browser",
   "isAccessibleForFree": true,
-  "softwareVersion": "1.4.1",
+  "softwareVersion": "1.4.2",
   "inLanguage": "it-IT",
   "author": {
     "@type": "Person",
@@ -659,7 +659,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Bilancio civilistico ITA GAAP · v1.4.1</span>
+<span class="tal-publication-label" data-tal-key="label">Bilancio civilistico ITA GAAP · v1.4.2</span>
 <h2 data-tal-key="title">Bilancio civilistico italiano, da dati contabili IAS/IFRS o gestionali</h2>
 <p data-tal-key="lead">Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mappatura, rettifiche, controlli e dettaglio per conto.</p>
 <div class="tal-publication-facts">
@@ -1946,7 +1946,7 @@ function downloadTemplate(){
   const wsCE=XLSX.utils.aoa_to_sheet(ceH.concat(ceEx)); wsCE['!cols']=[{wch:16},{wch:40},{wch:22},{wch:22},{wch:18}];
   XLSX.utils.book_append_sheet(wb,wsCE,'Conto Economico');
 
-  XLSX.writeFile(wb,'Template_TaxTool_FS.xlsx');
+  XLSX.writeFile(wb,'Template_Bilancio_TaxAutomationLab.xlsx');
   toast('Template scaricato');
 }
 
@@ -2526,7 +2526,7 @@ function exportExcel(){
     const wsSt=XLSX.utils.aoa_to_sheet(aoaSt); wsSt['!cols']=[{wch:14},{wch:12},{wch:40},{wch:12},{wch:40},{wch:14},{wch:30},{wch:10}]; XLSX.utils.book_append_sheet(wb,wsSt,'Storni');
   }
   const safe=(g('an_denom')||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);
-  XLSX.writeFile(wb,`TaxTool_FS_${r.mode==='ordinary'?'Ordinario':'Abbreviato'}_${safe}.xlsx`);
+  XLSX.writeFile(wb,`Bilancio_WorkingPaper_${r.mode==='ordinary'?'Ordinario':'Abbreviato'}_${safe}.xlsx`);
   toast('Working paper esportato');
 }
 
@@ -2638,7 +2638,7 @@ function openBlankSchema(){
   doc.autoTable({head:[['Stato Patrimoniale — Passivo e PN','€']],body:rowsOf('sp_passivo','Totale passivo'),styles:{font:'helvetica',fontSize:8.5,cellPadding:1.6},headStyles:{fillColor:[202,223,240],textColor:[20,20,20]},columnStyles:{1:{cellWidth:40}}});
   doc.addPage(); doc.setFont('times','italic'); doc.setFontSize(16); doc.text('Conto Economico',20,20);
   doc.autoTable({startY:26,head:[['Voce','€']],body:rowsOf('ce'),styles:{font:'helvetica',fontSize:8.5,cellPadding:1.6},headStyles:{fillColor:[202,223,240],textColor:[20,20,20]},columnStyles:{1:{cellWidth:40}}});
-  doc.save('Schema_TaxTool_FS_'+(mode==='ordinary'?'ordinario':'abbreviato')+'.pdf');
+  doc.save('Bilancio_Schema_vuoto_'+(mode==='ordinary'?'ordinario':'abbreviato')+'.pdf');
   toast('Schema vuoto esportato');
 }
 
@@ -3040,7 +3040,7 @@ renderSavedList();
       var unm=[['Conto','Descrizione','Sezione','Importo corrente €','Importo precedente €','Motivo']];r.unmapped.forEach(function(a){unm.push([a.code,a.desc,a.source==='ce'?'CE':'SP',round2(a.importo),round2(a.importo_prev),a.reason||'']);});var wsU=XLSX.utils.aoa_to_sheet(unm);wsU['!cols']=[{wch:16},{wch:44},{wch:10},{wch:20},{wch:20},{wch:48}];XLSX.utils.book_append_sheet(wb,wsU,'Conti non mappati');
       if(STATE.adjustments&&STATE.adjustments.length){var ad=[['Rettifica','Attiva','Voce','Descrizione voce','Dare corrente €','Avere corrente €','Dare precedente €','Avere precedente €','Nota']];STATE.adjustments.forEach(function(a){(a.lines||[]).forEach(function(l,i){ad.push([i===0?(a.desc||''):'',i===0?(a.active!==false?'Sì':'No'):'',l.leaf,l.leaf?labelForCode(l.leaf):'',l.dare?round2(l.dare):'',l.avere?round2(l.avere):'',l.darePrev?round2(l.darePrev):'',l.averePrev?round2(l.averePrev):'',i===0?(a.note||''):'']);});});var wsAd=XLSX.utils.aoa_to_sheet(ad);wsAd['!cols']=[{wch:38},{wch:9},{wch:15},{wch:58},{wch:18},{wch:18},{wch:18},{wch:18},{wch:36}];XLSX.utils.book_append_sheet(wb,wsAd,'Rettifiche IAS-OIC');}
       if(STATE.storni&&STATE.storni.length){var st=[['Importo corrente €','Importo precedente €','Da voce','Da descrizione','A voce','A descrizione','Conto rif.','Nota','Da verificare']];STATE.storni.forEach(function(x){st.push([round2(+x.amount||0),round2(+x.amountPrev||0),x.fromLeaf||'',x.fromLeaf?labelForCode(x.fromLeaf):'',x.toLeaf||'',x.toLeaf?labelForCode(x.toLeaf):'',x.accCode||'',x.note||'',stornoUnbalances(x)?'Sì':'No']);});var wsSt=XLSX.utils.aoa_to_sheet(st);wsSt['!cols']=[{wch:18},{wch:18},{wch:14},{wch:45},{wch:14},{wch:45},{wch:16},{wch:36},{wch:14}];XLSX.utils.book_append_sheet(wb,wsSt,'Storni');}
-      var safe=(g('an_denom')||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);XLSX.writeFile(wb,'TaxTool_FS_'+(r.mode==='ordinary'?'Ordinario':'Abbreviato')+'_'+safe+'.xlsx');toast('Working paper esportato');
+      var safe=(g('an_denom')||'bilancio').replace(/[^\w]+/g,'_').slice(0,40);XLSX.writeFile(wb,'Bilancio_WorkingPaper_'+(r.mode==='ordinary'?'Ordinario':'Abbreviato')+'_'+safe+'.xlsx');toast('Working paper esportato');
     }catch(e){console.error(e);toast('Esportazione Excel non riuscita: '+e.message,true);}
   };
 
@@ -3069,7 +3069,7 @@ renderSavedList();
       rows=rows.concat(ceRowsFor(['IMP']));
       rows.push({label:"Utile (perdita) dell'esercizio",amount:r.ceTotals.utileEsercizio,amountPrev:r.ceTotalsPrev.utileEsercizio,lvl:0});
       body(rows,30);
-      var pages=doc.getNumberOfPages();for(var i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(120);doc.text(V13.pdfSafeText('Bilancio civilistico ITA GAAP \u00b7 elaborazione locale'),14,291);doc.text(i+' / '+pages,196,291,{align:'right'});}var safe=den.replace(/[^\w]+/g,'_').slice(0,40),yr=(g('an_periodo_a')||'').slice(0,4)||'anno';doc.save('Bilancio_TaxTool_FS_'+(r.mode==='ordinary'?'Ordinario':'Abbreviato')+'_'+yr+'_'+safe+'.pdf');toast('PDF esportato');
+      var pages=doc.getNumberOfPages();for(var i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(120);doc.text(V13.pdfSafeText('Bilancio civilistico ITA GAAP \u00b7 elaborazione locale'),14,291);doc.text(i+' / '+pages,196,291,{align:'right'});}var safe=den.replace(/[^\w]+/g,'_').slice(0,40),yr=(g('an_periodo_a')||'').slice(0,4)||'anno';doc.save('Bilancio_Prospetto_'+(r.mode==='ordinary'?'Ordinario':'Abbreviato')+'_'+yr+'_'+safe+'.pdf');toast('PDF esportato');
     }catch(e){console.error(e);toast('Esportazione PDF non riuscita: '+e.message,true);}
   };
 
@@ -3087,7 +3087,7 @@ renderSavedList();
       tbl('sp_passivo',y+1);
       docTitle('Conto Economico');
       tbl('ce',30);
-      doc.save('Schema_TaxTool_FS_'+(mode==='ordinary'?'ordinario':'abbreviato')+'.pdf');toast('Schema vuoto esportato');
+      doc.save('Bilancio_Schema_vuoto_'+(mode==='ordinary'?'ordinario':'abbreviato')+'.pdf');toast('Schema vuoto esportato');
     }catch(e){console.error(e);toast('Errore schema PDF: '+e.message,true);}
   };
 
@@ -3302,7 +3302,7 @@ renderSavedList();
 /* Sorgente unica del numero di versione: interfaccia, backup ed export
    leggono tutti di qui. I commenti di blocco tengono la versione in cui il
    blocco è nato — è storia, non lo stato corrente. */
-const FS_PATCH_VERSION=(window.FS_VERSION='1.4.1');
+const FS_PATCH_VERSION=(window.FS_VERSION='1.4.2');
 const BAL_TOL=0.01;
 
 function fsAddVoce(list,code,label){if(!list.some(v=>v.code===code))list.push({code:code,label:label,sec:'ce'});window.CODE_SECTION[code]='ce';}
@@ -3478,7 +3478,7 @@ if(STATE.accounts&&STATE.accounts.length)refreshAll();
 })();
 </script><script id="tal-publication-i18n">
 (function(){
- const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio civilistico ITA GAAP · v1.4.1","title":"Bilancio civilistico italiano, da dati contabili IAS/IFRS o gestionali","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mappatura, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mappatura e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Italian statutory statements · ITA GAAP · v1.4.1","title":"Italian statutory financial statements from IAS/IFRS or management accounts","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros italianos · ITA GAAP · v1.4.1","title":"Estados financieros estatutarios italianos desde datos IAS/IFRS o de gestión","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
+ const copy={"it":{"summary":"Informazioni sullo strumento","label":"Bilancio civilistico ITA GAAP · v1.4.2","title":"Bilancio civilistico italiano, da dati contabili IAS/IFRS o gestionali","lead":"Trasforma trial balance e balance sheet gestionali in Stato Patrimoniale e Conto Economico civilistici, mantenendo mappatura, rettifiche, controlli e dettaglio per conto.","facts":["Input: Excel, mappatura e anagrafica","Output: SP, CE, Excel e PDF","Controlli: quadrature e non mappati","Dati: elaborazione locale"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"Italian statutory statements · ITA GAAP · v1.4.2","title":"Italian statutory financial statements from IAS/IFRS or management accounts","lead":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail.","facts":["Input: Excel, mapping and company data","Output: Balance Sheet, Income Statement, Excel and PDF","Controls: reconciliations and unmapped accounts","Data: local processing"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"Estados financieros italianos · ITA GAAP · v1.4.2","title":"Estados financieros estatutarios italianos desde datos IAS/IFRS o de gestión","lead":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta.","facts":["Input: Excel, mapping y datos de la sociedad","Output: balance, cuenta de resultados, Excel y PDF","Controles: cuadres y cuentas no mapeadas","Datos: procesamiento local"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
  const seo={"it":{"title":"Bilancio civilistico ITA GAAP | Tax Automation Lab","description":"Tool gratuito per riclassificare trial balance e bilanci IAS/IFRS secondo gli schemi civilistici italiani, con mappatura dei conti, rettifiche, quadrature, archivio clienti ed esportazione Excel e PDF."},"en":{"title":"Italian statutory financial statements · ITA GAAP | Tax Automation Lab","description":"Transforms management trial balances and balance sheets into Italian statutory Balance Sheet and Income Statement formats, preserving mapping, adjustments, controls and account-level detail."},"es":{"title":"Estados financieros italianos · ITA GAAP | Tax Automation Lab","description":"Transforma trial balances y balances de gestión en balance y cuenta de resultados estatutarios italianos, conservando mapping, ajustes, controles y detalle por cuenta."}};
  const buttons=[...document.querySelectorAll('[data-tal-lang]')];
  function setLang(lang,persist=true){

@@ -1207,6 +1207,50 @@ html.tal-tool-page :is(.reclass-section, #reclass-content) thead th{
 }
 .tal-gh-lang a.active{background:#F7F7F5;color:#11131A}
 
+/* ---------- 14-bis. L'altezza che si vede davvero ------------------------ */
+
+/* `100vh` e' l'altezza *grande*: comprende la barra del browser, che su iOS e
+   Android occupa fra 60 e 110 punti. Un elemento fissato alto 100vh finisce
+   quindi sotto quella barra, e - se e' un contenitore che scorre - non basta
+   scorrerlo fino in fondo, perche' misura se' stesso piu' alto di quanto si
+   vede: gli ultimi cento punti non si raggiungono mai.
+
+   Misurato a 375x812 su Analisi: menu laterale alto 812 con 1415 punti di
+   contenuto, ultima voce «Come si usa» a 1310. Con `dvh` il contenitore torna
+   alto quanto la finestra vera e l'ultima voce si raggiunge.
+
+   La riga con `vh` resta prima: i browser che non conoscono `dvh` la usano. */
+@media(max-width:980px){
+  html.tal-tool-page :is(#sidebar,.sidebar,nav.appbar){
+    height:100vh !important;
+    height:100dvh !important;
+    padding-bottom:calc(18px + env(safe-area-inset-bottom)) !important;
+    overscroll-behavior:contain !important;
+  }
+  html.tal-tool-page .app-main{
+    min-height:100vh !important;
+    min-height:100dvh !important;
+  }
+
+  /* Le finestre di dialogo: su telefono a scorrere dev'essere l'involucro, non
+     il riquadro. Il riquadro con `max-height:calc(100vh - x)` e
+     `overflow-y:hidden` teneva i pulsanti sotto la barra del browser, dove non
+     si arriva. Cosi' invece il dialogo scorre tutto, pulsanti compresi, e
+     comincia in alto invece che centrato - centrato, uno piu' alto dello
+     schermo sborda da tutte e due le parti. */
+  html.tal-tool-page :is(.modal-ov,.cf-modal,[role="dialog"]){
+    align-items:flex-start !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain !important;
+    padding:12px 12px calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+  html.tal-tool-page :is(.modal-ov,.cf-modal,[role="dialog"])>*{
+    max-height:none !important;
+    margin-top:0 !important;
+  }
+}
+
 /* ---------- 15. Sotto il comando del menu -------------------------------- */
 
 /* Il comando del menu galleggia in basso a sinistra su schermo piccolo, e

@@ -1061,7 +1061,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <span class="cf-hint">Per il 2026 non è ancora deliberato. Lasciando zero i contributi dei tre scenari risultano sottostimati dello stesso importo: il risultato lo dichiara.</span>
 </div>
 <div class="cf-field full" id="cfReducedMinimumsBox">
-<label class="cf-choice" style="border-radius:9px"><input id="cfReducedMinimums" type="checkbox"><b>Prima iscrizione alla Cassa prima dei 35 anni, entro i primi sei anni</b><small>Cassa Forense dimezza il minimo soggettivo (1.395 invece di 2.790) e quello integrativo (177,50 invece di 355). Per CNPADC non ho trovato gli importi ridotti in una fonte citabile: la riduzione non viene applicata e il risultato lo dichiara.</small></label>
+<label class="cf-choice" style="border-radius:9px"><input id="cfReducedMinimums" type="checkbox"><b>Prima iscrizione alla Cassa prima dei 35 anni, entro i primi sei anni</b><small>Cassa Forense dimezza il minimo soggettivo (1.395 invece di 2.790) e quello integrativo (177,50 invece di 355). Per la CNPADC gli importi ridotti non risultano in una fonte citabile: la riduzione non viene applicata, e il risultato lo dichiara.</small></label>
 </div>
 <div class="cf-field">
 <label for="cfIrapRate">Aliquota IRAP</label>
@@ -2001,8 +2001,8 @@ function cfAssunzioni(input, esito) {
   if (input.profession === 'commercialista' && input.reducedMinimums) {
     agg('minimi-ridotti-non-modellati', 'La riduzione per i neo-iscritti non e\u2019 modellata per CNPADC',
       'Hai dichiarato la prima iscrizione prima dei 35 anni. Per Cassa Forense la riduzione '
-      + 'dei minimi e\u2019 pubblicata e viene applicata; per CNPADC non ho trovato gli importi '
-      + 'ridotti in una fonte citabile, quindi il calcolo usa i minimi interi. Verifica la '
+      + 'dei minimi e\u2019 pubblicata e viene applicata; per la CNPADC gli importi '
+      + 'ridotti non risultano in una fonte citabile, quindi il calcolo usa i minimi interi. Verifica la '
       + 'tua posizione: se la riduzione ti spetta, i contributi qui sono sovrastimati.', 'alta');
   }
 

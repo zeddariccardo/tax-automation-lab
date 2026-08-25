@@ -6,7 +6,7 @@ Licensed under the MIT License. See /legal-docs/MIT.txt.
 -->
 
 
-<html class="tal-tool-page" data-tool-version="3.6.6" lang="it"><head><script>/* Le viste del tool e il loro indirizzo, in un posto solo.
+<html class="tal-tool-page" data-tool-version="3.6.7" lang="it"><head><script>/* Le viste del tool e il loro indirizzo, in un posto solo.
 
    I due pulsanti aggiunti il 24 agosto 2026 non funzionavano perche' erano
    registrati in uno solo dei quattro elenchi che governano la navigazione:
@@ -209,7 +209,7 @@ h2.bt .num{font-family:var(--sans);font-style:normal;color:var(--accent-deep);fo
 @media(max-width:820px){.choice-card.demo-card{grid-template-columns:1fr}.choice-card.demo-card .btn{justify-self:start}.demo-guide{flex-direction:column}.demo-guide-actions{justify-content:flex-start}}
 
 .carry-badge{display:inline-flex;align-items:center;margin-left:7px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}.carry-badge.auto{background:rgba(20,83,104,.14);color:#145368;border:1px solid rgba(20,83,104,.28)}.carry-badge.forced{background:rgba(200,155,106,.16);color:#8a5728;border:1px solid rgba(200,155,106,.38)}.vp-value input:disabled,.flags input:disabled,.flags select:disabled{opacity:.55;cursor:not-allowed;background:#eee}
-</style><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Generatore LIPE","alternateName":"LIPE","url":"https://taxautomationlab.com/tools/lipe/","description":"Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.","applicationCategory":"BusinessApplication","operatingSystem":"Modern web browser","browserRequirements":"JavaScript enabled; modern desktop or mobile browser","isAccessibleForFree":true,"softwareVersion":"3.6.6","inLanguage":"it-IT","author":{"@type":"Person","name":"Riccardo Zedda","url":"https://taxautomationlab.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"license":"https://taxautomationlab.com/legal-docs/MIT.txt","featureList":["Codiciario IVA permanente per cliente","Import Excel o incolla degli importi periodici","Mapping dei codici nei campi VP","Riconciliazioni e dettaglio per rigo","Modello ministeriale PDF e working paper Excel","Generazione XML IVP18 e storico locale"]}</script>
+</style><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Generatore LIPE","alternateName":"LIPE","url":"https://taxautomationlab.com/tools/lipe/","description":"Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18.","applicationCategory":"BusinessApplication","operatingSystem":"Modern web browser","browserRequirements":"JavaScript enabled; modern desktop or mobile browser","isAccessibleForFree":true,"softwareVersion":"3.6.7","inLanguage":"it-IT","author":{"@type":"Person","name":"Riccardo Zedda","url":"https://taxautomationlab.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"license":"https://taxautomationlab.com/legal-docs/MIT.txt","featureList":["Codiciario IVA permanente per cliente","Import Excel o incolla degli importi periodici","Mapping dei codici nei campi VP","Riconciliazioni e dettaglio per rigo","Prospetto PDF sul modello e working paper Excel","Generazione XML IVP18 e storico locale"]}</script>
 <style id="tal-publication-layer">
 .tal-publication{position:relative;z-index:52;padding:12px clamp(16px,3vw,34px);background:#0E1624;color:#F7F7F5;border-bottom:1px solid rgba(247,247,245,.14);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Arial,sans-serif}
 .tal-publication-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -377,7 +377,7 @@ footer a:hover{color:#F7F7F5!important}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">IVA · v3.6.6</span>
+<span class="tal-publication-label" data-tal-key="label">IVA · v3.6.7</span>
 <h2 data-tal-key="title">Generatore LIPE</h2>
 <p data-tal-key="lead">Configura il cliente una volta, prepara ogni comunicazione e ricostruisci il quadro VP con controlli sulle colonne e sul periodo, riporti automatici, prospetto di lavoro in PDF, working paper e XML.</p>
 <div class="tal-publication-facts">
@@ -941,7 +941,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
 </script>
 <script>
 'use strict';
-const APP_VERSION='3.6.6';
+const APP_VERSION='3.6.7';
 const DEMO_PIVA='12345678903';
 const KEYS={clients:'taxtool_lipe_v3_clients',history:'taxtool_lipe_v3_history',migrated:'taxtool_lipe_v3_migrated',work:'taxtool_lipe_v3_work',session:'taxtool_lipe_v3_session'};
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
@@ -1336,7 +1336,7 @@ function exportPdf(){
   writeModelBoxes(doc,c.interCf,76.18,118.45,16,5.05,7.2);if(c.commitment){doc.setFont('helvetica','bold');doc.setFontSize(7.4);doc.text(String(c.commitment),75.2,128.7,{align:'center'})}const dt=xmlDate(c.commitmentDate);if(dt){writeModelBoxes(doc,dt.slice(0,2),64.3,144.2,2,5.05,7.0);writeModelBoxes(doc,dt.slice(2,4),75.0,144.2,2,5.05,7.0);writeModelBoxes(doc,dt.slice(4,8),85.7,144.2,4,5.05,7.0)}
   const periods=periodDescriptors();periods.forEach((d,index)=>{doc.addPage('a4','portrait');doc.addImage(MINISTERIAL_VP_TEMPLATE,'PNG',0,0,210,297,'vpMinisteriale','FAST');const v=computePeriod(d),man=manualFor(d.key);writeModelBoxes(doc,c.cf||state.activeClientKey,90.15,22.9,16,5.13,7.2);writeModelBoxes(doc,String(index+1).padStart(2,'0'),161.75,42.0,2,5.08,7.0);if(d.month)writeModelBoxes(doc,String(d.month).padStart(2,'0'),53.58,58.25,2,5.08,7.0);else writeModelBoxes(doc,String(window.lipeQuarterCode?window.lipeQuarterCode(d):d.quarter),84.18,58.25,1,5.08,7.0);writeModelMark(doc,!!man.subforn,115.42,58.2);if(man.eventi){doc.setFont('helvetica','bold');doc.setFontSize(7.4);doc.text(String(man.eventi),141.08,58.2,{align:'center'})}writeModelMark(doc,!!man.operazioni,177.4,58.2);writeModelValue(doc,v.vp2,146.4,67.05);writeModelValue(doc,v.vp3,196.8,75.45);writeModelValue(doc,v.vp4,146.4,83.7);writeModelValue(doc,v.vp5,196.8,92.08);writeModelValue(doc,v.vp6>0?v.vp6:0,146.4,100.45);writeModelValue(doc,v.vp6<0?-v.vp6:0,196.8,100.45);writeModelValue(doc,v.vp7,146.4,108.85);writeModelValue(doc,v.vp8,196.8,117.22);writeModelValue(doc,v.vp9,196.8,125.6);writeModelValue(doc,v.vp10,196.8,133.98);writeModelValue(doc,v.vp11,196.8,142.36);writeModelValue(doc,v.vp12,146.4,150.74);writeModelValue(doc,v.vp13,196.8,159.12);writeModelValue(doc,v.vp14deb,146.4,167.5);writeModelValue(doc,v.vp14cre,196.8,167.5)});
   const xmlCheck=buildXml(),workingCopy=!!(xmlCheck.problems&&xmlCheck.problems.length);if(workingCopy){const pages=doc.getNumberOfPages();for(let page=1;page<=pages;page++){doc.setPage(page);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(165,61,40);doc.text('PROSPETTO DI LAVORO · NON PRESENTABILE',105,289,{align:'center'});}}
-  doc.setProperties({title:`Comunicazione liquidazioni periodiche IVA - ${c.denom||state.activeClientKey}`,subject:`LIPE ${state.year} Q${state.quarter}${workingCopy?' · prospetto di lavoro non presentabile':''}`,author:'Tax Automation Lab',creator:`TaxTool LIPE v${APP_VERSION}`});doc.save(`${workingCopy?'LIPE_PROSPETTO_LAVORO_':'LIPE_Modello_Ministeriale_'}${state.activeClientKey}_${state.year}_Q${state.quarter}.pdf`);$('export-status').innerHTML=workingCopy?'<div class="notice warn"><b>PDF generato come prospetto di lavoro non presentabile.</b><br>'+xmlCheck.problems.map(esc).join('<br>')+'</div>':'<div class="notice ok"><b>Modello ministeriale generato.</b> Il PDF contiene frontespizio e quadro/i VP compilati. Firma e controllo ufficiale restano a carico del professionista.</div>'
+  doc.setProperties({title:`Comunicazione liquidazioni periodiche IVA - ${c.denom||state.activeClientKey}`,subject:`LIPE ${state.year} Q${state.quarter}${workingCopy?' · prospetto di lavoro non presentabile':''}`,author:'Tax Automation Lab',creator:`TaxTool LIPE v${APP_VERSION}`});doc.save(`${workingCopy?'LIPE_Prospetto_NON_PRESENTABILE_':'LIPE_Prospetto_'}${state.activeClientKey}_${state.year}_Q${state.quarter}.pdf`);$('export-status').innerHTML=workingCopy?'<div class="notice warn"><b>PDF generato come prospetto di lavoro non presentabile.</b><br>'+xmlCheck.problems.map(esc).join('<br>')+'</div>':'<div class="notice ok"><b>Prospetto PDF generato.</b> Riproduce frontespizio e quadro/i VP compilati, e serve a documentare l’elaborazione. La comunicazione si trasmette con l’XML.</div>'
 }
 function xmlEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]))}
 function xmlValidPiva(v){const s=String(v||'').replace(/\D/g,'');if(!/^\d{11}$/.test(s))return false;let sum=0;for(let i=0;i<10;i++){let n=Number(s[i]);if(i%2===1){n*=2;if(n>9)n-=9}sum+=n}return (10-sum%10)%10===Number(s[10])}
@@ -1514,7 +1514,7 @@ window.addEventListener('DOMContentLoaded',init);
    ==================================================================== */
 (function(){
 'use strict';
-const PATCH_VERSION='3.6.6';
+const PATCH_VERSION='3.6.7';
 const $id=id=>document.getElementById(id);
 let carryIntegrityIssue='';
 
@@ -1692,16 +1692,16 @@ function injectBackup(){if($id('lipe-export-full-backup'))return;const host=$id(
 const oldSaveClient=saveClient;
 saveClient=function(){oldSaveClient();const p=state.loadedConfigKey;if(!p)return;const clients=getClients(),rec=clients[p];if(rec){rec.version=PATCH_VERSION;rec.client.quarterRegime=rec.client.quarterRegime||'ordinary';clients[p]=rec;writeStore(KEYS.clients,clients,true);state.activeRecord&&state.activeClientKey===p&&(state.activeRecord=clone(rec));}};
 
-document.documentElement.setAttribute('data-tool-version',PATCH_VERSION);document.querySelectorAll('.tool-version,.version-chip').forEach(el=>{el.textContent=String(el.textContent||'').replace(/v?3\.[0-9]+\.[0-9]+/g,'v3.6.6');});
+document.documentElement.setAttribute('data-tool-version',PATCH_VERSION);document.querySelectorAll('.tool-version,.version-chip').forEach(el=>{el.textContent=String(el.textContent||'').replace(/v?3\.[0-9]+\.[0-9]+/g,'v3.6.7');});
 const style=document.createElement('style');style.textContent='.lipe-save-status{display:block;margin-top:7px;font-size:12px;font-weight:750}.lipe-save-status.ok{color:#176b45}.lipe-save-status.fail{color:#a22}.lipe-save-status.warn{color:#8a5a00}#quarter-regime-field[hidden]{display:none!important}';document.head.appendChild(style);
 function bootPatch(){injectQuarterRegime();syncConfigToFields();injectBackup();saveBadge('Archivio locale pronto · esporta periodicamente un backup completo.','warn');}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootPatch);else bootPatch();
 })();
 </script><script id="tal-publication-i18n">
 (function(){
- const copy={"it":{"summary":"Informazioni sullo strumento","label":"IVA · v3.6.6","title":"Dai codici IVA al quadro VP e al file XML IVP18","lead":"Configura il cliente una volta, prepara ogni comunicazione e ricostruisci il quadro VP con controlli sulle colonne e sul periodo, riporti automatici, prospetto di lavoro in PDF, working paper e XML.","facts":["Configurazione: codiciario permanente","Input: Excel o incolla per periodo","Output: VP, PDF, Excel e XML IVP18","Controlli: caricamento, periodo, riporti e non mappati"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"VAT · v3.6.6","title":"From VAT codes to VP fields and the IVP18 XML file","lead":"Configure each client's VAT-code mapping once, import period amounts and reconstruct the VP framework with column and period controls, automatic carry-forwards, the official-style PDF, working paper and XML.","facts":["Configuration: permanent VAT-code mapping","Input: Excel or pasted period data","Output: VP, PDF, Excel and IVP18 XML","Controls: imports, periods, carry-forwards and unmapped codes"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"IVA · v3.6.6","title":"De los códigos de IVA al cuadro VP y al archivo XML IVP18","lead":"Configura una sola vez el mapping de códigos de IVA de cada cliente, importa los importes del período y reconstruye el cuadro VP con conciliaciones, controles, PDF de formato oficial, working paper y XML.","facts":["Configuración: mapping permanente de IVA","Input: Excel o datos pegados por período","Output: VP, PDF, Excel y XML IVP18","Controles: importación, período, traslados y códigos no mapeados"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
+ const copy={"it":{"summary":"Informazioni sullo strumento","label":"IVA · v3.6.7","title":"Dai codici IVA al quadro VP e al file XML IVP18","lead":"Configura il cliente una volta, prepara ogni comunicazione e ricostruisci il quadro VP con controlli sulle colonne e sul periodo, riporti automatici, prospetto di lavoro in PDF, working paper e XML.","facts":["Configurazione: codiciario permanente","Input: Excel o incolla per periodo","Output: VP, PDF, Excel e XML IVP18","Controlli: caricamento, periodo, riporti e non mappati"],"note":"La pagina informativa è disponibile in tre lingue; l’interfaccia operativa del tool resta in italiano."},"en":{"summary":"About this tool","label":"VAT · v3.6.7","title":"From VAT codes to VP fields and the IVP18 XML file","lead":"Configure each client's VAT-code mapping once, import period amounts and reconstruct the VP framework with column and period controls, automatic carry-forwards, the official-style PDF, working paper and XML.","facts":["Configuration: permanent VAT-code mapping","Input: Excel or pasted period data","Output: VP, PDF, Excel and IVP18 XML","Controls: imports, periods, carry-forwards and unmapped codes"],"note":"The informational page is available in three languages; the operational tool interface remains in Italian."},"es":{"summary":"Información sobre la herramienta","label":"IVA · v3.6.7","title":"De los códigos de IVA al cuadro VP y al archivo XML IVP18","lead":"Configura una sola vez el mapping de códigos de IVA de cada cliente, importa los importes del período y reconstruye el cuadro VP con conciliaciones, controles, PDF de formato oficial, working paper y XML.","facts":["Configuración: mapping permanente de IVA","Input: Excel o datos pegados por período","Output: VP, PDF, Excel y XML IVP18","Controles: importación, período, traslados y códigos no mapeados"],"note":"La página informativa está disponible en tres idiomas; la interfaz operativa de la herramienta permanece en italiano."}};
  const seo={"it":{"title":"Generatore LIPE: codiciario IVA, quadro VP e XML | Tax Automation Lab","description":"Tool locale per configurare il codiciario IVA dei clienti, importare gli importi periodici, predisporre e controllare il quadro VP, produrre working paper, modello PDF e XML IVP18."},"en":{"title":"From VAT codes to VP fields and the IVP18 XML file | Tax Automation Lab","description":"Configure each client's VAT-code mapping once, import period amounts and reconstruct the VP framework with column and period controls, automatic carry-forwards, the official-style PDF, working paper and XML."},"es":{"title":"De los códigos de IVA al cuadro VP y al archivo XML IVP18 | Tax Automation Lab","description":"Configura una sola vez el mapping de códigos de IVA de cada cliente, importa los importes del período y reconstruye el cuadro VP con conciliaciones, controles, PDF de formato oficial, working paper y XML."}};
- Object.values(copy).forEach(function(v){v.label=String(v.label||'').replace(/v3\.5\.0/,'v3.6.6');});
+ Object.values(copy).forEach(function(v){v.label=String(v.label||'').replace(/v3\.5\.0/,'v3.6.7');});
  const buttons=[...document.querySelectorAll('[data-tal-lang]')];
  function setLang(lang,persist=true){
    if(!copy[lang])lang='it';
@@ -1761,7 +1761,7 @@ document.addEventListener("click",function(event){
    ==================================================================== */
 (function(){
 'use strict';
-var VERSION='3.6.6';
+var VERSION='3.6.7';
 
 var SECTIONS=window.LIPE_VIEW_IDS||['client-config','start','period-processing','results-section','exports-section','lipe-data','lipe-help'];
 /* Un elenco solo: vedi window.LIPE_VIEWS in testa alla pagina. Il letterale
@@ -2236,7 +2236,7 @@ html{scroll-padding-top:calc(var(--tal-global-header-height,60px) + 12px)}
 <script id="lipe-v361-audit-remediation">
 (function(){
 'use strict';
-var VERSION='3.6.6',ROUTES=window.LIPE_VIEWS||{};
+var VERSION='3.6.7',ROUTES=window.LIPE_VIEWS||{};
 
 function vp7Limit(year){year=Number(year);return year===2023?25.82:100;}
 function groupParticipant(d,c){

@@ -22,7 +22,7 @@
     {
       "slug": "financial-analysis",
       "name": "Analisi di bilancio",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "site_url": "https://taxautomationlab.com/tools/financial-analysis/",
       "release_filename": null,
       "distribution": "online_only",
@@ -42,7 +42,7 @@
     {
       "slug": "lipe",
       "name": "Generatore LIPE",
-      "version": "3.6.5",
+      "version": "3.6.6",
       "site_url": "https://taxautomationlab.com/tools/lipe/",
       "release_filename": null,
       "distribution": "online_only",
@@ -62,7 +62,7 @@
     {
       "slug": "confronto-regimi",
       "name": "Confronto regimi",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "site_url": "https://taxautomationlab.com/tools/confronto-regimi/",
       "release_filename": null,
       "distribution": "online_only",

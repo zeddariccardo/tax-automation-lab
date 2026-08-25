@@ -5,7 +5,7 @@ Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 Official source: https://taxautomationlab.com/tools/confronto-regimi/
 -->
-<html class="tal-tool-page" data-tool-version="1.4.1" lang="it">
+<html class="tal-tool-page" data-tool-version="1.4.2" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -48,7 +48,7 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
   "description": "Confronto del netto personale disponibile fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l. per avvocati e dottori commercialisti, con soglia di convenienza oltre 85.000 euro di compensi e ottimizzazione automatica del mix compenso/dividendo.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Browser",
-  "softwareVersion": "1.4.1",
+  "softwareVersion": "1.4.2",
   "inLanguage": "it",
   "isAccessibleForFree": true,
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -846,7 +846,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
 <details>
 <summary data-tal-key="summary">Informazioni sullo strumento</summary>
 <div class="tal-publication-body">
-<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.4.1</span>
+<span class="tal-publication-label" data-tal-key="label">Confronto regimi · v1.4.2</span>
 <h2 data-tal-key="title">Forfettario, ordinario o società professionale: quale lascia più cassa</h2>
 <p data-tal-key="lead">Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra i tre assetti: quanto ti rimane dopo costi, contributi e imposte. Con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e l'ottimizzazione automatica del mix fra compenso amministratore e dividendo.</p>
 <div class="tal-publication-facts">
@@ -1983,15 +1983,15 @@ function cfAssunzioni(input, esito) {
   const altri = cfNum(input.otherIncome);
 
   if (soc && soc.dettaglio && soc.dettaglio.compensoRidotto) {
-    agg('compenso-ridotto', 'Il compenso amministratore e\u2019 stato ridotto',
+    agg('compenso-ridotto', 'Il compenso amministratore è stato ridotto',
       'Hai chiesto ' + Math.round(soc.dettaglio.compensoRichiesto) + ' euro, ma con questi '
-      + 'compensi e questi costi la societa\u2019 puo\u2019 erogarne al massimo '
+      + 'compensi e questi costi la società può erogarne al massimo '
       + Math.round(soc.dettaglio.compensoMax) + '. Il confronto usa il massimo, non il valore '
-      + 'chiesto: se il compenso e\u2019 un vincolo, cambia i costi o i compensi.', 'alta');
+      + 'chiesto: se il compenso è un vincolo, cambia i costi o i compensi.', 'alta');
   }
 
   if (cfNum(input.maternity) <= 0) {
-    agg('maternita-non-determinata', 'Il contributo di maternita\u2019 non e\u2019 ancora determinato',
+    agg('maternita-non-determinata', 'Il contributo di maternità non è ancora determinato',
       'Per il 2026 la Cassa non ha ancora deliberato l\u2019importo: il calcolo lo tratta come '
       + 'zero, quindi i contributi dei tre scenari sono sottostimati dello stesso importo. '
       + 'Non cambia il confronto, cambia la cassa netta di tutti e tre. Se conosci l\u2019importo '
@@ -1999,19 +1999,19 @@ function cfAssunzioni(input, esito) {
   }
 
   if (input.profession === 'commercialista' && input.reducedMinimums) {
-    agg('minimi-ridotti-non-modellati', 'La riduzione per i neo-iscritti non e\u2019 modellata per CNPADC',
+    agg('minimi-ridotti-non-modellati', 'La riduzione per i neo-iscritti non è modellata per CNPADC',
       'Hai dichiarato la prima iscrizione prima dei 35 anni. Per Cassa Forense la riduzione '
-      + 'dei minimi e\u2019 pubblicata e viene applicata; per la CNPADC gli importi '
+      + 'dei minimi è pubblicata e viene applicata; per la CNPADC gli importi '
       + 'ridotti non risultano in una fonte citabile, quindi il calcolo usa i minimi interi. Verifica la '
       + 'tua posizione: se la riduzione ti spetta, i contributi qui sono sovrastimati.', 'alta');
   }
 
   const socScenario = (esito.scenari || []).find((x) => x.id === 'societa');
   if (socScenario && socScenario.dettaglio && socScenario.dettaglio.scopertoSocieta > 0.5) {
-    agg('societa-senza-capienza', 'La societa\u2019 non ha cassa per le proprie imposte',
-      'Con questi compensi e questi costi, IRES e IRAP superano quello che resta in societa\u2019 '
+    agg('societa-senza-capienza', 'La società non ha cassa per le proprie imposte',
+      'Con questi compensi e questi costi, IRES e IRAP superano quello che resta in società '
       + 'dopo i costi: mancano ' + Math.round(socScenario.dettaglio.scopertoSocieta) + ' euro. '
-      + 'Il compenso amministratore erogabile e\u2019 zero, e lo scenario societario richiederebbe '
+      + 'Il compenso amministratore erogabile è zero, e lo scenario societario richiederebbe '
       + 'un apporto dei soci. Verificalo prima di considerarlo un\u2019alternativa.', 'alta');
   }
 
@@ -2030,11 +2030,11 @@ function cfAssunzioni(input, esito) {
     + 'la residenza fiscale e alcune partecipazioni indirette.', 'media');
 
   if (altri > 0) {
-    agg('redditi-misti', 'La detrazione degli altri redditi e\u2019 approssimata',
-      'Gli altri redditi sono trattati come un blocco unico e la detrazione applicata e\u2019 '
+    agg('redditi-misti', 'La detrazione degli altri redditi è approssimata',
+      'Gli altri redditi sono trattati come un blocco unico e la detrazione applicata è '
       + 'quella della categoria prevalente (' + (esito.detrazioneApplicata === 'dipendente'
         ? 'lavoro dipendente' : 'lavoro autonomo') + '). La norma vorrebbe una base per '
-      + 'categoria: con redditi di natura diversa e importi simili il risultato e\u2019 una stima.',
+      + 'categoria: con redditi di natura diversa e importi simili il risultato è una stima.',
       'media');
   }
 
@@ -2043,20 +2043,20 @@ function cfAssunzioni(input, esito) {
     + 'addizionali non coincide in tutto con quella dell\u2019imposta, e le aliquote comunali '
     + 'cambiano per comune e per fascia di reddito.', 'media');
 
-  agg('irap-semplificata', 'La base IRAP della societa\u2019 e\u2019 semplificata',
-    'L\u2019IRAP e\u2019 calcolata sui compensi meno i costi deducibili e la struttura, con '
-    + 'l\u2019aliquota che hai indicato. Non tiene conto delle deduzioni per il personale ne\u2019 '
+  agg('irap-semplificata', 'La base IRAP della società è semplificata',
+    'L\u2019IRAP è calcolata sui compensi meno i costi deducibili e la struttura, con '
+    + 'l\u2019aliquota che hai indicato. Non tiene conto delle deduzioni per il personale né '
     + 'delle variazioni regionali.', 'media');
 
   agg('ires-ordinaria', 'IRES all\u2019aliquota ordinaria del 24%',
-    'La riduzione al 20% introdotta dalla legge di bilancio 2025 e\u2019 subordinata a condizioni '
-    + 'sull\u2019accantonamento degli utili e sugli investimenti in beni strumentali: non e\u2019 '
+    'La riduzione al 20% introdotta dalla legge di bilancio 2025 è subordinata a condizioni '
+    + 'sull\u2019accantonamento degli utili e sugli investimenti in beni strumentali: non è '
     + 'modellata qui.', 'nota');
 
-  agg('integrativo-societa', 'Nello scenario societario l\u2019integrativo e\u2019 azzerato',
-    'Il contributo integrativo e\u2019 addebitato in fattura dalla societa\u2019, non dal socio: '
+  agg('integrativo-societa', 'Nello scenario societario l\u2019integrativo è azzerato',
+    'Il contributo integrativo è addebitato in fattura dalla società, non dal socio: '
     + 'il calcolo lo azzera in capo alla persona. La qualificazione va verificata con la Cassa, '
-    + 'che e\u2019 anche il punto in cui la posizione individuale puo\u2019 divergere.', 'media');
+    + 'che è anche il punto in cui la posizione individuale può divergere.', 'media');
 
   /* Le regole toccate a mano devono comparire nel working paper: chi rilegge il
      file mesi dopo non ha modo di sapere che una percentuale non e' quella
@@ -2080,13 +2080,13 @@ function cfAssunzioni(input, esito) {
 
   agg('costi-aggregati', 'Le regole dei costi sono aggregate',
     'Auto, beni pluriennali, formazione, vitto e alloggio e rappresentanza hanno limiti, '
-    + 'ammortamenti e basi che possono divergere fra professionista e societa\u2019: qui '
+    + 'ammortamenti e basi che possono divergere fra professionista e società: qui '
     + 'ciascuna voce usa una sola percentuale e un solo tetto per entrambi.', 'media');
 
   agg('ruleset', 'Versione delle regole',
     'Parametri ' + CF_RULESET.versione + ', aggiornati al ' + CF_RULESET.aggiornato
     + ', anno d\u2019imposta ' + input.year + '. Un risultato salvato prima di questa data '
-    + 'puo\u2019 essere stato prodotto con parametri diversi.', 'nota');
+    + 'può essere stato prodotto con parametri diversi.', 'nota');
 
   return A;
 }
@@ -3079,7 +3079,7 @@ function graficoDriver(esito, vincente, secondo) {
      risponde a parole, e la barra resta solo come ordine di grandezza. */
   const host = $('cfDrivers'), E = euro(), X = esc();
   if (!secondo) {
-    host.innerHTML = '<p class="cf-lead">Serve piu’ di un regime applicabile per confrontare le leve.</p>';
+    host.innerHTML = '<p class="cf-lead">Serve più di un regime applicabile per confrontare le leve.</p>';
     return;
   }
   const stato = window.cfStato();
@@ -3854,9 +3854,9 @@ const CF_CAMPI_VALIDATI = [
   { id: 'cfEmployeeIncomePrev', chiave: 'employeeIncomePrev', nome: 'Lavoro dipendente dell\u2019anno precedente', min: 0 },
   { id: 'cfEmployeeIncomeCurr', chiave: 'employeeIncomeCurr', nome: 'Lavoro dipendente dell\u2019anno corrente', min: 0 },
   { id: 'cfAdmin', chiave: 'admin', nome: 'Compenso amministratore', min: 0 },
-  { id: 'cfCompanyOverhead', chiave: 'companyOverhead', nome: 'Costi di struttura della societa\u2019', min: 0 },
-  { id: 'cfMaternity', chiave: 'maternity', nome: 'Contributo di maternita\u2019', min: 0 },
-  { id: 'cfRetainInCompany', chiave: 'retainInCompany', nome: 'Quanto deve restare in societa\u2019', min: 0 },
+  { id: 'cfCompanyOverhead', chiave: 'companyOverhead', nome: 'Costi di struttura della società', min: 0 },
+  { id: 'cfMaternity', chiave: 'maternity', nome: 'Contributo di maternità', min: 0 },
+  { id: 'cfRetainInCompany', chiave: 'retainInCompany', nome: 'Quanto deve restare in società', min: 0 },
   { id: 'cfOwnership', chiave: 'ownership', nome: 'Quota di partecipazione', min: 0, max: 100, pct: true },
   { id: 'cfDistribution', chiave: 'distribution', nome: 'Quota di utile distribuita', min: 0, max: 100, pct: true },
   { id: 'cfIrapRate', chiave: 'irapRate', nome: 'Aliquota IRAP', min: 0, max: 100, pct: true },
@@ -3884,19 +3884,19 @@ function valida() {
     if (!el) return;
     const grezzo = el.value;
     if (!testoNumerico(grezzo)) {
-      agg(c.id, c.nome, 'Non e\u2019 un numero: «' + String(grezzo).trim() + '». '
+      agg(c.id, c.nome, 'Non è un numero: «' + String(grezzo).trim() + '». '
         + 'Scrivi per esempio 85.000 oppure 85000,50.');
       return;
     }
     const n = leggiNumero(grezzo);
     if (n < c.min) {
       agg(c.id, c.nome, c.min === 0
-        ? 'Non puo\u2019 essere negativo.'
-        : 'Il minimo previsto e\u2019 ' + c.min + (c.pct ? '%.' : '.'));
+        ? 'Non può essere negativo.'
+        : 'Il minimo previsto è ' + c.min + (c.pct ? '%.' : '.'));
       return;
     }
     if (c.max != null && n > c.max) {
-      agg(c.id, c.nome, 'Il massimo e\u2019 ' + c.max + (c.pct ? '%.' : '.'));
+      agg(c.id, c.nome, 'Il massimo è ' + c.max + (c.pct ? '%.' : '.'));
     }
   });
 
@@ -3907,8 +3907,8 @@ function valida() {
   if (testoNumerico($('cfOtherIncome').value) && testoNumerico($('cfEmployeeIncomeCurr').value)
       && dip > altri + 0.005) {
     agg('cfEmployeeIncomeCurr', 'Lavoro dipendente dell\u2019anno corrente',
-      'E\u2019 una quota degli altri redditi personali (' + euro(altri) + '), quindi non puo\u2019 '
-      + 'superarli. Se il reddito da lavoro dipendente e\u2019 in piu\u2019, sommalo agli altri redditi.');
+      'È una quota degli altri redditi personali (' + euro(altri) + '), quindi non può '
+      + 'superarli. Se il reddito da lavoro dipendente è in più, sommalo agli altri redditi.');
   }
 
   const anno = Number($('cfYear').value);
@@ -4570,7 +4570,7 @@ const SINO_AMMESSI = /^(si|sì|s|no|n|0|1|true|false|vero|falso|x)$/i;
 const ENUM = {
   profession:      { commercialista: 'commercialista', avvocato: 'avvocato' },
   currentRegime:   { forfettario: 'forfettario', ordinario: 'ordinario',
-                     societa: 'societa', 'societa’': 'societa', stp: 'societa', sta: 'societa',
+                     societa: 'societa', 'società': 'societa', stp: 'societa', sta: 'societa',
                      'stp/sta': 'societa', 'stp srl': 'societa', 'sta srl': 'societa' },
   subjectKind:     { me: 'self', io: 'self', self: 'self', altro: 'other',
                      'altro soggetto': 'other', other: 'other' },

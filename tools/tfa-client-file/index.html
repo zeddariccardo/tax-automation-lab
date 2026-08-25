@@ -1,11 +1,11 @@
-<!-- build: tfa-client-file/2.3.2 channel:stable -->
+<!-- build: tfa-client-file/2.3.3 channel:stable -->
 <!--
 TaxTool Fascicolo fiscale cliente
 Copyright (c) 2026 Riccardo Zedda
 Licensed under the MIT License. See /legal-docs/MIT.txt.
 -->
 <!DOCTYPE html>
-<html class="tal-tool-page" data-tool-version="2.3.2" lang="it">
+<html class="tal-tool-page" data-tool-version="2.3.3" lang="it">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
@@ -34,7 +34,7 @@ Licensed under the MIT License. See /legal-docs/MIT.txt.
 <meta content="https://taxautomationlab.com/assets/social-preview-v6142.png" name="twitter:image"/>
 <link href="https://taxautomationlab.com/tools/tfa-client-file/" hreflang="it" rel="alternate"/>
 <link href="https://taxautomationlab.com/tools/tfa-client-file/" hreflang="x-default" rel="alternate"/>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Fascicolo fiscale cliente","alternateName":"Client Tax Profile","url":"https://taxautomationlab.com/tools/tfa-client-file/","description":"Scheda fiscale del cliente: profilo permanente, organigramma di gruppo, aree fiscali, contenzioso e controlli, operazioni straordinarie e novità dell'esercizio, con export PDF ed Excel.","applicationCategory":"BusinessApplication","operatingSystem":"Modern web browser","browserRequirements":"JavaScript enabled; modern desktop or mobile browser","isAccessibleForFree":true,"softwareVersion":"2.3.2","inLanguage":"it-IT","author":{"@type":"Person","name":"Riccardo Zedda","url":"https://taxautomationlab.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"license":"https://taxautomationlab.com/legal-docs/MIT.txt","featureList":["Profilo permanente del cliente riutilizzabile negli esercizi successivi","Organigramma di gruppo con soci multipli, quote e diritti di voto","Aree fiscali e tematiche rilevanti con stato e fonte","Contenzioso, controlli e operazioni straordinarie","Novità dell'esercizio con promozione al profilo permanente","Situazione storica a una data","Export PDF impaginato ed Excel strutturato","Backup e ripristino JSON in locale"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Fascicolo fiscale cliente","alternateName":"Client Tax Profile","url":"https://taxautomationlab.com/tools/tfa-client-file/","description":"Scheda fiscale del cliente: profilo permanente, organigramma di gruppo, aree fiscali, contenzioso e controlli, operazioni straordinarie e novità dell'esercizio, con export PDF ed Excel.","applicationCategory":"BusinessApplication","operatingSystem":"Modern web browser","browserRequirements":"JavaScript enabled; modern desktop or mobile browser","isAccessibleForFree":true,"softwareVersion":"2.3.3","inLanguage":"it-IT","author":{"@type":"Person","name":"Riccardo Zedda","url":"https://taxautomationlab.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"license":"https://taxautomationlab.com/legal-docs/MIT.txt","featureList":["Profilo permanente del cliente riutilizzabile negli esercizi successivi","Organigramma di gruppo con soci multipli, quote e diritti di voto","Aree fiscali e tematiche rilevanti con stato e fonte","Contenzioso, controlli e operazioni straordinarie","Novità dell'esercizio con promozione al profilo permanente","Situazione storica a una data","Export PDF impaginato ed Excel strutturato","Backup e ripristino JSON in locale"]}</script>
 
 <style id="ctp-app-style">
 /* ============================================================
@@ -711,7 +711,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
    Profili e storico restano nel browser; gli allegati sono separati in IndexedDB quando disponibile.
    ===================================================================== */
 
-var VERSION='2.3.2';
+var VERSION='2.3.3';
 var STORE='tal_ctp_v21';
 var WELCOME_KEY='tal_ctp_welcome_v21';
 var ATTACH_DB='tal_ctp_attachments_v21';
@@ -3723,7 +3723,7 @@ function viewImportData(){return pageHead('Gestione','Importa dati','Il file non
   '<section class="import-step"><div class="n">3</div><h3>Importa e verifica</h3><p>Prima di creare o integrare il cliente vedrai conteggi, warning e differenze rispetto al fascicolo esistente.</p><button class="btn add-action" data-imp="pick" type="button">Importa Excel</button></section></div>'+ 
   '<div class="notice info"><strong>Importazione tollerante.</strong> Fogli assenti, campi vuoti, fonti mancanti o sezioni non pertinenti non bloccano l’import. Per sicurezza il file Excel non può superare 12 MB. Vengono scartate solo righe non interpretabili, con un warning visibile nella preview.</div>'+ 
   '<section class="panel s-business"><h2 class="panel-title">Cosa può popolare il template</h2><dl class="kv-list">'+kv('Profilo permanente','Anagrafica, business, contabilità, gruppo, fiscalità e altri aspetti')+kv('Organigramma','Entità e relazioni con quote economiche e diritti di voto')+kv('Eventi','Contenzioso, operazioni straordinarie e novità FY')+kv('Aree non compilate','Restano “Da verificare”; non vengono trasformate in conclusioni positive')+'</dl></section>'+ 
-  '<div class="page-actions"><button class="btn ghost" data-imp="demo" type="button">Prova con il cliente demo</button></div>'}
+  '<div class="page-actions"><button class="btn ghost" data-imp="demo" type="button">Prova con i dati dimostrativi</button></div>'}
 function viewClientManager(){var q=aiKey(clientManagerQuery||'');var rows=vault.clients.filter(function(c){return !q||aiKey(c.data.client.name+' '+c.data.client.taxId).indexOf(q)>=0});return pageHead('Gestione','Clienti','Apri, cerca o crea un fascicolo. Ogni cliente mantiene profilo permanente, esercizi e storico indipendenti.','<button class="btn add-action" data-cm="new" type="button">＋ Nuovo cliente</button><button class="btn secondary" data-cm="import" type="button">Importa Excel</button>')+
   '<div class="client-search"><input id="clientManagerSearch" type="search" value="'+esc(clientManagerQuery||'')+'" placeholder="Cerca per denominazione o CF / P.IVA" aria-label="Cerca cliente"/></div>'+ 
   (rows.length?'<div class="manage-grid">'+rows.map(function(c){var cur=c.id===vault.currentId;return '<article class="manage-card'+(cur?' current':'')+'"><div><h3>'+esc(c.data.client.name)+'</h3><p>'+esc(nonEmpty(c.data.client.taxId,'CF/P.IVA non indicato'))+' · FY '+c.data.client.currentFY+' · '+allTaxTopics(c.data.profile).length+' tematiche fiscali</p></div><div class="manage-actions">'+(cur?'<span class="tag ok">in lavorazione</span>':'<button class="btn sm" data-cm="open" data-id="'+esc(c.id)+'" type="button">Apri</button>')+'<button class="btn sm edit-action" data-cm="duplicate" data-id="'+esc(c.id)+'" type="button">Duplica</button>'+(vault.clients.length>1?'<button class="btn sm danger" data-cm="delete" data-id="'+esc(c.id)+'" type="button">Elimina</button>':'')+'</div></article>'}).join('')+'</div>':'<div class="empty"><b>Nessun cliente trovato</b>Modifica la ricerca oppure importa un nuovo fascicolo.</div>')}

@@ -32,7 +32,7 @@
     {
       "slug": "tfa-client-file",
       "name": "Fascicolo fiscale cliente",
-      "version": "2.3.2",
+      "version": "2.3.3",
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
       "release_filename": null,
       "distribution": "online_only",

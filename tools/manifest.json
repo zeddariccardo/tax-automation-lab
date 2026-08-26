@@ -5,7 +5,8 @@
     "processing": "local_in_browser",
     "server_upload": false,
     "persistence": "device_browser_storage",
-    "backup_recommended": true
+    "backup_recommended": true,
+    "note": "Vale per tutti i tool salvo dove il singolo tool dichiara altrimenti nel proprio blocco privacy_model."
   },
   "distribution_note": "All tools are available exclusively online. No standalone packages are published through GitHub Releases.",
   "tools": [
@@ -67,7 +68,17 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-23",
+      "privacy_model": {
+        "processing": "server_side_calculation",
+        "server_upload": "numeric_inputs_only",
+        "uploads_documents": false,
+        "uploads_identifiers": false,
+        "server_retention": "none",
+        "server_logging_of_inputs": "none",
+        "local_fallback": true,
+        "endpoint": "https://taxautomationlab.com/api/confronto-regimi/calcola"
+      }
     }
   ]
 }

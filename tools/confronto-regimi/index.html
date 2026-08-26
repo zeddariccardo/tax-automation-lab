@@ -1228,7 +1228,7 @@ main#cfMain{max-width:1120px;margin:0 auto}
      del viewport e testo tagliato a sinistra. Il testo e' proprio di questo
      tool: la prima versione l'avevo copiata da LIPE assieme al markup, e
      parlava di codici IVA e file telematico. -->
-<footer aria-label="Tax Automation Lab legal information" class="tal-site-footer"><div><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span><p>Strumento di simulazione e di supporto alla decisione. La scelta del regime, la verifica dei requisiti dichiarati e la posizione presso la Cassa restano in capo al professionista. Tax Automation Lab è un progetto personale e indipendente. L’elaborazione dei file avviene localmente nel browser; assunzioni, parametri e risultati devono essere verificati dal professionista.</p></div></footer>
+<footer aria-label="Tax Automation Lab legal information" class="tal-site-footer"><div><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span><p>Strumento di simulazione e di supporto alla decisione. La scelta del regime, la verifica dei requisiti dichiarati e la posizione presso la Cassa restano in capo al professionista. Tax Automation Lab è un progetto personale e indipendente. I dati che ti identificano — nomi, codici fiscali, partite IVA — restano nel browser: al servizio di calcolo vengono trasmessi i soli valori numerici della simulazione, che non vengono salvati. Assunzioni, parametri e risultati devono essere verificati dal professionista.</p></div></footer>
 </div>
 
 <!-- RE-002. Il dialogo nativo aveva due sole risposte e ne serviva una terza:
@@ -4555,8 +4555,17 @@ else avvia();
 (function () {
 
 const MODI = ['locale', 'api', 'api-con-riserva'];
-const MODO_PREDEFINITO = 'locale';
+
+/* Il servizio calcola, e se non risponde calcola la pagina.
+   Era 'locale' finche' il servizio non esisteva. Da quando c'e', il valore
+   predefinito e' quello che usa il servizio tenendo la rete sotto: i numeri
+   sono gli stessi — verificati su 327 casi — quindi ripiegare non cambia il
+   risultato, cambia solo chi lo ha calcolato. Diventera' 'api' secco quando il
+   motore uscira' dalla pagina e non ci sara' piu' niente su cui ripiegare. */
+const MODO_PREDEFINITO = 'api-con-riserva';
+
 const PERCORSO = '/api/confronto-regimi/calcola';
+const SONDA = '/api/stato';
 const ATTESA_MS = 8000;
 const MAX_TENTATIVI = 2;
 
@@ -4579,16 +4588,19 @@ const modo = () => {
   return MODI.indexOf(m) !== -1 ? m : MODO_PREDEFINITO;
 };
 
-const indirizzo = () => {
+const radice = () => {
   const b = (preferenza('tal-api-base') || '').trim();
-  return b && FORMA_PROVA.test(b) ? b + PERCORSO : PERCORSO;
+  return b && FORMA_PROVA.test(b) ? b : '';
 };
+const indirizzo = () => radice() + PERCORSO;
 
 /* ------------------------------------------------------------------ errori */
 
 /* Il messaggio che vede l'utente dice cosa e' successo e cosa puo' fare. Non
    dice «errore 500»: un codice di stato non e' un'istruzione. */
 const TESTI = {
+  assente: ['Il servizio di calcolo non è collegato',
+    'Non è un guasto: a questo indirizzo il servizio non c’è ancora. Il calcolo è stato fatto da questa pagina.'],
   rete: ['Il servizio di calcolo non risponde',
     'Non riesco a raggiungere il servizio che esegue i calcoli. Controlla la connessione e riprova.'],
   attesa: ['Il calcolo sta impiegando troppo',
@@ -4610,9 +4622,58 @@ function guasto(genere, extra) {
   return g;
 }
 
+/* ----------------------------------------------------------------- sonda */
+
+/* C'e' davvero un servizio a quell'indirizzo?
+ *
+ * La domanda non e' teorica. In produzione l'indirizzo e' `/api/...` sulla
+ * stessa origine del sito, e ci arriva una Route di Cloudflare. Finche' quella
+ * Route non e' attiva, quell'indirizzo lo serve GitHub Pages: un POST
+ * finirebbe li' — con dentro i compensi, i costi e le aliquote di chi sta
+ * usando il tool — e tornerebbe indietro un 404. I numeri sarebbero comunque
+ * usciti, verso qualcuno che non c'entra niente.
+ *
+ * Quindi prima si bussa, con una GET che non porta niente: `/api/stato`
+ * risponde `{"ok":true}` solo se dall'altra parte c'e' il Worker. Se non
+ * risponde cosi', per il resto della sessione non parte nessun POST e la
+ * pagina calcola da sola.
+ *
+ * Una volta per sessione, non una per calcolo. */
+let servizioPronto = null;       /* null = non ancora chiesto */
+let sondaInCorso = null;
+
+async function ilServizioCe() {
+  if (servizioPronto !== null) return servizioPronto;
+  if (sondaInCorso) return sondaInCorso;
+  sondaInCorso = (async () => {
+    try {
+      const ctrl = new AbortController();
+      const scadenza = setTimeout(() => ctrl.abort(), ATTESA_MS);
+      const r = await fetch(radice() + SONDA, {
+        method: 'GET', signal: ctrl.signal, credentials: 'omit',
+        cache: 'no-store', referrerPolicy: 'no-referrer'
+      });
+      clearTimeout(scadenza);
+      const d = r.ok ? await r.json().catch(() => null) : null;
+      servizioPronto = !!(d && d.ok === true);
+    } catch (_) {
+      servizioPronto = false;
+    }
+    if (!servizioPronto) {
+      console.warn('cf-api: a ' + (radice() || location.origin) + SONDA +
+        ' non risponde il servizio di calcolo. Nessun dato viene inviato: ' +
+        'il calcolo lo fa questa pagina.');
+    }
+    sondaInCorso = null;
+    return servizioPronto;
+  })();
+  return sondaInCorso;
+}
+
 /* --------------------------------------------------------------- richiesta */
 
 async function chiama(corpo, tentativo) {
+  if (!(await ilServizioCe())) throw guasto('assente');
   const t = tentativo || 1;
   const ctrl = new AbortController();
   const scadenza = setTimeout(() => ctrl.abort(), ATTESA_MS);
@@ -4875,7 +4936,19 @@ function mostraGuasto(g, riprova) {
   if (b) b.addEventListener('click', riprova);
 }
 
-function mostraRiserva() {
+/* Il ripiego si dichiara quando e' successo qualcosa, e tace quando non e'
+   successo niente.
+
+   «Non collegato» non e' un guasto: e' lo stato in cui il servizio non e'
+   ancora stato attaccato al dominio. L'utente non puo' farci nulla, i numeri
+   sono gli stessi — 327 casi lo dimostrano — e un avviso giallo su ogni
+   calcolo racconterebbe a chi usa il tool una cosa che riguarda noi. Resta
+   scritto in console e nella diagnostica, per chi verifica.
+
+   Un servizio che invece cade *dopo* essere stato collegato e' un fatto, e si
+   dice: quello e' uno stato che non dovrebbe durare. */
+function mostraRiserva(genere) {
+  if (genere === 'assente') { chiudiAttesa(); return; }
   const el = riquadro();
   if (!el) return;
   el.hidden = false;
@@ -4972,7 +5045,7 @@ window.cfRenderConfronto = function () {
     chiudiAttesa();
     if (modo() === 'api-con-riserva' && motoreInPagina()) {
       usaRiserva = true;
-      try { renderConfrontoLocale(); mostraRiserva(); return; }
+      try { renderConfrontoLocale(); mostraRiserva(g.genere); return; }
       catch (e) { console.error('cf-api: fallita anche la riserva', e); }
     }
     svuotaRisultato();
@@ -5010,15 +5083,24 @@ const PARAMETRI_PER_ANNO = {};
 
 window.cfAssicuraParametri = async function (anno) {
   const y = Number(anno || window.cfStato().year);
-  if (!daServer()) return window.cfParametri();
+  if (!daServer()) return window.cfParametri(y);
   if (PARAMETRI_PER_ANNO[y]) return PARAMETRI_PER_ANNO[y];
   if (CACHE && CACHE.base && CACHE.base.params && window.cfStato().year === y) {
     PARAMETRI_PER_ANNO[y] = CACHE.base.params;
     return PARAMETRI_PER_ANNO[y];
   }
-  const r = await chiama({ input: { year: y }, parti: ['parametri'] });
-  PARAMETRI_PER_ANNO[y] = r.parametri;
-  return r.parametri;
+  try {
+    const r = await chiama({ input: { year: y }, parti: ['parametri'] });
+    PARAMETRI_PER_ANNO[y] = r.parametri;
+    return r.parametri;
+  } catch (g) {
+    /* Finche' il motore e' in pagina i parametri ci sono comunque, e sono gli
+       stessi. Quando non ci sara' piu', questo `return` dara' null e chi
+       disegna se ne accorgera' — che e' il comportamento giusto: meglio una
+       schermata vuota di una schermata con dei numeri inventati. */
+    if (motoreInPagina()) return window.cfParametri(y);
+    throw g;
+  }
 };
 
 /* La versione sincrona, per chi disegna e non puo' aspettare: risponde con
@@ -5053,6 +5135,8 @@ window.cfAnniPrevisti = function () {
 window.cfApiDiagnostica = () => ({
   modo: modo(),
   indirizzo: indirizzo(),
+  sonda: radice() + SONDA,
+  servizioTrovato: servizioPronto,      /* null = non ancora chiesto */
   motoreInPagina: motoreInPagina(),
   inRiserva: usaRiserva,
   risultatoInMemoria: !!CACHE

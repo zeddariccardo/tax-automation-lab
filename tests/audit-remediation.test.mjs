@@ -86,7 +86,14 @@ assert.match(configureAi,/analisi-bilancio-import-20260815\.png/);
 assert.match(configureAi,/lipe-periodo-20260815\.png/);
 assert.match(configureAi,/fascicolo-importa-excel-20260815\.png/);
 assert.match(configureAi,/f24-import-massivo-20260815\.png/);
-assert.match(configureAi,/setupGrid\.appendChild\(f24Setup\)/);
+/* La card di F24 deve stare nella griglia delle configurazioni. Fino al 25
+   agosto 2026 ci arrivava a runtime - stava scritta in fondo alla pagina e uno
+   script la spostava con appendChild - e questo test controllava lo spostamento.
+   Ora le card sono raggruppate per famiglia direttamente nel markup, quindi si
+   controlla il risultato invece del meccanismo: la card sta dentro la famiglia
+   «Fiscale e adempimenti», accanto a quella di LIPE. */
+assert.match(configureAi,/class="tool-family tool-family--adempimenti"[\s\S]*?id="f24"/);
+assert.doesNotMatch(configureAi,/setupGrid\.appendChild/);
 assert.doesNotMatch(configureAi,/financial-statement-import-(?:tab|button)\.png/);
 
 for(const relative of ['en/configure-with-ai/index.html','es/configura-con-ia/index.html']){

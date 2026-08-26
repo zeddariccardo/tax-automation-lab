@@ -107,6 +107,33 @@ footer a:hover{color:#F7F7F5!important}
 <section class="section" id="financial-statement"><div class="shell"><header class="section-head"><div><span class="label">ELIGE LA CONFIGURACIÓN</span><h2>Configuraciones iniciales, listas para tu IA</h2></div></header><div class="tool-grid">
 <article class="tool-card surface"><span class="label">ESTADOS FINANCIEROS ITALIANOS · CONFIGURACIÓN INICIAL</span><h2>Estados financieros italianos · ITA GAAP</h2><p>Completa datos maestros, cuentas, saldos corrientes y anteriores y la asignación a los esquemas estatutarios italianos. El archivo incluye una hoja separada para dudas, fuentes y revisiones.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Balance de comprobación o trial balance</li><li>Plan de cuentas o descripciones de cuentas</li><li>Cuentas anuales aprobadas o reporting de gestión</li><li>Extracto registral u otra fuente de datos maestros</li></ul></div><div class="actions"><a class="button" download="" href="/resources/templates/Template_TaxTool_FS_AI.xlsx">Descargar plantilla ↓</a><button class="button secondary copy-btn" data-copy="fs-prompt" type="button">Copiar prompt</button><a class="button secondary" href="/tools/financial-statement/">Abrir herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="fs-prompt">Actúa como asistente de preparación de datos contables para Tax Automation Lab.
 
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
+
 OBJETIVO
 Completar el archivo “Template_TaxTool_FS_AI.xlsx” para que pueda importarse en la herramienta de estados financieros italianos · ITA GAAP sin modificar la estructura requerida.
 
@@ -168,6 +195,33 @@ CONTROL DE CIERRE A INCLUIR EN “ESITI AI”
 - conciliación final;
 - anomalías no resueltas.
 </pre></details><p class="prompt-note">El prompt ordena a la IA no inventar, no cambiar la estructura del template y separar claramente todos los puntos que deben revisarse.</p></div></article><article class="tool-card surface fa-config-card" id="financial-analysis-card"><span class="label">CONTROLLING · ANÁLISIS Y PLANIFICACIÓN</span><h2>Análisis financiero</h2><p>Prepara datos contables ya clasificados para reclasificaciones de gestión, KPI, dashboard, flujo de caja, presupuesto, previsión y centros de coste, conservando cada cuenta y subcuenta.</p><div class="doc-box"><h3>Documentación útil, incluidas fuentes equivalentes</h3><ul><li>Estados financieros o balance de comprobación ya clasificado</li><li>Plan de cuentas con saldos comparativos</li><li>Presupuesto, previsión y asignaciones por centro de coste</li><li>Reporting de gestión e información complementaria</li></ul></div><div class="callout">La plantilla principal incluye Actual, Budget, Forecast y centros de coste. Budget, Forecast y asignaciones pueden ser parciales y se tratan como módulos opcionales.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Analisi_di_Bilancio_AI.xlsx">Descargar plantilla ↓</a><button class="button secondary copy-btn" data-copy="fa-prompt" type="button">Copiar prompt</button><a class="button secondary" href="/tools/financial-analysis/">Abrir herramienta →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="fa-prompt">Actúa como asistente de preparación de datos contables para Tax Automation Lab.
+
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
 
 OBJETIVO
 Completar “Template_Analisi_di_Bilancio_AI.xlsx” para que pueda importarse en la herramienta de Análisis financiero sin modificar la estructura requerida.
@@ -232,6 +286,33 @@ CONTROL DE CIERRE A INCLUIR EN “ESITI AI”
 - anomalías no resueltas.
 </pre></details><p class="prompt-note">El prompt conserva la granularidad del plan de cuentas, prohíbe agregaciones y exige conciliar las filas de origen con las filas de salida.</p></div></article>
 <article class="tool-card surface"><span class="label">IVA · CONFIGURACIÓN PERMANENTE</span><h2>Mapeo LIPE de códigos de IVA</h2><p>Configura los datos maestros y el significado permanente de los códigos de IVA. Esta fase no contiene importes mensuales o trimestrales, que se cargarán después en la herramienta.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Listado de códigos de IVA del ERP</li><li>Libros de IVA o liquidaciones periódicas</li><li>Reportes contables o ejemplos de contabilización</li><li>LIPE, XML o instrucciones internas anteriores</li></ul></div><div class="callout">Configura aquí una sola vez el mapeo de códigos. Para cada período cargarás después en la herramienta el archivo con Código IVA, Base imponible, IVA y Mes.</div><div class="actions"><a class="button" download="" href="/resources/templates/LIPE_Codiciario_AI.xlsx">Descargar plantilla ↓</a><button class="button secondary copy-btn" data-copy="lipe-prompt" type="button">Copiar prompt</button><a class="button secondary" href="/tools/lipe/">Abrir herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="lipe-prompt">Actúa como asistente de preparación de datos de IVA para Tax Automation Lab.
+
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
 
 OBJETIVO
 Completar el archivo “LIPE_Codiciario_AI.xlsx” para configurar una sola vez los datos maestros y el mapeo permanente de códigos de IVA del cliente en el Generador LIPE.

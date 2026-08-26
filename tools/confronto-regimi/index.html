@@ -4599,8 +4599,14 @@ const indirizzo = () => radice() + PERCORSO;
 /* Il messaggio che vede l'utente dice cosa e' successo e cosa puo' fare. Non
    dice «errore 500»: un codice di stato non e' un'istruzione. */
 const TESTI = {
-  assente: ['Il servizio di calcolo non è collegato',
-    'Non è un guasto: a questo indirizzo il servizio non c’è ancora. Il calcolo è stato fatto da questa pagina.'],
+  /* Questo testo si vede in un caso solo: servizio irraggiungibile E nessun
+     motore in pagina su cui ripiegare. Quando la riserva c'e', il ripiego e'
+     silenzioso e questo riquadro non compare — quindi il testo non deve dire
+     «il calcolo l'ha fatto la pagina», perche' nel caso in cui si vede il
+     calcolo non l'ha fatto nessuno. Lo diceva, ed era falso davanti a una
+     schermata vuota. */
+  assente: ['Il servizio di calcolo non risponde',
+    'A questo indirizzo il servizio non c’è, o non è raggiungibile. Senza, questo strumento non può calcolare: riprova fra un momento, e se continua segnalalo.'],
   rete: ['Il servizio di calcolo non risponde',
     'Non riesco a raggiungere il servizio che esegue i calcoli. Controlla la connessione e riprova.'],
   attesa: ['Il calcolo sta impiegando troppo',
@@ -4772,29 +4778,38 @@ const CAMPI_DEL_MOTORE = [
   'costFactor', 'costs'
 ];
 
+/* Anche le voci di costo portano campi che servono solo a disegnare la tabella:
+   `nota`, `custom`, e il nome — che per le voci aggiunte a mano lo scrive
+   l'utente, e puo' contenere qualunque cosa. Restano qui. */
+const CAMPI_DELLA_VOCE = ['id', 'amount', 'gross', 'iva', 'ivaOrd', 'ivaSoc',
+  'dedOrd', 'dedSoc', 'irap', 'uso', 'tetto'];
+
+/* Il filtro e' UNO, e ripulisce anche dentro.
+ *
+ * Prima erano due: uno per i campi di primo livello e uno, separato, per le
+ * voci di costo. Il secondo lo applicava solo la strada del confronto; quella
+ * dell'archivio chiamava il primo e basta, e spediva le voci intere — con
+ * dentro il nome e la nota, che nelle simulazioni salvate l'utente scrive come
+ * gli pare. Verificato in produzione mettendo «Rossi» nel nome di una voce: era
+ * nel corpo della richiesta.
+ *
+ * Due filtri per la stessa cosa e' un filtro che prima o poi qualcuno dimentica
+ * di applicare. Adesso ce n'e' uno solo, e ripulisce a tutti i livelli. */
 function soloCampiDelMotore(input) {
   const pulito = {};
   CAMPI_DEL_MOTORE.forEach((k) => {
     if (input[k] !== undefined) pulito[k] = input[k];
   });
-  return pulito;
-}
-
-/* Anche le voci di costo portano campi che servono solo a disegnare la tabella
-   (`nota`, `custom`, il nome esteso). Restano qui. */
-const CAMPI_DELLA_VOCE = ['id', 'amount', 'gross', 'iva', 'ivaOrd', 'ivaSoc',
-  'dedOrd', 'dedSoc', 'irap', 'uso', 'tetto'];
-
-function inputDaMandare(extra) {
-  const grezzo = soloCampiDelMotore(
-    Object.assign({}, window.cfInputMotore(), extra || {}));
-  grezzo.costs = (grezzo.costs || []).map((c) => {
+  pulito.costs = (input.costs || []).map((c) => {
     const v = {};
     CAMPI_DELLA_VOCE.forEach((k) => { if (c[k] !== undefined) v[k] = c[k]; });
     return v;
   });
-  return grezzo;
+  return pulito;
 }
+
+const inputDaMandare = (extra) =>
+  soloCampiDelMotore(Object.assign({}, window.cfInputMotore(), extra || {}));
 
 window.cfInputDaMandare = inputDaMandare;
 

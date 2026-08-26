@@ -269,6 +269,25 @@ main#cfMain{max-width:1120px;margin:0 auto}
 .cf-alert.is-critical{background:#FBECEB;border-color:#E3BDB9}
 .cf-alert h3{font-size:13.5px;margin:0 0 4px}
 .cf-alert p{font-size:13px;margin:0;line-height:1.55}
+/* Lo stato del servizio di calcolo. Chiaro su chiaro, come gli altri avvisi
+   di questa pagina: un banner scuro qui perderebbe il titolo contro la regola
+   degli h2 del guscio, che e' il difetto che `banner-scuri.test.mjs` esiste
+   per impedire. */
+.cf-api-stato{margin:0 0 18px;padding:14px 16px;border-radius:12px;
+  font-size:13px;line-height:1.55}
+.cf-api-stato[hidden]{display:none}
+.cf-api-stato h3{margin:0 0 5px;font-size:13.5px}
+.cf-api-stato p{margin:0 0 6px}
+.cf-api-stato p:last-of-type{margin-bottom:0}
+.cf-api-stato.is-attesa{background:var(--tal-sunken,#fbfaf8);
+  border:1px solid var(--tal-line);color:var(--tal-ink-2,#4a463f)}
+.cf-api-stato.is-riserva{background:var(--tal-gold-bg);border:1px solid var(--tal-gold-line)}
+.cf-api-stato.is-guasto{background:#FFF6F4;border:1px solid #E4B9B1;
+  border-left:4px solid #8A2015}
+.cf-api-stato.is-guasto h3{color:#6E1810}
+.cf-api-rif{font-size:11px;color:var(--tal-ink-3);font-variant-numeric:tabular-nums}
+.cf-api-stato .btn{margin-top:10px}
+
 .cf-checks{list-style:none;margin:0;padding:0;display:grid;gap:7px}
 .cf-checks li{padding:9px 11px;border:1px solid var(--tal-line);border-radius:8px;
   background:var(--tal-sunken,#fbfaf8);font-size:11.5px;line-height:1.5}
@@ -2475,10 +2494,12 @@ function renderCostoSalto(conv, esito) {
      una simulazione precedente e' una trappola per il prossimo che lo mostra. */
   if (!conv.applicabileA85) { box.hidden = true; box.innerHTML = ''; return; }
 
-  const oltre = stato.revenue > P.sogliaPermanenza
-    ? stato.revenue : P.sogliaPermanenza + 5000;
-  const nettoOltre = cfEngine(window.cfInputMotore({ revenue: oltre })).scenari[1].netto;
-  const inPiu = oltre - P.sogliaPermanenza;
+  /* I due numeri arrivano insieme alle soglie: erano l'ultima chiamata diretta
+     al motore rimasta fuori dal motore, ed e' proprio quella che dopo la
+     migrazione non esisterebbe piu'. */
+  const oltre = conv.oltre;
+  const nettoOltre = conv.nettoOrdinarioOltre;
+  const inPiu = oltre - conv.soglia;
   const differenza = nettoOltre - conv.nettoRiferimento;
 
   box.innerHTML =
@@ -3071,20 +3092,11 @@ function graficoPonte(esito) {
 /* Ogni leva viene mossa in su e in giù, e si misura di quanto cambia il
    divario fra il primo e il secondo. È il modo più diretto per rispondere alla
    domanda «cosa dovrebbe succedere perché la decisione cambi». */
-function graficoDriver(esito, vincente, secondo) {
-  /* Era un grafico a tornado: barre verde e rosse intorno a una linea centrale,
-     con lo scostamento del divario. Diceva la cosa giusta e non si capiva —
-     bisognava tenere a mente il divario di partenza e leggere una lunghezza.
-     La domanda vera e' binaria: questa cosa ribalta la scelta o no. Quindi si
-     risponde a parole, e la barra resta solo come ordine di grandezza. */
-  const host = $('cfDrivers'), E = euro(), X = esc();
-  if (!secondo) {
-    host.innerHTML = '<p class="cf-lead">Serve più di un regime applicabile per confrontare le leve.</p>';
-    return;
-  }
-  const stato = window.cfStato();
-  const divarioBase = vincente.netto - secondo.netto;
-
+/* Le leve del «e se?»: quali variazioni provare, dati i numeri inseriti.
+   Sta fuori da graficoDriver() perche' la risposta serve due volte — a chi
+   disegna la tabella e a chi deve chiedere quegli scenari al server prima di
+   disegnarla — e due elenchi separati divergerebbero al primo cambiamento. */
+window.cfLeve = function (stato) {
   const automatico = (stato.mixMode || 'auto') !== 'manual';
   const LEVE = [
     ['Costi annuali', 'un terzo in più', { costFactor: 1.3 }, 'un terzo in meno', { costFactor: 0.7 }],
@@ -3108,7 +3120,28 @@ function graficoDriver(esito, vincente, secondo) {
     LEVE.push(['Aliquota CNPADC', '10 punti in più', { pensionRate: Math.min(100, stato.pensionRate + 10) },
       '10 punti in meno', { pensionRate: Math.max(12, stato.pensionRate - 10) }]);
   }
+  return LEVE;
+};
 
+function graficoDriver(esito, vincente, secondo) {
+  /* Era un grafico a tornado: barre verde e rosse intorno a una linea centrale,
+     con lo scostamento del divario. Diceva la cosa giusta e non si capiva —
+     bisognava tenere a mente il divario di partenza e leggere una lunghezza.
+     La domanda vera e' binaria: questa cosa ribalta la scelta o no. Quindi si
+     risponde a parole, e la barra resta solo come ordine di grandezza. */
+  const host = $('cfDrivers'), E = euro(), X = esc();
+  if (!secondo) {
+    host.innerHTML = '<p class="cf-lead">Serve più di un regime applicabile per confrontare le leve.</p>';
+    return;
+  }
+  const stato = window.cfStato();
+  const divarioBase = vincente.netto - secondo.netto;
+
+  const LEVE = window.cfLeve(stato);
+  /* Serve piu' sotto, per scegliere quale leva raccontare a parole. La
+     dichiarazione stava nel blocco che costruiva le leve, ed e' uscita di qui
+     insieme a quello. */
+  const automatico = (stato.mixMode || 'auto') !== 'manual';
   /* Per ogni variante si guarda chi vince, non solo di quanto: il ribaltamento
      e' l'unica informazione che cambia una decisione. */
   const prova = (extra) => {
@@ -3366,7 +3399,7 @@ function renderVerifiche(esito) {
      controlli» dell'Excel. Erano due elenchi paralleli, e divergevano — il
      working paper non riportava né il compenso ridotto né la maternità non
      determinata, cioè le due voci che spostano il risultato. */
-  cfAssunzioni(window.cfInputMotore(), esito).forEach((a) => {
+  window.cfAssunzioniCorrenti().forEach((a) => {
     v.push([a.severita === 'alta', a.titolo + ' — ' + a.dettaglio,
       a.severita === 'alta' ? 'Da leggere prima di decidere.' : null]);
   });
@@ -3406,7 +3439,8 @@ window.cfRenderArchivio = function () {
         const sv = (s.costi || []).find((c) => c.id === base.id);
         return sv ? Object.assign({}, base, sv) : base;
       }).concat((s.costi || []).filter((c) => c.custom));
-      const r = cfEngine(Object.assign({}, window.cfStatoDefault(), s.stato, { costs: costiSalvati }));
+      const r = window.cfCalcolaSalvata(s.id,
+        Object.assign({}, window.cfStatoDefault(), s.stato, { costs: costiSalvati }));
       sintesi = r.scenari.map((x) => ({ id: x.id, netto: x.netto, applicabile: x.applicabile }));
       ricalcolata = true;
     } catch (e) {
@@ -4031,6 +4065,14 @@ function convenienza() {
     }
   }
 
+  /* «Quanto costa superare la soglia adesso». Stava dentro renderCostoSalto(),
+     che per calcolarlo doveva conoscere la soglia di permanenza. Da qui in poi
+     la soglia la conosce solo il motore — nella pagina non c'e' piu' — quindi
+     il numero nasce insieme alla soglia da cui dipende, e la pagina lo riceve
+     gia' fatto. Sono le stesse due righe di prima, spostate. */
+  const oltre = stato.revenue > soglia ? stato.revenue : soglia + 5000;
+  const nettoOrdinarioOltre = nettoOrdinarioA(oltre);
+
   const min = Math.max(10000, Math.floor((soglia * 0.5) / 10000) * 10000);
   const max = Math.min(600000, Math.max(160000,
     Math.ceil(((pareggio || 160000) * 1.2) / 10000) * 10000,
@@ -4046,11 +4088,16 @@ function convenienza() {
   }
   return { soglia, nettoRiferimento: rifer.netto, applicabileA85: rifer.applicabile,
     pareggio, extra: pareggio == null ? null : Math.max(0, pareggio - soglia),
-    sogliaCosti, costiAttuali, rifCosti, min, max, punti };
+    sogliaCosti, costiAttuali, rifCosti, oltre, nettoOrdinarioOltre, min, max, punti };
 }
 
 window.cfConvenienza = convenienza;
 window.cfCalcola = calcola;
+/* L'archivio ricalcola simulazioni salvate, che sono input completi e non
+   varianti di quella aperta: passa da qui perche' chi le calcola possa
+   cambiare senza che l'elenco se ne accorga. L'identificativo serve a chi le
+   calcola altrove e deve poi ritrovarle. */
+window.cfCalcolaSalvata = (id, input) => cfEngine(input);
 /* Serve a cfAssunzioni(), che deve vedere lo stesso input del motore:
    professione, campi dichiarati e regole dei costi effettivamente in uso. */
 window.cfInputMotore = () => inputMotore();
@@ -4460,6 +4507,558 @@ else avvia();
 
 })();
 
+</script>
+<script id="cf-api">
+/* Confronto regimi — il collegamento al servizio di calcolo.
+
+   Perche' esiste. Il motore fiscale di questo tool — le soglie del
+   forfettario, il trattamento dei costi, la contribuzione sull'utile
+   attribuibile, la ricerca del mix compenso/utili — e' il lavoro che sta
+   dietro allo strumento. Finche' gira nel browser, chiunque apra gli
+   strumenti per sviluppatori se lo porta via per intero. Da qui in poi gira
+   su un server, e la pagina chiede i numeri invece di produrli.
+
+   Come si accende. Non c'e' nessun indirizzo scritto qui dentro e non c'e'
+   nessuna chiave: il modo si legge dalle preferenze del browser.
+
+     localStorage.setItem('tal-api-modo', 'api')   // usa il servizio
+     localStorage.setItem('tal-api-modo', 'locale')// calcola in pagina (default)
+
+   Il valore predefinito e' 'locale': finche' non si decide, la pagina si
+   comporta esattamente come prima e nessuna richiesta parte. E' la stessa
+   ragione per cui la migrazione e' reversibile — si torna indietro togliendo
+   una preferenza, non ripubblicando il sito.
+
+   Perche' l'indirizzo non e' scritto qui. In produzione l'API sta sulla
+   stessa origine del sito (`/api/...`): una Route di Cloudflare la
+   intercetta prima che la richiesta arrivi a GitHub Pages. Cosi' non serve
+   CORS, non serve un sottodominio e non serve un record DNS nuovo. Per le
+   prove si puo' puntare a un indirizzo *.workers.dev, ma solo mettendolo a
+   mano in `localStorage` e solo se ha quella forma: un indirizzo che si
+   potesse passare nel link sarebbe un modo per far spedire i numeri di
+   qualcuno a un server scelto da qualcun altro.
+
+   Che cosa parte davvero, senza formule consolatorie. Partono i VALORI del
+   calcolo — compensi, costi, percentuali, aliquote — e nient'altro. Non
+   partono nomi, codici fiscali, partite IVA, note, file. Il filtro e'
+   `inputDaMandare()`, qui sotto; il server rifiuta comunque tutto cio' che
+   non e' nel suo elenco; e nessuna delle due parti conserva niente.
+
+   Cosa protegge e cosa no. Protegge il METODO: le formule non vengono piu'
+   consegnate al browser. Non rende i RISULTATI irraggiungibili — un'API
+   pubblica risponde a chiunque la chiami, e chi ha pazienza puo' interrogarla
+   a tappeto. Le due cose vanno tenute distinte, altrimenti si scambia una
+   protezione reale per una che non c'e'. */
+
+'use strict';
+
+(function () {
+
+const MODI = ['locale', 'api', 'api-con-riserva'];
+const MODO_PREDEFINITO = 'locale';
+const PERCORSO = '/api/confronto-regimi/calcola';
+const ATTESA_MS = 8000;
+const MAX_TENTATIVI = 2;
+
+/* Un sottodominio workers.dev e nient'altro. */
+const FORMA_PROVA = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{0,40}\.workers\.dev$/;
+
+const preferenza = (chiave) => {
+  try { return localStorage.getItem(chiave); } catch (_) { return null; }
+};
+
+const motoreInPagina = () => typeof window.cfCalcolaLocale === 'function';
+
+/* Quando il motore e' stato tolto dalla pagina, 'locale' e 'api-con-riserva'
+   non sono piu' scelte disponibili: non c'e' niente con cui ripiegare. La
+   preferenza resta scritta nel browser di chi l'aveva messa, e verrebbe
+   applicata dando una pagina muta; qui si ignora. */
+const modo = () => {
+  if (!motoreInPagina()) return 'api';
+  const m = preferenza('tal-api-modo');
+  return MODI.indexOf(m) !== -1 ? m : MODO_PREDEFINITO;
+};
+
+const indirizzo = () => {
+  const b = (preferenza('tal-api-base') || '').trim();
+  return b && FORMA_PROVA.test(b) ? b + PERCORSO : PERCORSO;
+};
+
+/* ------------------------------------------------------------------ errori */
+
+/* Il messaggio che vede l'utente dice cosa e' successo e cosa puo' fare. Non
+   dice «errore 500»: un codice di stato non e' un'istruzione. */
+const TESTI = {
+  rete: ['Il servizio di calcolo non risponde',
+    'Non riesco a raggiungere il servizio che esegue i calcoli. Controlla la connessione e riprova.'],
+  attesa: ['Il calcolo sta impiegando troppo',
+    'Il servizio non ha risposto entro otto secondi. Riprova fra un momento.'],
+  limite: ['Troppe richieste di seguito',
+    'Il servizio chiede di rallentare. Aspetta una decina di secondi e riprova: i dati che hai inserito restano dove sono.'],
+  dati: ['Un dato non è accettato dal servizio',
+    'Il servizio di calcolo ha rifiutato un valore. Controlla i campi segnalati e riprova.'],
+  servizio: ['Il servizio di calcolo ha avuto un problema',
+    'Non è colpa dei dati che hai inserito. Riprova; se continua, segnalalo indicando il riferimento qui sotto.'],
+  pagina: ['I numeri sono arrivati ma non riesco a mostrarli',
+    'È un difetto di questa pagina, non del calcolo. Il dettaglio è nella console del browser: segnalalo.']
+};
+
+function guasto(genere, extra) {
+  const g = new Error(TESTI[genere] ? TESTI[genere][0] : 'Errore');
+  g.genere = genere;
+  Object.assign(g, extra || {});
+  return g;
+}
+
+/* --------------------------------------------------------------- richiesta */
+
+async function chiama(corpo, tentativo) {
+  const t = tentativo || 1;
+  const ctrl = new AbortController();
+  const scadenza = setTimeout(() => ctrl.abort(), ATTESA_MS);
+  let r;
+  try {
+    r = await fetch(indirizzo(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(corpo),
+      signal: ctrl.signal,
+      credentials: 'omit',
+      cache: 'no-store',
+      referrerPolicy: 'no-referrer'
+    });
+  } catch (e) {
+    clearTimeout(scadenza);
+    const genere = e && e.name === 'AbortError' ? 'attesa' : 'rete';
+    /* Un secondo tentativo solo per i guasti di trasporto, e solo uno: se il
+       servizio e' giu' davvero, insistere allunga l'attesa dell'utente senza
+       cambiare l'esito. Un errore di dati non si ritenta mai — la risposta
+       sarebbe identica. */
+    if (t < MAX_TENTATIVI && genere === 'rete') return chiama(corpo, t + 1);
+    throw guasto(genere);
+  }
+  clearTimeout(scadenza);
+
+  if (r.status === 429) throw guasto('limite');
+
+  let dati = null;
+  try { dati = await r.json(); } catch (_) { dati = null; }
+
+  if (!r.ok) {
+    const e = (dati && dati.errore) || {};
+    if (r.status === 400 && e.codice === 'input_non_valido') {
+      throw guasto('dati', { campo: e.campo, spiegazione: e.messaggio });
+    }
+    throw guasto('servizio', { riferimento: e.riferimento || null });
+  }
+  if (!dati) throw guasto('servizio');
+  return dati;
+}
+
+/* ------------------------------------------------------------------- cache */
+
+/* La pagina disegna il risultato leggendo il motore molte volte: il caso
+   inserito, i dieci «e se?», l'anno successivo, le soglie, i punti del
+   grafico. Con una chiamata per ciascuno sarebbero cinquanta viaggi di rete
+   per un aggiornamento. Qui si chiede tutto in una volta e si tiene il
+   risultato: `cfCalcola()` continua a essere una funzione che risponde
+   subito, e chi la chiama non si accorge di niente. */
+
+let CACHE = null;
+let usaRiserva = false;
+
+const chiave = (extra) => {
+  if (!extra) return '{}';
+  const o = {};
+  Object.keys(extra).sort().forEach((k) => { o[k] = extra[k]; });
+  return JSON.stringify(o);
+};
+
+/* Gli scenari alternativi che il disegno chiedera'. Vengono dalla stessa
+   `cfLeve()` che poi li usa: se un giorno si aggiunge una leva, arriva anche
+   qui senza che nessuno se ne debba ricordare. */
+function variantiNecessarie(stato) {
+  const v = [];
+  const aggiungi = (e) => { if (v.every((x) => chiave(x) !== chiave(e))) v.push(e); };
+  (window.cfLeve(stato) || []).forEach((riga) => {
+    aggiungi(riga[2]);
+    aggiungi(riga[4]);
+  });
+  /* La linea del tempo confronta l'anno simulato col successivo, dove i
+     compensi di quest'anno diventano quelli «dell'anno precedente». */
+  aggiungi({ previousRevenue: stato.revenue });
+  return v;
+}
+
+/* ------------------------------------------------- che cosa parte da qui */
+
+/* Solo i campi che il motore legge. E' lo stesso elenco che il server accetta,
+   e li' e' il controllo che conta — ma il controllo del server protegge il
+   *calcolo*, non il *viaggio*: un campo scartato all'arrivo e' comunque un
+   campo che e' uscito dal computer di chi lo ha scritto.
+   Misurato aprendo la scheda «Rete» del browser: senza questo filtro partivano
+   anche `subjectName` — il nome del cliente — `subjectKind` e `currentRegime`,
+   che il motore non guarda nemmeno. Il tool dice di non mandare in giro i dati
+   dei clienti: allora non li manda. */
+const CAMPI_DEL_MOTORE = [
+  'year', 'revenue', 'previousRevenue', 'otherIncome',
+  'employeeIncomePrev', 'employeeIncomeCurr',
+  'startup', 'incompatible', 'employer', 'employmentEnded', 'reducedMinimums',
+  'ownership', 'distribution', 'companyOverhead', 'irapRate',
+  'extractionMode', 'admin', 'adminTreatment', 'inpsRate',
+  'mixMode', 'retainInCompany',
+  'profession', 'pensionRate', 'maternity', 'regionalRate', 'municipalRate',
+  'costFactor', 'costs'
+];
+
+function soloCampiDelMotore(input) {
+  const pulito = {};
+  CAMPI_DEL_MOTORE.forEach((k) => {
+    if (input[k] !== undefined) pulito[k] = input[k];
+  });
+  return pulito;
+}
+
+/* Anche le voci di costo portano campi che servono solo a disegnare la tabella
+   (`nota`, `custom`, il nome esteso). Restano qui. */
+const CAMPI_DELLA_VOCE = ['id', 'amount', 'gross', 'iva', 'ivaOrd', 'ivaSoc',
+  'dedOrd', 'dedSoc', 'irap', 'uso', 'tetto'];
+
+function inputDaMandare(extra) {
+  const grezzo = soloCampiDelMotore(
+    Object.assign({}, window.cfInputMotore(), extra || {}));
+  grezzo.costs = (grezzo.costs || []).map((c) => {
+    const v = {};
+    CAMPI_DELLA_VOCE.forEach((k) => { if (c[k] !== undefined) v[k] = c[k]; });
+    return v;
+  });
+  return grezzo;
+}
+
+window.cfInputDaMandare = inputDaMandare;
+
+/* --------------------------------------------------- il motore, dal server */
+
+/* Se l'input non e' cambiato, non si richiede niente.
+ *
+ * Il disegno del confronto riparte ogni volta che si torna su quella schermata,
+ * anche solo per riguardarla: apri i costi, torni indietro, apri l'archivio,
+ * torni indietro. Ogni ritorno era una richiesta identica alla precedente.
+ * Misurato su una sessione di quattro secondi fatta di navigazione avanti e
+ * indietro: undici richieste, di cui quattro identiche a quella prima.
+ *
+ * Il servizio e' deterministico e senza memoria — stesso input, stesso
+ * risultato — quindi la richiesta ripetuta non porta nessuna informazione
+ * nuova. Costa solo: una attesa all'utente, una richiesta al piano gratuito, e
+ * un colpo alla soglia del limitatore, che a quel punto si consuma con l'uso
+ * normale invece che con l'abuso.
+ *
+ * La chiave e' il payload stesso: se cambia un qualunque numero, cambia la
+ * chiave e la richiesta riparte. Non c'e' modo di dimenticarsi di invalidarla,
+ * perche' non c'e' niente da invalidare a mano. */
+let ULTIMA_CHIESTA = null;
+
+async function precarica() {
+  const stato = window.cfStato();
+  const varianti = variantiNecessarie(stato);
+  const corpo = {
+    input: inputDaMandare(),
+    parti: ['risultato', 'soglie', 'curva', 'varianti'],
+    varianti: varianti
+  };
+
+  const impronta = JSON.stringify(corpo);
+  if (CACHE && impronta === ULTIMA_CHIESTA) return;
+
+  const risposta = await chiama(corpo);
+
+  const perChiave = {};
+  varianti.forEach((e, i) => { perChiave[chiave(e)] = risposta.varianti[i]; });
+
+  CACHE = {
+    base: risposta.esito,
+    assunzioni: risposta.assunzioni,
+    varianti: perChiave,
+    conv: Object.assign({}, risposta.soglie, { punti: risposta.curva.punti })
+  };
+  PARAMETRI_PER_ANNO[stato.year] = risposta.esito.params;
+  /* Segnata solo adesso: se la richiesta fosse fallita, la prossima volta si
+     deve riprovare, non credere di avere gia' il risultato. */
+  ULTIMA_CHIESTA = impronta;
+  usaRiserva = false;
+}
+
+/* Gli archivi sono simulazioni diverse fra loro, non varianti di quella
+   aperta: si mandano come input completi, uno per riga. */
+let CACHE_ARCHIVIO = {};
+let ULTIMO_ARCHIVIO = null;
+
+async function precaricaArchivio(elenco) {
+  if (!elenco.length) { CACHE_ARCHIVIO = {}; ULTIMO_ARCHIVIO = null; return; }
+  const corpo = {
+    input: soloCampiDelMotore(elenco[0].input),
+    parti: ['varianti'],
+    varianti: elenco.map((x) => soloCampiDelMotore(x.input))
+  };
+
+  /* Stessa regola del confronto: riaprire l'archivio senza averlo toccato non
+     e' una domanda nuova. */
+  const impronta = JSON.stringify(corpo);
+  if (impronta === ULTIMO_ARCHIVIO) return;
+
+  const risposta = await chiama(corpo);
+  const m = {};
+  elenco.forEach((x, i) => { m[x.id] = risposta.varianti[i]; });
+  CACHE_ARCHIVIO = m;
+  ULTIMO_ARCHIVIO = impronta;
+}
+
+/* ------------------------------------------------------------ l'interfaccia */
+
+/* Un solo riquadro, sopra il risultato: dice che sta calcolando, oppure cosa
+   e' andato storto e come riprovare. Non e' un toast — un messaggio che
+   sparisce da solo mentre l'utente sta leggendo dei numeri sbagliati e' il
+   modo di far credere che i numeri siano giusti. */
+function riquadro() {
+  let el = document.getElementById('cfApiStato');
+  if (el) return el;
+  const ancora = document.getElementById('cfVerdict');
+  if (!ancora || !ancora.parentNode) return null;
+  el = document.createElement('div');
+  el.id = 'cfApiStato';
+  el.className = 'cf-api-stato';
+  el.setAttribute('role', 'status');
+  el.hidden = true;
+  ancora.parentNode.insertBefore(el, ancora);
+  return el;
+}
+
+let attesaVisibile = null;
+
+function mostraAttesa() {
+  const el = riquadro();
+  if (!el) return;
+  /* Solo se il calcolo tarda: sotto i due decimi di secondo un messaggio che
+     compare e sparisce e' un lampo, e un lampo si legge come un errore. */
+  attesaVisibile = setTimeout(() => {
+    el.hidden = false;
+    el.className = 'cf-api-stato is-attesa';
+    el.innerHTML = '<p><b>Sto calcolando…</b></p>';
+  }, 220);
+  const cards = document.getElementById('cfCards');
+  if (cards) cards.setAttribute('aria-busy', 'true');
+}
+
+function chiudiAttesa() {
+  if (attesaVisibile) { clearTimeout(attesaVisibile); attesaVisibile = null; }
+  const el = document.getElementById('cfApiStato');
+  if (el) { el.hidden = true; el.innerHTML = ''; }
+  const cards = document.getElementById('cfCards');
+  if (cards) cards.removeAttribute('aria-busy');
+}
+
+function mostraGuasto(g, riprova) {
+  const el = riquadro();
+  if (!el) return;
+  const testo = TESTI[g.genere] || TESTI.servizio;
+  el.hidden = false;
+  el.className = 'cf-api-stato is-guasto';
+  el.setAttribute('role', 'alert');
+  el.innerHTML =
+    '<h3>' + window.cfEsc(testo[0]) + '</h3>' +
+    '<p>' + window.cfEsc(g.spiegazione || testo[1]) + '</p>' +
+    (g.campo ? '<p>Campo: <b>' + window.cfEsc(g.campo) + '</b></p>' : '') +
+    (g.riferimento ? '<p class="cf-api-rif">Riferimento: ' +
+      window.cfEsc(g.riferimento) + '</p>' : '') +
+    '<button class="btn secondary" id="cfApiRiprova" type="button">Riprova</button>';
+  const b = document.getElementById('cfApiRiprova');
+  if (b) b.addEventListener('click', riprova);
+}
+
+function mostraRiserva() {
+  const el = riquadro();
+  if (!el) return;
+  el.hidden = false;
+  el.className = 'cf-api-stato is-riserva';
+  el.innerHTML = '<p><b>Il servizio di calcolo non risponde.</b> I numeri qui sotto ' +
+    'sono stati calcolati dal browser con le regole che questa pagina conosce.</p>';
+}
+
+/* Svuota il risultato invece di lasciarlo com'era. Numeri vecchi accanto a un
+   messaggio d'errore si leggono come numeri nuovi. */
+function svuotaRisultato() {
+  ['cfVerdict', 'cfCards', 'cfThresholdReadout', 'cfChartReadout', 'cfDrivers']
+    .forEach((id) => { const e = document.getElementById(id); if (e) e.innerHTML = ''; });
+}
+
+/* ---------------------------------------------------- sostituzione dei ponti */
+
+/* Le funzioni originali restano raggiungibili: servono al modo 'locale', alla
+   riserva, e a poter tornare indietro senza ripubblicare niente. */
+window.cfCalcolaLocale = window.cfCalcola;
+window.cfConvenienzaLocale = window.cfConvenienza;
+window.cfCalcolaSalvataLocale = window.cfCalcolaSalvata;
+const renderConfrontoLocale = window.cfRenderConfronto;
+const renderArchivioLocale = window.cfRenderArchivio;
+
+const daServer = () => modo() !== 'locale' && !usaRiserva;
+
+window.cfCalcola = function (extra) {
+  if (!daServer()) return window.cfCalcolaLocale(extra);
+  if (!CACHE) throw new Error('cfCalcola: il risultato non è ancora arrivato dal servizio');
+  const k = chiave(extra);
+  if (k === '{}') return CACHE.base;
+  const v = CACHE.varianti[k];
+  if (!v) throw new Error('cfCalcola: lo scenario ' + k + ' non è stato chiesto al servizio');
+  return v;
+};
+
+window.cfConvenienza = function () {
+  if (!daServer()) return window.cfConvenienzaLocale();
+  if (!CACHE) throw new Error('cfConvenienza: il risultato non è ancora arrivato dal servizio');
+  return CACHE.conv;
+};
+
+window.cfCalcolaSalvata = function (id, input) {
+  if (!daServer()) return window.cfCalcolaSalvataLocale(id, input);
+  const r = CACHE_ARCHIVIO[id];
+  if (!r) throw new Error('archivio: simulazione non ricalcolata');
+  return r;
+};
+
+/* I parametri dell'anno. Oggi vengono ancora dalla tabella in pagina; quando
+   la tabella non ci sara' piu', vengono dall'ultima risposta del servizio.
+   Le due strade danno gli stessi numeri — il test di equivalenza lo verifica —
+   e averle entrambe e' cio' che rende la migrazione reversibile. */
+window.cfParametri = function (anno) {
+  if (!daServer() && typeof CF_PARAMS !== 'undefined') {
+    return CF_PARAMS[Number(anno || window.cfStato().year)];
+  }
+  const p = parametriNoti(anno);
+  if (p) return p;
+  if (typeof CF_PARAMS !== 'undefined') {
+    return CF_PARAMS[Number(anno || window.cfStato().year)];
+  }
+  return null;
+};
+
+/* Le assunzioni: dal servizio quando c'e', dalla pagina quando calcola lei. */
+window.cfAssunzioniCorrenti = function () {
+  if (daServer() && CACHE) return CACHE.assunzioni || [];
+  return cfAssunzioni(window.cfInputMotore(), window.cfCalcola());
+};
+
+/* ------------------------------------------------------------- i due render */
+
+window.cfRenderConfronto = function () {
+  if (modo() === 'locale') { chiudiAttesa(); return renderConfrontoLocale(); }
+  mostraAttesa();
+  return precarica().then(() => {
+    chiudiAttesa();
+    /* Il disegno sta in un `try` suo. Se fallisce non e' il servizio ad avere
+       un problema — i numeri sono arrivati — ed e' un difetto della pagina, che
+       va detto per quello che e' e lasciato in console per intero. Metterlo
+       nello stesso `catch` della rete faceva accusare il servizio di un guasto
+       che era qui: e' successo alla prima prova in browser, e il messaggio
+       mandava a cercare dalla parte sbagliata. */
+    try {
+      renderConfrontoLocale();
+    } catch (e) {
+      console.error('cf-api: i numeri sono arrivati ma il disegno è fallito', e);
+      svuotaRisultato();
+      mostraGuasto(guasto('pagina'), () => window.cfRenderConfronto());
+    }
+  }).catch((g) => {
+    chiudiAttesa();
+    if (modo() === 'api-con-riserva' && motoreInPagina()) {
+      usaRiserva = true;
+      try { renderConfrontoLocale(); mostraRiserva(); return; }
+      catch (e) { console.error('cf-api: fallita anche la riserva', e); }
+    }
+    svuotaRisultato();
+    mostraGuasto(g, () => window.cfRenderConfronto());
+  });
+};
+
+window.cfRenderArchivio = function () {
+  if (modo() === 'locale') return renderArchivioLocale();
+  const elenco = (window.cfLeggiArchivio() || []).map((s) => ({
+    id: s.id,
+    input: Object.assign({}, window.cfStatoDefault(), s.stato, {
+      costs: window.cfNuoviCosti().map((base) => {
+        const sv = (s.costi || []).find((c) => c.id === base.id);
+        return sv ? Object.assign({}, base, sv) : base;
+      }).concat((s.costi || []).filter((c) => c.custom))
+    })
+  }));
+  return precaricaArchivio(elenco).then(renderArchivioLocale).catch(() => {
+    /* L'archivio ha gia' la sua rete: se il ricalcolo non riesce mostra la
+       sintesi memorizzata e lo dichiara. Qui basta lasciarlo fare. */
+    CACHE_ARCHIVIO = {};
+    renderArchivioLocale();
+  });
+};
+
+/* I parametri dell'anno, per le schermate che li mostrano senza aver mai fatto
+   un confronto — «Come si usa» li stampa tutti, con le fonti accanto. Costano
+   zero calcoli al server ed escono dalla stessa proiezione del risultato,
+   quindi non c'e' una seconda verita' su che cosa e' pubblico.
+   Si tengono per anno: cambiare anno e' un'azione dell'utente, non un evento
+   raro, e rifare la richiesta ogni volta che si riapre la stessa schermata
+   sarebbe traffico senza informazione. */
+const PARAMETRI_PER_ANNO = {};
+
+window.cfAssicuraParametri = async function (anno) {
+  const y = Number(anno || window.cfStato().year);
+  if (!daServer()) return window.cfParametri();
+  if (PARAMETRI_PER_ANNO[y]) return PARAMETRI_PER_ANNO[y];
+  if (CACHE && CACHE.base && CACHE.base.params && window.cfStato().year === y) {
+    PARAMETRI_PER_ANNO[y] = CACHE.base.params;
+    return PARAMETRI_PER_ANNO[y];
+  }
+  const r = await chiama({ input: { year: y }, parti: ['parametri'] });
+  PARAMETRI_PER_ANNO[y] = r.parametri;
+  return r.parametri;
+};
+
+/* La versione sincrona, per chi disegna e non puo' aspettare: risponde con
+   quello che c'e' gia'. Chi la chiama deve aver chiamato prima
+   `cfAssicuraParametri()`, ed e' quello che fanno i render. */
+const parametriNoti = (anno) => {
+  const y = Number(anno || window.cfStato().year);
+  if (PARAMETRI_PER_ANNO[y]) return PARAMETRI_PER_ANNO[y];
+  if (CACHE && CACHE.base && CACHE.base.params && window.cfStato().year === y) {
+    return CACHE.base.params;
+  }
+  return null;
+};
+
+/* Gli anni per cui esistono parametri. Finche' la tabella e' in pagina la
+   risposta viene da li'; quando non c'e' piu', viene dal menu a tendina degli
+   anni, che e' l'unico elenco che la pagina possiede davvero — ed e' anche
+   l'elenco che l'utente vede, quindi non possono divergere senza che si noti.
+   L'ultima parola resta comunque al server, che rifiuta un anno che non
+   conosce: questo serve a dirlo prima, non al posto suo. */
+window.cfAnniPrevisti = function () {
+  if (typeof CF_PARAMS !== 'undefined') {
+    return Object.keys(CF_PARAMS).map(Number).sort();
+  }
+  const sel = document.getElementById('cfYear');
+  const anni = sel ? [...sel.options].map((o) => Number(o.value)).filter(Number.isFinite) : [];
+  return anni.sort();
+};
+
+/* Una sonda per chi verifica: dice come sta girando il tool senza doverlo
+   dedurre dal traffico di rete. */
+window.cfApiDiagnostica = () => ({
+  modo: modo(),
+  indirizzo: indirizzo(),
+  motoreInPagina: motoreInPagina(),
+  inRiserva: usaRiserva,
+  risultatoInMemoria: !!CACHE
+});
+
+})();
 </script>
 <script id="cf-xlsx">
 /* Confronto regimi — template, importazione ed esportazione Excel.
@@ -5278,7 +5877,7 @@ function esportaExcel() {
       (f.osservazione || '') + (f.fonte ? ' [fonte: ' + f.fonte + ']' : ''),
       'da risolvere']);
   });
-  cfAssunzioni(window.cfInputMotore(), esito).forEach((a) => {
+  window.cfAssunzioniCorrenti().forEach((a) => {
     ass.push([a.severita, a.titolo, a.dettaglio,
       a.severita === 'alta' ? 'da leggere prima di decidere' : 'dichiarata']);
   });

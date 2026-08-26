@@ -216,6 +216,57 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-design.css?v=20260814">
 <script defer src="/assets/tal-experience.js?v=20260823"></script>
+
+<style id="tal-tool-families">
+/* Le famiglie di strumenti.
+
+   La suite e' arrivata a sei tool e l'elenco piatto non diceva piu' a cosa
+   serve ciascuno: chi arriva con «devo fare la LIPE» doveva leggerli tutti. Tre
+   famiglie, un colore per famiglia, e il tag ripetuto sulla card cosi' resta
+   riconoscibile anche quando la si guarda da sola.
+
+   Il colore non e' l'unica informazione: il tag porta sempre il testo, e la
+   famiglia ha il proprio titolo sopra le card. */
+.tool-family{margin:0 0 46px}
+.tool-family-head{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:0 0 12px;margin:0 0 18px;border-bottom:1px solid var(--tal-line,#e7e4dc)
+}
+.tool-family-head h2{
+  margin:0;font-size:clamp(17px,2.2vw,21px);line-height:1.2;
+  display:flex;align-items:center;gap:9px
+}
+/* Il quadratino colorato accanto al titolo lega la famiglia ai tag delle card. */
+.tool-family-head h2::before{
+  content:"";width:11px;height:11px;border-radius:3px;flex:0 0 auto;
+  background:var(--fam)
+}
+.tool-family-head p{margin:0;font-size:13px;color:var(--tal-ink-3,#6e6b65)}
+
+.tool-family--contabilita{--fam:#145368}
+.tool-family--adempimenti{--fam:#8B6A16}
+.tool-family--utilita{--fam:#59147D}
+
+.tool-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:999px;
+  font-size:10.5px;font-weight:750;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid transparent
+}
+.tool-tag::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:currentColor;
+  flex:0 0 auto;opacity:.75
+}
+/* Fondi tenui e testo scuro: i rapporti di contrasto stanno fra 5,5 e 7,5,
+   quindi il tag resta leggibile anche stampato in bianco e nero. */
+.tool-tag--contabilita{background:#EAF2F5;color:#0C3341;border-color:#BFD6DE}
+.tool-tag--adempimenti{background:#FFF8DF;color:#6B5211;border-color:#E8DCAE}
+.tool-tag--utilita{background:#F3EAF8;color:#4A116A;border-color:#DCC7E8}
+
+@media(max-width:640px){
+  .tool-family-head{flex-direction:column;gap:4px}
+}
+</style>
 </head><body><div class="wrap">
 <header class="tal-global-header">
 <div class="tal-gh-frame">
@@ -235,9 +286,14 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div><span class="label">AI-ASSISTED ONBOARDING</span><h2>Prepare configuration files with your AI</h2><p>Downloadable templates, guided prompts and upload instructions to configure the tools with data you already have.</p></div>
 <a class="button" href="/en/configure-with-ai/">Configure with AI →</a>
 </section>
-<section class="grid">
+<section aria-labelledby="fam-contabilita" class="tool-family tool-family--contabilita">
+<div class="tool-family-head">
+<h2 id="fam-contabilita">Accounting and financial statements</h2>
+<p>Reclassify, analyse, file.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">Statutory statements · v1.4.2</span><h2>Italian statutory financial statements · ITA GAAP</h2><span class="category-tag category-accounting">Accounting</span>
+<span class="label">Statutory statements · v1.4.2</span><h2>Italian statutory financial statements · ITA GAAP</h2><span class="tool-tag tool-tag--contabilita">Statutory statements</span>
 <p>Fourth Directive reclassification from an IAS/IFRS trial balance, with ordinary or abbreviated layouts, mapping, maturity breakdown by category, adjustments and reconciliations.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel trial balance</div>
@@ -248,7 +304,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/financial-statement/">Open statutory statements (IT) →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="label">Management analysis · v2.1.3</span><h2>Financial analysis</h2><span class="category-tag category-controlling">Controlling</span>
+<span class="label">Management analysis · v2.1.3</span><h2>Financial analysis</h2><span class="tool-tag tool-tag--contabilita">Analysis and KPIs</span>
 <p>Management reclassifications, KPIs, cash flow, budget, forecast, cost centres, documented benchmarks and quality gates.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Trial balance and optional modules</div>
@@ -258,19 +314,16 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/financial-analysis/">Open financial analysis (IT) →</a></div>
 </article>
-<article class="card tool-card-v614">
-<span class="label">Fascicolo cliente · v2.3.3</span><h2>Client tax file</h2><span class="category-tag category-client">Client management</span>
-<p>Client profile and annual tax working paper for Tax for Audit, M&amp;A due diligence and other tax review processes, with open items and full backup.</p>
-<div class="facts">
-<div><strong>Input</strong><br/>Client and tax documentation</div>
-<div><strong>Output</strong><br/>Analytical and narrative tax file</div>
-<div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
 </div>
-<p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/tfa-client-file/">Open client tax file (IT) →</a></div>
-</article>
+</section>
+<section aria-labelledby="fam-adempimenti" class="tool-family tool-family--adempimenti">
+<div class="tool-family-head">
+<h2 id="fam-adempimenti">Tax and compliance</h2>
+<p>Prepare and check what has to be filed or paid.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">LIPE · v3.6.7</span><h2>LIPE Generator</h2><span class="category-tag category-vat">Tax · VAT</span>
+<span class="label">LIPE · v3.6.7</span><h2>LIPE Generator</h2><span class="tool-tag tool-tag--adempimenti">Periodic VAT</span>
 <p>VAT codes, VP section and IVP18 XML for periodic VAT settlement communications, with controlled carry-forwards, PDF and working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>VAT code mapping and Excel amounts</div>
@@ -281,7 +334,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/lipe/">Open LIPE Generator (IT) →</a></div>
 </article>
 <article class="card tool-card-v614">
-<span class="label">F24 · v1.0.1</span><h2>F24 Generator</h2><span class="category-tag category-vat">Tax · Payments</span>
+<span class="label">F24 · v1.0.1</span><h2>F24 Generator</h2><span class="tool-tag tool-tag--adempimenti">Tax payments</span>
 <p>Italian F24 payment forms for one or many taxpayers, grouped by payment stream, with checks on balances, form capacity and tax codes, a credit register and the telematic record layout.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel or CSV of payments, or guided entry</div>
@@ -291,8 +344,27 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/f24/">Open F24 Generator (IT) →</a></div>
 </article>
+</div>
+</section>
+<section aria-labelledby="fam-utilita" class="tool-family tool-family--utilita">
+<div class="tool-family-head">
+<h2 id="fam-utilita">Organisation and decisions</h2>
+<p>Keep the client in order and decide how to set them up.</p>
+</div>
+<div class="grid">
 <article class="card tool-card-v614">
-<span class="label">Confronto regimi · v1.4.2</span><h2>Confronto regimi</h2><span class="category-tag category-vat">Tax · Choosing the regime</span>
+<span class="label">Fascicolo cliente · v2.3.3</span><h2>Client tax file</h2><span class="tool-tag tool-tag--utilita">Client file</span>
+<p>Client profile and annual tax working paper for Tax for Audit, M&amp;A due diligence and other tax review processes, with open items and full backup.</p>
+<div class="facts">
+<div><strong>Input</strong><br/>Client and tax documentation</div>
+<div><strong>Output</strong><br/>Analytical and narrative tax file</div>
+<div>Operational interface in Italian</div>
+<div>Updated 23 August 2026 · local processing · online only</div>
+</div>
+<p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/tfa-client-file/">Open client tax file (IT) →</a></div>
+</article>
+<article class="card tool-card-v614">
+<span class="label">Confronto regimi · v1.4.2</span><h2>Confronto regimi</h2><span class="tool-tag tool-tag--utilita">Choosing the regime</span>
 <p>Compares the net personal cash of an Italian lawyer or chartered accountant across the flat-rate regime, ordinary self-employment and a professional limited company (STP/STA), including the break-even point above EUR 85,000, pension-fund contributions on attributable profit, and the director-fee versus dividend mix.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel workbook with profile, fees and costs, or guided entry</div>
@@ -301,7 +373,9 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <div>Updated 23 August 2026 · local processing · online only</div>
 </div>
 <div class="actions"><a class="button" href="/tools/confronto-regimi/">Open Confronto regimi →</a></div>
-</article></section>
+</article>
+</div>
+</section>
 
 <section aria-label="Which financial-statement tool should you use?" class="compare-wrap">
 <table class="compare-table">

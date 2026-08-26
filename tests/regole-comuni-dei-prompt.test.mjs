@@ -65,14 +65,22 @@ for (const [pagina, titolo, regole] of PAGINE) {
   });
 }
 
-test('i prompt italiani sono la misura: le altre lingue non ne hanno di meno', () => {
-  const quanti = (p) => Object.keys(prompt(fs.readFileSync(path.join(root, p), 'utf8'))).length;
-  const it = quanti('configura-con-ai/index.html');
-  /* Inglese e spagnolo ne hanno meno per una scelta dichiarata in pagina: per i
-     tre tool piu' recenti il blocco rimanda alla pagina italiana invece di
-     tenere tre copie del prompt che divergono. Il test fissa il numero di oggi
-     cosi' che, se qualcuno traduce o toglie un prompt, se ne parli. */
-  assert.equal(it, 6, `l’italiano ha ${it} prompt, non 6`);
-  assert.equal(quanti('en/configure-with-ai/index.html'), 3, 'l’inglese non ha piu’ 3 prompt tradotti');
-  assert.equal(quanti('es/configura-con-ia/index.html'), 3, 'lo spagnolo non ha piu’ 3 prompt tradotti');
+test('le tre lingue hanno gli stessi prompt', () => {
+  /* Fino al 25 agosto 2026 inglese e spagnolo ne avevano tre invece di sei: per
+     i tool piu' recenti il blocco rimandava alla pagina italiana, per non tenere
+     tre copie che divergono. Riccardo ha scelto di tradurre tutto, e allora la
+     regola diventa questa: se un prompt esiste in italiano, esiste in tutte e
+     tre le lingue. Un prompt aggiunto in una lingua sola fa fallire il test. */
+  const quali = (p) => Object.keys(prompt(fs.readFileSync(path.join(root, p), 'utf8'))).sort();
+  const it = quali('configura-con-ai/index.html');
+  assert.equal(it.length, 6, `l’italiano ha ${it.length} prompt, non 6`);
+  for (const [lingua, p] of [['inglese', 'en/configure-with-ai/index.html'],
+    ['spagnolo', 'es/configura-con-ia/index.html']]) {
+    const altri = quali(p);
+    const mancanti = it.filter((k) => !altri.includes(k));
+    const inPiu = altri.filter((k) => !it.includes(k));
+    assert.equal(mancanti.length + inPiu.length, 0,
+      `${lingua}: ${mancanti.length ? 'mancano ' + mancanti.join(', ') : ''}` +
+      `${inPiu.length ? ' in piu’ ' + inPiu.join(', ') : ''}`);
+  }
 });

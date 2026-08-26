@@ -346,13 +346,504 @@ REGLAS OBLIGATORIAS
 
 RESULTADO ESPERADO
 Devuelve el XLSX completado y un resumen muy breve de los códigos configurados, códigos excluidos y puntos que requieren revisión profesional. El profesional revisará el archivo antes de importarlo.</pre></details><p class="prompt-note">El prompt ordena a la IA no inventar, no cambiar la estructura del template y separar claramente todos los puntos que deben revisarse.</p></div></article>
-<article class="tool-card surface" id="tfa-client-file"><span class="label">EXPEDIENTE FISCAL DEL CLIENTE</span><h2>Expediente fiscal del cliente</h2><p>Esta herramienta y su plantilla de configuración se mantienen solo en italiano. La plantilla alimenta una aplicación cuya estructura cambia a menudo: mantener tres copias traducidas del prompt significaría corregir una y dejar atrás las otras dos.</p><div class="callout">La plantilla y el prompt están en la página italiana. El libro es un archivo Excel normal: puedes rellenarlo con documentos en cualquier idioma, solo los nombres de las hojas están en italiano.</div><div class="actions"><a class="button" href="/configura-con-ai/#tfa-client-file">Abrir la configuración italiana →</a><a class="button secondary" href="/tools/tfa-client-file/">Abrir la herramienta (IT) →</a></div></article></div></div></section>
-<section class="section"><div class="shell"><article class="privacy surface"><div class="privacy-icon">⌁</div><div><h3>Antes de cargar documentos en tu IA</h3><p>Comprueba que el servicio esté autorizado por las políticas del despacho o empresa y sea adecuado para las obligaciones de confidencialidad y protección de datos. Anonimiza los documentos cuando sea necesario. La clasificación final sigue siendo responsabilidad del profesional.</p></div></article></div></section>
+<article class="tool-card surface" id="tfa-client-file"><span class="label">EXPEDIENTE FISCAL DEL CLIENTE</span><h2>Expediente fiscal del cliente</h2><p>El expediente separa lo que sigue siendo válido a lo largo de los años — datos identificativos, negocio, planteamiento contable, grupo, áreas fiscales, litigios, operaciones — de lo que cambia en un ejercicio concreto. La plantilla prepara el perfil permanente; las novedades del año se añaden después, desde la herramienta.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Nota del registro mercantil, organigrama e información societaria</li><li>Cuentas anuales, balance de comprobación y tax computation</li><li>Declaraciones, papeles de trabajo y cuadros fiscales</li><li>Contratos, actas de inspección, consultas vinculantes y memorandos internos</li></ul></div><div class="callout"><strong>El archivo puede quedar parcial.</strong> La plantilla tiene catorce hojas y puedes dejar vacías las que quieras: la importación lee las que están, enumera lo que falta y no se bloquea. Las áreas sin rellenar quedan «por verificar», no se convierten en conclusiones positivas.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Fascicolo_Fiscale_Cliente_Configura_AI_v1.0.xlsx">Descargar la plantilla ↓</a><button class="button secondary copy-btn" data-copy="tfa-prompt" type="button">Copiar el prompt</button><a class="button secondary" href="/tools/tfa-client-file/">Abrir la herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="tfa-prompt">Actúa como asistente de preparación de datos fiscales para Tax Automation Lab.
+
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
+
+OBJETIVO
+Completar el archivo “Template_Fascicolo_Fiscale_Cliente_Configura_AI_v1.0.xlsx”
+para preparar una primera configuración del Expediente fiscal del cliente. El
+expediente distingue dos planos:
+- el PERFIL PERMANENTE, es decir lo que sigue siendo válido a lo largo de los
+  años (datos identificativos, negocio, planteamiento contable, grupo, áreas
+  fiscales, litigios, operaciones extraordinarias, otros aspectos);
+- el EJERCICIO, es decir solo lo que cambia o merece atención en un año
+  concreto.
+
+MATERIALES DISPONIBLES
+Te adjunto la plantilla y uno o varios documentos: pueden ser notas del registro
+mercantil, organigramas, cuentas anuales, balances de sumas y saldos, tax
+computation, declaraciones, papeles de trabajo, contratos, actas de inspección o
+memorandos internos. No se exige una lista precisa: usa lo que haya. Si un
+documento es ilegible o ambiguo, no intentes adivinar su contenido.
+
+REGLAS ABSOLUTAS
+1. No inventes. Rellena solo lo que sustente un documento adjunto.
+2. Deja vacío lo que no esté disponible o no sea verificable. Una celda vacía es
+   un resultado correcto; un dato plausible pero no documentado es un error.
+3. No escribas “sin observaciones”, “no aplicable” ni fórmulas equivalentes si
+   los documentos no permiten concluirlo. Déjalo vacío.
+4. No modifiques la estructura del libro: no renombres, añadas ni elimines hojas
+   y columnas, no muevas los encabezados, no insertes filas por encima de la
+   primera fila de encabezado.
+5. Un solo cliente por libro.
+6. El archivo puede quedar parcial. Hojas enteras vacías no bloquean la
+   importación: es preferible un archivo incompleto y fiable a uno completo e
+   inventado.
+7. En la hoja FISCALE no indiques IRES ni IRAP como peculiaridades: son
+   ordinarias. Incluye solo regímenes, características o temas distintivos.
+8. En la hoja FY registra solo las novedades del ejercicio. No dupliques lo que
+   ya está en el perfil permanente.
+
+LOS NOMBRES DE HOJAS Y COLUMNAS Y LOS VALORES DE LISTA SE QUEDAN EN ITALIANO
+La herramienta reconoce hojas, encabezados y los valores de los campos de
+elección por su nombre italiano. Escribe tus descripciones en el idioma que
+prefieras, pero deja “ANAGRAFICA”, “Ragione_sociale”, “Ricorrente”, “Da
+monitorare” y todos los demás nombres y valores de lista que siguen exactamente
+como están.
+
+FORMATOS
+- Fechas: YYYY-MM-DD (por ejemplo 2026-03-31).
+- Porcentajes: número sin símbolo, con la coma como separador decimal (por
+  ejemplo 80 o 30,5).
+- Listas dentro de una celda: separa con coma.
+- Campos “Stato”: usa Ricorrente, Da monitorare o Risolto.
+- Campo “Fonte”: indica el documento y, si resulta útil, el punto exacto (por
+  ejemplo “Visura camerale 2026, pag. 2” o “Bilancio 2025, nota 14”).
+
+HOJAS Y COLUMNAS
+
+ANAGRAFICA — una sola fila de datos.
+  Ragione_sociale | Codice_fiscale_PIVA | Paese | Esercizio_sociale |
+  Chiusura_esercizio_MM_GG | Tipo_attivita | Mercati | Descrizione_business
+  Esercizio_sociale: “anno solare” o la descripción encontrada en los documentos.
+  Chiusura_esercizio_MM_GG: formato MM-DD, por ejemplo 12-31.
+  Tipo_attivita: entre Produttore, Distributore, Servizi, Holding, Immobiliare,
+  Agricolo, Energia, Finanziario, Altro.
+  Mercati: entre Italia, UE, Extra UE.
+
+TEMATICHE_BUSINESS — peculiaridades del modelo de negocio.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+  Una fila por tema. Las filas sin Titolo se descartan.
+
+CONTABILITA — una sola fila de datos.
+  Principi_contabili | Tipo_bilancio | Reporting_di_gruppo | First_Time_Adoption
+
+TEMATICHE_CONTABILI — cuestiones contables recurrentes o que hay que vigilar.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+SOCIETA_GRUPPO — una sola fila de datos.
+  Gruppo_di_appartenenza | Direzione_e_coordinamento | Consolidato_civilistico |
+  Parti_correlate
+
+TEMATICHE_GRUPPO — peculiaridades societarias que el organigrama por sí solo no
+muestra.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+CARATTERISTICHE_FISCALI — una fila por característica, una sola columna.
+  Caratteristica
+  Ejemplos admitidos: IVA mensile, IVA trimestrale, Consolidato fiscale,
+  Transfer Pricing, Fiscalità internazionale, Regime di adempimento
+  collaborativo, Gruppo IVA, Pro-rata IVA, CFC, Pillar Two.
+
+GRUPPO_ENTITA — entidades que se mostrarán en el organigrama.
+  ID | Denominazione | Tipo | Forma | Colore | Cliente | Note
+  ID: un identificador breve y estable (E1, E2, HOLD, OPCO…). Solo sirve para
+  enlazar las relaciones: invéntalo si los documentos no lo traen.
+  Tipo: Società, Persona fisica, Fondo / Trust, JV / Partnership, Stabile
+  organizzazione, Altro.
+  Forma: rounded, rect, circle, triangle, diamond (opcional).
+  Colore: teal, purple, navy, green, amber, rust, gray (opcional).
+  Cliente: escribe SI en la fila de la entidad que es el cliente del expediente.
+  Las filas sin Denominazione se descartan.
+
+GRUPPO_RELAZIONI — relaciones entre las entidades.
+  Da_ID | A_ID | Quota_percentuale | Diritti_voto_percentuale | Tipo_relazione |
+  Etichetta
+  Da_ID y A_ID deben corresponder a los ID de la hoja GRUPPO_ENTITA.
+  La participación y los derechos de voto pueden diferir: rellena ambos solo si
+  los documentos los distinguen.
+  Tipo_relazione: Partecipazione, Controllo di fatto, Direzione e coordinamento,
+  Altro rapporto.
+
+FISCALE — áreas y temas fiscales relevantes.
+  Area | Esito_area | Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+  Area: Imposte dirette, IVA, Ritenute, Transfer Pricing, Consolidato fiscale,
+  Fiscalità internazionale, Agevolazioni &amp; crediti, Altro.
+  Una fila por tema; repite el nombre del Area en cada fila que le pertenece.
+  Esito_area: rellénalo solo si los documentos sustentan una conclusión sobre el
+  área.
+
+CONTENZIOSO — inspecciones, liquidaciones, litigios, consultas vinculantes.
+  Titolo | Tipo | Autorita | Periodo | Tema | Stato | Rischio | Descrizione |
+  Data_apertura | Data_chiusura
+
+OPERAZIONI — operaciones extraordinarias.
+  Titolo | Tipo | Data_efficacia | Descrizione | Aspetti_rilevanti
+  Incluye también operaciones cerradas si producen efectos plurianuales.
+
+ALTRI_ASPETTI — otros elementos permanentes relevantes que no encajan en otro
+sitio.
+  Titolo | Stato | Descrizione | Fonte | Aggiornato_al
+
+FY — novedades de un ejercicio concreto.
+  Esercizio | Data | Sezione | Area | Titolo | Stato | Descrizione |
+  Riporta_nel_profilo
+  Esercizio: el año, por ejemplo 2026.
+  Sezione: la sección del perfil a la que se refiere la novedad (Anagrafica &amp;
+  Business, Contabilità &amp; Reporting, Società &amp; Gruppo, Fiscale, Contenzioso &amp;
+  Controlli, Operazioni straordinarie, Altri aspetti rilevanti).
+  Riporta_nel_profilo: escribe SI solo si la novedad es estructural, es decir si
+  cambia el perfil permanente y no afecta solo a ese año.
+
+QUÉ ENTREGAR
+1. El libro completado, con el mismo nombre y la misma estructura.
+2. Un resumen breve, fuera del archivo, con:
+   - las hojas que has rellenado y las que has dejado vacías, con el motivo;
+   - la información que has encontrado pero no has sabido colocar;
+   - los puntos en los que los documentos eran ambiguos o contradictorios;
+   - las partidas que requieren revisión profesional antes de su uso.
+
+El archivo lo revisará el profesional antes de la importación. Tu tarea es
+preparar una base de trabajo trazable, no un expediente definitivo.</pre></details><p class="prompt-note">El prompt prohíbe a la IA inventar, le exige dejar vacío lo que los documentos no sustenten y entregar aparte la lista de las hojas sin rellenar y de los puntos a verificar.</p></div></article></div></div></section>
+<section class="section"><div class="shell"><article class="privacy surface"><div class="privacy-icon">⌁</div><div><h3>Antes de cargar documentos en tu IA</h3><p>Comprueba que el servicio esté autorizado por las políticas del despacho o empresa y sea adecuado para las obligaciones de confidencialidad y protección de datos. Anonimiza los documentos cuando sea necesario. La clasificación final sigue siendo responsabilidad del profesional.</p></div></article><article class="tool-card surface" id="f24"><span class="label">GENERADOR F24</span><h2>Generador F24</h2><p>La plantilla recoge los pagos fila por fila: contribuyente, flujo de pago, fecha, sección, código de tributo, periodo, año e importe. Cada combinación de contribuyente, fecha y flujo se convierte en un F24 distinto, así que la forma en que la IA asigna los flujos decide cuántos modelos obtendrás.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Hojas de cálculo de retenciones y resúmenes de nóminas</li><li>Modelos DM10, extractos UniEmens y certificados de la cuenta de cotización</li><li>Liquidaciones de IVA, cálculos de IMU y notificaciones de entes locales</li><li>Autoliquidaciones INAIL, hojas de regularización voluntaria, extractos de un ERP o de nóminas</li></ul></div><div class="callout"><strong>Los datos identificativos pueden quedar fuera.</strong> Si el contribuyente ya está en el archivo de la herramienta, las columnas con denominación, código fiscal y número de IVA pueden quedar vacías: solo hacen falta cuando el mismo archivo contiene varias sociedades. La herramienta reconoce por sí sola si el archivo es individual o masivo y nunca atribuye a una sociedad filas que podrían ser de otra.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_F24_Configura_AI_v1.0.xlsx">Descargar la plantilla ↓</a><button class="button secondary copy-btn" data-copy="f24-prompt" type="button">Copiar el prompt</button><a class="button secondary" href="/tools/f24/">Abrir la herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="f24-prompt">Actúa como asistente de preparación de datos fiscales para Tax Automation Lab.
+
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
+
+OBJETIVO
+Completar la hoja PAGAMENTI del archivo “Template_F24_Configura_AI_v1.0.xlsx”
+para preparar uno o varios modelos F24, para uno o varios contribuyentes. El
+archivo no debe contener ningún identificador interno de la herramienta: solo
+datos que estén en los documentos adjuntos.
+
+ANTES DE EMPEZAR
+1. Lee la hoja ISTRUZIONI de la plantilla: contiene las reglas de
+   cumplimentación de este archivo y prevalecen sobre cualquier costumbre.
+2. La hoja PAGAMENTI llega vacía, solo con los encabezados. Es correcto: es la
+   hoja que tienes que rellenar tú.
+3. La hoja ESEMPI_NON_IMPORTARE contiene filas de ejemplo sobre sociedades
+   inventadas (ALFA S.R.L., BETA S.P.A.). Solo sirven para mostrarte la forma de
+   una fila correcta. No las copies en PAGAMENTI, no las modifiques, no las
+   borres: la herramienta no lee esa hoja, y reconoce y descarta esas filas
+   aunque acaben en otro sitio.
+4. No dejes en PAGAMENTI ninguna fila que no provenga de los documentos
+   adjuntos.
+
+MATERIALES DISPONIBLES
+Te adjunto la plantilla y uno o varios documentos: pueden ser hojas de cálculo de
+retenciones, resúmenes de nóminas, modelos DM10 o extractos UniEmens,
+liquidaciones de IVA, cálculos de IMU, notificaciones de entes locales,
+autoliquidaciones INAIL, hojas de regularización voluntaria o extractos de un
+sistema contable o ERP. Usa lo que haya. Si un documento es ilegible o ambiguo,
+no intentes adivinar su contenido.
+
+REGLAS ABSOLUTAS
+1. No inventes. Rellena solo lo que sustente un documento adjunto.
+2. No corrijas ni “ajustes” códigos fiscales, números de IVA, códigos de tributo
+   ni causas de cotización. Si un identificador tiene una longitud anómala,
+   recógelo tal cual y señálalo en el resumen final: será la herramienta la que
+   lo rechace, y así debe ser.
+3. No rellenes Importo debito e Importo credito en la misma fila. Si un
+   documento muestra un saldo neto y no distingue la parte deudora de la
+   acreedora, deja vacías ambas columnas, rellena el resto de la fila y describe
+   el caso en el resumen como punto bloqueante. No deduzcas el signo de un
+   saldo: equivocarse produce un pago equivocado, y es exactamente lo que ocurre
+   si eliges tú una de las dos columnas.
+4. No modifiques el encabezado de la hoja, no añadas columnas, no las reordenes
+   ni las renombres: la herramienta las reconoce por su nombre.
+5. No redondees. Recoge los importes con los céntimos tal como están en el
+   documento de origen.
+
+LOS NOMBRES DE HOJAS Y COLUMNAS Y LOS VALORES DE LISTA SE QUEDAN EN ITALIANO
+La herramienta reconoce la hoja, los encabezados y los valores de los campos de
+elección por su nombre italiano. Escribe tus notas en el idioma que prefieras,
+pero deja “PAGAMENTI”, “Importo debito”, “Erario”, “Dipendenti” y todos los demás
+nombres y valores de lista que siguen exactamente como están.
+
+CÓMO RELLENAR LAS COLUMNAS
+- Denominazione, Codice fiscale, Partita IVA: hacen falta cuando el archivo
+  contiene varias sociedades. Si trabajas sobre una sola sociedad ya
+  seleccionada en la herramienta, déjalas vacías: las filas se atribuirán a esa
+  sociedad.
+- Flusso y Descrizione flusso: el tipo de pago (Dipendenti, Autonomi, IVA,
+  Imposte, IMU, Ravvedimenti). Las filas con el mismo contribuyente, la misma
+  Data pagamento y el mismo Flusso acaban en el mismo F24. Usa flujos distintos
+  para separar pagos que deben quedar en modelos distintos.
+- Data pagamento: el vencimiento del pago, en formato DD/MM/AAAA.
+- Sezione: una entre Erario, INPS, Regioni, IMU e altri tributi locali, INAIL,
+  Altri enti previdenziali e assicurativi. Escríbela completa.
+- Codice tributo / causale: el código tal como aparece en las instrucciones del
+  tributo o en el documento de origen.
+- Periodo / rateazione: cuatro cifras. 0008 para el mes de agosto; 0101 cuando
+  las instrucciones del tributo prevén el pago en un solo plazo. Para los
+  tributos que no lo exigen, déjalo vacío.
+- Anno: el año al que se refiere el tributo, no el año del pago.
+- Importo debito / Importo credito: valores positivos, en una sola de las dos
+  columnas.
+- Codice ente / sede / regione / comune: código de la sede del INPS, código de
+  región, código catastral del municipio para el IMU, código de la sede del
+  INAIL, según la sección.
+- Matricola / posizione / riferimento: matrícula del INPS, código de posición,
+  número de referencia del INAIL.
+- Periodo da / Periodo a: solo para las secciones que los prevén (normalmente
+  INPS y Altri enti), en formato MM/AAAA.
+- Las demás columnas (código de oficina, código de acta, indicadores del IMU,
+  número de inmuebles, deducción, datos del INAIL, coobligado, notas) se
+  rellenan solo cuando el documento las sustenta. Vacías es un resultado
+  aceptable.
+
+CAPACIDAD DEL MODELO
+Un solo F24 tiene un número fijo de filas por sección: Erario 6, INPS 4, Regioni
+4, IMU y tributos locales 4, INAIL 3, Altri enti 2. Si para un contribuyente y
+una fecha superas el límite de una sección, distribuye las filas en varios
+flujos: cada flujo se convierte en un F24 distinto. Indícalo en el resumen cuando
+lo hayas hecho.
+
+COMPENSACIONES
+Si un documento muestra un crédito para utilizar en compensación, recógelo en la
+columna Importo credito con su código de tributo y su año. No verifiques el
+derecho, la disponibilidad restante, el visado de conformidad ni los límites
+anuales: no es un juicio que puedas emitir a partir de los documentos adjuntos.
+Enuméralos en el resumen como puntos a verificar.
+
+RESUMEN FINAL
+Después del archivo, produce una lista con:
+- los contribuyentes y el número de F24 previstos para cada uno;
+- los totales deudores, los acreedores y el saldo de cada F24;
+- las filas en las que has tenido que interpretar un documento ambiguo;
+- los identificadores que te hayan parecido anómalos;
+- los créditos recogidos, con su origen documental;
+- lo que no has encontrado en los documentos y el profesional debe añadir;
+- la reconciliación de las filas: cuántas filas has leído en los documentos,
+  cuántas has escrito en PAGAMENTI, cuántas has agregado y cuántas has excluido,
+  con el motivo. Los dos totales deben cuadrar, y si no cuadran tienes que decir
+  por qué. La herramienta declara cuántas filas ha importado: ese número y el
+  tuyo deben coincidir.
+
+El archivo lo revisará el profesional antes de la importación y la herramienta
+ejecutará sus propios controles formales sobre saldos, capacidad, códigos e
+identificadores.</pre></details><p class="prompt-note">El prompt prohíbe a la IA corregir códigos fiscales y códigos de tributo de aspecto anómalo: deben llegar a la herramienta tal como están, para que sea el control formal el que los rechace en lugar de una corrección arbitraria previa.</p></div></article><article class="tool-card surface" id="confronto-regimi"><span class="label">CONFRONTO REGIMI</span><h2>Confronto regimi</h2><p>La plantilla recoge tres cosas separadas: quién es el sujeto, cuánto factura y cuánto gasta. El perfil va antes que los números: la profesión decide la caja de previsión y la forma societaria comparada, y el régimen actual es el punto de partida desde el que se mide la diferencia. Los umbrales del régimen de tanto alzado, en cambio, valen para todos los escenarios. Cada coste lleva sus propias reglas de IVA y deducibilidad, distintas entre el ejercicio ordinario y la sociedad: es la única forma de comparar un régimen que deduce los costes con otro que no los deduce. La combinación entre retribución del administrador y dividendo en la STP o STA no se decide de antemano: la herramienta la optimiza, y la plantilla solo pregunta cuánto debe quedarse en la sociedad.</p><div class="doc-box"><h3>Materiales útiles, también en formatos equivalentes</h3><ul><li>Declaración de la renta del año anterior, para los honorarios y las demás rentas</li><li>Libros de IVA, facturas emitidas o resúmenes del sistema contable, para los honorarios del año</li><li>Libro de bienes de inversión, registro de costes, extractos contables o libro diario, para los gastos anuales</li><li>Certificado de la caja de previsión, para el tipo personal y los mínimos</li><li>Estatutos, pacto de socios o nota del registro, para la participación en la STP o STA</li><li>Acuerdos de reparto y actas, para el beneficio distribuido y la retribución del administrador</li></ul></div><div class="callout"><strong>Los honorarios van netos del recargo de previsión.</strong> El recargo lo carga el profesional en la factura y lo paga el cliente: no es un ingreso, y sumarlo infla los tres escenarios. Si las facturas muestran un total con todo incluido, el prompt pide separarlo y declarar cómo se ha hecho.</div><div class="actions"><a class="button" download="" href="/resources/templates/Template_Confronto_Regimi_v1.0.xlsx">Descargar la plantilla ↓</a><button class="button secondary copy-btn" data-copy="confronto-regimi-prompt" type="button">Copiar el prompt</button><a class="button secondary" href="/tools/confronto-regimi/">Abrir la herramienta (IT) →</a><span aria-live="polite" class="copy-status"></span></div><div class="prompt-wrap"><details><summary>Leer el prompt completo</summary><pre id="confronto-regimi-prompt">Actúa como asistente de preparación de datos fiscales para Tax Automation Lab.
+
+REGLAS COMUNES A TODAS LAS PLANTILLAS DE TAX AUTOMATION LAB
+Rigen antes y por encima de las instrucciones específicas que siguen.
+1.  Lee primero la hoja ISTRUZIONI de la plantilla: contiene las reglas de este
+    archivo y prevalecen sobre cualquier costumbre.
+2.  Utiliza solo la evidencia contenida en los documentos adjuntos. Si un dato
+    no está, no está: no lo reconstruyas, no lo estimes, no lo completes por
+    analogía.
+3.  No corrijas ni completes los identificadores: códigos fiscales, números de
+    IVA, códigos de tributo, códigos de IVA, códigos de cuenta. Recógelos tal
+    como están y señálalos. El control formal lo hace la herramienta, y así
+    debe ser.
+4.  Borra o ignora toda fila de ejemplo. Si la plantilla tiene una hoja de
+    ejemplos, no copies su contenido en las hojas de trabajo.
+5.  No dejes valores predeterminados que el documento no sustente. Si un campo
+    admite una elección — esquema de balance, periodicidad, sección — y la
+    fuente no la declara, déjalo vacío: no elijas tú.
+6.  Si un dato es ambiguo, deja la celda vacía y abre un resultado bloqueante
+    en la hoja «Esiti AI». Una celda vacía se ve; un dato inventado con
+    seguridad no, y llega hasta la declaración.
+7.  Cita la fuente de cada dato no evidente: documento, hoja, fila o página.
+8.  Reconcilia los recuentos: cuántas filas has leído, cuántas has escrito,
+    cuántas has agregado, cuántas has excluido y por qué. Los totales deben
+    cuadrar.
+9.  No renombres hojas, columnas ni encabezados, no añadas ninguno y no los
+    reordenes: la herramienta los reconoce por su nombre.
+10. No declares completo un trabajo con resultados bloqueantes abiertos.
+
+OBJETIVO
+Completar las hojas PROFILO, COMPENSI y COSTI del archivo
+“Template_Confronto_Regimi_v1.0.xlsx” para comparar la caja personal neta de un
+abogado o un economista-auditor italiano entre tres planteamientos: el régimen
+de tanto alzado italiano (regime forfettario), el ejercicio por cuenta propia
+ordinario y una sociedad profesional STP o STA. La herramienta no decide:
+calcula los tres escenarios y declara sus supuestos.
+
+ANTES DE EMPEZAR
+1. Lee la hoja ISTRUZIONI.
+2. Mira la hoja ESEMPI_NON_IMPORTARE para entender la forma esperada y luego
+   olvídala: la herramienta no la lee y reconoce esas filas aunque acaben en las
+   hojas de trabajo.
+3. Las hojas PROFILO, COMPENSI y COSTI llegan con la columna de valores vacía.
+   Es intencionado: si las vuelves a cargar intactas la herramienta responde
+   «no hay datos que importar», y está bien así.
+
+LOS NOMBRES DE HOJAS Y COLUMNAS Y LOS VALORES DE LISTA SE QUEDAN EN ITALIANO
+La herramienta reconoce hojas, encabezados y los valores de los campos de
+elección por su nombre italiano. Escribe tus conclusiones en el idioma que
+prefieras, pero deja “PROFILO”, “Esiti AI”, “Bloccante”, “automatico” y todos
+los demás nombres y valores de lista que siguen exactamente como están.
+
+EL PERFIL VA ANTES QUE LOS NÚMEROS
+La profesión decide la caja de previsión — CNPADC para el economista-auditor,
+Cassa Forense para el abogado — y la forma societaria comparada: STP o STA. El
+régimen actual no cambia los umbrales, que valen para todos los escenarios: es
+el punto de partida desde el que la herramienta mide la diferencia y desde el
+que dice qué implica el cambio. Hacen falta los dos, y se determinan antes que
+los números. Si los documentos no dicen la profesión o el régimen de partida,
+deja las celdas vacías y abre un resultado bloqueante: no deduzcas uno del otro.
+
+HONORARIOS: QUÉ SON Y QUÉ NO SON
+Los honorarios se indican netos de IVA y del recargo obligatorio de previsión
+(contributo integrativo). El recargo lo carga el profesional en la factura y lo
+paga el cliente: no es un ingreso, y sumarlo infla todos los escenarios. Si las
+facturas muestran un total con todo incluido, sepáralo y declara cómo lo has
+hecho.
+Usa la palabra honorarios o ingresos, no renta: los umbrales del régimen de
+tanto alzado se miden sobre los honorarios cobrados, no sobre el beneficio.
+Los honorarios del año anterior cuentan: por encima de 85.000 el régimen de
+tanto alzado no es aplicable en el año simulado, y ese dato está en la
+declaración del año anterior, no en la del año en curso.
+Las demás rentas personales sirven para dos cosas: la progresividad del IRPEF y
+la capacidad para deducir las cotizaciones. Si el sujeto tiene rentas del
+trabajo por cuenta ajena o pensión, indícalas también en la fila dedicada: por
+encima de 35.000 son causa de exclusión.
+
+CAUSAS DE EXCLUSIÓN: DECLARAR, NO DEDUCIR
+Las filas con respuesta SI o NO — tipo del 5% por nueva actividad,
+participaciones incompatibles, actividad principalmente hacia un empleador o
+antiguo empleador — son declaraciones del profesional, no conclusiones tuyas.
+Ponlas en SI solo si un documento lo afirma. Si no encuentras nada, deja NO y
+abre un resultado que diga que el requisito no se ha verificado.
+Atención al tipo del 5%: superar los 85.000 durante el año NO lo hace perder. No
+lo elimines porque los honorarios sean altos.
+
+LA SOCIEDAD: NO DECIDAS TÚ LA COMBINACIÓN
+«Modalità di calcolo della società» hay que dejarlo en automatico, que es el
+valor por defecto: la herramienta busca por sí sola la combinación de retribución
+del administrador y dividendo que deja más caja personal neta. No es un dato que
+se deduzca de los documentos, es lo que calcula la herramienta.
+Ponlo en manuale solo si los documentos dicen que la retribución y el reparto ya
+están acordados y deben quedarse así: en ese caso rellena también
+«Remunerazione dalla società», «Compenso amministratore» y «Utile distribuito
+%», y abre un resultado que diga de qué acuerdo proceden.
+«Quanto deve restare in società» es una restricción, no una preferencia: pon los
+euros que deben quedarse para circulante, inversiones o pactos entre socios. La
+herramienta optimiza respetándolo. Si los documentos no lo dicen, deja cero: lo
+que se queda en la sociedad no es dinero disponible para la persona y no entra
+en la comparación.
+
+DOS FILAS QUE CAMBIAN EL RESULTADO Y QUE SE OLVIDAN
+«Rapporto di lavoro precedente cessato»: el umbral de 35.000 de rentas del
+trabajo por cuenta ajena del año anterior no opera si esa relación laboral ha
+terminado. Ponlo en SI solo si un documento acredita el cese Y en el año simulado
+no llegan rentas del trabajo ni de pensión: una nueva relación laboral vuelve a
+activar la causa de exclusión. Si tienes el cese pero no sabes si hay rentas
+nuevas, deja NO y abre un resultado: es el caso en el que una deducción
+equivocada cambia el resultado de la comprobación previa.
+«Prima iscrizione alla Cassa prima dei 35 anni»: Cassa Forense reduce a la mitad
+la cotización mínima personal y la del recargo durante los primeros seis años de
+alta. Vale solo para el abogado, y hace falta la fecha de primera alta, no la
+edad actual. Para CNPADC la herramienta no modela la reducción: ponlo en SI de
+todos modos si concurre, así la herramienta lo declara entre los supuestos.
+
+COSTES: DOS NÚMEROS DISTINTOS QUE NO HAY QUE CONFUNDIR
+Para cada partida, el importe anual es lo que sale del bolsillo. Los porcentajes
+que siguen dicen cuánto de ese importe es fiscalmente relevante, y son distintos
+entre el ejercicio ordinario y la sociedad. No ajustes el importe para tener en
+cuenta la deducibilidad: el importe es bruto de cualquier regla, y las reglas
+están en las columnas.
+Indica si el importe es neto o incluye IVA en la columna «Importo IVA compresa»:
+en el régimen de tanto alzado el IVA no se deduce, así que equivocarse en esa
+columna desplaza la comparación por el importe entero del impuesto.
+«Uso professionale %» sirve cuando un bien es también personal: la parte personal
+sale del bolsillo pero no entra en la comparación entre regímenes.
+«Tetto % dei compensi» es el límite superior de la deducción, no una segunda
+reducción. Las partidas que tienen uno ya lo traen escrito: representación al 1%,
+desplazamientos al 2%. No los toques si el documento no impone otra cosa.
+Si un gasto no encaja en ninguna partida, añade una fila con un nombre nuevo: la
+herramienta crea la partida y parte de las reglas genéricas. No lo fuerces dentro
+de una partida existente con reglas distintas.
+Los gastos de personal por cuenta ajena tienen un efecto propio: por encima de
+20.000 son causa de exclusión del régimen de tanto alzado. Mantenlos separados de
+los colaboradores que facturan.
+
+SOCIEDAD PROFESIONAL
+Rellena la participación, el beneficio distribuido y los costes de estructura
+solo si los documentos los sustentan. La participación determina el beneficio
+atribuible, el dividendo y la base de cotización: si no está documentada, déjala
+vacía y abre un resultado bloqueante, porque un valor inventado desplaza todo el
+escenario societario.
+Sobre la remuneración, indica dividendo, retribución o mixta según lo que prevean
+los documentos. Si no lo prevén, déjalo vacío: la elección es del profesional, y
+la herramienta la explora igualmente.
+No reclasifiques la retribución del administrador entre la caja de previsión y la
+Gestione Separata: escribe lo que dicen los documentos y, si no lo dicen, abre un
+resultado. La calificación depende de la autonomía y de la naturaleza del cargo,
+no de una regla automática.
+
+«ESITI AI»: ES LA PARTE QUE CUENTA
+Todo supuesto, duda o dato que falte va a la hoja «Esiti AI», con su fuente.
+Escribe «Bloccante» en la columna Stato cuando el dato falte o sea ambiguo de un
+modo que invalide la comparación: la herramienta los muestra destacados y los
+lleva a la exportación. Una comparación con un resultado bloqueante abierto no es
+una comparación terminada.
+Usa «Risolto» solo para lo que hayas verificado en un documento, citándolo.
+
+RESUMEN FINAL
+Después del archivo, produce una lista con:
+- la profesión y el régimen actual, con el documento del que los has sacado;
+- los honorarios del año y del año anterior, y cómo los has separado del IVA y
+  del recargo de previsión;
+- las partidas de coste rellenadas, y qué reglas por defecto has cambiado y por
+  qué;
+- las partidas que has añadido porque no existía una fila adecuada;
+- los requisitos del régimen de tanto alzado que no has podido verificar;
+- los resultados bloqueantes abiertos;
+- la reconciliación de los recuentos: cuántas partidas de coste has leído en los
+  documentos, cuántas has escrito en COSTI, cuántas has agregado y cuántas has
+  excluido, con el motivo. La herramienta declara cuántas filas ha leído: ese
+  número y el tuyo deben coincidir.
+
+El archivo lo revisará el profesional antes de la importación. La herramienta
+ejecuta sus propios controles y declara en pantalla todos los supuestos del
+modelo, pero no sustituye el criterio profesional ni verifica los requisitos
+declarados.</pre></details><p class="prompt-note">El prompt prohíbe deducir la profesión del régimen o al revés, y poner en SI un requisito del régimen de tanto alzado que ningún documento afirme: esas filas son declaraciones del profesional, no conclusiones de la IA. Prohíbe también ajustar los importes de los costes para tener en cuenta la deducibilidad: el importe queda bruto de cualquier regla, y las reglas están en las columnas.</p></div></article></div></section>
 <section class="section" id="where-upload"><div class="shell"><header class="section-head"><div><span class="label">INSTRUCCIONES DE CARGA</span><h2>¿Dónde cargo los archivos de importación?</h2></div><p>Los templates completados se cargan directamente en las secciones operativas de cada herramienta. Las pantallas siguientes muestran la ruta exacta. Las interfaces operativas permanecen en italiano.</p></header><div class="upload-grid">
 <article class="upload-card surface"><span class="label">01 · ESTADOS FINANCIEROS ITALIANOS · ITA GAAP</span><h3>Estados financieros italianos · ITA GAAP</h3><div class="path">Bilancio civilistico ITA GAAP → “Importa da Excel” → descarga la plantilla → carga el archivo completado en el área discontinua o pulsa “Carica Excel compilato”.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Abre “Importa da Excel” en el menú.</div><div class="guide-step"><b>2.</b> Descarga y completa la plantilla.</div><div class="guide-step"><b>3.</b> Arrastra el archivo o pulsa el botón de carga.</div></div><figure class="screen annotated"><div class="screen-visual"><img alt="Estados financieros italianos ITA GAAP: opción Importa da Excel y área de carga del archivo completado" height="900" loading="lazy" src="/resources/images/ai-onboarding/bilancio-ita-gaap-import-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="1" style="--marker-x:10.1%;--marker-y:34.1%;--marker-size:64px"></span><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:59%;--marker-y:77.8%;--marker-size:82px"></span></div><figcaption>El círculo 1 señala el comando del menú; el círculo 3 señala el área de carga.</figcaption></figure></article><article class="upload-card surface" id="financial-analysis-upload"><span class="label">02 · ANÁLISIS FINANCIERO</span><h3>Análisis financiero</h3><div class="path">Análisis financiero → “Importa da Excel” → descarga la plantilla única → carga el libro completado. Las hojas Actual son obligatorias; Budget, Forecast y centros de coste pueden quedar vacíos.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Abre “Importa da Excel” en el menú.</div><div class="guide-step"><b>2.</b> Descarga y completa la plantilla única.</div><div class="guide-step"><b>3.</b> Selecciona el archivo en el área discontinua.</div></div><div class="screen-pair"><figure class="screen annotated"><div class="screen-visual"><img alt="Análisis financiero: comando Importa da Excel en el menú lateral" height="900" loading="lazy" src="/resources/images/ai-onboarding/analisi-bilancio-menu-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="1" style="--marker-x:8.5%;--marker-y:31.5%;--marker-size:64px"></span></div><figcaption>El círculo 1 señala “Importa da Excel”.</figcaption></figure><figure class="screen annotated"><div class="screen-visual"><img alt="Análisis financiero: área de carga de la plantilla completada" height="900" loading="lazy" src="/resources/images/ai-onboarding/analisi-bilancio-import-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:28.7%;--marker-y:80.8%;--marker-size:72px"></span></div><figcaption>El círculo 3 señala el área que hay que pulsar para elegir el archivo.</figcaption></figure></div></article>
 <article class="upload-card surface"><span class="label">03 · LIPE — CONFIGURACIÓN</span><h3>Datos del cliente y mapeo de códigos IVA</h3><div class="path">Generador LIPE → “Importa da Excel” → descarga la plantilla con datos del cliente y códigos IVA → pulsa “Importa il file compilato”.</div><figure class="screen annotated"><div class="screen-visual"><img alt="Generador LIPE: botón para importar el archivo de datos del cliente y códigos IVA" height="900" loading="lazy" src="/resources/images/ai-onboarding/lipe-importa-file-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="1" style="--marker-x:60.3%;--marker-y:48.6%;--marker-size:72px"></span></div><figcaption>El círculo señala “Importa il file compilato”.</figcaption></figure></article>
 <article class="upload-card surface"><span class="label">04 · LIPE — PERIODO</span><h3>Los importes del periodo permanecen separados</h3><div class="path">Generador LIPE → “Elaborazione periodica” → selecciona cliente, año y trimestre → “Carica Excel importi”. Este segundo archivo contiene código IVA, base imponible, IVA y mes.</div><figure class="screen annotated"><div class="screen-visual"><img alt="Generador LIPE: elaboración periódica y botón Carica Excel importi" height="900" loading="lazy" src="/resources/images/ai-onboarding/lipe-periodo-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="2" style="--marker-x:46.2%;--marker-y:78.8%;--marker-size:72px"></span></div><figcaption>El círculo señala “Carica Excel importi”, después de elegir cliente y periodo.</figcaption></figure></article>
-<article class="upload-card surface tfa-upload-card"><span class="label">05 · EXPEDIENTE FISCAL DEL CLIENTE</span><h3>Expediente fiscal del cliente</h3><div class="path">Expediente fiscal del cliente → “Importa da Excel” → descarga y completa la plantilla → pulsa “Importa Excel”. La herramienta muestra conteos, avisos y diferencias antes de guardar.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Descarga la plantilla.</div><div class="guide-step"><b>2.</b> Complétala sin inventar datos.</div><div class="guide-step"><b>3.</b> Importa y revisa la vista previa.</div></div><figure class="screen annotated"><div class="screen-visual"><img alt="Expediente fiscal del cliente: tres pasos ordenados para importar la plantilla Excel" height="900" loading="lazy" src="/resources/images/ai-onboarding/fascicolo-importa-excel-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:81.3%;--marker-y:56.2%;--marker-size:72px"></span></div><figcaption>El círculo 3 señala “Importa Excel”; las áreas vacías permanecen “Da verificare”.</figcaption></figure></article><article class="upload-card surface" id="f24-upload"><span class="label">06 · GENERADOR F24</span><h3>Generador F24</h3><div class="path">Generador F24 → “Elaborazione massiva” → descarga la plantilla → carga el archivo completado. Es la ruta directa para uno o varios contribuyentes.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Elige “Elaborazione massiva”.</div><div class="guide-step"><b>2.</b> Descarga y completa la plantilla F24.</div><div class="guide-step"><b>3.</b> Carga el archivo Excel o CSV.</div></div><div class="screen-pair"><figure class="screen annotated"><div class="screen-visual"><img alt="Generador F24: ruta Elaborazione massiva" height="900" loading="lazy" src="/resources/images/ai-onboarding/f24-percorso-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="1" style="--marker-x:59.8%;--marker-y:41.8%;--marker-size:72px"></span></div><figcaption>El círculo 1 señala “Elaborazione massiva”.</figcaption></figure><figure class="screen annotated"><div class="screen-visual"><img alt="Generador F24: área de carga del archivo masivo completado" height="900" loading="lazy" src="/resources/images/ai-onboarding/f24-import-massivo-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:59.8%;--marker-y:67.7%;--marker-size:82px"></span></div><figcaption>El círculo 3 señala el área de carga del archivo completado.</figcaption></figure></div></article></div></div></section>
+<article class="upload-card surface tfa-upload-card"><span class="label">05 · EXPEDIENTE FISCAL DEL CLIENTE</span><h3>Expediente fiscal del cliente</h3><div class="path">Expediente fiscal del cliente → “Importa da Excel” → descarga y completa la plantilla → pulsa “Importa Excel”. La herramienta muestra conteos, avisos y diferencias antes de guardar.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Descarga la plantilla.</div><div class="guide-step"><b>2.</b> Complétala sin inventar datos.</div><div class="guide-step"><b>3.</b> Importa y revisa la vista previa.</div></div><figure class="screen annotated"><div class="screen-visual"><img alt="Expediente fiscal del cliente: tres pasos ordenados para importar la plantilla Excel" height="900" loading="lazy" src="/resources/images/ai-onboarding/fascicolo-importa-excel-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:81.3%;--marker-y:56.2%;--marker-size:72px"></span></div><figcaption>El círculo 3 señala “Importa Excel”; las áreas vacías permanecen “Da verificare”.</figcaption></figure></article><article class="upload-card surface" id="f24-upload"><span class="label">06 · GENERADOR F24</span><h3>Generador F24</h3><div class="path">Generador F24 → “Elaborazione massiva” → descarga la plantilla → carga el archivo completado. Es la ruta directa para uno o varios contribuyentes.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Elige “Elaborazione massiva”.</div><div class="guide-step"><b>2.</b> Descarga y completa la plantilla F24.</div><div class="guide-step"><b>3.</b> Carga el archivo Excel o CSV.</div></div><div class="screen-pair"><figure class="screen annotated"><div class="screen-visual"><img alt="Generador F24: ruta Elaborazione massiva" height="900" loading="lazy" src="/resources/images/ai-onboarding/f24-percorso-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="1" style="--marker-x:59.8%;--marker-y:41.8%;--marker-size:72px"></span></div><figcaption>El círculo 1 señala “Elaborazione massiva”.</figcaption></figure><figure class="screen annotated"><div class="screen-visual"><img alt="Generador F24: área de carga del archivo masivo completado" height="900" loading="lazy" src="/resources/images/ai-onboarding/f24-import-massivo-20260815.png" width="1280"/><span aria-hidden="true" class="screen-marker" data-step="3" style="--marker-x:59.8%;--marker-y:67.7%;--marker-size:82px"></span></div><figcaption>El círculo 3 señala el área de carga del archivo completado.</figcaption></figure></div></article><article class="upload-card surface"><span class="label">07 · CONFRONTO REGIMI</span><h3>Confronto regimi</h3><div class="path">Confronto regimi &rarr; paso 3 &laquo;Costi annuali&raquo; o paso 1 &laquo;Profilo&raquo; &rarr; &laquo;Scarica il template Excel&raquo; &rarr; rellena PROFILO, COMPENSI y COSTI &rarr; &laquo;Importa da Excel&raquo;.</div><div class="guide-steps"><div class="guide-step"><b>1.</b> Pulsa &laquo;Scarica il template Excel&raquo;: las hojas de trabajo salen vacías.</div><div class="guide-step"><b>2.</b> Rellena PROFILO, COMPENSI y COSTI, y escribe tus dudas en la hoja &laquo;Esiti AI&raquo;.</div><div class="guide-step"><b>3.</b> Pulsa &laquo;Importa da Excel&raquo; y elige si crear una simulación nueva o actualizar la que está en curso.</div><div class="guide-step"><b>4.</b> Comprueba el recuento: la herramienta declara cuántos campos ha leído y cuáles faltaban.</div></div><p class="prompt-note">Un archivo parcial funciona: los campos ausentes conservan sus valores por defecto y la herramienta los enumera. Un valor fuera de la lista admitida, en cambio, bloquea la importación y dice qué celda hay que corregir.</p></article></div></div></section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/es/analisis/">Casos y método</a><a href="/es/privacidad/">Privacidad</a><a href="/es/seguridad/">Seguridad</a><a href="/es/terminos/">Términos y disclaimer</a><a href="/es/licencias/">Licencias</a></nav><p>Proyecto personal e independiente. El contenido no constituye asesoramiento profesional y el proyecto no está aprobado, patrocinado ni afiliado a empleadores o terceros.</p></div></footer><a aria-label="Back to top" class="back-top" href="#top">↑</a>
-<script>var setupGrid=document.querySelector('#financial-statement .tool-grid');if(setupGrid&&!document.getElementById('f24'))setupGrid.insertAdjacentHTML('beforeend','<article class="tool-card surface" id="f24"><span class="label">GENERADOR F24</span><h2>Generador F24</h2><p>Prepara uno o varios modelos F24 desde cálculos, resúmenes de nómina, liquidaciones de IVA y documentos equivalentes. La plantilla, el prompt y la interfaz operativa se mantienen en italiano.</p><div class="doc-box"><h3>Archivos disponibles</h3><ul><li>Plantilla Excel para preparación individual o masiva</li><li>Prompt italiano con trazabilidad de fuentes y controles formales</li></ul></div><div class="actions"><a class="button" download href="/resources/templates/Template_F24_Configura_AI_v1.0.xlsx">Descargar plantilla ↓</a><a class="button secondary" download href="/resources/templates/Prompt_F24_AI_v1.0.txt">Descargar prompt (IT) ↓</a><a class="button secondary" href="/tools/f24/">Abrir herramienta (IT) →</a></div></article><article class="tool-card surface" id="confronto-regimi"><span class="label">CONFRONTO REGIMI</span><h2>Confronto regimi</h2><p>Compara la caja personal neta de un abogado o de un censor jurado de cuentas italiano entre el r&eacute;gimen de tanto alzado, el r&eacute;gimen ordinario y una sociedad profesional. La plantilla, el prompt y la interfaz operativa se mantienen en italiano.</p><div class="doc-box"><h3>Archivos disponibles</h3><ul><li>Plantilla Excel para perfil, honorarios y costes anuales</li><li>Prompt en italiano con trazabilidad de las fuentes y hallazgos bloqueantes</li></ul></div><div class="actions"><a class="button" download href="/resources/templates/Template_Confronto_Regimi_v1.0.xlsx">Descargar plantilla &darr;</a><a class="button secondary" href="/configura-con-ai/#confronto-regimi">Leer el prompt (IT) &rarr;</a><a class="button secondary" href="/tools/confronto-regimi/">Abrir la herramienta (IT) &rarr;</a></div></article>');document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',async function(){var text=document.getElementById(btn.dataset.copy).textContent;var status=btn.parentElement.querySelector('.copy-status'),ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch(e){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{ok=!!document.execCommand('copy')}catch(_){ok=false}ta.remove()}status.textContent=ok?"Prompt copiado":"Error al copiar";status.style.color=ok?'':'#ffb4a8';setTimeout(function(){status.textContent='';status.style.color=''},2400)})});</script><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script defer src="/assets/site-shell.js?v=20260823"></script>
+<script>document.querySelectorAll('.copy-btn').forEach(function(btn){btn.addEventListener('click',async function(){var text=document.getElementById(btn.dataset.copy).textContent;var status=btn.parentElement.querySelector('.copy-status'),ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch(e){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{ok=!!document.execCommand('copy')}catch(_){ok=false}ta.remove()}status.textContent=ok?"Prompt copiado":"Error al copiar";status.style.color=ok?'':'#ffb4a8';setTimeout(function(){status.textContent='';status.style.color=''},2400)})});</script><script id="tal-clean-home-session">document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a');if(!a)return;var h=a.getAttribute('href');if(h==='/'||h==='/en/'||h==='/es/'||/^\/(?:en|es)?\/#/.test(h||'')){try{sessionStorage.setItem('tal-intro-seen','1')}catch(_){}}});</script><script defer src="/assets/site-shell.js?v=20260823"></script>
 </body></html>

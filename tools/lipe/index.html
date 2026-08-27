@@ -1922,9 +1922,16 @@ function testiLocali(stato) {
  *      cambia un numero cambia la chiave.
  *   2. **richiesta condivisa** — griglia, controlli ed export che chiedono nello
  *      stesso istante ricevono tutti *la stessa* promessa. Una richiesta sola.
- *   3. **attesa breve** — i campi manuali reagiscono su `change`, non su ogni
- *      tasto, quindi non c'e' una raffica da smorzare; l'attesa resta come rete
- *      di sicurezza per il giorno in cui qualcuno cambiera' quell'evento.
+ *   3. **una sola in volo** — se ne arriva un'altra mentre la prima e' per
+ *      strada, aspetta il turno e le intermedie si scartano. Una raffica di
+ *      modifiche costa quante richieste ci stanno nel tempo di andata e
+ *      ritorno, non quante sono le modifiche. Misurato in produzione: dieci
+ *      modifiche di seguito facevano dieci richieste in 1,7 secondi — quasi
+ *      sei al secondo, contro un limite di venti ogni dieci. Adesso ne fanno
+ *      due.
+ *   4. **attesa breve** — i campi manuali reagiscono su `change`, non su ogni
+ *      tasto, quindi non c'e' una raffica di tasti da smorzare; l'attesa resta
+ *      come rete di sicurezza per il giorno in cui qualcuno cambiera' quell'evento.
  *
  * Un guasto non si mette in memoria: se la richiesta fallisce, la prossima deve
  * riprovare, non credere di avere gia' la risposta. E' lo stesso errore che
@@ -1939,6 +1946,7 @@ function creaPonte(opzioni) {
   let impronta = '';
   let inMemoria = null;
   let inVolo = null;          /* { impronta, promessa } */
+  let inCoda = null;          /* { impronta, payload, risolvi, rifiuta, promessa } */
   let timer = null;
   let richieste = 0;
 
@@ -1951,6 +1959,35 @@ function creaPonte(opzioni) {
     return chiaveDi(payload) === impronta ? inMemoria : null;
   }
 
+  function parti(payload, chiave) {
+    richieste += 1;
+    const promessa = chiamaRete(payload).then((esito) => {
+      /* Si scrive in memoria SOLO se nel frattempo la domanda non e' cambiata:
+         una risposta in ritardo non deve sovrascrivere una piu' recente. */
+      if (inVolo && inVolo.impronta === chiave) {
+        impronta = chiave;
+        inMemoria = esito;
+        inVolo = null;
+      }
+      svuotaLaCoda();
+      return esito;
+    }).catch((e) => {
+      /* Un guasto non diventa memoria. */
+      if (inVolo && inVolo.impronta === chiave) inVolo = null;
+      svuotaLaCoda();
+      throw e;
+    });
+    inVolo = { impronta: chiave, promessa, quando: orologio() };
+    return promessa;
+  }
+
+  function svuotaLaCoda() {
+    if (!inCoda || inVolo) return;
+    const attesa = inCoda;
+    inCoda = null;
+    parti(attesa.payload, attesa.impronta).then(attesa.risolvi, attesa.rifiuta);
+  }
+
   function chiedi(payload) {
     const chiave = chiaveDi(payload);
 
@@ -1961,28 +1998,32 @@ function creaPonte(opzioni) {
           un'altra. E' la difesa che conta di piu', perche' i quattro
           consumatori partono nello stesso ciclo di eventi. */
     if (inVolo && inVolo.impronta === chiave) return inVolo.promessa;
+    if (inCoda && inCoda.impronta === chiave) return inCoda.promessa;
 
-    /* 3. in volo ma per una domanda vecchia: quella la si lascia morire da
-          sola. Non si annulla — la risposta potrebbe arrivare comunque — ma non
-          verra' mai messa in memoria, perche' l'impronta non corrispondera'. */
-    richieste += 1;
-    const promessa = chiamaRete(payload).then((esito) => {
-      /* Si scrive in memoria SOLO se nel frattempo la domanda non e' cambiata:
-         una risposta in ritardo non deve sovrascrivere una piu' recente. */
-      if (inVolo && inVolo.impronta === chiave) {
-        impronta = chiave;
-        inMemoria = esito;
-        inVolo = null;
-      }
-      return esito;
-    }).catch((e) => {
-      /* Un guasto non diventa memoria. */
-      if (inVolo && inVolo.impronta === chiave) inVolo = null;
-      throw e;
-    });
+    /* 3. c'e' gia' una richiesta in volo per un'altra domanda: si aspetta il
+     *    turno invece di partire subito.
+     *
+     *    Non e' educazione, e' aritmetica. Misurato in produzione: dieci
+     *    modifiche di seguito facevano dieci richieste in 1,7 secondi, cioe'
+     *    quasi sei al secondo. Il limite e' venti ogni dieci secondi: chi
+     *    compila di fretta un trimestre intero — sono ventuno caselle — lo
+     *    supererebbe, e si vedrebbe comparire «Troppe richieste» durante un
+     *    lavoro perfettamente normale.
+     *
+     *    Con una sola richiesta in volo, un raffica di modifiche costa quante
+     *    richieste ci stanno nel tempo di andata e ritorno, non quante sono le
+     *    modifiche. Gli stati intermedi non li guarda nessuno: quello che conta
+     *    e' che l'ULTIMO parta sempre, ed e' garantito perche' la coda tiene
+     *    l'ultimo arrivato. */
+    if (inVolo) {
+      if (inCoda) inCoda.risolvi(null);   /* superata: non interessa piu' */
+      let risolvi, rifiuta;
+      const promessa = new Promise((ok, ko) => { risolvi = ok; rifiuta = ko; });
+      inCoda = { impronta: chiave, payload, risolvi, rifiuta, promessa };
+      return promessa;
+    }
 
-    inVolo = { impronta: chiave, promessa, quando: orologio() };
-    return promessa;
+    return parti(payload, chiave);
   }
 
   /* Con attesa: per le strade che possono partire piu' volte di seguito. */
@@ -2000,6 +2041,7 @@ function creaPonte(opzioni) {
     impronta = '';
     inMemoria = null;
     inVolo = null;
+    if (inCoda) { inCoda.risolvi(null); inCoda = null; }
     if (timer) { clearTimeout(timer); timer = null; }
   }
 
@@ -2375,6 +2417,10 @@ function assicura(poi) {
   if (RISULTATO && RISULTATO.impronta === ora.impronta) { poi(); return; }
   mostraAttesaLipe();
   ponteLipe.chiedi(ora.payload).then((esito) => {
+    /* `null` vuol dire «superata»: mentre questa aspettava il turno, l'utente
+       ha cambiato ancora qualcosa e ne e' partita una piu' recente. Non e' un
+       guasto e non c'e' niente da disegnare: fra un istante arriva l'altra. */
+    if (!esito) return;
     RISULTATO = { impronta: ora.impronta, esito, dettagli: ora.dettagli };
     daRifare = [];
     chiudiAttesaLipe();

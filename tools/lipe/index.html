@@ -1903,6 +1903,45 @@ function testiLocali(stato) {
   };
 }
 
+/* La schermata di partenza: nessun cliente selezionato.
+ *
+ * Non e' un calcolo e non e' logica fiscale: e' quello che il tool dice a chi
+ * lo ha appena aperto — «scegli un cliente, carica gli importi». Finora lo
+ * produceva `checks()` della pagina, che pero' sta per sparire insieme al
+ * motore; e chiederlo al servizio sarebbe una richiesta per non calcolare
+ * niente, con dentro solo degli zeri.
+ *
+ * Quindi resta qui, congelato. L'unica cosa che cambia con l'anno e il
+ * trimestre sono i nomi dei mesi attesi, che arrivano da fuori.
+ *
+ * `test/lipe-senza-cliente.test.mjs` confronta questo elenco con quello che la
+ * pagina produce davvero, finche' il motore c'e' ancora: e' cosi' che si sa
+ * che e' giusto, invece di crederlo. */
+function controlliSenzaCliente(mesiAttesi) {
+  return [
+    { name: 'Cliente selezionato', status: 'fail', value: 'Assente',
+      desc: 'L’elaborazione deve essere associata a un cliente configurato.' },
+    { name: 'Importi caricati', status: 'fail', value: '0',
+      desc: 'Righe lette dal file o dai dati incollati.' },
+    { name: 'Codici non riconosciuti', status: 'ok', value: '0',
+      desc: 'Tutti i codici sono presenti nel codiciario.' },
+    { name: 'Righe fuori periodo', status: 'ok', value: 'Coerenti',
+      desc: `Periodo atteso: ${mesiAttesi.join(', ')}.` },
+    { name: 'Codiciario cliente', status: 'ok', value: '0 codici',
+      desc: 'Controllo duplicati e percentuali di confluenza.' },
+    { name: 'Riporto periodo precedente', status: 'ok', value: 'Coerente',
+      desc: 'Credito e piccoli debiti sono riportati automaticamente tra periodi dello stesso anno.' },
+    { name: 'Liquidazione IVA di gruppo', status: 'ok', value: 'Coerente',
+      desc: 'Nessuna regola speciale di gruppo applicabile.' },
+    { name: 'Acconto e interessi', status: 'ok', value: 'Coerenti',
+      desc: 'Collocazione temporale coerente.' },
+    { name: 'Righe a zero', status: 'ok', value: '0',
+      desc: 'Nessuna riga completamente a zero.' },
+    { name: 'Coerenza fra file e periodo', status: 'ok', value: 'Coerente',
+      desc: 'Il file importato è vincolato a cliente, anno, trimestre e periodicità correnti.' }
+  ];
+}
+
 /* ---- lipe-api.js ---- */
 /* Una richiesta per stato. Non una per calcolo.
  *
@@ -2336,14 +2375,22 @@ function rifiuta() {
 }
 
 computePeriod = function (d, stack) {
-  if (!acceso() || nienteDaCalcolare()) return computePeriodInPagina(d, stack);
+  /* Senza cliente `periodDescriptors()` non produce periodi, quindi questa non
+     viene mai chiamata: se succedesse sarebbe un difetto, e va visto. */
+  if (!acceso()) return computePeriodInPagina(d, stack);
   const dal = RISULTATO ? periodoDalServizio(d) : null;
   if (dal) return dal;
   throw rifiuta();
 };
 
 checks = function () {
-  if (!acceso() || nienteDaCalcolare()) return checksInPagina();
+  if (!acceso()) return checksInPagina();
+  /* Senza cliente non si calcola e non si chiede: la schermata di partenza e'
+     testo, non aritmetica, e sta qui. Non passa piu' dai controlli della
+     pagina, che dopo la rimozione del motore non esisteranno. */
+  if (nienteDaCalcolare()) {
+    return controlliSenzaCliente(quarterMonths(state.quarter).map((m) => MONTHS[m - 1]));
+  }
   if (!RISULTATO) throw rifiuta();
   /* La pagina se li aspetta gia' calcolati: `deriveImportIssues` riempie
      `state.importIssues`, che serve sia qui sia al riepilogo dell'import. */

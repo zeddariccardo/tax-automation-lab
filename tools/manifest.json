@@ -48,7 +48,19 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-23",
+      "privacy_model": {
+        "processing": "server_side_calculation",
+        "server_upload": "aggregated_vp_totals_only",
+        "uploads_documents": false,
+        "uploads_identifiers": false,
+        "uploads_vat_codes": false,
+        "server_retention": "none",
+        "server_logging_of_inputs": "none",
+        "local_fallback": false,
+        "endpoint": "https://taxautomationlab.com/api/lipe/calcola",
+        "note": "Il registro IVA non viene trasmesso: il browser applica il codiciario del cliente e invia i soli totali per rigo del quadro VP e per mese. XML e PDF sono generati nel browser."
+      }
     },
     {
       "slug": "f24",
@@ -76,8 +88,9 @@
         "uploads_identifiers": false,
         "server_retention": "none",
         "server_logging_of_inputs": "none",
-        "local_fallback": true,
-        "endpoint": "https://taxautomationlab.com/api/confronto-regimi/calcola"
+        "local_fallback": false,
+        "endpoint": "https://taxautomationlab.com/api/confronto-regimi/calcola",
+        "local_fallback_note": "Il motore e stato rimosso dalla pagina il 27 agosto 2026: senza il servizio il tool non calcola."
       }
     }
   ]

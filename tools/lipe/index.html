@@ -518,7 +518,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="panel"><h3>Storico locale</h3><div class="history-list" id="history-list"></div></div>
 </section>
 </main>
-<footer aria-label="Tax Automation Lab legal information" class="tal-site-footer"><div><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span><p>Strumento didattico e di supporto operativo. La responsabilità della classificazione dei codici IVA, della compilazione della LIPE e della validazione del file telematico resta in capo al professionista. Tax Automation Lab è un progetto personale e indipendente. L’elaborazione dei file avviene localmente nel browser; classificazioni, mappature e output devono essere verificati dal professionista.</p></div></footer>
+<footer aria-label="Tax Automation Lab legal information" class="tal-site-footer"><div><span>© 2026 Riccardo Zedda · Tax Automation Lab</span><span><a href="/privacy/">Privacy</a> · <a href="/security/">Sicurezza</a> · <a href="/terms/">Termini</a> · <a href="/licenses/">Licenze</a></span><p>Strumento didattico e di supporto operativo. La responsabilità della classificazione dei codici IVA, della compilazione della LIPE e della validazione del file telematico resta in capo al professionista. Tax Automation Lab è un progetto personale e indipendente. I file, il codiciario e i dati che ti identificano restano nel browser: al servizio di calcolo vengono trasmessi i soli totali del quadro VP, che non vengono salvati. XML e PDF sono generati sul tuo dispositivo. Classificazioni, mappature e output devono essere verificati dal professionista.</p></div></footer>
 </div><!-- /.app-main -->
 <div class="toast" id="toast"></div>
 <script data-vendored="SheetJS 0.20.3">
@@ -2024,32 +2024,40 @@ function creaPonte(opzioni) {
  * comodita' nostra: si e' scelto di non farlo.
  *
  * ---------------------------------------------------------------------------
- * SPENTO FINCHE' NON LO SI ACCENDE
+ * ACCESO PER TUTTI, dal 27 agosto 2026
  *
- * Con `localStorage['tal-lipe-api']` diverso da `'si'` questo file non fa
- * assolutamente niente: nessuna sonda, nessuna richiesta, nessuna differenza.
- * Le funzioni della pagina restano quelle di prima e il calcolo lo fa il
- * browser, come ha sempre fatto. Per accenderlo, dalla console:
+ * Fino a oggi era il contrario: il ponte c'era ma bisognava accenderlo a mano.
+ * Adesso il calcolo lo fa il servizio, per chiunque apra il tool. Resta un
+ * modo per spegnerlo — serve a chi assiste qualcuno al telefono, non
+ * all'utente:
  *
- *     localStorage.setItem('tal-lipe-api', 'si'); location.reload();
+ *     localStorage.setItem('tal-lipe-api', 'no'); location.reload();   // spento
+ *     localStorage.removeItem('tal-lipe-api');    location.reload();   // acceso
  *
- * e per spegnerlo:
- *
- *     localStorage.removeItem('tal-lipe-api'); location.reload();
+ * Chi aveva scritto `'si'` nelle prove continua ad avere il servizio: qualunque
+ * valore diverso da `'no'` vuol dire acceso.
  *
  * ---------------------------------------------------------------------------
- * COME FUNZIONA QUANDO E' ACCESO
+ * COME FUNZIONA
  *
- * Le strade che disegnano — `renderResults` e `renderExportState` — diventano
- * asincrone: prima si assicurano di avere il risultato del servizio per lo
- * stato corrente, poi disegnano esattamente come prima. Le funzioni che
- * calcolano — `computePeriod` e `checks` — non calcolano piu': leggono dal
- * risultato in memoria.
+ * Le strade che disegnano — `renderResults`, `renderExportState` — e quelle che
+ * esportano — XLSX, PDF, XML, salvataggio nello storico — diventano asincrone:
+ * prima si assicurano di avere il risultato del servizio per lo stato corrente,
+ * poi fanno esattamente quello che facevano prima. Le funzioni che calcolano —
+ * `computePeriod` e `checks` — non calcolano piu': leggono dal risultato in
+ * memoria.
  *
- * Se il servizio non risponde **non si ripiega di nascosto**: compare un
- * riquadro che lo dice, con un pulsante «Riprova». Un ripiego silenzioso
- * renderebbe invisibile il guasto oggi, e cambierebbe comportamento il giorno
- * in cui il motore non sara' piu' in pagina — cioe' proprio quando conta.
+ * **Nessun ripiego sul motore in pagina.** Il motore c'e' ancora, ma quando il
+ * ponte e' acceso non viene mai usato: se il risultato del servizio non c'e',
+ * `computePeriod` e `checks` si rifiutano di rispondere, la pagina lo dice e
+ * chiede al servizio. Un ripiego silenzioso renderebbe invisibile il guasto
+ * oggi, e cambierebbe comportamento il giorno in cui il motore non sara' piu'
+ * qui — cioe' proprio quando conta. Il contatore `rifiuti` nella diagnostica
+ * dice quante volte e' successo: deve restare zero.
+ *
+ * L'unica eccezione, ed e' un'eccezione solo di forma: **senza un cliente
+ * attivo** non c'e' niente da calcolare, e la pagina disegna il suo stato
+ * vuoto da sola senza chiedere niente a nessuno.
  *
  * Il dettaglio riga per riga (la tabella in fondo e il foglio di lavoro XLSX)
  * **non** viene dal servizio: lo calcola il browser mentre aggrega, perche'
@@ -2070,7 +2078,11 @@ const MAX_TENTATIVI_LIPE = 2;
 const FORMA_PROVA_LIPE = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{0,40}\.workers\.dev$/;
 
 const preferenzaLipe = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
-const acceso = () => preferenzaLipe(CHIAVE_MODO) === 'si';
+
+/* Acceso salvo che qualcuno abbia scritto 'no'. Il valore predefinito e'
+   l'assenza della preferenza, quindi chi apre il tool per la prima volta usa il
+   servizio; chi nelle prove aveva scritto 'si' continua come prima. */
+const acceso = () => preferenzaLipe(CHIAVE_MODO) !== 'no';
 const radiceLipe = () => {
   const b = String(preferenzaLipe('tal-api-base') || '').trim();
   return b && FORMA_PROVA_LIPE.test(b) ? b : '';
@@ -2088,7 +2100,12 @@ const TESTI_LIPE = {
   dati: ['Un dato non è accettato dal servizio',
     'Il servizio di calcolo ha rifiutato un valore. Controlla gli importi e il codiciario, poi riprova.'],
   servizio: ['Il servizio di calcolo ha avuto un problema',
-    'Non è colpa dei dati che hai caricato. Riprova; se continua, segnalalo indicando il riferimento qui sotto.']
+    'Non è colpa dei dati che hai caricato. Riprova; se continua, segnalalo indicando il riferimento qui sotto.'],
+  /* Questo si vede solo se una strada chiede un numero prima che il servizio
+     abbia risposto. Non dovrebbe succedere — ogni strada passa da `assicura` —
+     e quando succede la pagina lo dice invece di calcolare per conto suo. */
+  nonPronto: ['Il calcolo non è ancora pronto',
+    'Sto chiedendo i numeri al servizio di calcolo: riprova fra un istante.']
 };
 
 function guastoLipe(genere, extra) {
@@ -2179,7 +2196,9 @@ const ponteLipe = creaPonte({ chiama: chiamaLipe, attesa: 0 });
    mano. `dettagli` non viene dal servizio — lo calcola il browser mentre
    aggrega, perche' contiene i codici IVA e le descrizioni del cliente. */
 let RISULTATO = null;
-let RIPIEGHI = 0;      /* quante volte si e' dovuto ricalcolare in pagina */
+/* Quante volte una strada ha chiesto un numero che il servizio non aveva
+   ancora dato. Non e' un ripiego: e' un rifiuto. Deve restare zero. */
+let RIFIUTI = 0;
 
 const apiDellaPagina = {
   num, round2, pct, mappingMap, unknownCodes, deriveImportIssues, mappingErrors,
@@ -2233,30 +2252,39 @@ const aGiorno = () => !!(RISULTATO && RISULTATO.impronta === payloadOra().impron
 
 const computePeriodInPagina = computePeriod;
 const checksInPagina = checks;
+const renderResultsInPagina = renderResults;
+const renderExportStateInPagina = renderExportState;
+
+/* Senza un cliente attivo non c'e' niente da calcolare: la pagina disegna il
+   suo stato vuoto e non si chiede niente a nessuno. E' l'unico caso in cui,
+   col ponte acceso, il codice della pagina risponde ancora — e non nasconde
+   nessun guasto, perche' non c'e' nessun calcolo da fare.
+   NOTA per il giorno della rimozione: quel poco andra' preso dal servizio o
+   riscritto come stato fisso, perche' `checks()` non ci sara' piu'. */
+const nienteDaCalcolare = () => !state.activeRecord;
+
+/* Il rifiuto. Non si calcola in locale: si dice che non si e' pronti e si
+   chiede al servizio, cosi' fra un istante la schermata e' giusta. */
+function rifiuta() {
+  RIFIUTI += 1;
+  assicura(() => { renderResultsInPagina(); renderExportStateInPagina(); });
+  return guastoLipe('nonPronto');
+}
 
 computePeriod = function (d, stack) {
-  if (acceso() && RISULTATO) {
-    const dal = periodoDalServizio(d);
-    if (dal) return dal;
-  }
-  /* Ci si arriva quando una strada sincrona — un export, un'anteprima — chiede
-     un calcolo prima che il disegno abbia messo in memoria il risultato. In
-     questa fase il motore e' ancora in pagina e risponde lui; il contatore
-     serve a sapere quante volte succede, perche' quando il motore non ci sara'
-     piu' questa strada dovra' essere vuota. */
-  if (acceso()) RIPIEGHI += 1;
-  return computePeriodInPagina(d, stack);
+  if (!acceso() || nienteDaCalcolare()) return computePeriodInPagina(d, stack);
+  const dal = RISULTATO ? periodoDalServizio(d) : null;
+  if (dal) return dal;
+  throw rifiuta();
 };
 
 checks = function () {
-  if (acceso() && RISULTATO) {
-    /* La pagina se li aspetta gia' calcolati: `deriveImportIssues` riempie
-       `state.importIssues`, che serve sia qui sia al riepilogo dell'import. */
-    deriveImportIssues();
-    return applicaTestiLocali(RISULTATO.esito.controlli, testiLocali(state));
-  }
-  if (acceso()) RIPIEGHI += 1;
-  return checksInPagina();
+  if (!acceso() || nienteDaCalcolare()) return checksInPagina();
+  if (!RISULTATO) throw rifiuta();
+  /* La pagina se li aspetta gia' calcolati: `deriveImportIssues` riempie
+     `state.importIssues`, che serve sia qui sia al riepilogo dell'import. */
+  deriveImportIssues();
+  return applicaTestiLocali(RISULTATO.esito.controlli, testiLocali(state));
 };
 
 /* ------------------------------------------------------------ l'interfaccia */
@@ -2377,6 +2405,39 @@ function conIlServizio(originale) {
 renderResults = conIlServizio(renderResults);
 renderExportState = conIlServizio(renderExportState);
 
+/* Gli export vanno avvolti piu' tardi, e c'e' un motivo preciso.
+ *
+ * `exportXml` viene riscritta da un blocco `<script>` che sta piu' avanti nel
+ * file, quindi avvolgerla adesso vorrebbe dire avvolgere una versione che fra
+ * un attimo qualcuno sostituira'. E i pulsanti prendono la funzione al momento
+ * in cui `initEvents()` gira, che e' su DOMContentLoaded: riassegnare la
+ * variabile dopo non basterebbe, perche' il pulsante tiene gia' la sua copia.
+ *
+ * Quindi si aspetta che tutti abbiano finito di riscriversi a vicenda — un
+ * `setTimeout(0)` dopo DOMContentLoaded — si avvolgono le funzioni **vive**, e
+ * si riattaccano ai pulsanti. Senza questo, cliccare «Esporta XML» chiederebbe
+ * numeri che il servizio non ha ancora dato, e il rifiuto si vedrebbe. */
+function collegaGliExport() {
+  [['exportPdf', 'export-pdf'],
+    ['exportWorkingPaper', 'export-excel'],
+    ['exportXml', 'export-xml'],
+    ['saveHistory', 'save-history']
+  ].forEach(([nome, pulsante]) => {
+    const originale = window[nome];
+    if (typeof originale !== 'function') return;
+    const avvolto = conIlServizio(originale);
+    window[nome] = avvolto;
+    const b = document.getElementById(pulsante);
+    if (b) b.onclick = avvolto;
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(collegaGliExport, 0));
+} else {
+  setTimeout(collegaGliExport, 0);
+}
+
 /* Un po' di stile per il riquadro, sulla falsariga di quello di Confronto
    regimi: gli strumenti devono somigliarsi anche quando si guastano. */
 (function () {
@@ -2400,11 +2461,11 @@ window.lipeApiDiagnostica = () => ({
   acceso: acceso(),
   servizio: servizioLipePronto,
   richieste: ponteLipe.quanteRichieste(),
-  ripieghi: RIPIEGHI,
+  rifiuti: RIFIUTI,
   aGiorno: acceso() ? aGiorno() : null,
   impronta: RISULTATO ? RISULTATO.impronta.length : 0
 });
-window.lipeApiAzzeraDiagnostica = () => { RIPIEGHI = 0; ponteLipe.azzeraContatore(); };
+window.lipeApiAzzeraDiagnostica = () => { RIFIUTI = 0; ponteLipe.azzeraContatore(); };
 window.lipeApiPayload = () => payloadOra().payload;
 })();
 /* >>> fine PONTE LIPE <<< */

@@ -1,9 +1,15 @@
-/* I tool non chiedono niente a nessuno.
+/* I tool non caricano niente da fuori, e quattro su sei non chiedono niente a
+ * nessuno.
  *
- * «L'elaborazione dei file avviene localmente nel browser» è scritto nel piede
- * di ogni pagina, nella privacy e nei cataloghi: è la promessa su cui poggia
- * tutto il resto. Il 24 agosto 2026, misurata aprendo i sei tool e leggendo le
- * risorse caricate: **sette risorse ciascuno, zero fuori origine**.
+ * «I file restano nel browser» è scritto nel piede di ogni pagina, nella privacy
+ * e nei cataloghi: è la promessa su cui poggia tutto il resto. Il 24 agosto
+ * 2026, misurata aprendo i sei tool e leggendo le risorse caricate: **sette
+ * risorse ciascuno, zero fuori origine**.
+ *
+ * Due tool — Confronto regimi e Generatore LIPE — dal 27 agosto 2026 fanno il
+ * calcolo su un servizio nostro, allo stesso indirizzo del sito. Non mandano
+ * file né dati identificativi: solo i valori del calcolo. Hanno controlli loro,
+ * in fondo a questo file.
  *
  * Questo controllo la tiene senza dover aprire un browser: nessun tool può
  * caricare uno script, un foglio di stile, un carattere o un'immagine da un
@@ -137,20 +143,36 @@ test('nessun dato identificativo è fra i campi che Confronto regimi spedisce', 
 
 /* ------------------------------------------------ il tool che chiama, ma spento */
 
-test('LIPE: il ponte c’è, ma non si accende da solo', () => {
+test('LIPE usa il servizio di calcolo, e si può spegnere solo a mano', () => {
   const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
   const blocco = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//);
   assert.ok(blocco, 'non trovo il blocco del ponte LIPE');
   const codice = blocco[0];
 
-  /* Per un visitatore qualsiasi LIPE non chiama niente: senza la preferenza
-     scritta a mano nel proprio browser, il ponte non fa una richiesta. */
-  assert.match(codice, /const acceso = \(\) => preferenzaLipe\('?tal-lipe-api'?\)|const acceso = \(\) => preferenzaLipe\(CHIAVE_MODO\) === 'si';/,
+  /* Dal 27 agosto 2026 il calcolo lo fa il servizio per chiunque apra il tool.
+     Resta un modo per spegnerlo — serve a chi assiste qualcuno, non all'utente —
+     e passa da una preferenza scritta a mano nel proprio browser. */
+  assert.match(codice, /const acceso = \(\) => preferenzaLipe\(CHIAVE_MODO\) !== 'no';/,
     'l’interruttore del ponte non è più quello previsto');
   assert.equal(/setItem\(\s*CHIAVE_MODO/.test(codice), false,
-    'il ponte non deve poter accendersi da solo');
+    'il ponte non deve scriversi da solo la preferenza');
   assert.doesNotMatch(codice, /location\.search|URLSearchParams|getAttribute\('data-api/,
     'né l’interruttore né l’indirizzo devono poter arrivare dal link o dal markup');
+});
+
+test('LIPE non calcola in pagina quando il servizio è acceso', () => {
+  /* Il motore fiscale è ancora nel file — verrà tolto dopo — ma col ponte
+     acceso non lo tocca nessuno. Se il risultato del servizio manca, la pagina
+     si rifiuta e lo dice, invece di calcolare per conto suo: un ripiego
+     silenzioso nasconderebbe il guasto proprio quando conta saperlo. */
+  const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
+  const codice = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//)[0];
+  assert.match(codice, /throw rifiuta\(\);/, 'manca il rifiuto');
+  assert.match(codice, /RIFIUTI \+= 1;/, 'i rifiuti devono essere contati');
+  /* E le strade che esportano passano dal servizio come quelle che disegnano. */
+  ['exportPdf', 'exportWorkingPaper', 'exportXml', 'saveHistory'].forEach((n) => {
+    assert.ok(codice.includes("'" + n + "'"), 'l’export ' + n + ' non passa dal servizio');
+  });
 });
 
 test('LIPE chiama solo il proprio servizio di calcolo, e bussa prima', () => {

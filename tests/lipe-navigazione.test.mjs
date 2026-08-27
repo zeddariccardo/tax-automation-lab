@@ -41,12 +41,13 @@ const MAPPA = viste();
 
 test('ogni voce del menu punta a una vista registrata e presente', () => {
   const male = [];
-  /* Solo gli identificativi veri: `data-lipeview="'+v[0]+'"` e' la stringa con
-     cui `applyNav()` costruisce a runtime «Dati e backup» e «Come si usa». */
+  /* Dalla Fase 1 tutte e sei le voci stanno nel markup. La sezione, pero', non
+     sempre: «Dati e backup» e «Come si usa» nascono da `createElement` con
+     `d.id='lipe-data'`. Si cerca l'id in qualunque forma di virgolette. */
   for (const m of html.matchAll(/data-lipeview="([a-z][a-z0-9-]*)"/g)) {
     const id = m[1];
     if (!(id in MAPPA)) male.push(`  la voce "${id}" non è in window.LIPE_VIEWS: go() la rifiuterebbe`);
-    if (!new RegExp(`id="${id}"`).test(html)) male.push(`  la voce "${id}" non ha una sezione con quell'id`);
+    if (!new RegExp(`id=["']${id}["']`).test(html)) male.push(`  la voce "${id}" non ha una sezione con quell'id`);
   }
   assert.equal(male.length, 0, `${male.length} voci di menu scollegate:\n${[...new Set(male)].join('\n')}`);
 });

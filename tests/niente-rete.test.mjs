@@ -20,12 +20,15 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TOOLS = ['financial-statement', 'financial-analysis', 'lipe', 'tfa-client-file', 'f24', 'confronto-regimi'];
 
-/* Dal 27 agosto 2026 il Confronto regimi fa il calcolo su un servizio nostro.
-   Continuerebbe a passare il controllo qui sotto, perché l'indirizzo che chiama
-   è relativo — ma passerebbe per un dettaglio di forma, e un test che dice sì
-   per il motivo sbagliato è peggio di un test che non c'è. Gli altri cinque
-   restano senza rete; per lui c'è un controllo suo, in fondo al file. */
-const SENZA_RETE = TOOLS.filter((t) => t !== 'confronto-regimi');
+/* Dal 27 agosto 2026 il Confronto regimi fa il calcolo su un servizio nostro, e
+   il Generatore LIPE ha il ponte per farlo — spento, ma c'è. Tutti e due
+   continuerebbero a passare il controllo qui sotto, perché l'indirizzo che
+   chiamano è relativo — ma passerebbero per un dettaglio di forma, e un test
+   che dice sì per il motivo sbagliato è peggio di un test che non c'è. Gli
+   altri quattro restano senza rete; per questi due ci sono controlli loro, in
+   fondo al file. */
+const CON_SERVIZIO = ['confronto-regimi', 'lipe'];
+const SENZA_RETE = TOOLS.filter((t) => CON_SERVIZIO.indexOf(t) === -1);
 
 /* Solo gli attributi che fanno partire una richiesta. */
 const CARICANO = [
@@ -130,4 +133,67 @@ test('nessun dato identificativo è fra i campi che Confronto regimi spedisce', 
   assert.ok(voce, 'non trovo l’elenco dei campi di una voce di costo');
   assert.equal(voce[1].indexOf("'nome'"), -1,
     'il nome di una voce di costo lo scrive l’utente: non deve partire');
+});
+
+/* ------------------------------------------------ il tool che chiama, ma spento */
+
+test('LIPE: il ponte c’è, ma non si accende da solo', () => {
+  const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
+  const blocco = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//);
+  assert.ok(blocco, 'non trovo il blocco del ponte LIPE');
+  const codice = blocco[0];
+
+  /* Per un visitatore qualsiasi LIPE non chiama niente: senza la preferenza
+     scritta a mano nel proprio browser, il ponte non fa una richiesta. */
+  assert.match(codice, /const acceso = \(\) => preferenzaLipe\('?tal-lipe-api'?\)|const acceso = \(\) => preferenzaLipe\(CHIAVE_MODO\) === 'si';/,
+    'l’interruttore del ponte non è più quello previsto');
+  assert.equal(/setItem\(\s*CHIAVE_MODO/.test(codice), false,
+    'il ponte non deve poter accendersi da solo');
+  assert.doesNotMatch(codice, /location\.search|URLSearchParams|getAttribute\('data-api/,
+    'né l’interruttore né l’indirizzo devono poter arrivare dal link o dal markup');
+});
+
+test('LIPE chiama solo il proprio servizio di calcolo, e bussa prima', () => {
+  const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
+  const codice = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//)[0];
+
+  const percorsi = [...codice.matchAll(/const (?:PERCORSO_LIPE|SONDA_LIPE) = '([^']+)'/g)].map((m) => m[1]);
+  assert.deepStrictEqual(percorsi.sort(), ['/api/lipe/calcola', '/api/stato'],
+    'gli indirizzi chiamati non sono quelli attesi');
+  percorsi.forEach((u) => assert.ok(u.startsWith('/'), u + ' non è relativo: uscirebbe dal sito'));
+
+  assert.match(codice, /const FORMA_PROVA_LIPE = \/\^https:.*workers\\.dev\$\//,
+    'manca il vincolo di forma sull’indirizzo di prova');
+
+  /* Prima di spedire si controlla che dall'altra parte ci sia il servizio:
+     senza, con la Route non attiva, un POST finirebbe a GitHub Pages. */
+  assert.match(codice, /if \(!\(await ilServizioLipeCe\(\)\)\) throw guastoLipe\('assente'\);/,
+    'manca la sonda che precede ogni invio');
+  const i = codice.indexOf('async function chiamaLipe(');
+  const j = codice.indexOf('ilServizioLipeCe()', i);
+  const k = codice.indexOf('body: JSON.stringify(corpo)', i);
+  assert.ok(i !== -1 && j !== -1 && k !== -1 && j < k,
+    'la sonda deve stare prima del corpo della richiesta, non dopo');
+});
+
+test('nessun dato identificativo è fra i campi che LIPE spedirebbe', () => {
+  const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
+  const codice = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//)[0];
+
+  /* Il registro non parte: parte la somma per rigo VP e per mese. Quindi nel
+     payload non c'è nessun posto dove un codice IVA possa infilarsi. */
+  const costruttore = codice.match(/function costruisciPayload\(stato, api\) \{([\s\S]*?)\n\}/);
+  assert.ok(costruttore, 'non trovo il costruttore del payload');
+  ['denom', 'piva', 'cf', 'repCf', 'interCf', 'notes', 'sourceFile', 'code', 'description', 'note']
+    .forEach((campo) => {
+      assert.equal(new RegExp('\b' + campo + ':').test(costruttore[1]), false,
+        campo + ' non deve comparire fra i campi che partono');
+    });
+
+  /* Le uniche stringhe ammesse, e sono elenchi chiusi. */
+  assert.match(codice, /const PERIODICITA = \['M', 'T'\];/);
+  assert.match(codice, /const REGIMI = \['', 'ordinary', 'option'\];/);
+  /* «eventi» viaggia come sì/no: al calcolo serve sapere se c'è, non che cosa. */
+  assert.match(codice, /eventi: !!m\.eventi/,
+    'il codice degli eventi eccezionali non deve partire come testo');
 });

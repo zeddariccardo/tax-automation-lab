@@ -1695,6 +1695,719 @@ saveClient=function(){oldSaveClient();const p=state.loadedConfigKey;if(!p)return
 document.documentElement.setAttribute('data-tool-version',PATCH_VERSION);document.querySelectorAll('.tool-version,.version-chip').forEach(el=>{el.textContent=String(el.textContent||'').replace(/v?3\.[0-9]+\.[0-9]+/g,'v3.6.7');});
 const style=document.createElement('style');style.textContent='.lipe-save-status{display:block;margin-top:7px;font-size:12px;font-weight:750}.lipe-save-status.ok{color:#176b45}.lipe-save-status.fail{color:#a22}.lipe-save-status.warn{color:#8a5a00}#quarter-regime-field[hidden]{display:none!important}';document.head.appendChild(style);
 function bootPatch(){injectQuarterRegime();syncConfigToFields();injectBackup();saveBadge('Archivio locale pronto · esporta periodicamente un backup completo.','warn');}
+/* >>> PONTE LIPE — generato da tax-automation-lab-backend/strumenti/genera-ponte-lipe.mjs. Non modificare a mano. <<< */
+(function () {
+'use strict';
+/* ---- lipe-aggrega.js ---- */
+/* Quello che il browser fa prima di parlare col servizio.
+ *
+ * Il registro IVA non parte. Qui viene ridotto a quattro somme per mese — al
+ * massimo quattro voci in tutto — e tutto il resto resta a casa: il file, i
+ * codici IVA, le descrizioni, le note, i numeri di riga del foglio,
+ * l'anagrafica.
+ *
+ * L'aggregazione deve ripetere la stessa sequenza di arrotondamenti del motore
+ * di oggi, non una piu' furba: `computePeriod` arrotonda ogni riga e poi
+ * riarrotonda a ogni somma, e chi aggrega gli importi grezzi ottiene numeri
+ * diversi nel 70% dei casi. Quindi:
+ *
+ *     arrotonda(importo di riga) → somma nel secchio (rigo VP × mese) → riarrotonda
+ *
+ * Le funzioni della pagina arrivano da fuori (`api`) invece di essere
+ * ricopiate: nel browser sono quelle vere del tool, nei test sono quelle
+ * estratte dalla pagina. Ricopiarle vorrebbe dire avere due `pct` che un giorno
+ * smettono di essere d'accordo — ed e' esattamente il difetto che LIPE ha gia'
+ * al suo interno.
+ */
+
+const RIGHI = ['VP2', 'VP3', 'VP4', 'VP5'];
+
+/* Le chiavi di periodo che il tool si scrive da solo. Non sono testo
+   dell'utente, ma vengono da un salvataggio locale che potrebbe essere vecchio
+   o manomesso: passano da qui prima di partire. */
+const CHIAVE_PERIODO = /^(?:M(?:[1-9]|1[0-2])|Q[1-4])$/;
+
+const PERIODICITA = ['M', 'T'];
+const REGIMI = ['', 'ordinary', 'option'];
+
+/* Perche' lo storico del trimestre precedente non e' utilizzabile. Il browser
+   lo sa come frase; al servizio va un codice, e il testo lo riscrive il
+   servizio. `test/lipe-ponte.test.mjs` verifica che queste due frasi siano
+   ancora quelle della pagina: se cambiano, il codice diventa muto e il
+   controllo perde il motivo. */
+const MOTIVI_STORICO = [
+  ['Manca il trimestre precedente finalizzato.', 'assente'],
+  ['La lavorazione del trimestre precedente è stata modificata dopo la finalizzazione.', 'modificato']
+];
+
+function motivoStorico(testo) {
+  const t = String(testo || '').trim();
+  if (!t) return '';
+  const trovato = MOTIVI_STORICO.find(([frase]) => t === frase);
+  /* Una frase che non riconosco non viaggia: diventa il caso generico. Meglio
+     un controllo un po' piu' vago che una frase inattesa spedita fuori. */
+  return trovato ? trovato[1] : 'assente';
+}
+
+const numeroFinito = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+
+/* Il cuore: dal registro ai secchi.
+ *
+ * Restituisce anche `dettagli`, che NON parte — serve alla tabella di dettaglio
+ * e al foglio di lavoro XLSX, che restano nel browser. */
+function aggrega(righe, api) {
+  const maps = api.mappingMap();
+  const secchi = new Map();
+  const dettagli = [];
+
+  for (const r of righe) {
+    const m = maps[r.code];
+    if (!m) continue;
+    const metti = (rigo, importo) => {
+      if (!rigo) return;
+      const arrotondato = api.round2(importo);
+      const chiave = (r.month || 0) + '|' + rigo;
+      secchi.set(chiave, api.round2((secchi.get(chiave) || 0) + arrotondato));
+      dettagli.push({
+        mese: r.month || null, row: rigo, code: r.code,
+        description: m.description || '', amount: arrotondato, source: r.source
+      });
+    };
+    metti(m.baseRow, r.taxable * api.pct(m.basePct) / 100);
+    metti(m.dueRow, r.vat * api.pct(m.duePct) / 100);
+    metti(m.dedRow, r.vat * api.pct(m.dedPct) / 100);
+  }
+  return { secchi, dettagli };
+}
+
+/* I secchi diventano l'elenco che parte. Si tengono solo i mesi del trimestre
+   scelto: gli altri il motore non li guarderebbe comunque, e non c'e' motivo di
+   farli viaggiare. La voce senza mese serve solo ai trimestrali, dove una riga
+   senza mese leggibile entra lo stesso nel periodo. */
+function aggregati(secchi, periodicita, mesiValidi) {
+  const perMese = new Map();
+  for (const [chiave, valore] of secchi) {
+    const [meseTesto, rigo] = chiave.split('|');
+    const mese = Number(meseTesto) || null;
+    const ammesso = mese === null ? periodicita === 'T' : mesiValidi.includes(mese);
+    if (!ammesso) continue;
+    if (!perMese.has(mese)) perMese.set(mese, { mese });
+    perMese.get(mese)[rigo] = valore;
+  }
+  return [...perMese.values()].sort((a, b) => (a.mese || 0) - (b.mese || 0));
+}
+
+/* I valori scritti a mano. Escono solo numeri e due sì/no: niente testo.
+ *
+ * `null` non e' zero. Casella vuota vuol dire «lascia lavorare il riporto
+ * automatico», zero vuol dire «azzeralo»: sono due cose diverse e il motore le
+ * distingue. Di `eventi` al servizio serve sapere soltanto se c'e' qualcosa,
+ * non che cosa: parte un sì/no. `metodo` e `operazioni` non servono affatto al
+ * calcolo — restano nel browser, dove li usa l'XML. */
+function manuali(manual, api) {
+  const out = {};
+  for (const chiave of Object.keys(manual || {})) {
+    if (!CHIAVE_PERIODO.test(chiave)) continue;
+    const m = manual[chiave] || {};
+    const ha = (k) => Object.prototype.hasOwnProperty.call(m, k) && String(m[k] ?? '').trim() !== '';
+    const voce = { subforn: !!m.subforn, eventi: !!m.eventi };
+    let qualcosa = voce.subforn || voce.eventi;
+    ['vp7', 'vp8', 'vp9', 'vp10', 'vp11', 'vp12', 'vp13'].forEach((k) => {
+      voce[k] = ha(k) ? numeroFinito(api.num(m[k])) : null;
+      if (voce[k] !== null) qualcosa = true;
+    });
+    /* Una voce vuota non parte. Non e' solo un byte in meno: `manualFor()`
+       crea l'oggetto del periodo al primo disegno della griglia, anche se
+       l'utente non ha scritto niente. Mandandola, il payload cambierebbe fra
+       il caricamento del lavoro e il primo disegno, e il ponte farebbe una
+       richiesta in piu' per due stati che il motore considera identici —
+       misurato: era la seconda richiesta di ogni sessione. Per il servizio
+       «voce assente» e «voce tutta vuota» sono la stessa cosa. */
+    if (qualcosa) out[chiave] = voce;
+  }
+  return out;
+}
+
+/* Il payload completo. Tutto quello che non e' qui dentro non esce dal
+   browser: nessuna denominazione, nessuna partita IVA, nessun codice fiscale,
+   nessun codice IVA, nessuna descrizione, nessuna nota, nessun nome di file. */
+function costruisciPayload(stato, api) {
+  const cliente = stato.activeRecord?.client || {};
+  const codiciario = stato.activeRecord?.mapping || [];
+  const mesiValidi = api.mesiDelTrimestre(stato.quarter);
+  const periodicita = PERIODICITA.includes(cliente.periodType) ? cliente.periodType : 'M';
+
+  const { secchi, dettagli } = aggrega(stato.rows || [], api);
+  const storico = api.previousHistoryResult();
+
+  return {
+    payload: {
+      anno: Number(stato.year),
+      trimestre: Number(stato.quarter),
+      periodicita,
+      regimeTrimestrale: REGIMI.includes(cliente.quarterRegime) ? cliente.quarterRegime : '',
+      gruppo: {
+        partecipante: !!cliente.groupVat,
+        controllante: cliente.groupLiquidation === '1',
+        meseFinale: cliente.lastMonth ? Number(cliente.lastMonth) : null
+      },
+      aggregati: aggregati(secchi, periodicita, mesiValidi),
+      manuali: manuali(stato.manual, api),
+      riportoStorico: storico
+        ? { vp14deb: numeroFinito(Number(storico.vp14deb)), vp14cre: numeroFinito(Number(storico.vp14cre)) }
+        : null,
+      storicoMancante: motivoStorico(api.motivoStoricoCorrente()),
+      clienteSelezionato: !!stato.activeRecord,
+      contestoCoerente: !!api.sameContext(stato.importContext),
+      pivaFormalmenteValida: stato.activeClientKey ? !!api.xmlValidPiva(stato.activeClientKey) : null,
+      conteggi: {
+        righe: (stato.rows || []).length,
+        codiciSconosciuti: api.unknownCodes().length,
+        righeFuoriPeriodo: api.deriveImportIssues().length,
+        codiciariAnomali: codiciario.filter((m) => api.mappingErrors(m, codiciario).length).length,
+        codiciariTotale: codiciario.length,
+        righeAZero: (stato.rows || []).filter(
+          (r) => Math.abs(r.taxable) < 0.005 && Math.abs(r.vat) < 0.005).length
+      }
+    },
+    /* Resta qui. Il servizio non lo riceve e non lo restituisce. */
+    dettagli
+  };
+}
+
+/* La strada di ritorno: due testi che il servizio non puo' scrivere.
+ *
+ * «Cliente selezionato» mostra la denominazione, «Righe fuori periodo» elenca i
+ * numeri di riga del foglio. Il servizio manda stato e gravita' e lascia un
+ * segnale; qui il browser ci mette il testo suo. La regola resta fuori, il dato
+ * resta dentro. */
+function applicaTestiLocali(controlli, locale) {
+  return controlli.map((c) => {
+    const fuori = { name: c.name, status: c.status, value: c.value, desc: c.desc };
+    if (c.valoreLocale === 'denominazione') fuori.value = locale.denominazione;
+    if (c.descrizioneLocale === 'righe-fuori-periodo') fuori.desc = locale.righeFuoriPeriodo;
+    return fuori;
+  });
+}
+
+function bloccantiConTestiLocali(bloccanti, locale) {
+  return bloccanti.map((b) => b.nome + ': ' +
+    (b.descrizioneLocale === 'righe-fuori-periodo' ? locale.righeFuoriPeriodo : b.descrizione));
+}
+
+/* Quello che serve per riempire i due buchi, preso dallo stato della pagina. */
+function testiLocali(stato) {
+  return {
+    denominazione: stato.activeRecord?.client?.denom || 'Assente',
+    righeFuoriPeriodo: (stato.importIssues || []).slice(0, 3).join(' · ')
+  };
+}
+
+/* ---- lipe-api.js ---- */
+/* Una richiesta per stato. Non una per calcolo.
+ *
+ * Il motivo non e' l'eleganza, e' un numero misurato: LIPE, per un cliente
+ * mensile, chiama `computePeriod()` **54 volte** ogni volta che l'utente tocca
+ * un valore manuale. Cinquantaquattro calcoli per tre soli risultati distinti —
+ * la griglia VP, i controlli, lo stato degli export e l'anteprima XML rifanno
+ * ognuno lo stesso lavoro, e il riporto ricalcola a sua volta il periodo
+ * precedente.
+ *
+ * Portare quel numero sulla rete cosi' com'e' vorrebbe dire 54 richieste per
+ * ogni modifica, e la regola di 20 ogni 10 secondi scatterebbe alla prima. Fra
+ * il tool e il servizio ci va quindi questo strato, che ha tre difese:
+ *
+ *   1. **memoria** — la chiave e' il payload stesso. Se non e' cambiato niente,
+ *      non si chiede niente: non c'e' una scadenza da azzeccare, perche' se
+ *      cambia un numero cambia la chiave.
+ *   2. **richiesta condivisa** — griglia, controlli ed export che chiedono nello
+ *      stesso istante ricevono tutti *la stessa* promessa. Una richiesta sola.
+ *   3. **attesa breve** — i campi manuali reagiscono su `change`, non su ogni
+ *      tasto, quindi non c'e' una raffica da smorzare; l'attesa resta come rete
+ *      di sicurezza per il giorno in cui qualcuno cambiera' quell'evento.
+ *
+ * Un guasto non si mette in memoria: se la richiesta fallisce, la prossima deve
+ * riprovare, non credere di avere gia' la risposta. E' lo stesso errore che
+ * Confronto regimi aveva fatto la prima volta.
+ */
+
+function creaPonte(opzioni) {
+  const chiamaRete = opzioni.chiama;           /* (payload) → Promise<esito> */
+  const attesaMs = opzioni.attesa ?? 250;
+  const orologio = opzioni.orologio || (() => Date.now());
+
+  let impronta = '';
+  let inMemoria = null;
+  let inVolo = null;          /* { impronta, promessa } */
+  let timer = null;
+  let richieste = 0;
+
+  const chiaveDi = (payload) => JSON.stringify(payload);
+
+  /* Il risultato che si puo' disegnare adesso, senza aspettare niente.
+     Serve alle strade sincrone della pagina — la griglia, i controlli, l'XML —
+     che non possono diventare asincrone senza riscrivere mezzo tool. */
+  function subito(payload) {
+    return chiaveDi(payload) === impronta ? inMemoria : null;
+  }
+
+  function chiedi(payload) {
+    const chiave = chiaveDi(payload);
+
+    /* 1. gia' in memoria */
+    if (chiave === impronta && inMemoria) return Promise.resolve(inMemoria);
+
+    /* 2. gia' in volo, stessa domanda: si aspetta quella, non se ne apre
+          un'altra. E' la difesa che conta di piu', perche' i quattro
+          consumatori partono nello stesso ciclo di eventi. */
+    if (inVolo && inVolo.impronta === chiave) return inVolo.promessa;
+
+    /* 3. in volo ma per una domanda vecchia: quella la si lascia morire da
+          sola. Non si annulla — la risposta potrebbe arrivare comunque — ma non
+          verra' mai messa in memoria, perche' l'impronta non corrispondera'. */
+    richieste += 1;
+    const promessa = chiamaRete(payload).then((esito) => {
+      /* Si scrive in memoria SOLO se nel frattempo la domanda non e' cambiata:
+         una risposta in ritardo non deve sovrascrivere una piu' recente. */
+      if (inVolo && inVolo.impronta === chiave) {
+        impronta = chiave;
+        inMemoria = esito;
+        inVolo = null;
+      }
+      return esito;
+    }).catch((e) => {
+      /* Un guasto non diventa memoria. */
+      if (inVolo && inVolo.impronta === chiave) inVolo = null;
+      throw e;
+    });
+
+    inVolo = { impronta: chiave, promessa, quando: orologio() };
+    return promessa;
+  }
+
+  /* Con attesa: per le strade che possono partire piu' volte di seguito. */
+  function programma(payload) {
+    if (timer) clearTimeout(timer);
+    return new Promise((risolvi, rifiuta) => {
+      timer = setTimeout(() => {
+        timer = null;
+        chiedi(payload).then(risolvi, rifiuta);
+      }, attesaMs);
+    });
+  }
+
+  function dimentica() {
+    impronta = '';
+    inMemoria = null;
+    inVolo = null;
+    if (timer) { clearTimeout(timer); timer = null; }
+  }
+
+  return {
+    chiedi, subito, programma, dimentica,
+    /* Per i test e per la misura: quante richieste sono davvero partite. */
+    quanteRichieste: () => richieste,
+    azzeraContatore: () => { richieste = 0; }
+  };
+}
+
+/* ---- lipe-integrazione.js ---- */
+/* Il collegamento fra la pagina di LIPE e il servizio di calcolo.
+ *
+ * Questo file non viene caricato dal browser cosi' com'e': viene **concatenato
+ * dentro la pagina** da `strumenti/genera-ponte-lipe.mjs`, insieme a
+ * `lipe-aggrega.js` e `lipe-api.js`. Il posto e' preciso: dentro la closure del
+ * blocco `lipe-v340-audit-remediation`, perche' quattro cose che qui servono —
+ * `sameContext`, `contextNow`, `stableHash`, `carryIntegrityIssue` — vivono li'
+ * dentro e non sono raggiungibili da nessun altro blocco. L'alternativa era
+ * esporle su `window`, cioe' allargare la superficie pubblica della pagina per
+ * comodita' nostra: si e' scelto di non farlo.
+ *
+ * ---------------------------------------------------------------------------
+ * SPENTO FINCHE' NON LO SI ACCENDE
+ *
+ * Con `localStorage['tal-lipe-api']` diverso da `'si'` questo file non fa
+ * assolutamente niente: nessuna sonda, nessuna richiesta, nessuna differenza.
+ * Le funzioni della pagina restano quelle di prima e il calcolo lo fa il
+ * browser, come ha sempre fatto. Per accenderlo, dalla console:
+ *
+ *     localStorage.setItem('tal-lipe-api', 'si'); location.reload();
+ *
+ * e per spegnerlo:
+ *
+ *     localStorage.removeItem('tal-lipe-api'); location.reload();
+ *
+ * ---------------------------------------------------------------------------
+ * COME FUNZIONA QUANDO E' ACCESO
+ *
+ * Le strade che disegnano — `renderResults` e `renderExportState` — diventano
+ * asincrone: prima si assicurano di avere il risultato del servizio per lo
+ * stato corrente, poi disegnano esattamente come prima. Le funzioni che
+ * calcolano — `computePeriod` e `checks` — non calcolano piu': leggono dal
+ * risultato in memoria.
+ *
+ * Se il servizio non risponde **non si ripiega di nascosto**: compare un
+ * riquadro che lo dice, con un pulsante «Riprova». Un ripiego silenzioso
+ * renderebbe invisibile il guasto oggi, e cambierebbe comportamento il giorno
+ * in cui il motore non sara' piu' in pagina — cioe' proprio quando conta.
+ *
+ * Il dettaglio riga per riga (la tabella in fondo e il foglio di lavoro XLSX)
+ * **non** viene dal servizio: lo calcola il browser mentre aggrega, perche'
+ * contiene i codici IVA e le descrizioni del cliente, che non escono.
+ */
+
+/* eslint-disable no-undef */   /* le funzioni della pagina arrivano dalla closure */
+
+const CHIAVE_MODO = 'tal-lipe-api';
+const PERCORSO_LIPE = '/api/lipe/calcola';
+const SONDA_LIPE = '/api/stato';
+const ATTESA_LIPE_MS = 8000;
+const MAX_TENTATIVI_LIPE = 2;
+
+/* Solo un sottodominio workers.dev, e solo scritto a mano nelle preferenze del
+   browser. Un indirizzo che si potesse passare nel link sarebbe un modo per
+   far spedire i numeri di qualcuno a un server scelto da qualcun altro. */
+const FORMA_PROVA_LIPE = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{0,40}\.workers\.dev$/;
+
+const preferenzaLipe = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
+const acceso = () => preferenzaLipe(CHIAVE_MODO) === 'si';
+const radiceLipe = () => {
+  const b = String(preferenzaLipe('tal-api-base') || '').trim();
+  return b && FORMA_PROVA_LIPE.test(b) ? b : '';
+};
+
+const TESTI_LIPE = {
+  assente: ['Il servizio di calcolo non risponde',
+    'A questo indirizzo il servizio non c’è, o non è raggiungibile. Riprova fra un momento, e se continua segnalalo.'],
+  rete: ['Il servizio di calcolo non risponde',
+    'Non riesco a raggiungere il servizio che esegue i calcoli. Controlla la connessione e riprova.'],
+  attesa: ['Il calcolo sta impiegando troppo',
+    'Il servizio non ha risposto entro otto secondi. Riprova fra un momento.'],
+  limite: ['Troppe richieste di seguito',
+    'Il servizio chiede di rallentare. Aspetta una decina di secondi e riprova: gli importi che hai caricato restano dove sono.'],
+  dati: ['Un dato non è accettato dal servizio',
+    'Il servizio di calcolo ha rifiutato un valore. Controlla gli importi e il codiciario, poi riprova.'],
+  servizio: ['Il servizio di calcolo ha avuto un problema',
+    'Non è colpa dei dati che hai caricato. Riprova; se continua, segnalalo indicando il riferimento qui sotto.']
+};
+
+function guastoLipe(genere, extra) {
+  const g = new Error(TESTI_LIPE[genere] ? TESTI_LIPE[genere][0] : 'Errore');
+  g.genere = genere;
+  Object.assign(g, extra || {});
+  return g;
+}
+
+/* --------------------------------------------------------------- la sonda */
+
+/* Si bussa prima di parlare. In produzione l'indirizzo e' `/api/...` sulla
+   stessa origine del sito, e ci arriva una Route di Cloudflare: finche' quella
+   Route non e' attiva, quell'indirizzo lo serve GitHub Pages, e un POST
+   finirebbe li' — con dentro gli importi di chi sta usando il tool. La GET di
+   `/api/stato` non porta niente.
+   Il «sì» vale per la sessione, il «no» no: ricordarsi un «no» per sempre
+   vorrebbe dire che «Riprova» promette una cosa che non può riuscire. */
+let servizioLipePronto = null;
+let sondaLipeInCorso = null;
+
+async function ilServizioLipeCe() {
+  if (servizioLipePronto === true) return true;
+  if (sondaLipeInCorso) return sondaLipeInCorso;
+  sondaLipeInCorso = (async () => {
+    try {
+      const ctrl = new AbortController();
+      const scadenza = setTimeout(() => ctrl.abort(), ATTESA_LIPE_MS);
+      const r = await fetch(radiceLipe() + SONDA_LIPE, {
+        method: 'GET', signal: ctrl.signal, credentials: 'omit',
+        cache: 'no-store', referrerPolicy: 'no-referrer'
+      });
+      clearTimeout(scadenza);
+      const d = r.ok ? await r.json().catch(() => null) : null;
+      servizioLipePronto = !!(d && d.ok === true);
+    } catch (_) {
+      servizioLipePronto = false;
+    }
+    sondaLipeInCorso = null;
+    return servizioLipePronto;
+  })();
+  return sondaLipeInCorso;
+}
+
+async function chiamaLipe(corpo, tentativo) {
+  if (!(await ilServizioLipeCe())) throw guastoLipe('assente');
+  const t = tentativo || 1;
+  const ctrl = new AbortController();
+  const scadenza = setTimeout(() => ctrl.abort(), ATTESA_LIPE_MS);
+  let r;
+  try {
+    r = await fetch(radiceLipe() + PERCORSO_LIPE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(corpo),
+      signal: ctrl.signal, credentials: 'omit',
+      cache: 'no-store', referrerPolicy: 'no-referrer'
+    });
+  } catch (e) {
+    clearTimeout(scadenza);
+    const genere = e && e.name === 'AbortError' ? 'attesa' : 'rete';
+    /* Un secondo tentativo solo per i guasti di trasporto. Un errore di dati
+       non si ritenta mai: la risposta sarebbe identica. */
+    if (t < MAX_TENTATIVI_LIPE && genere === 'rete') return chiamaLipe(corpo, t + 1);
+    throw guastoLipe(genere);
+  }
+  clearTimeout(scadenza);
+  if (r.status === 429) throw guastoLipe('limite');
+  let dati = null;
+  try { dati = await r.json(); } catch (_) { dati = null; }
+  if (!r.ok) {
+    const e = (dati && dati.errore) || {};
+    if (r.status === 400 && e.codice === 'input_non_valido') {
+      throw guastoLipe('dati', { campo: e.campo });
+    }
+    throw guastoLipe('servizio', { riferimento: e.riferimento || null });
+  }
+  if (!dati) throw guastoLipe('servizio');
+  return dati;
+}
+
+const ponteLipe = creaPonte({ chiama: chiamaLipe, attesa: 0 });
+
+/* --------------------------------------------------- il risultato in memoria */
+
+/* Quello che la pagina disegna adesso. `impronta` e' il payload stesso: se
+   cambia un numero cambia la chiave, quindi non c'e' niente da invalidare a
+   mano. `dettagli` non viene dal servizio — lo calcola il browser mentre
+   aggrega, perche' contiene i codici IVA e le descrizioni del cliente. */
+let RISULTATO = null;
+let RIPIEGHI = 0;      /* quante volte si e' dovuto ricalcolare in pagina */
+
+const apiDellaPagina = {
+  num, round2, pct, mappingMap, unknownCodes, deriveImportIssues, mappingErrors,
+  previousHistoryResult, sameContext, xmlValidPiva,
+  mesiDelTrimestre: quarterMonths,
+  motivoStoricoCorrente: () => carryIntegrityIssue
+};
+
+function payloadOra() {
+  const costruito = costruisciPayload(state, apiDellaPagina);
+  return { payload: costruito.payload, dettagli: costruito.dettagli,
+           impronta: JSON.stringify(costruito.payload) };
+}
+
+/* I dettagli del periodo, ricostruiti da quelli calcolati in locale. La pagina
+   li vuole gia' divisi per periodo e nell'ordine in cui sono nel file: qui si
+   filtra e basta, l'ordine e' quello dell'aggregazione. */
+function dettagliDelPeriodo(p) {
+  if (!RISULTATO) return [];
+  return RISULTATO.dettagli
+    .filter((d) => (p.mese === null || p.mese === undefined
+      ? (d.mese === null || p.mesi.indexOf(d.mese) !== -1)
+      : d.mese === p.mese))
+    .map((d) => ({ period: p.etichetta, row: d.row, code: d.code,
+                   description: d.description, amount: d.amount, source: d.source }));
+}
+
+/* Il periodo, rimesso nella forma che la pagina si aspetta. */
+function periodoDalServizio(d) {
+  if (!RISULTATO) return null;
+  const p = RISULTATO.esito.periodi.find((x) => x.chiave === d.key);
+  if (!p) return null;
+  return {
+    descriptor: d,
+    vp2: p.vp2, vp3: p.vp3, vp4: p.vp4, vp5: p.vp5, vp6: p.vp6,
+    vp7: p.vp7, vp8: p.vp8, vp9: p.vp9, vp10: p.vp10, vp11: p.vp11,
+    vp12: p.vp12, vp13: p.vp13,
+    vp14deb: p.vp14deb, vp14cre: p.vp14cre, saldo: p.saldo,
+    details: dettagliDelPeriodo(p),
+    carry: {
+      vp7: p.riporto.vp7, vp8: p.riporto.vp8, source: p.riporto.origine,
+      missingHistory: p.riporto.storicoMancante,
+      vp7Manual: p.riporto.vp7Forzato, vp8Manual: p.riporto.vp8Forzato
+    }
+  };
+}
+
+const aGiorno = () => !!(RISULTATO && RISULTATO.impronta === payloadOra().impronta);
+
+/* --------------------------------------------------------- le sostituzioni */
+
+const computePeriodInPagina = computePeriod;
+const checksInPagina = checks;
+
+computePeriod = function (d, stack) {
+  if (acceso() && RISULTATO) {
+    const dal = periodoDalServizio(d);
+    if (dal) return dal;
+  }
+  /* Ci si arriva quando una strada sincrona — un export, un'anteprima — chiede
+     un calcolo prima che il disegno abbia messo in memoria il risultato. In
+     questa fase il motore e' ancora in pagina e risponde lui; il contatore
+     serve a sapere quante volte succede, perche' quando il motore non ci sara'
+     piu' questa strada dovra' essere vuota. */
+  if (acceso()) RIPIEGHI += 1;
+  return computePeriodInPagina(d, stack);
+};
+
+checks = function () {
+  if (acceso() && RISULTATO) {
+    /* La pagina se li aspetta gia' calcolati: `deriveImportIssues` riempie
+       `state.importIssues`, che serve sia qui sia al riepilogo dell'import. */
+    deriveImportIssues();
+    return applicaTestiLocali(RISULTATO.esito.controlli, testiLocali(state));
+  }
+  if (acceso()) RIPIEGHI += 1;
+  return checksInPagina();
+};
+
+/* ------------------------------------------------------------ l'interfaccia */
+
+function riquadroLipe() {
+  let el = document.getElementById('lipeApiStato');
+  if (el) return el;
+  const sezione = document.getElementById('results-section');
+  const ancora = document.getElementById('results-empty');
+  if (!sezione || !ancora) return null;
+  el = document.createElement('div');
+  el.id = 'lipeApiStato';
+  el.className = 'lipe-api-stato';
+  el.setAttribute('role', 'status');
+  el.hidden = true;
+  sezione.insertBefore(el, ancora);
+  return el;
+}
+
+let attesaLipe = null;
+
+function mostraAttesaLipe() {
+  const el = riquadroLipe();
+  if (!el) return;
+  /* Sotto i due decimi di secondo un messaggio che compare e sparisce e' un
+     lampo, e un lampo si legge come un errore. */
+  if (attesaLipe) clearTimeout(attesaLipe);
+  attesaLipe = setTimeout(() => {
+    el.hidden = false;
+    el.className = 'lipe-api-stato is-attesa';
+    el.removeAttribute('role');
+    el.setAttribute('role', 'status');
+    el.innerHTML = '<p><b>Sto calcolando…</b></p>';
+  }, 220);
+}
+
+function chiudiAttesaLipe() {
+  if (attesaLipe) { clearTimeout(attesaLipe); attesaLipe = null; }
+  const el = document.getElementById('lipeApiStato');
+  if (el) { el.hidden = true; el.innerHTML = ''; el.className = 'lipe-api-stato'; }
+}
+
+function mostraGuastoLipe(g, riprova) {
+  const el = riquadroLipe();
+  if (!el) return;
+  const testo = TESTI_LIPE[g.genere] || TESTI_LIPE.servizio;
+  el.hidden = false;
+  el.className = 'lipe-api-stato is-guasto';
+  el.setAttribute('role', 'alert');
+  el.innerHTML =
+    '<h3>' + esc(testo[0]) + '</h3>' +
+    '<p>' + esc(testo[1]) + '</p>' +
+    (g.riferimento ? '<p class="lipe-api-rif">Riferimento: ' + esc(g.riferimento) + '</p>' : '') +
+    '<button class="btn secondary" id="lipeApiRiprova" type="button">Riprova</button>';
+  const b = document.getElementById('lipeApiRiprova');
+  if (b) b.addEventListener('click', riprova);
+}
+
+/* Numeri vecchi accanto a un messaggio d'errore si leggono come numeri nuovi. */
+function svuotaRisultatoLipe() {
+  ['results-summary', 'period-tabs', 'period-panels', 'checks-grid']
+    .forEach((id) => { const e = document.getElementById(id); if (e) e.innerHTML = ''; });
+  const t = document.getElementById('detail-table');
+  if (t && t.querySelector('tbody')) t.querySelector('tbody').innerHTML = '';
+}
+
+/* -------------------------------------------------------- le strade che disegnano */
+
+/* I disegni rimasti a meta' per colpa di un guasto.
+ *
+ * Ne restano piu' di uno: chi modifica un valore fa partire `renderResults` e
+ * `renderExportState`, e tutti e due si mettono in attesa dello stesso
+ * risultato. Se «Riprova» rifacesse solo l'ultimo che ha chiesto — cioe' solo
+ * quello che ha scritto il pulsante per ultimo — la schermata resterebbe
+ * vuota mentre il riquadro d'errore sparisce: il tool sembrerebbe aver
+ * funzionato, senza mostrare niente. Successo davvero, ed e' per questo che
+ * l'elenco esiste. */
+let daRifare = [];
+
+function riprovaTutto() {
+  const rimasti = daRifare;
+  daRifare = [];
+  rimasti.forEach((f) => assicura(f));
+}
+
+function assicura(poi) {
+  const ora = payloadOra();
+  if (RISULTATO && RISULTATO.impronta === ora.impronta) { poi(); return; }
+  mostraAttesaLipe();
+  ponteLipe.chiedi(ora.payload).then((esito) => {
+    RISULTATO = { impronta: ora.impronta, esito, dettagli: ora.dettagli };
+    daRifare = [];
+    chiudiAttesaLipe();
+    poi();
+  }, (g) => {
+    /* Niente ripiego di nascosto: il guasto si vede. */
+    RISULTATO = null;
+    if (daRifare.indexOf(poi) === -1) daRifare.push(poi);
+    chiudiAttesaLipe();
+    svuotaRisultatoLipe();
+    mostraGuastoLipe(g, riprovaTutto);
+  });
+}
+
+function conIlServizio(originale) {
+  return function () {
+    /* Spento: la pagina e' quella di sempre, riga per riga. */
+    if (!acceso()) return originale.apply(this, arguments);
+    /* Senza un cliente attivo non c'e' niente da calcolare, e non c'e' niente
+       da chiedere: la pagina mostra lo stato vuoto da sola. */
+    if (!state.activeRecord) return originale.apply(this, arguments);
+    const argomenti = arguments, dove = this;
+    assicura(() => originale.apply(dove, argomenti));
+    return undefined;
+  };
+}
+
+renderResults = conIlServizio(renderResults);
+renderExportState = conIlServizio(renderExportState);
+
+/* Un po' di stile per il riquadro, sulla falsariga di quello di Confronto
+   regimi: gli strumenti devono somigliarsi anche quando si guastano. */
+(function () {
+  const s = document.createElement('style');
+  s.textContent =
+    '.lipe-api-stato{margin:0 0 14px;padding:14px 16px;border-radius:12px;' +
+    'border:1px solid var(--line,#d8dee9);background:var(--surface,#fff)}' +
+    '.lipe-api-stato[hidden]{display:none}' +
+    '.lipe-api-stato h3{margin:0 0 6px;font-size:15px}' +
+    '.lipe-api-stato p{margin:0 0 8px;font-size:13.5px;line-height:1.5}' +
+    '.lipe-api-stato.is-attesa{border-style:dashed;opacity:.85}' +
+    '.lipe-api-stato.is-guasto{border-color:#e0a3a3;background:#fdf4f4}' +
+    '.lipe-api-stato .lipe-api-rif{font-family:ui-monospace,monospace;font-size:12px;opacity:.75}';
+  document.head.appendChild(s);
+})();
+
+/* Una maniglia per le verifiche: dice se il servizio e' acceso, quante
+   richieste sono partite e quante volte si e' dovuto ripiegare sul motore in
+   pagina. Non espone niente della pagina, solo numeri su come sta andando. */
+window.lipeApiDiagnostica = () => ({
+  acceso: acceso(),
+  servizio: servizioLipePronto,
+  richieste: ponteLipe.quanteRichieste(),
+  ripieghi: RIPIEGHI,
+  aGiorno: acceso() ? aGiorno() : null,
+  impronta: RISULTATO ? RISULTATO.impronta.length : 0
+});
+window.lipeApiAzzeraDiagnostica = () => { RIPIEGHI = 0; ponteLipe.azzeraContatore(); };
+window.lipeApiPayload = () => payloadOra().payload;
+})();
+/* >>> fine PONTE LIPE <<< */
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootPatch);else bootPatch();
 })();
 </script><script id="tal-publication-i18n">

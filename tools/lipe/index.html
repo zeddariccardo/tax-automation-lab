@@ -1941,6 +1941,14 @@ function testiLocali(stato) {
 function creaPonte(opzioni) {
   const chiamaRete = opzioni.chiama;           /* (payload) → Promise<esito> */
   const attesaMs = opzioni.attesa ?? 250;
+  /* Distanza minima fra due partenze. Serve solo quando la rete e' veloce: la
+     coda da sola non basta, perche' se ogni risposta torna prima della
+     modifica successiva non c'e' mai niente in volo da accodare. Misurato in
+     produzione: giro di rete 58 ms, dieci modifiche a 120 ms l'una dall'altra
+     facevano dieci richieste in 1,4 secondi. Con 600 ms di distanza minima il
+     ritmo massimo diventa circa sedici richieste ogni dieci secondi, sotto il
+     limite di venti, qualunque cosa faccia chi digita. */
+  const minimoFraRichieste = opzioni.minimoFraRichieste ?? 0;
   const orologio = opzioni.orologio || (() => Date.now());
 
   let impronta = '';
@@ -1948,6 +1956,8 @@ function creaPonte(opzioni) {
   let inVolo = null;          /* { impronta, promessa } */
   let inCoda = null;          /* { impronta, payload, risolvi, rifiuta, promessa } */
   let timer = null;
+  let timerCoda = null;
+  let ultimaPartenza = -Infinity;
   let richieste = 0;
 
   const chiaveDi = (payload) => JSON.stringify(payload);
@@ -1961,6 +1971,7 @@ function creaPonte(opzioni) {
 
   function parti(payload, chiave) {
     richieste += 1;
+    ultimaPartenza = orologio();
     const promessa = chiamaRete(payload).then((esito) => {
       /* Si scrive in memoria SOLO se nel frattempo la domanda non e' cambiata:
          una risposta in ritardo non deve sovrascrivere una piu' recente. */
@@ -1982,7 +1993,12 @@ function creaPonte(opzioni) {
   }
 
   function svuotaLaCoda() {
-    if (!inCoda || inVolo) return;
+    if (!inCoda || inVolo || timerCoda) return;
+    const residuo = minimoFraRichieste - (orologio() - ultimaPartenza);
+    if (residuo > 0) {
+      timerCoda = setTimeout(() => { timerCoda = null; svuotaLaCoda(); }, residuo);
+      return;
+    }
     const attesa = inCoda;
     inCoda = null;
     parti(attesa.payload, attesa.impronta).then(attesa.risolvi, attesa.rifiuta);
@@ -2015,11 +2031,13 @@ function creaPonte(opzioni) {
      *    modifiche. Gli stati intermedi non li guarda nessuno: quello che conta
      *    e' che l'ULTIMO parta sempre, ed e' garantito perche' la coda tiene
      *    l'ultimo arrivato. */
-    if (inVolo) {
+    const troppoPresto = orologio() - ultimaPartenza < minimoFraRichieste;
+    if (inVolo || troppoPresto) {
       if (inCoda) inCoda.risolvi(null);   /* superata: non interessa piu' */
       let risolvi, rifiuta;
       const promessa = new Promise((ok, ko) => { risolvi = ok; rifiuta = ko; });
       inCoda = { impronta: chiave, payload, risolvi, rifiuta, promessa };
+      svuotaLaCoda();                     /* se e' solo questione di tempo, si programma */
       return promessa;
     }
 
@@ -2042,6 +2060,7 @@ function creaPonte(opzioni) {
     inMemoria = null;
     inVolo = null;
     if (inCoda) { inCoda.risolvi(null); inCoda = null; }
+    if (timerCoda) { clearTimeout(timerCoda); timerCoda = null; }
     if (timer) { clearTimeout(timer); timer = null; }
   }
 
@@ -2229,7 +2248,10 @@ async function chiamaLipe(corpo, tentativo) {
   return dati;
 }
 
-const ponteLipe = creaPonte({ chiama: chiamaLipe, attesa: 0 });
+/* 600 ms fra una partenza e l'altra: chi digita in fretta non fa piu' di una
+   richiesta ogni sei decimi, e il limite di venti ogni dieci secondi resta
+   irraggiungibile. Una modifica isolata dopo una pausa parte comunque subito. */
+const ponteLipe = creaPonte({ chiama: chiamaLipe, attesa: 0, minimoFraRichieste: 600 });
 
 /* --------------------------------------------------- il risultato in memoria */
 

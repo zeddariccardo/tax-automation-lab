@@ -991,7 +991,6 @@ let state={configClient:defaultClient(),configMapping:[],loadedConfigKey:'',adva
 const round2=v=>{const n=Number(v)||0;return Math.round((n+Math.sign(n||1)*Number.EPSILON)*100)/100};
 const hasOwn=(o,k)=>Object.prototype.hasOwnProperty.call(o||{},k);
 const manualHasValue=(m,k)=>hasOwn(m,k)&&String(m[k]??'').trim()!=='';
-function isLastAnnualPeriod(d){return state.activeRecord?.client?.periodType==='T'?Number(d.quarter)===4:Number(d.month)===12}
 function deriveImportIssues(){const issues=[],valid=activeMonths(),monthly=state.activeRecord?.client?.periodType==='M';for(const r of state.rows){if(monthly&&!r.month)issues.push(`Riga ${r.sourceRow}: mese mancante.`);if(r.month&&!valid.includes(r.month))issues.push(`Riga ${r.sourceRow}: il mese ${r.month} non appartiene al trimestre selezionato.`)}state.importIssues=issues;return issues}
 function workKey(p=state.activeClientKey,y=state.year,q=state.quarter){return p?`${p}|${y}|Q${q}`:''}
 function persistSession(){if(state.activeClientKey)writeStore(KEYS.session,{piva:state.activeClientKey,year:state.year,quarter:state.quarter},true)}
@@ -999,7 +998,6 @@ function persistWork(quiet=true){const key=workKey();if(!key)return false;const 
 function restoreWorkForCurrent(){const rec=readStore(KEYS.work,{})[workKey()];if(!rec)return false;state.rows=clone(rec.rows||[]);state.manual=clone(rec.manual||{});state.sourceFile=rec.sourceFile||'';state.unknownDraft=clone(rec.unknownDraft||{});state.periodMapping=clone(rec.periodMapping||{});deriveImportIssues();return true}
 function removeCurrentWork(){const all=readStore(KEYS.work,{}),key=workKey();if(key&&hasOwn(all,key)){delete all[key];writeStore(KEYS.work,all,true)}}
 function previousHistoryResult(){if(!state.activeClientKey||state.quarter<=1)return null;const history=readStore(KEYS.history,[]).filter(x=>x.client?.piva===state.activeClientKey&&Number(x.client?.year)===Number(state.year)&&Number(x.client?.quarter)===Number(state.quarter)-1).sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));const rec=history[0],last=rec?.periods?.[rec.periods.length-1];return last?.vp||null}
-function automaticCarry(d,stack=new Set()){const c=state.activeRecord?.client||{};if(c.groupVat)return {vp7:0,vp8:0,source:'group',missingHistory:false};const descriptors=periodDescriptors(),idx=descriptors.findIndex(x=>x.key===d.key);let prev=null,source='',missingHistory=false;if(idx>0){const prevD=descriptors[idx-1];if(!stack.has(prevD.key)){const next=new Set(stack);next.add(d.key);prev=computePeriod(prevD,next);source=prevD.label}}else if(state.quarter>1){prev=previousHistoryResult();source=`storico Q${state.quarter-1}`;missingHistory=!prev}if(!prev)return {vp7:0,vp8:0,source,missingHistory};const debit=round2(prev.vp14deb||0),credit=round2(prev.vp14cre||0),blockSmallDebt=isLastAnnualPeriod(d);return {vp7:debit>0&&debit<=100&&!blockSmallDebt?debit:0,vp8:credit>0?credit:0,source,missingHistory:false}}
 
 function routeValue(v,allowed){const s=String(v??'').toUpperCase();for(const x of allowed)if(s.includes(x))return x;return ''}
 function pct(v){const n=num(v);return v===''||v===null||typeof v==='undefined'?100:Math.max(0,Math.min(100,n))}
@@ -1222,17 +1220,7 @@ function useUnknownForPeriod(){
   toast(newMaps.length+(newMaps.length===1?' codice usato':' codici usati')+' per questo periodo. Il codiciario del cliente non è stato modificato.');
 }
 function saveUnknown(){if(!state.activeRecord)return;const list=unknownCodes(),newMaps=[];for(const u of list){const d=state.unknownDraft[u.code];if(!d?.decision){toast(`Definisci il trattamento del codice ${u.code}.`,true);return}if(d.decision==='include'&&!d.baseRow&&!d.dueRow&&!d.dedRow){toast(`Il codice ${u.code} è incluso ma non alimenta alcun rigo.`,true);return}if(d.decision==='exclude')d.baseRow=d.dueRow=d.dedRow='';newMaps.push({...defaultMapping(u.code),...d,id:uid(),decision:undefined})}const clients=getClients(),rec=clients[state.activeClientKey];if(!rec){toast('Cliente non trovato.',true);return}/* Il codiciario è permanente: prima di scriverci dentro si dice cosa e per chi. */if(!confirm('Aggiungere definitivamente '+newMaps.length+' codici IVA al codiciario di '+((rec.client&&rec.client.denom)||'questo cliente')+'?'+String.fromCharCode(10)+String.fromCharCode(10)+'Varranno per tutte le elaborazioni future. Per usarli solo adesso, scegli «Usa solo per questo periodo».'))return;const byCode=Object.fromEntries((rec.mapping||[]).map(m=>[m.code,m]));newMaps.forEach(m=>byCode[m.code]=m);rec.mapping=Object.values(byCode);rec.savedAt=new Date().toISOString();clients[state.activeClientKey]=rec;writeStore(KEYS.clients,clients);state.activeRecord=clone(rec);if(state.loadedConfigKey===state.activeClientKey){state.configMapping=clone(rec.mapping);renderConfigMapping()}state.unknownDraft={};renderSavedClients();renderProcessing();toast(`${newMaps.length} nuovi codici salvati nel cliente.`)}
-function periodDescriptors(){if(!state.activeRecord)return [];if(state.activeRecord.client.periodType==='T')return [{key:`Q${state.quarter}`,label:`${state.quarter}° trimestre`,quarter:state.quarter,months:activeMonths()}];return activeMonths().map(m=>({key:`M${m}`,label:MONTHS[m-1],month:m,months:[m]}))}
 function manualFor(key){return state.manual[key]||(state.manual[key]={})}
-function rowInPeriod(r,d){return state.activeRecord.client.periodType==='T'?!r.month||d.months.includes(r.month):d.months.includes(r.month)}
-function computePeriod(d,stack=new Set()){
-  const acc={VP2:0,VP3:0,VP4:0,VP5:0},details=[],maps=mappingMap();
-  for(const r of state.rows.filter(x=>rowInPeriod(x,d))){const m=maps[r.code];if(!m)continue;const add=(row,amount)=>{if(!row)return;const rounded=round2(amount);acc[row]=round2(acc[row]+rounded);details.push({period:d.label,row,code:r.code,description:m.description||'',amount:rounded,source:r.source})};add(m.baseRow,r.taxable*pct(m.basePct)/100);add(m.dueRow,r.vat*pct(m.duePct)/100);add(m.dedRow,r.vat*pct(m.dedPct)/100)}
-  const man=manualFor(d.key),carry=automaticCarry(d,stack),manualValue=(key,automatic)=>manualHasValue(man,key)?round2(num(man[key])):round2(automatic);
-  const vp7=manualValue('vp7',carry.vp7),vp8=manualValue('vp8',carry.vp8),vp9=round2(num(man.vp9)),vp10=round2(num(man.vp10)),vp11=round2(num(man.vp11)),vp12=round2(num(man.vp12)),vp13=round2(num(man.vp13));
-  const vp2=round2(acc.VP2),vp3=round2(acc.VP3),vp4=round2(acc.VP4),vp5=round2(acc.VP5),vp6=round2(vp4-vp5),saldo=round2(vp6+vp7-vp8-vp9-vp10-vp11+vp12-vp13);
-  return {descriptor:d,vp2,vp3,vp4,vp5,vp6,vp7,vp8,vp9,vp10,vp11,vp12,vp13,vp14deb:saldo>0?saldo:0,vp14cre:saldo<0?-saldo:0,saldo,details,carry:{...carry,vp7Manual:manualHasValue(man,'vp7'),vp8Manual:manualHasValue(man,'vp8')}}
-}
 function buildVpGrid(d,v){
   const man=manualFor(d.key);
   const calc=(code,label,a,b='')=>`<div class="vp-code">${code}</div><div>${esc(label)}</div><div class="vp-value">${a===''?'':fmt(a)}</div><div class="vp-value">${b===''?'':fmt(b)}</div>`;
@@ -1244,24 +1232,6 @@ function buildVpGrid(d,v){
   h+=`<div class="vp-code">VP13</div><div>Acconto dovuto</div><div class="vp-value"><input data-manual-key="${d.key}" data-manual-field="vp13" value="${esc(man.vp13||'')}" inputmode="decimal" placeholder="0,00"></div><div class="flags"><label>Metodo <select data-manual-key="${d.key}" data-manual-field="metodo"><option value="" ${!man.metodo?'selected':''}>—</option><option value="1" ${String(man.metodo)==='1'?'selected':''}>1 · storico</option><option value="2" ${String(man.metodo)==='2'?'selected':''}>2 · previsionale</option><option value="3" ${String(man.metodo)==='3'?'selected':''}>3 · analitico</option><option value="4" ${String(man.metodo)==='4'?'selected':''}>4 · settori particolari</option></select></label></div>`;
   h+=`<div class="vp-code vp-result">VP14</div><div class="vp-result">IVA da versare / a credito</div><div class="vp-value vp-result">${fmt(v.vp14deb)}</div><div class="vp-value vp-result">${fmt(v.vp14cre)}</div>`;return h
 }
-function checks(){
-  deriveImportIssues();const out=[],unknown=unknownCodes().length,invalidMonths=state.importIssues.length,invalidMap=(state.activeRecord?.mapping||[]).filter(m=>mappingErrors(m,state.activeRecord.mapping).length).length,descriptors=periodDescriptors(),vals=descriptors.map(d=>computePeriod(d)),c=state.activeRecord?.client||{};
-  out.push({name:'Cliente selezionato',status:state.activeRecord?'ok':'fail',value:state.activeRecord?.client?.denom||'Assente',desc:'L’elaborazione deve essere associata a un cliente configurato.'});
-  out.push({name:'Importi caricati',status:state.rows.length?'ok':'fail',value:String(state.rows.length),desc:'Righe lette dal file o dai dati incollati.'});
-  out.push({name:'Codici non riconosciuti',status:unknown?'fail':'ok',value:String(unknown),desc:unknown?'Mappa i codici prima di generare gli output ufficiali.':'Tutti i codici sono presenti nel codiciario.'});
-  out.push({name:'Righe fuori periodo',status:invalidMonths?'fail':'ok',value:invalidMonths?`${invalidMonths} anomalie`:'Coerenti',desc:invalidMonths?state.importIssues.slice(0,3).join(' · '):`Periodo atteso: ${activeMonths().map(m=>MONTHS[m-1]).join(', ')}.`});
-  out.push({name:'Codiciario cliente',status:invalidMap?'fail':'ok',value:invalidMap?`${invalidMap} anomalie`:`${state.activeRecord?.mapping?.length||0} codici`,desc:'Controllo duplicati e percentuali di confluenza.'});
-  const vp7TooHigh=vals.filter(v=>v.vp7>100.0001),both=vals.filter(v=>v.vp7>.004&&v.vp8>.004),carryMissing=vals.filter(v=>v.carry.missingHistory),carryForced=vals.filter(v=>(v.carry.vp7Manual&&Math.abs(v.vp7-v.carry.vp7)>.004)||(v.carry.vp8Manual&&Math.abs(v.vp8-v.carry.vp8)>.004));
-  out.push({name:'Riporto periodo precedente',status:vp7TooHigh.length||both.length?'fail':carryMissing.length||carryForced.length?'warn':'ok',value:vp7TooHigh.length?'VP7 oltre € 100':both.length?'VP7 e VP8 insieme':carryMissing.length?'Storico non disponibile':carryForced.length?'Valore forzato':'Coerente',desc:vp7TooHigh.length?'VP7 può contenere solo il debito precedente non superiore a 100 euro.':both.length?'VP7 e VP8 non possono essere valorizzati contemporaneamente.':carryMissing.length?'Per il primo modulo del trimestre non è stato trovato nello storico il periodo immediatamente precedente.':carryForced.length?'Il riporto automatico è stato modificato manualmente: verificare la scelta.':'Credito e piccoli debiti sono riportati automaticamente tra periodi dello stesso anno.'});
-  const groupErrors=[];if(c.groupVat)vals.forEach(v=>{if(v.vp7||v.vp8||v.vp9||v.vp13)groupErrors.push(v.descriptor.label)});if(c.groupLiquidation==='1')vals.forEach(v=>{const m=manualFor(v.descriptor.key);if(v.vp2||v.vp3||v.vp10||v.vp11||v.vp12||m.subforn||m.eventi)groupErrors.push(v.descriptor.label)});
-  out.push({name:'Liquidazione IVA di gruppo',status:groupErrors.length?'fail':'ok',value:groupErrors.length?`${new Set(groupErrors).size} modulo/i`:'Coerente',desc:c.groupVat?'Per le società partecipanti VP7, VP8, VP9 e VP13 devono essere omessi.':c.groupLiquidation==='1'?'Nella comunicazione aggregata della controllante devono essere omessi VP2, VP3, VP10, VP11, VP12, Subforniture ed Eventi eccezionali.':'Nessuna regola speciale di gruppo applicabile.'});
-  const advanceBad=vals.filter(v=>Math.abs(v.vp13)>.004&&!isLastAnnualPeriod(v.descriptor)),interestBad=vals.filter(v=>Math.abs(v.vp12)>.004&&(c.periodType!=='T'||Number(v.descriptor.quarter)===4));
-  out.push({name:'Acconto e interessi',status:advanceBad.length||interestBad.length?'fail':'ok',value:advanceBad.length?'Acconto fuori periodo':interestBad.length?'Interessi non ammessi':'Coerenti',desc:advanceBad.length?'VP13 può essere indicato solo nell’ultimo periodo dell’anno.':interestBad.length?'VP12 è riservato alle liquidazioni trimestrali e non va indicato nel quarto trimestre.':'Collocazione temporale coerente.'});
-  const zero=state.rows.filter(r=>Math.abs(r.taxable)<.005&&Math.abs(r.vat)<.005).length;out.push({name:'Righe a zero',status:zero?'warn':'ok',value:String(zero),desc:zero?'Le righe a zero non alterano il risultato ma possono essere rimosse.':'Nessuna riga completamente a zero.'});
-  if(state.activeClientKey&&!xmlValidPiva(state.activeClientKey))out.push({name:'Partita IVA',status:'warn',value:'Check digit non coerente',desc:'La lunghezza è corretta, ma la cifra di controllo non risulta formalmente valida.'});
-  return out
-}
-function hasBlocking(){return !state.rows.length||checks().some(c=>c.status==='fail')}
 function renderResults(){
   const demoGuide=$('demo-guide');if(demoGuide)demoGuide.hidden=!(state.activeClientKey===DEMO_PIVA&&state.sourceFile==='Esempio completo guidato');
   const ready=!!(state.activeRecord&&state.rows.length),empty=$('results-empty'),content=$('results-content');empty.hidden=ready;content.hidden=!ready;if(!ready)return;
@@ -1641,34 +1611,7 @@ previousHistoryResult=function(){
   const last=rec.periods&&rec.periods[rec.periods.length-1];return last&&last.vp||null;
 };
 
-const oldChecks=checks;
-checks=function(){
-  const out=oldChecks(),ctxOk=!state.rows.length||sameContext(state.importContext);
-  const operationalWarnings=new Set(['Codici non riconosciuti','Righe fuori periodo','Codiciario cliente']);
-  out.forEach(function(item){
-    if(item&&item.status==='fail'&&operationalWarnings.has(item.name))item.status='warn';
-  });
-  out.push({name:'Coerenza fra file e periodo',status:ctxOk?'ok':'warn',value:ctxOk?'Coerente':'Da verificare',desc:ctxOk?'Il file importato è vincolato a cliente, anno, trimestre e periodicità correnti.':'Controlla che gli importi appartengano al cliente e al periodo selezionati prima dell’invio.'});
-  const carry=out.find(c=>c.name==='Riporto periodo precedente');
-  if(carry&&carry.status!=='fail'&&(carry.value==='Storico non disponibile'||carryIntegrityIssue)){
-    carry.status='warn';
-    carry.value='Storico precedente non disponibile';
-    carry.desc=(carryIntegrityIssue?carryIntegrityIssue+' ':'')+'Il trimestre può essere gestito autonomamente: verifica e inserisci manualmente gli eventuali riporti VP7 e VP8.';
-  }
-  const c=state.activeRecord?.client||{};
-  if(c.periodType==='T')out.push({name:'Regime trimestrale',status:['ordinary','option'].includes(c.quarterRegime)?'ok':'fail',value:c.quarterRegime==='option'?'Per opzione':'Ordinario',desc:'Il quarto trimestre è codificato rispettivamente come 5 o 4 nel tracciato.'});
-  const vals=periodDescriptors().map(d=>computePeriod(d));
-  const firstBad=vals.filter(v=>((v.descriptor.month===1)||(v.descriptor.quarter===1))&&v.vp8>.004);
-  if(firstBad.length)out.push({name:'VP8 primo periodo',status:'fail',value:'Non ammesso',desc:'Nel primo periodo dell’anno il credito del periodo precedente non deve essere serializzato come VP8.'});
-  return out;
-};
 
-function officialOutputProblems(){
-  const blockingNames=new Set(['Codici non riconosciuti','Righe fuori periodo','Codiciario cliente','Coerenza fra file e periodo']);
-  return checks().filter(c=>blockingNames.has(c.name)&&c.status!=='ok').map(c=>c.name+': '+(c.desc||c.value||'verifica richiesta'));
-}
-function quarterCode(d){const c=state.activeRecord?.client||{};return c.periodType==='T'&&c.quarterRegime==='option'&&Number(d.quarter)===4?5:Number(d.quarter);}
-window.lipeQuarterCode=quarterCode;
 function pushMoney(tags,name,value,indent=4){if(Math.abs(Number(value)||0)>.004)tags.push(xmlTag(name,xmlMoney(value),indent));}
 buildXml=function(){
   const problems=[],warnings=[];if(!state.activeRecord){problems.push('Nessun cliente selezionato.');return {xml:'',problems,warnings,filename:''};}officialOutputProblems().forEach(p=>problems.push(p));
@@ -2124,18 +2067,21 @@ function creaPonte(opzioni) {
  * comodita' nostra: si e' scelto di non farlo.
  *
  * ---------------------------------------------------------------------------
- * ACCESO PER TUTTI, dal 27 agosto 2026
+ * NON C'E' PIU' NIENTE DA ACCENDERE
  *
- * Fino a oggi era il contrario: il ponte c'era ma bisognava accenderlo a mano.
- * Adesso il calcolo lo fa il servizio, per chiunque apra il tool. Resta un
- * modo per spegnerlo — serve a chi assiste qualcuno al telefono, non
- * all'utente:
+ * Il motore fiscale non e' piu' in questa pagina: il calcolo lo fa il servizio,
+ * sempre. Fino al 27 agosto 2026 c'era un interruttore, perche' c'era una
+ * seconda strada; adesso la seconda strada non esiste e l'interruttore
+ * sarebbe una promessa falsa. Chi avesse scritto `'no'` nelle preferenze del
+ * browser se lo ritrova scritto, e va ignorato: applicarlo darebbe una pagina
+ * muta.
  *
- *     localStorage.setItem('tal-lipe-api', 'no'); location.reload();   // spento
- *     localStorage.removeItem('tal-lipe-api');    location.reload();   // acceso
- *
- * Chi aveva scritto `'si'` nelle prove continua ad avere il servizio: qualunque
- * valore diverso da `'no'` vuol dire acceso.
+ * Questo file non si limita piu' a sostituire il calcolo: **fornisce** alla
+ * pagina le funzioni che il motore dava e che sono passate al servizio —
+ * i periodi, il quadro VP, i controlli, i bloccanti, il tetto VP7, la
+ * partecipazione all'IVA di gruppo, il codice del trimestre. Le espone su
+ * `window` e non come dichiarazioni, perche' chi le chiama sta in altre
+ * closure e le cerca risalendo fino al globale.
  *
  * ---------------------------------------------------------------------------
  * COME FUNZIONA
@@ -2166,7 +2112,6 @@ function creaPonte(opzioni) {
 
 /* eslint-disable no-undef */   /* le funzioni della pagina arrivano dalla closure */
 
-const CHIAVE_MODO = 'tal-lipe-api';
 const PERCORSO_LIPE = '/api/lipe/calcola';
 const SONDA_LIPE = '/api/stato';
 const ATTESA_LIPE_MS = 8000;
@@ -2179,10 +2124,14 @@ const FORMA_PROVA_LIPE = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{
 
 const preferenzaLipe = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
 
-/* Acceso salvo che qualcuno abbia scritto 'no'. Il valore predefinito e'
-   l'assenza della preferenza, quindi chi apre il tool per la prima volta usa il
-   servizio; chi nelle prove aveva scritto 'si' continua come prima. */
-const acceso = () => preferenzaLipe(CHIAVE_MODO) !== 'no';
+/* Il calcolo lo fa il servizio. Non c'e' alternativa, ed e' la conclusione di
+   un percorso in tre tempi: prima la pagina sapeva parlare col servizio ma
+   calcolava da sola; poi calcolava il servizio con la pagina sotto come rete;
+   dal 27 agosto 2026 il motore non e' piu' qui e la rete non c'e'. Se il
+   servizio non risponde il tool lo dice e offre di riprovare — non inventa
+   numeri e non ne mostra di vecchi. */
+const acceso = () => true;
+const motoreInPagina = () => false;
 const radiceLipe = () => {
   const b = String(preferenzaLipe('tal-api-base') || '').trim();
   return b && FORMA_PROVA_LIPE.test(b) ? b : '';
@@ -2353,8 +2302,9 @@ const aGiorno = () => !!(RISULTATO && RISULTATO.impronta === payloadOra().impron
 
 /* --------------------------------------------------------- le sostituzioni */
 
-const computePeriodInPagina = computePeriod;
-const checksInPagina = checks;
+/* Le due strade che disegnano restano dichiarate nella pagina: il ponte le
+   avvolge, non le sostituisce. Il motore invece non c'e' piu', quindi non
+   c'e' nessuna versione della pagina da tenere da parte come riserva. */
 const renderResultsInPagina = renderResults;
 const renderExportStateInPagina = renderExportState;
 
@@ -2374,20 +2324,20 @@ function rifiuta() {
   return guastoLipe('nonPronto');
 }
 
-computePeriod = function (d, stack) {
-  /* Senza cliente `periodDescriptors()` non produce periodi, quindi questa non
-     viene mai chiamata: se succedesse sarebbe un difetto, e va visto. */
-  if (!acceso()) return computePeriodInPagina(d, stack);
+/* Da qui in poi il ponte non sostituisce: **fornisce**. Tutto su `window`,
+   perche' chi chiama queste funzioni sta in altre closure e le cerca risalendo
+   fino al globale — se fossero dichiarazioni dentro questa IIFE, nessuno le
+   troverebbe. */
+
+window.computePeriod = function (d) {
   const dal = RISULTATO ? periodoDalServizio(d) : null;
   if (dal) return dal;
   throw rifiuta();
 };
 
-checks = function () {
-  if (!acceso()) return checksInPagina();
+window.checks = function () {
   /* Senza cliente non si calcola e non si chiede: la schermata di partenza e'
-     testo, non aritmetica, e sta qui. Non passa piu' dai controlli della
-     pagina, che dopo la rimozione del motore non esisteranno. */
+     testo, non aritmetica, e sta qui. */
   if (nienteDaCalcolare()) {
     return controlliSenzaCliente(quarterMonths(state.quarter).map((m) => MONTHS[m - 1]));
   }
@@ -2397,6 +2347,54 @@ checks = function () {
   deriveImportIssues();
   return applicaTestiLocali(RISULTATO.esito.controlli, testiLocali(state));
 };
+
+/* I periodi. Erano una regola della pagina — mensile tre, trimestrale uno, con
+   le etichette — e adesso li decide il servizio: qui si rileggono e basta. */
+window.periodDescriptors = function () {
+  if (nienteDaCalcolare()) return [];
+  if (!RISULTATO) throw rifiuta();
+  return RISULTATO.esito.periodi.map((p) => ({
+    key: p.chiave, label: p.etichetta,
+    month: p.mese ?? undefined, quarter: p.trimestre ?? undefined,
+    months: p.mesi
+  }));
+};
+
+/* Le tre cose che l'XML e il PDF, che restano nel browser, chiedevano al
+   motore. Adesso arrivano dalla risposta: non sono piu' regole scritte qui. */
+const periodoDelServizio = (d) =>
+  (RISULTATO ? RISULTATO.esito.periodi.find((p) => p.chiave === d.key) : null);
+
+window.quarterCode = (d) => {
+  const p = periodoDelServizio(d);
+  return p ? p.codiceTrimestre : Number(d.quarter);
+};
+window.lipeQuarterCode = window.quarterCode;
+
+window.groupParticipant = (d) => {
+  const p = periodoDelServizio(d);
+  return p ? p.partecipanteAlGruppo : false;
+};
+window.lipeGroupParticipant = window.groupParticipant;
+
+window.vp7Limit = () => (RISULTATO ? RISULTATO.esito.tettoVp7 : 100);
+window.lipeVp7Limit = window.vp7Limit;
+
+/* C'e' qualcosa che impedisce di generare gli output ufficiali? Lo dice il
+   servizio: qui si rilegge, e i testi che nominano le righe del foglio li
+   rimette il browser. */
+window.hasBlocking = () => {
+  if (nienteDaCalcolare()) return true;
+  if (!RISULTATO) throw rifiuta();
+  return RISULTATO.esito.blocca;
+};
+
+window.officialOutputProblems = () => {
+  if (nienteDaCalcolare()) return [];
+  if (!RISULTATO) throw rifiuta();
+  return bloccantiConTestiLocali(RISULTATO.esito.bloccanti, testiLocali(state));
+};
+window.lipeOfficialProblems = window.officialOutputProblems;
 
 /* ------------------------------------------------------------ l'interfaccia */
 
@@ -2506,8 +2504,6 @@ function assicura(poi) {
 
 function conIlServizio(originale) {
   return function () {
-    /* Spento: la pagina e' quella di sempre, riga per riga. */
-    if (!acceso()) return originale.apply(this, arguments);
     /* Senza un cliente attivo non c'e' niente da calcolare, e non c'e' niente
        da chiedere: la pagina mostra lo stato vuoto da sola. */
     if (!state.activeRecord) return originale.apply(this, arguments);
@@ -2517,6 +2513,7 @@ function conIlServizio(originale) {
   };
 }
 
+/* Queste due sono dichiarate nella pagina e restano: si avvolgono. */
 renderResults = conIlServizio(renderResults);
 renderExportState = conIlServizio(renderExportState);
 
@@ -2573,11 +2570,11 @@ if (document.readyState === 'loading') {
    richieste sono partite e quante volte si e' dovuto ripiegare sul motore in
    pagina. Non espone niente della pagina, solo numeri su come sta andando. */
 window.lipeApiDiagnostica = () => ({
-  acceso: acceso(),
+  motoreInPagina: motoreInPagina(),
   servizio: servizioLipePronto,
   richieste: ponteLipe.quanteRichieste(),
   rifiuti: RIFIUTI,
-  aGiorno: acceso() ? aGiorno() : null,
+  aGiorno: aGiorno(),
   impronta: RISULTATO ? RISULTATO.impronta.length : 0
 });
 window.lipeApiAzzeraDiagnostica = () => { RIFIUTI = 0; ponteLipe.azzeraContatore(); };
@@ -3127,25 +3124,7 @@ html{scroll-padding-top:calc(var(--tal-global-header-height,60px) + 12px)}
 'use strict';
 var VERSION='3.6.7',ROUTES=window.LIPE_VIEWS||{};
 
-function vp7Limit(year){year=Number(year);return year===2023?25.82:100;}
-function groupParticipant(d,c){
-  c=c||state.activeRecord&&state.activeRecord.client||{};if(!c.groupVat)return false;
-  var last=Number(c.lastMonth||99);if(!c.lastMonth||last===99||last===13)return true;
-  if(d.month)return Number(d.month)<=last;
-  var months=d.months||[],start=Math.min.apply(Math,months),end=Math.max.apply(Math,months);if(end<=last)return true;if(start>last)return false;return null;
-}
-window.lipeGroupParticipant=groupParticipant;window.lipeVp7Limit=vp7Limit;
 
-automaticCarry=function(d,stack){
-  stack=stack||new Set();var c=state.activeRecord&&state.activeRecord.client||{},participant=groupParticipant(d,c);if(participant!==false&&c.groupVat)return {vp7:0,vp8:0,source:'group',missingHistory:false};
-  var descriptors=periodDescriptors(),idx=descriptors.findIndex(function(x){return x.key===d.key;}),prev=null,source='',missingHistory=false;
-  if(idx>0){var prevD=descriptors[idx-1];if(!stack.has(prevD.key)){var next=new Set(stack);next.add(d.key);prev=computePeriod(prevD,next);source=prevD.label;}}
-  else if(state.quarter>1){prev=previousHistoryResult();source='storico Q'+(state.quarter-1);missingHistory=!prev;}
-  if(!prev)return {vp7:0,vp8:0,source:source,missingHistory:missingHistory};
-  var debit=round2(prev.vp14deb||0),credit=round2(prev.vp14cre||0),blockSmallDebt=isLastAnnualPeriod(d),limit=vp7Limit(state.year);
-  return {vp7:debit>0&&debit<=limit&&!blockSmallDebt?debit:0,vp8:credit>0?credit:0,source:source,missingHistory:false};
-};
-window.automaticCarry=automaticCarry;
 
 function unsavedFields(c){
   var map={transmitterId:'cfg-transmitter-id',flagConferma:'cfg-flag-conferma',moduleProfile:'cfg-module-profile'},labels={transmitterId:'Identificativo soggetto trasmittente',flagConferma:'FlagConferma',moduleProfile:'Struttura della comunicazione'},out=[];
@@ -3153,7 +3132,6 @@ function unsavedFields(c){
 }
 function nextSequence(key){var all={};try{all=JSON.parse(localStorage.getItem('lipe_file_seq_v1')||'{}');}catch(_){all={};}return Number(all[key]||0)+1;}
 function softwareIdValid(v){return !v||/^(?:\d{11}|[A-Z0-9]{16})$/.test(String(v).trim().toUpperCase());}
-function lipeOfficialProblems(){var blocking=new Set(['Codici non riconosciuti','Righe fuori periodo','Codiciario cliente','Coerenza fra file e periodo']);return checks().filter(function(c){return blocking.has(c.name)&&c.status!=='ok';}).map(function(c){return c.name+': '+(c.desc||c.value||'verifica richiesta');});}
 function xmlPushMoney(tags,name,value){if(Math.abs(Number(value)||0)>.004)tags.push(xmlTag(name,xmlMoney(value),4));}
 
 window.buildXml=function(){

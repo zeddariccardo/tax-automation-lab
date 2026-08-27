@@ -143,32 +143,35 @@ test('nessun dato identificativo è fra i campi che Confronto regimi spedisce', 
 
 /* ------------------------------------------------ il tool che chiama, ma spento */
 
-test('LIPE usa il servizio di calcolo, e si può spegnere solo a mano', () => {
+test('LIPE usa il servizio di calcolo, e non ha più un’alternativa', () => {
   const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
   const blocco = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//);
   assert.ok(blocco, 'non trovo il blocco del ponte LIPE');
   const codice = blocco[0];
 
-  /* Dal 27 agosto 2026 il calcolo lo fa il servizio per chiunque apra il tool.
-     Resta un modo per spegnerlo — serve a chi assiste qualcuno, non all'utente —
-     e passa da una preferenza scritta a mano nel proprio browser. */
-  assert.match(codice, /const acceso = \(\) => preferenzaLipe\(CHIAVE_MODO\) !== 'no';/,
-    'l’interruttore del ponte non è più quello previsto');
-  assert.equal(/setItem\(\s*CHIAVE_MODO/.test(codice), false,
-    'il ponte non deve scriversi da solo la preferenza');
+  /* Dal 27 agosto 2026 il motore fiscale non è più in questa pagina: il calcolo
+     lo fa il servizio, sempre. Non c'è più un interruttore, perché non c'è più
+     una seconda strada da scegliere. */
+  assert.match(codice, /const acceso = \(\) => true;/,
+    'il ponte non deve avere alternative: il motore non è più in pagina');
+  assert.match(codice, /const motoreInPagina = \(\) => false;/);
   assert.doesNotMatch(codice, /location\.search|URLSearchParams|getAttribute\('data-api/,
     'né l’interruttore né l’indirizzo devono poter arrivare dal link o dal markup');
 });
 
-test('LIPE non calcola in pagina quando il servizio è acceso', () => {
-  /* Il motore fiscale è ancora nel file — verrà tolto dopo — ma col ponte
-     acceso non lo tocca nessuno. Se il risultato del servizio manca, la pagina
-     si rifiuta e lo dice, invece di calcolare per conto suo: un ripiego
-     silenzioso nasconderebbe il guasto proprio quando conta saperlo. */
+test('LIPE non calcola più in pagina, e non può ripiegare', () => {
+  /* Le funzioni fiscali non sono più nel file. Se il risultato del servizio
+     manca, la pagina si rifiuta e lo dice: non c'è niente su cui ripiegare, e
+     non deve esserci — un ripiego silenzioso nasconderebbe il guasto proprio
+     quando conta saperlo. */
   const html = fs.readFileSync(path.join(root, 'tools', 'lipe', 'index.html'), 'utf8');
   const codice = html.match(/\/\* >>> PONTE LIPE[\s\S]*?\/\* >>> fine PONTE LIPE <<< \*\//)[0];
   assert.match(codice, /throw rifiuta\(\);/, 'manca il rifiuto');
   assert.match(codice, /RIFIUTI \+= 1;/, 'i rifiuti devono essere contati');
+  ['function computePeriod(', 'function checks(){', 'function automaticCarry(',
+    'function periodDescriptors(', 'function vp7Limit(', 'function groupParticipant('
+  ].forEach((pezzo) => assert.equal(html.includes(pezzo), false,
+    'la logica fiscale è ancora nel sorgente pubblico: ' + pezzo));
   /* E le strade che esportano passano dal servizio come quelle che disegnano. */
   ['exportPdf', 'exportWorkingPaper', 'exportXml', 'saveHistory'].forEach((n) => {
     assert.ok(codice.includes("'" + n + "'"), 'l’export ' + n + ' non passa dal servizio');

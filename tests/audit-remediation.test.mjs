@@ -67,7 +67,12 @@ assert.match(lipe,/if\(!q5\|\|sub\)\{if\(v\.vp14deb/);
 assert.match(lipe,/front\.push\(xmlTag\('FlagConferma','1',3\)\)/);
 assert.match(lipe,/seqKey='IVP18_'\+transmitter/);
 assert.match(lipe,/filename:'IT'\+transmitter\+'_LI_'/);
-assert.match(lipe,/year===2023\?25\.82:100/);
+/* Il tetto VP7 per anno non è più nella pagina: dal 27 agosto 2026 lo decide il
+   servizio di calcolo, e il browser lo riceve già deciso. Qui si verifica che
+   non sia tornato: una regola fiscale che ricompare nel sorgente pubblico è
+   esattamente ciò che la migrazione doveva impedire. */
+assert.doesNotMatch(lipe,/year===2023\?25\.82:100/,
+  'il tetto VP7 per anno è tornato nella pagina: dovrebbe stare solo nel servizio');
 assert.match(lipe,/PROSPETTO DI LAVORO · NON PRESENTABILE/);
 assert.match(lipe,/moduleProfile:'single'/);
 

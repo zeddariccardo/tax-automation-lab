@@ -1268,112 +1268,19 @@ e.push('  <style:style style:name="ro'+a+'" style:family="table-row">\n');e.push
 a=bw(aw(t.messages[0].data)[1][0].data);n=Pw({deps:[1],location:r[a].location,type:2},r);i[a]=n;kw(t,n);f[1].push({type:2,data:ww(n)});var l=zw(e,r,a);l.id=n;if(r[1].location==r[n].location)s.push(l);else Ww(e,r,n,function(e,r){return r.push(l)});t.messages[0].data=nw(f)});var s=-1;Ww(e,r,n,function(t,a){var f=aw(t.messages[0].data);for(var l=3;l<=69;++l)delete f[l];var o=iw(f[2],bw);o.forEach(function(e){return Aw(t,e)});s=Pw({deps:[n],location:r[o[0]].location,type:r[o[0]].type},r);kw(t,s);i[o[0]]=s;f[2]=[{type:2,data:ww(s)}];var c=zw(e,r,o[0]);c.id=s;if(r[o[0]].location==r[n].location)a.push(c);else{Ww(e,r,2,function(e){var t=aw(e.messages[0].data);$w(t,r,n,s);e.messages[0].data=nw(t)});Ww(e,r,s,function(e,r){return r.push(c)})}t.messages[0].data=nw(f)});var f=-1;Ww(e,r,s,function(t,a){var n=aw(t.messages[0].data);var l=aw(n[1][0].data);for(var o=3;o<=69;++o)delete l[o];var c=bw(l[2][0].data);l[2][0].data=ww(i[c]);n[1][0].data=nw(l);var h=bw(n[2][0].data);Aw(t,h);f=Pw({deps:[s],location:r[h].location,type:r[h].type},r);kw(t,f);i[h]=f;n[2][0].data=ww(f);var u=zw(e,r,h);u.id=f;if(r[s].location==r[f].location)a.push(u);else Ww(e,r,f,function(e,r){return r.push(u)});t.messages[0].data=nw(n)});Ww(e,r,f,function(a,n){var s,l;var o=aw(a.messages[0].data);var c=Xb(o[1][0].data),h=c.replace(/-[A-Z0-9]*/,"-".concat(("0000"+t.toString(16)).slice(-4)));o[1][0].data=Gb(h);[12,13,29,31,32,33,39,44,47,81,82,84].forEach(function(e){return delete o[e]});if(o[45]){var u=aw(o[45][0].data);var d=bw(u[1][0].data);Aw(a,d);delete o[45]}if(o[70]){var v=aw(o[70][0].data);(s=v[2])==null?void 0:s.forEach(function(e){var r=aw(e.data);[2,3].map(function(e){return r[e][0]}).forEach(function(e){var r=aw(e.data);if(!r[8])return;var t=bw(r[8][0].data);Aw(a,t)})});delete o[70]}[46,30,34,35,36,38,48,49,60,61,62,63,64,71,72,73,74,75,85,86,87,88,89].forEach(function(e){if(!o[e])return;var r=bw(o[e][0].data);delete o[e];Aw(a,r)});var p=aw(o[4][0].data);{[2,4,5,6,11,12,13,15,16,17,18,19,20,21,22].forEach(function(t){var s;if(!((s=p[t])==null?void 0:s[0]))return;var l=bw(p[t][0].data);var o=Pw({deps:[f],location:r[l].location,type:r[l].type},r);Aw(a,l);kw(a,o);i[l]=o;var c=zw(e,r,l);c.id=o;if(r[l].location==r[f].location)n.push(c);else{r[o].location=r[l].location.replace(l.toString(),o.toString());if(r[o].location==r[l].location)r[o].location=r[o].location.replace(/\.iwa/,"-".concat(o,".iwa"));Qe.utils.cfb_add(e,r[o].location,cw(fw([c])));var h=r[o].location.replace(/^Root Entry\//,"").replace(/^Index\//,"").replace(/\.iwa$/,"");Ww(e,r,2,function(e){var t=aw(e.messages[0].data);Hw(t,o,h);$w(t,r,f,o);e.messages[0].data=nw(t)})}p[t][0].data=ww(o)});var m=aw(p[1][0].data);{(l=m[2])==null?void 0:l.forEach(function(t){var s=bw(t.data);var l=Pw({deps:[f],location:r[s].location,type:r[s].type},r);Aw(a,s);kw(a,l);i[s]=l;var o=zw(e,r,s);o.id=l;if(r[s].location==r[f].location){n.push(o)}else{r[l].location=r[s].location.replace(s.toString(),l.toString());if(r[l].location==r[s].location)r[l].location=r[l].location.replace(/\.iwa/,"-".concat(l,".iwa"));Qe.utils.cfb_add(e,r[l].location,cw(fw([o])));var c=r[l].location.replace(/^Root Entry\//,"").replace(/^Index\//,"").replace(/\.iwa$/,"");Ww(e,r,2,function(e){var t=aw(e.messages[0].data);Hw(t,l,c);$w(t,r,f,l);e.messages[0].data=nw(t)})}t.data=ww(l)})}p[1][0].data=nw(m);var g=aw(p[3][0].data);{g[1].forEach(function(t){var n=aw(t.data);var s=bw(n[2][0].data);var l=i[s];if(!i[s]){l=Pw({deps:[f],location:"",type:r[s].type},r);r[l].location="Root Entry/Index/Tables/Tile-".concat(l,".iwa");i[s]=l;var o=zw(e,r,s);o.id=l;Aw(a,s);kw(a,l);Qe.utils.cfb_add(e,"/Index/Tables/Tile-".concat(l,".iwa"),cw(fw([o])));Ww(e,r,2,function(e){var t=aw(e.messages[0].data);t[3].push({type:2,data:nw([[],[{type:0,data:qb(l)}],[{type:2,data:Gb("Tables/Tile")}],[{type:2,data:Gb("Tables/Tile-".concat(l))}],[{type:2,data:new Uint8Array([2,0,0])}],[{type:2,data:new Uint8Array([2,0,0])}],[],[],[],[],[{type:0,data:qb(0)}],[],[{type:0,data:qb(0)}]])});t[1]=[{type:0,data:qb(Math.max(l+1,rw(t[1][0].data)))}];$w(t,r,f,l);e.messages[0].data=nw(t)})}n[2][0].data=ww(l);t.data=nw(n)})}p[3][0].data=nw(g)}o[4][0].data=nw(p);a.messages[0].data=nw(o)})}function jw(e,r,t,a,n,i){var s=[];Ww(e,r,i,function(e){var r=aw(e.messages[0].data);{r[1]=[{type:2,data:Gb(a)}];s=iw(r[2],bw)}e.messages[0].data=nw(r)});var f=zw(e,r,s[0]);var l=bw(aw(f.messages[0].data)[2][0].data);Ww(e,r,l,function(a,n){return Yw(e,r,t,a,n,l)})}var Kw=true;function Yw(e,r,t,a,n,i){if(!t["!ref"])throw new Error("Cannot export empty sheet to NUMBERS");var s=Za(t["!ref"]);s.s.r=s.s.c=0;var f=false;if(s.e.c>999){f=true;s.e.c=999}if(s.e.r>999999){f=true;s.e.r=999999}if(f)console.error("Truncating to ".concat(Ja(s)));var l=[];if(t["!data"])l=t["!data"];else{var o=[];for(var c=0;c<=s.e.c;++c)o[c]=$a(c);for(var h=0;h<=s.e.r;++h){l[h]=[];var u=""+(h+1);for(c=0;c<=s.e.c;++c){var d=t[o[c]+u];if(!d)continue;l[h][c]=d}}}var v={cmnt:[{a:"~54ee77S~",t:"... the people who are crazy enough to think they can change the world, are the ones who do."}],ferr:[],fmla:[],nfmt:[],ofmt:[],rsst:[{v:"~54ee77S~",l:"https://sheetjs.com/"}],sst:["~Sh33tJ5~"]};var p=aw(a.messages[0].data);{p[6][0].data=qb(s.e.r+1);p[7][0].data=qb(s.e.c+1);delete p[46];var m=aw(p[4][0].data);{var g=bw(aw(m[1][0].data)[2][0].data);Ww(e,r,g,function(e,r){var t;var a=aw(e.messages[0].data);if((t=a==null?void 0:a[2])==null?void 0:t[0])for(var n=0;n<l.length;++n){var i=aw(a[2][0].data);i[1][0].data=qb(n);i[4][0].data=qb(l[n].length);a[2][n]={type:a[2][0].type,data:nw(i)}}e.messages[0].data=nw(a)});var b=bw(m[2][0].data);Ww(e,r,b,function(e,r){var t=aw(e.messages[0].data);for(var a=0;a<=s.e.c;++a){var n=aw(t[2][0].data);n[1][0].data=qb(a);n[4][0].data=qb(s.e.r+1);t[2][a]={type:t[2][0].type,data:nw(n)}}e.messages[0].data=nw(t)});var w=aw(m[9][0].data);w[1]=[];var k=aw(m[3][0].data);{var A=256;k[2]=[{type:0,data:qb(A)}];var T=bw(aw(k[1][0].data)[2][0].data);var y=function(){var t=zw(e,r,2);var a=aw(t.messages[0].data);var n=a[3].filter(function(e){return rw(aw(e.data)[1][0].data)==T});return(n==null?void 0:n.length)?rw(aw(n[0].data)[12][0].data):0}();{Qe.utils.cfb_del(e,r[T].location);Ww(e,r,2,function(e){var t=aw(e.messages[0].data);t[3]=t[3].filter(function(e){return rw(aw(e.data)[1][0].data)!=T});Xw(t,r,i,T);e.messages[0].data=nw(t)});Aw(a,T)}k[1]=[];var E=Math.ceil((s.e.r+1)/A);for(var C=0;C<E;++C){var _=Pw({deps:[],location:"",type:6002},r);r[_].location="Root Entry/Index/Tables/Tile-".concat(_,".iwa");var S=[[],[{type:0,data:qb(0)}],[{type:0,data:qb(Math.min(s.e.r+1,(C+1)*A))}],[{type:0,data:qb(0)}],[{type:0,data:qb(Math.min((C+1)*A,s.e.r+1)-C*A)}],[],[{type:0,data:qb(5)}],[{type:0,data:qb(1)}],[{type:0,data:qb(Kw?1:0)}]];for(var x=C*A;x<=Math.min(s.e.r,(C+1)*A-1);++x){var O=Fw(l[x],v,Kw);O[1][0].data=qb(x-C*A);S[5].push({data:nw(O),type:2})}k[1].push({type:2,data:nw([[],[{type:0,data:qb(C)}],[{type:2,data:ww(_)}]])});var I={id:_,messages:[Dw(6002,nw(S))]};var R=cw(fw([I]));Qe.utils.cfb_add(e,"/Index/Tables/Tile-".concat(_,".iwa"),R);Ww(e,r,2,function(e){var t=aw(e.messages[0].data);t[3].push({type:2,data:nw([[],[{type:0,data:qb(_)}],[{type:2,data:Gb("Tables/Tile")}],[{type:2,data:Gb("Tables/Tile-".concat(_))}],[{type:2,data:new Uint8Array([2,0,0])}],[{type:2,data:new Uint8Array([2,0,0])}],[],[],[],[],[{type:0,data:qb(0)}],[],[{type:0,data:qb(y)}]])});t[1]=[{type:0,data:qb(Math.max(_+1,rw(t[1][0].data)))}];$w(t,r,i,_);e.messages[0].data=nw(t)});kw(a,_);w[1].push({type:2,data:nw([[],[{type:0,data:qb(C*A)}],[{type:0,data:qb(C)}]])})}}m[3][0].data=nw(k);m[9][0].data=nw(w);m[10]=[{type:2,data:new Uint8Array([])}];if(t["!merges"]){var N=Pw({type:6144,deps:[i],location:r[i].location},r);n.push({id:N,messages:[Dw(6144,nw([[],t["!merges"].map(function(e){return{type:2,data:nw([[],[{type:2,data:nw([[],[{type:5,data:new Uint8Array(new Uint16Array([e.s.r,e.s.c]).buffer)}]])}],[{type:2,data:nw([[],[{type:5,data:new Uint8Array(new Uint16Array([e.e.r-e.s.r+1,e.e.c-e.s.c+1]).buffer)}]])}]])}})]))]});m[13]=[{type:2,data:ww(N)}];Ww(e,r,2,function(e){var t=aw(e.messages[0].data);$w(t,r,i,N);e.messages[0].data=nw(t)});kw(a,N)}else delete m[13];var F=bw(m[4][0].data);Ww(e,r,F,function(e){var r=aw(e.messages[0].data);{r[3]=[];v.sst.forEach(function(e,t){if(t==0)return;r[3].push({type:2,data:nw([[],[{type:0,data:qb(t)}],[{type:0,data:qb(1)}],[{type:2,data:Gb(e)}]])})})}e.messages[0].data=nw(r)});var D=bw(m[17][0].data);Ww(e,r,D,function(t){var a=aw(t.messages[0].data);a[3]=[];var n=[904980,903835,903815,903845];v.rsst.forEach(function(i,s){if(s==0)return;var f=[[],[{type:0,data:new Uint8Array([5])}],[],[{type:2,data:Gb(i.v)}]];f[10]=[{type:0,data:new Uint8Array([1])}];f[19]=[{type:2,data:new Uint8Array([10,6,8,0,18,2,101,110])}];f[5]=[{type:2,data:new Uint8Array([10,8,8,0,18,4,8,155,149,55])}];f[2]=[{type:2,data:new Uint8Array([8,148,158,55])}];f[6]=[{type:2,data:new Uint8Array([10,6,8,0,16,0,24,0])}];f[7]=[{type:2,data:new Uint8Array([10,8,8,0,18,4,8,135,149,55])}];f[8]=[{type:2,data:new Uint8Array([10,8,8,0,18,4,8,165,149,55])}];f[14]=[{type:2,data:new Uint8Array([10,6,8,0,16,0,24,0])}];f[24]=[{type:2,data:new Uint8Array([10,6,8,0,16,0,24,0])}];var l=Pw({deps:[],location:"",type:2001},r);var o=[];if(i.l){var c=Vw(e,2032,[[],[],[{type:2,data:Gb(i.l)}]],"/Index/Tables/DataList",r);f[11]=[];var h=[[],[]];if(!h[1])h[1]=[];h[1].push({type:2,data:nw([[],[{type:0,data:qb(0)}],[{type:2,data:ww(c)}]])});f[11][0]={type:2,data:nw(h)};o.push(c)}Vw(e,2001,f,"/Index/Tables/DataList",r,l);Ww(e,r,l,function(e){n.forEach(function(r){return kw(e,r)});o.forEach(function(r){return kw(e,r)})});var u=Vw(e,6218,[[],[{type:2,data:ww(l)}],[],[{type:2,data:new Uint8Array([13,255,255,255,0,18,10,16,255,255,1,24,255,255,255,255,7])}]],"/Index/Tables/DataList",r);Ww(e,r,u,function(e){return kw(e,l)});a[3].push({type:2,data:nw([[],[{type:0,data:qb(s)}],[{type:0,data:qb(1)}],[],[],[],[],[],[],[{type:2,data:ww(u)}]])});kw(t,u);Ww(e,r,2,function(e){var t=aw(e.messages[0].data);$w(t,r,D,u);$w(t,r,u,l);$w(t,r,l,o);$w(t,r,l,n);e.messages[0].data=nw(t)})});t.messages[0].data=nw(a)});if(v.cmnt.length>1){var P=bw(m[19][0].data);var L={},M=0;Ww(e,r,P,function(t){var a=aw(t.messages[0].data);{a[3]=[];v.cmnt.forEach(function(n,i){if(i==0)return;var s=[];if(n.replies)n.replies.forEach(function(t){if(!L[t.a||""])L[t.a||""]=Vw(e,212,[[],[{type:2,data:Gb(t.a||"")}],[{type:2,data:Uw(++M)}],[],[{type:0,data:qb(0)}]],"/Index/Tables/DataList",r);var a=L[t.a||""];var n=Vw(e,3056,[[],[{type:2,data:Gb(t.t||"")}],[{type:2,data:nw([[],[{type:1,data:new Uint8Array([0,0,0,128,116,109,182,65])}]])}],[{type:2,data:ww(a)}]],"/Index/Tables/DataList",r);Ww(e,r,n,function(e){return kw(e,a)});s.push(n);Ww(e,r,2,function(e){var t=aw(e.messages[0].data);$w(t,r,n,a);e.messages[0].data=nw(t)})});if(!L[n.a||""])L[n.a||""]=Vw(e,212,[[],[{type:2,data:Gb(n.a||"")}],[{type:2,data:Uw(++M)}],[],[{type:0,data:qb(0)}]],"/Index/Tables/DataList",r);var f=L[n.a||""];var l=Vw(e,3056,[[],[{type:2,data:Gb(n.t||"")}],[{type:2,data:nw([[],[{type:1,data:new Uint8Array([0,0,0,128,116,109,182,65])}]])}],[{type:2,data:ww(f)}],s.map(function(e){return{type:2,data:ww(e)}}),[{type:2,data:nw([[],[{type:0,data:qb(i)}],[{type:0,data:qb(0)}]])}]],"/Index/Tables/DataList",r);Ww(e,r,l,function(e){kw(e,f);s.forEach(function(r){return kw(e,r)})});a[3].push({type:2,data:nw([[],[{type:0,data:qb(i)}],[{type:0,data:qb(1)}],[],[],[],[],[],[],[],[{type:2,data:ww(l)}]])});kw(t,l);Ww(e,r,2,function(e){var t=aw(e.messages[0].data);$w(t,r,P,l);$w(t,r,l,f);if(s.length)$w(t,r,l,s);e.messages[0].data=nw(t)})})}a[2][0].data=qb(v.cmnt.length+1);t.messages[0].data=nw(a)})}}p[4][0].data=nw(m)}a.messages[0].data=nw(p)}function Zw(e){return function r(t){for(var a=0;a!=e.length;++a){var n=e[a];if(t[n[0]]===undefined)t[n[0]]=n[1];if(n[2]==="n")t[n[0]]=Number(t[n[0]])}}}function Jw(e){Zw([["cellNF",false],["cellHTML",true],["cellFormula",true],["cellStyles",false],["cellText",true],["cellDates",false],["sheetStubs",false],["sheetRows",0,"n"],["bookDeps",false],["bookSheets",false],["bookProps",false],["bookFiles",false],["bookVBA",false],["password",""],["WTF",false]])(e)}function qw(e){Zw([["cellDates",false],["bookSST",false],["bookType","xlsx"],["compression",false],["WTF",false]])(e)}function Qw(e){if(bi.WS.indexOf(e)>-1)return"sheet";if(bi.CS&&e==bi.CS)return"chart";if(bi.DS&&e==bi.DS)return"dialog";if(bi.MS&&e==bi.MS)return"macro";return e&&e.length?e:"sheet"}function ek(e,r){if(!e)return 0;try{e=r.map(function a(r){if(!r.id)r.id=r.strRelID;return[r.name,e["!id"][r.id].Target,Qw(e["!id"][r.id].Type)]})}catch(t){return null}return!e||e.length===0?null:e}function rk(e,r,t,a,n,i,s,f){if(!e||!e["!legdrawel"])return;var l=tt(e["!legdrawel"].Target,a);var o=Zr(t,l,true);if(o)Rh(It(o),e,f||[])}function tk(e,r,t,a,n,i,s,f,l,o,c,h){try{i[a]=ki(Zr(e,t,true),r);var u=Yr(e,r);var d;switch(f){case"sheet":d=tg(u,r,n,l,i[a],o,c,h);break;case"chart":d=ag(u,r,n,l,i[a],o,c,h);if(!d||!d["!drawel"])break;var v=tt(d["!drawel"].Target,r);var p=wi(v);var m=Ih(Zr(e,v,true),ki(Zr(e,p,true),v));var g=tt(m,v);var b=wi(g);d=km(Zr(e,g,true),g,l,ki(Zr(e,b,true),g),o,d);break;case"macro":d=ng(u,r,n,l,i[a],o,c,h);break;case"dialog":d=ig(u,r,n,l,i[a],o,c,h);break;default:throw new Error("Unrecognized sheet type "+f);}s[a]=d;var w=[],k=[];if(i&&i[a])ir(i[a]).forEach(function(t){var n="";if(i[a][t].Type==bi.CMNT){n=tt(i[a][t].Target,r);w=lg(Yr(e,n,true),n,l);if(!w||!w.length)return;Dh(d,w,false)}if(i[a][t].Type==bi.TCMNT){n=tt(i[a][t].Target,r);k=k.concat(Mh(Yr(e,n,true),l))}});if(k&&k.length)Dh(d,k,true,l.people||[]);rk(d,f,e,r,n,l,o,w)}catch(A){if(l.WTF)throw A}}function ak(e){return e.charAt(0)=="/"?e.slice(1):e}function nk(e,r){$e();r=r||{};Jw(r);if(jr(e,"META-INF/manifest.xml"))return Lb(e,r);if(jr(e,"objectdata.xml"))return Lb(e,r);if(jr(e,"Index/Document.iwa")){if(typeof Uint8Array=="undefined")throw new Error("NUMBERS file parsing requires Uint8Array support");if(typeof Nw!="undefined"){if(e.FileIndex)return Nw(e,r);var t=Qe.utils.cfb_new();qr(e).forEach(function(r){Qr(t,r,Jr(e,r))});return Nw(t,r)}throw new Error("Unsupported NUMBERS file")}if(!jr(e,"[Content_Types].xml")){if(jr(e,"index.xml.gz"))throw new Error("Unsupported NUMBERS 08 file");if(jr(e,"index.xml"))throw new Error("Unsupported NUMBERS 09 file");var a=Qe.find(e,"Index.zip");if(a){r=Ar(r);delete r.type;if(typeof a.content=="string")r.type="binary";if(typeof Bun!=="undefined"&&Buffer.isBuffer(a.content))return mk(new Uint8Array(a.content),r);return mk(a.content,r)}throw new Error("Unsupported ZIP file")}var n=qr(e);var i=mi(Zr(e,"[Content_Types].xml"));var s=false;var f,l;if(i.workbooks.length===0){l="xl/workbook.xml";if(Yr(e,l,true))i.workbooks.push(l)}if(i.workbooks.length===0){l="xl/workbook.bin";if(!Yr(e,l,true))throw new Error("Could not find workbook");i.workbooks.push(l);s=true}if(i.workbooks[0].slice(-3)=="bin")s=true;var o={};var c={};if(!r.bookSheets&&!r.bookProps){mv=[];if(i.sst)try{mv=fg(Yr(e,ak(i.sst)),i.sst,r)}catch(h){if(r.WTF)throw h}if(r.cellStyles&&i.themes.length)o=nh(Zr(e,i.themes[0].replace(/^\//,""),true)||"",r);if(i.style)c=sg(Yr(e,ak(i.style)),i.style,o,r)}i.links.map(function(t){try{var a=ki(Zr(e,wi(ak(t))),t);return cg(Yr(e,ak(t)),a,t,r)}catch(n){}});var u=rg(Yr(e,ak(i.workbooks[0])),i.workbooks[0],r);var d={},v="";if(i.coreprops.length){v=Yr(e,ak(i.coreprops[0]),true);if(v)d=Ri(v);if(i.extprops.length!==0){v=Yr(e,ak(i.extprops[0]),true);if(v)Mi(v,d,r)}}var p={};if(!r.bookSheets||r.bookProps){if(i.custprops.length!==0){v=Zr(e,ak(i.custprops[0]),true);if(v)p=Wi(v,r)}}var m={};if(r.bookSheets||r.bookProps){if(u.Sheets)f=u.Sheets.map(function N(e){return e.name});else if(d.Worksheets&&d.SheetNames.length>0)f=d.SheetNames;if(r.bookProps){m.Props=d;m.Custprops=p}if(r.bookSheets&&typeof f!=="undefined")m.SheetNames=f;if(r.bookSheets?m.SheetNames:r.bookProps)return m}f={};var g={};if(r.bookDeps&&i.calcchain)g=og(Yr(e,ak(i.calcchain)),i.calcchain,r);var b=0;var w={};var k,A;{var T=u.Sheets;d.Worksheets=T.length;d.SheetNames=[];for(var y=0;y!=T.length;++y){d.SheetNames[y]=T[y].name}}var E=s?"bin":"xml";var C=i.workbooks[0].lastIndexOf("/");var _=(i.workbooks[0].slice(0,C+1)+"_rels/"+i.workbooks[0].slice(C+1)+".rels").replace(/^\//,"");if(!jr(e,_))_="xl/_rels/workbook."+E+".rels";var S=ki(Zr(e,_,true),_.replace(/_rels.*/,"s5s"));if((i.metadata||[]).length>=1){r.xlmeta=hg(Yr(e,ak(i.metadata[0])),i.metadata[0],r)}if((i.people||[]).length>=1){r.people=Bh(Yr(e,ak(i.people[0])),r)}if(S)S=ek(S,u.Sheets);var x=Yr(e,"xl/worksheets/sheet.xml",true)?1:0;e:for(b=0;b!=d.Worksheets;++b){var O="sheet";if(S&&S[b]){k="xl/"+S[b][1].replace(/[\/]?xl\//,"");if(!jr(e,k))k=S[b][1];if(!jr(e,k))k=_.replace(/_rels\/[\S\s]*$/,"")+S[b][1];O=S[b][2]}else{k="xl/worksheets/sheet"+(b+1-x)+"."+E;k=k.replace(/sheet0\./,"sheet.")}A=k.replace(/^(.*)(\/)([^\/]*)$/,"$1/_rels/$3.rels");if(r&&r.sheets!=null)switch(typeof r.sheets){case"number":if(b!=r.sheets)continue e;break;case"string":if(d.SheetNames[b].toLowerCase()!=r.sheets.toLowerCase())continue e;break;default:if(Array.isArray&&Array.isArray(r.sheets)){var I=false;for(var R=0;R!=r.sheets.length;++R){if(typeof r.sheets[R]=="number"&&r.sheets[R]==b)I=1;if(typeof r.sheets[R]=="string"&&r.sheets[R].toLowerCase()==d.SheetNames[b].toLowerCase())I=1}if(!I)continue e};}tk(e,k,A,d.SheetNames[b],b,w,f,O,r,u,o,c)}m={Directory:i,Workbook:u,Props:d,Custprops:p,Deps:g,Sheets:f,SheetNames:d.SheetNames,Strings:mv,Styles:c,Themes:o,SSF:Ar(q)};if(r&&r.bookFiles){if(e.files){m.keys=n;m.files=e.files}else{m.keys=[];m.files={};e.FullPaths.forEach(function(r,t){r=r.replace(/^Root Entry[\/]/,"");m.keys.push(r);m.files[r]=e.FileIndex[t]})}}if(r&&r.bookVBA){if(i.vba.length>0)m.vbaraw=Yr(e,ak(i.vba[0]),true);else if(i.defaults&&i.defaults.bin===jh)m.vbaraw=Yr(e,"xl/vbaProject.bin",true)}m.bookType=s?"xlsb":"xlsx";return m}function ik(e,r){var t=r||{};var a="Workbook",n=Qe.find(e,a);try{a="/!DataSpaces/Version";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);Eo(n.content);a="/!DataSpaces/DataSpaceMap";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);var i=_o(n.content);if(i.length!==1||i[0].comps.length!==1||i[0].comps[0].t!==0||i[0].name!=="StrongEncryptionDataSpace"||i[0].comps[0].v!=="EncryptedPackage")throw new Error("ECMA-376 Encrypted file bad "+a);a="/!DataSpaces/DataSpaceInfo/StrongEncryptionDataSpace";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);var s=So(n.content);if(s.length!=1||s[0]!="StrongEncryptionTransform")throw new Error("ECMA-376 Encrypted file bad "+a);a="/!DataSpaces/TransformInfo/StrongEncryptionTransform/!Primary";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);Oo(n.content)}catch(f){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);var l=No(n.content);a="/EncryptedPackage";n=Qe.find(e,a);if(!n||!n.content)throw new Error("ECMA-376 Encrypted file missing "+a);if(l[0]==4&&typeof decrypt_agile!=="undefined")return decrypt_agile(l[1],n.content,t.password||"",t);if(l[0]==2&&typeof decrypt_std76!=="undefined")return decrypt_std76(l[1],n.content,t.password||"",t);throw new Error("File is password-protected")}function sk(e,r){if(e&&!e.SSF){e.SSF=Ar(q)}if(e&&e.SSF){$e();Ve(e.SSF);r.revssf=lr(e.SSF);r.revssf[e.SSF[65535]]=0;r.ssf=e.SSF}r.rels={};r.wbrels={};r.Strings=[];r.Strings.Count=0;r.Strings.Unique=0;if(bv)r.revStrings=new Map;else{r.revStrings={};r.revStrings.foo=[];delete r.revStrings.foo}var t="bin";var a=true;var n=pi();qw(r=r||{});var i=et();var s="",f=0;r.cellXfs=[];Tv(r.cellXfs,{},{revssf:{General:0}});if(!e.Props)e.Props={};s="docProps/core.xml";Qr(i,s,Fi(e.Props,r));n.coreprops.push(s);Ti(r.rels,2,s,bi.CORE_PROPS);s="docProps/app.xml";if(e.Props&&e.Props.SheetNames){}else if(!e.Workbook||!e.Workbook.Sheets)e.Props.SheetNames=e.SheetNames;else{var l=[];for(var o=0;o<e.SheetNames.length;++o)if((e.Workbook.Sheets[o]||{}).Hidden!=2)l.push(e.SheetNames[o]);e.Props.SheetNames=l}e.Props.Worksheets=e.Props.SheetNames.length;Qr(i,s,Ui(e.Props,r));n.extprops.push(s);Ti(r.rels,3,s,bi.EXT_PROPS);if(e.Custprops!==e.Props&&ir(e.Custprops||{}).length>0){s="docProps/custom.xml";Qr(i,s,zi(e.Custprops,r));n.custprops.push(s);Ti(r.rels,4,s,bi.CUST_PROPS)}var c=["SheetJ5"];r.tcid=0;for(f=1;f<=e.SheetNames.length;++f){var h={"!id":{}};var u=e.Sheets[e.SheetNames[f-1]];var d=(u||{})["!type"]||"sheet";switch(d){case"chart":;default:s="xl/worksheets/sheet"+f+"."+t;Qr(i,s,bm(f-1,r,e,h));n.sheets.push(s);Ti(r.wbrels,-1,"worksheets/sheet"+f+"."+t,bi.WS[0]);}if(u){var v=u["!comments"];var p=false;var m="";if(v&&v.length>0){var g=false;v.forEach(function(e){e[1].forEach(function(e){if(e.T==true)g=true})});if(g){m="xl/threadedComments/threadedComment"+f+".xml";Qr(i,m,Uh(v,c,r));n.threadedcomments.push(m);Ti(h,-1,"../threadedComments/threadedComment"+f+".xml",bi.TCMNT)}m="xl/comments"+f+"."+t;Qr(i,m,Gh(v,r));n.comments.push(m);Ti(h,-1,"../comments"+f+"."+t,bi.CMNT);p=true}if(u["!legacy"]){if(p)Qr(i,"xl/drawings/vmlDrawing"+f+".vml",Nh(f,u["!comments"]))}delete u["!comments"];delete u["!legacy"]}if(h["!id"].rId1)Qr(i,wi(s),Ai(h))}if(r.Strings!=null&&r.Strings.length>0){s="xl/sharedStrings."+t;Qr(i,s,Ao(r.Strings,r));n.strs.push(s);Ti(r.wbrels,-1,"sharedStrings."+t,bi.SST)}s="xl/workbook."+t;Qr(i,s,eg(e,r));n.workbooks.push(s);Ti(r.rels,1,s,bi.WB);s="xl/theme/theme1.xml";var b=ih(e.Themes,r);Qr(i,s,b);n.themes.push(s);Ti(r.wbrels,-1,"theme/theme1.xml",bi.THEME);s="xl/styles."+t;Qr(i,s,qc(e,r));n.styles.push(s);Ti(r.wbrels,-1,"styles."+t,bi.STY);if(e.vbaraw&&a){s="xl/vbaProject.bin";Qr(i,s,e.vbaraw);n.vba.push(s);Ti(r.wbrels,-1,"vbaProject.bin",bi.VBA)}s="xl/metadata."+t;Qr(i,s,Th());n.metadata.push(s);Ti(r.wbrels,-1,"metadata."+t,bi.XLMETA);if(c.length>1){s="xl/persons/person.xml";Qr(i,s,Wh(c,r));n.people.push(s);Ti(r.wbrels,-1,"persons/person.xml",bi.PEOPLE)}Qr(i,"[Content_Types].xml",gi(n,r));Qr(i,"_rels/.rels",Ai(r.rels));Qr(i,"xl/_rels/workbook."+t+".rels",Ai(r.wbrels));delete r.revssf;delete r.ssf;return i}function fk(e,r){if(e&&!e.SSF){e.SSF=Ar(q)}if(e&&e.SSF){$e();Ve(e.SSF);r.revssf=lr(e.SSF);r.revssf[e.SSF[65535]]=0;r.ssf=e.SSF}r.rels={};r.wbrels={};r.Strings=[];r.Strings.Count=0;r.Strings.Unique=0;if(bv)r.revStrings=new Map;else{r.revStrings={};r.revStrings.foo=[];delete r.revStrings.foo}var t="xml";var a=Zh.indexOf(r.bookType)>-1;var n=pi();qw(r=r||{});var i=et();var s="",f=0;r.cellXfs=[];Tv(r.cellXfs,{},{revssf:{General:0}});if(!e.Props)e.Props={};s="docProps/core.xml";Qr(i,s,Fi(e.Props,r));n.coreprops.push(s);Ti(r.rels,2,s,bi.CORE_PROPS);s="docProps/app.xml";if(e.Props&&e.Props.SheetNames){}else if(!e.Workbook||!e.Workbook.Sheets)e.Props.SheetNames=e.SheetNames;else{var l=[];for(var o=0;o<e.SheetNames.length;++o)if((e.Workbook.Sheets[o]||{}).Hidden!=2)l.push(e.SheetNames[o]);e.Props.SheetNames=l}e.Props.Worksheets=e.Props.SheetNames.length;Qr(i,s,Ui(e.Props,r));n.extprops.push(s);Ti(r.rels,3,s,bi.EXT_PROPS);if(e.Custprops!==e.Props&&ir(e.Custprops||{}).length>0){s="docProps/custom.xml";Qr(i,s,zi(e.Custprops,r));n.custprops.push(s);Ti(r.rels,4,s,bi.CUST_PROPS)}var c=["SheetJ5"];r.tcid=0;for(f=1;f<=e.SheetNames.length;++f){var h={"!id":{}};var u=e.Sheets[e.SheetNames[f-1]];var d=(u||{})["!type"]||"sheet";switch(d){case"chart":;default:s="xl/worksheets/sheet"+f+"."+t;Qr(i,s,ep(f-1,r,e,h));n.sheets.push(s);Ti(r.wbrels,-1,"worksheets/sheet"+f+"."+t,bi.WS[0]);}if(u){var v=u["!comments"];var p=false;var m="";if(v&&v.length>0){var g=false;v.forEach(function(e){e[1].forEach(function(e){if(e.T==true)g=true})});if(g){m="xl/threadedComments/threadedComment"+f+".xml";Qr(i,m,Uh(v,c,r));n.threadedcomments.push(m);Ti(h,-1,"../threadedComments/threadedComment"+f+".xml",bi.TCMNT)}m="xl/comments"+f+"."+t;Qr(i,m,Lh(v,r));n.comments.push(m);Ti(h,-1,"../comments"+f+"."+t,bi.CMNT);p=true}if(u["!legacy"]){if(p)Qr(i,"xl/drawings/vmlDrawing"+f+".vml",Nh(f,u["!comments"]))}delete u["!comments"];delete u["!legacy"]}if(h["!id"].rId1)Qr(i,wi(s),Ai(h))}if(r.Strings!=null&&r.Strings.length>0){s="xl/sharedStrings."+t;Qr(i,s,mo(r.Strings,r));n.strs.push(s);Ti(r.wbrels,-1,"sharedStrings."+t,bi.SST)}s="xl/workbook."+t;Qr(i,s,Um(e,r));n.workbooks.push(s);Ti(r.rels,1,s,bi.WB);s="xl/theme/theme1.xml";Qr(i,s,ih(e.Themes,r));n.themes.push(s);Ti(r.wbrels,-1,"theme/theme1.xml",bi.THEME);s="xl/styles."+t;Qr(i,s,Cc(e,r));n.styles.push(s);Ti(r.wbrels,-1,"styles."+t,bi.STY);if(e.vbaraw&&a){s="xl/vbaProject.bin";Qr(i,s,e.vbaraw);n.vba.push(s);Ti(r.wbrels,-1,"vbaProject.bin",bi.VBA)}s="xl/metadata."+t;Qr(i,s,Eh());n.metadata.push(s);Ti(r.wbrels,-1,"metadata."+t,bi.XLMETA);if(c.length>1){s="xl/persons/person.xml";Qr(i,s,Wh(c,r));n.people.push(s);Ti(r.wbrels,-1,"persons/person.xml",bi.PEOPLE)}Qr(i,"[Content_Types].xml",gi(n,r));Qr(i,"_rels/.rels",Ai(r.rels));Qr(i,"xl/_rels/workbook."+t+".rels",Ai(r.wbrels));delete r.revssf;delete r.ssf;return i}function lk(e,r){var t="";switch((r||{}).type||"base64"){case"buffer":return[e[0],e[1],e[2],e[3],e[4],e[5],e[6],e[7]];case"base64":t=E(e.slice(0,12));break;case"binary":t=e;break;case"array":return[e[0],e[1],e[2],e[3],e[4],e[5],e[6],e[7]];default:throw new Error("Unrecognized type "+(r&&r.type||"undefined"));}return[t.charCodeAt(0),t.charCodeAt(1),t.charCodeAt(2),t.charCodeAt(3),t.charCodeAt(4),t.charCodeAt(5),t.charCodeAt(6),t.charCodeAt(7)]}function ok(e,r){if(Qe.find(e,"EncryptedPackage"))return ik(e,r);return Kg(e,r)}function ck(e,r){var t,a=e;var n=r||{};if(!n.type)n.type=C&&Buffer.isBuffer(e)?"buffer":"base64";t=rt(a,n);return nk(t,n)}function hk(e,r){var t=0;e:while(t<e.length)switch(e.charCodeAt(t)){case 10:;case 13:;case 32:++t;break;case 60:return Cg(e.slice(t),r);default:break e;}return to.to_workbook(e,r)}function uk(e,r){var t="",a=lk(e,r);switch(r.type){case"base64":t=E(e);break;case"binary":t=e;break;case"buffer":t=e.toString("binary");break;case"array":t=kr(e);break;default:throw new Error("Unrecognized type "+r.type);}if(a[0]==239&&a[1]==187&&a[2]==191)t=It(t);r.type="binary";return hk(t,r)}function dk(e,r){var t=e;if(r.type=="base64")t=E(t);if(typeof ArrayBuffer!=="undefined"&&e instanceof ArrayBuffer)t=new Uint8Array(e);t=typeof a!=="undefined"?a.utils.decode(1200,t.slice(2),"str"):C&&Buffer.isBuffer(e)?e.slice(2).toString("utf16le"):typeof Uint8Array!=="undefined"&&t instanceof Uint8Array?typeof TextDecoder!=="undefined"?new TextDecoder("utf-16le").decode(t.slice(2)):u(t.slice(2)):h(t.slice(2));r.type="binary";return hk(t,r)}function vk(e){return!e.match(/[^\x00-\x7F]/)?e:Rt(e)}function pk(e,r,t,a){if(a){t.type="string";return to.to_workbook(e,t)}return to.to_workbook(r,t)}function mk(e,r){o();var t=r||{};if(t.codepage&&typeof a==="undefined")console.error("Codepage tables are not loaded.  Non-ASCII characters may not give expected results");if(typeof ArrayBuffer!=="undefined"&&e instanceof ArrayBuffer)return mk(new Uint8Array(e),(t=Ar(t),t.type="array",t));if(typeof Int8Array!=="undefined"&&e instanceof Int8Array)return mk(new Uint8Array(e.buffer,e.byteOffset,e.length),t);if(typeof Uint8Array!=="undefined"&&e instanceof Uint8Array&&!t.type)t.type=typeof Deno!=="undefined"?"buffer":"array";var n=e,i=[0,0,0,0],s=false;if(t.cellStyles){t.cellNF=true;t.sheetStubs=true}gv={};if(t.dateNF)gv.dateNF=t.dateNF;if(!t.type)t.type=C&&Buffer.isBuffer(e)?"buffer":"base64";if(t.type=="file"){t.type=C?"buffer":"binary";n=nr(e);if(typeof Uint8Array!=="undefined"&&!C)t.type="array"}if(t.type=="string"){s=true;t.type="binary";t.codepage=65001;n=vk(e)}if(t.type=="array"&&typeof Uint8Array!=="undefined"&&e instanceof Uint8Array&&typeof ArrayBuffer!=="undefined"){var f=new ArrayBuffer(3),l=new Uint8Array(f);l.foo="bar";if(!l.foo){t=Ar(t);t.type="array";return mk(D(n),t)}}switch((i=lk(n,t))[0]){case 208:if(i[1]===207&&i[2]===17&&i[3]===224&&i[4]===161&&i[5]===177&&i[6]===26&&i[7]===225)return ok(Qe.read(n,t),t);break;case 9:if(i[1]<=8)return Kg(n,t);break;case 60:return Cg(n,t);case 73:if(i[1]===73&&i[2]===42&&i[3]===0)throw new Error("TIFF Image File is not a spreadsheet");if(i[1]===68)return ao(n,t);break;case 84:if(i[1]===65&&i[2]===66&&i[3]===76)return eo.to_workbook(n,t);break;case 80:return i[1]===75&&i[2]<9&&i[3]<9?ck(n,t):pk(e,n,t,s);case 239:return i[3]===60?Cg(n,t):pk(e,n,t,s);case 255:if(i[1]===254){return dk(n,t)}else if(i[1]===0&&i[2]===2&&i[3]===0)return no.to_workbook(n,t);break;case 0:if(i[1]===0){if(i[2]>=2&&i[3]===0)return no.to_workbook(n,t);if(i[2]===0&&(i[3]===8||i[3]===9))return no.to_workbook(n,t)}break;case 3:;case 131:;case 139:;case 140:return ql.to_workbook(n,t);case 123:if(i[1]===92&&i[2]===114&&i[3]===116)return jo(n,t);break;case 10:;case 13:;case 32:return uk(n,t);case 137:if(i[1]===80&&i[2]===78&&i[3]===71)throw new Error("PNG Image File is not a spreadsheet");break;case 8:if(i[1]===231)throw new Error("Unsupported Multiplan 1.x file!");break;case 12:if(i[1]===236)throw new Error("Unsupported Multiplan 2.x file!");if(i[1]===237)throw new Error("Unsupported Multiplan 3.x file!");break;}if(Jl.indexOf(i[0])>-1&&i[2]<=12&&i[3]<=31)return ql.to_workbook(n,t);return pk(e,n,t,s)}function gk(e,r){var t=r||{};t.type="file";return mk(e,t)}function bk(e,r){switch(r.type){case"base64":;case"binary":break;case"buffer":;case"array":r.type="";break;case"file":return ar(r.file,Qe.write(e,{type:C?"buffer":""}));case"string":throw new Error("'string' output type invalid for '"+r.bookType+"' files");default:throw new Error("Unrecognized type "+r.type);}return Qe.write(e,r)}function wk(e,r){switch(r.bookType){case"ods":return Hb(e,r);case"numbers":return Bw(e,r);case"xlsb":return sk(e,r);default:return fk(e,r);}}function kk(e,r){var t=Ar(r||{});var a=wk(e,t);return Tk(a,t)}function Ak(e,r){var t=Ar(r||{});var a=fk(e,t);return Tk(a,t)}function Tk(e,r){var t={};var a=C?"nodebuffer":typeof Uint8Array!=="undefined"?"array":"string";if(r.compression)t.compression="DEFLATE";if(r.password)t.type=a;else switch(r.type){case"base64":t.type="base64";break;case"binary":t.type="string";break;case"string":throw new Error("'string' output type invalid for '"+r.bookType+"' files");case"buffer":;case"file":t.type=a;break;default:throw new Error("Unrecognized type "+r.type);}var n=e.FullPaths?Qe.write(e,{fileType:"zip",type:{nodebuffer:"buffer",string:"binary"}[t.type]||t.type,compression:!!r.compression}):e.generate(t);if(typeof Deno!=="undefined"){if(typeof n=="string"){if(r.type=="binary"||r.type=="base64")return n;n=new Uint8Array(R(n))}}if(r.password&&typeof encrypt_agile!=="undefined")return bk(encrypt_agile(n,r.password),r);if(r.type==="file")return ar(r.file,n);return r.type=="string"?It(n):n}function yk(e,r){var t=r||{};var a=Yg(e,t);return bk(a,t)}function Ek(e,r,t){if(!t)t="";var a=t+e;switch(r.type){case"base64":return A(Rt(a));case"binary":return Rt(a);case"string":return e;case"file":return ar(r.file,a,"utf8");case"buffer":{if(C)return _(a,"utf8");else if(typeof TextEncoder!=="undefined")return(new TextEncoder).encode(a);else return Ek(a,{type:"binary"}).split("").map(function(e){return e.charCodeAt(0)})};}throw new Error("Unrecognized type "+r.type)}function Ck(e,r){switch(r.type){case"base64":return T(e);case"binary":return e;case"string":return e;case"file":return ar(r.file,e,"binary");case"buffer":{if(C)return _(e,"binary");else return e.split("").map(function(e){return e.charCodeAt(0)})};}throw new Error("Unrecognized type "+r.type)}function _k(e,r){switch(r.type){case"string":;case"base64":;case"binary":var t="";for(var a=0;a<e.length;++a)t+=String.fromCharCode(e[a]);return r.type=="base64"?A(t):r.type=="string"?It(t):t;case"file":return ar(r.file,e);case"buffer":return e;default:throw new Error("Unrecognized type "+r.type);}}function Sk(e,r){o();Pm(e);var t=Ar(r||{});if(t.cellStyles){t.cellNF=true;t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=Sk(e,t);t.type="array";return R(a)}return Ak(e,t)}function xk(e,r){o();Pm(e);var t=Ar(r||{});if(t.cellStyles){t.cellNF=true;
 t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="array";return R(a)}var n=0;if(t.sheet){if(typeof t.sheet=="number")n=t.sheet;else n=e.SheetNames.indexOf(t.sheet);if(!e.SheetNames[n])throw new Error("Sheet not found: "+t.sheet+" : "+typeof t.sheet)}switch(t.bookType||"xlsb"){case"xml":;case"xlml":return Ek(Ug(e,t),t);case"slk":;case"sylk":return Ek(Ql.from_sheet(e.Sheets[e.SheetNames[n]],t,e),t);case"htm":;case"html":return Ek(Sb(e.Sheets[e.SheetNames[n]],t),t);case"txt":return Ck(Uk(e.Sheets[e.SheetNames[n]],t),t);case"csv":return Ek(Mk(e.Sheets[e.SheetNames[n]],t),t,"\ufeff");case"dif":return Ek(eo.from_sheet(e.Sheets[e.SheetNames[n]],t),t);case"dbf":return _k(ql.from_sheet(e.Sheets[e.SheetNames[n]],t),t);case"prn":return Ek(to.from_sheet(e.Sheets[e.SheetNames[n]],t),t);case"rtf":return Ek(Ko(e.Sheets[e.SheetNames[n]],t),t);case"eth":return Ek(ro.from_sheet(e.Sheets[e.SheetNames[n]],t),t);case"fods":return Ek(Hb(e,t),t);case"wk1":return _k(no.sheet_to_wk1(e.Sheets[e.SheetNames[n]],t),t);case"wk3":return _k(no.book_to_wk3(e,t),t);case"biff2":if(!t.biff)t.biff=2;case"biff3":if(!t.biff)t.biff=3;case"biff4":if(!t.biff)t.biff=4;return _k(kb(e,t),t);case"biff5":if(!t.biff)t.biff=5;case"biff8":;case"xla":;case"xls":if(!t.biff)t.biff=8;return yk(e,t);case"xlsx":;case"xlsm":;case"xlam":;case"xlsb":;case"numbers":;case"ods":return kk(e,t);default:throw new Error("Unrecognized bookType |"+t.bookType+"|");}}function Ok(e){if(e.bookType)return;var r={xls:"biff8",htm:"html",slk:"sylk",socialcalc:"eth",Sh33tJS:"WTF"};var t=e.file.slice(e.file.lastIndexOf(".")).toLowerCase();if(t.match(/^\.[a-z]+$/))e.bookType=t.slice(1);e.bookType=r[e.bookType]||e.bookType}function Ik(e,r,t){var a=t||{};a.type="file";a.file=r;Ok(a);return xk(e,a)}function Rk(e,r,t){var a=t||{};a.type="file";a.file=r;Ok(a);return Sk(e,a)}function Nk(e,r,t,a){var n=t||{};n.type="file";n.file=e;Ok(n);n.type="buffer";var i=a;if(!(i instanceof Function))i=t;return er.writeFile(e,xk(r,n),i)}function Fk(e,r,t,a,n,i,s){var f=Wa(t);var l=s.defval,o=s.raw||!Object.prototype.hasOwnProperty.call(s,"raw");var c=true,h=e["!data"]!=null;var u=n===1?[]:{};if(n!==1){if(Object.defineProperty)try{Object.defineProperty(u,"__rowNum__",{value:t,enumerable:false})}catch(d){u.__rowNum__=t}else u.__rowNum__=t}if(!h||e["!data"][t])for(var v=r.s.c;v<=r.e.c;++v){var p=h?(e["!data"][t]||[])[v]:e[a[v]+f];if(p==null||p.t===undefined){if(l===undefined)continue;if(i[v]!=null){u[i[v]]=l}continue}var m=p.v;switch(p.t){case"z":if(m==null)break;continue;case"e":m=m==0?null:void 0;break;case"s":;case"b":;case"n":if(!p.z||!Le(p.z))break;m=vr(m);if(typeof m=="number")break;case"d":if(!(s&&(s.UTC||s.raw===false)))m=Fr(new Date(m));break;default:throw new Error("unrecognized type "+p.t);}if(i[v]!=null){if(m==null){if(p.t=="e"&&m===null)u[i[v]]=null;else if(l!==undefined)u[i[v]]=l;else if(o&&m===null)u[i[v]]=null;else continue}else{u[i[v]]=(p.t==="n"&&typeof s.rawNumbers==="boolean"?s.rawNumbers:o)?m:tn(p,m,s)}if(m!=null)c=false}}return{row:u,isempty:c}}function Dk(e,r){if(e==null||e["!ref"]==null)return[];var t={t:"n",v:0},a=0,n=1,i=[],s=0,f="";var l={s:{r:0,c:0},e:{r:0,c:0}};var o=r||{};var c=o.range!=null?o.range:e["!ref"];if(o.header===1)a=1;else if(o.header==="A")a=2;else if(Array.isArray(o.header))a=3;else if(o.header==null)a=0;switch(typeof c){case"string":l=en(c);break;case"number":l=en(e["!ref"]);l.s.r=c;break;default:l=c;}if(a>0)n=0;var h=Wa(l.s.r);var u=[];var d=[];var v=0,p=0;var m=e["!data"]!=null;var g=l.s.r,b=0;var w={};if(m&&!e["!data"][g])e["!data"][g]=[];var k=o.skipHidden&&e["!cols"]||[];var A=o.skipHidden&&e["!rows"]||[];for(b=l.s.c;b<=l.e.c;++b){if((k[b]||{}).hidden)continue;u[b]=$a(b);t=m?e["!data"][g][b]:e[u[b]+h];switch(a){case 1:i[b]=b-l.s.c;break;case 2:i[b]=u[b];break;case 3:i[b]=o.header[b-l.s.c];break;default:if(t==null)t={w:"__EMPTY",t:"s"};f=s=tn(t,null,o);p=w[s]||0;if(!p)w[s]=1;else{do{f=s+"_"+p++}while(w[f]);w[s]=p;w[f]=1}i[b]=f;}}for(g=l.s.r+n;g<=l.e.r;++g){if((A[g]||{}).hidden)continue;var T=Fk(e,l,g,u,a,i,o);if(T.isempty===false||(a===1?o.blankrows!==false:!!o.blankrows))d[v++]=T.row}d.length=v;return d}var Pk=/"/g;function Lk(e,r,t,a,n,i,s,f,l){var o=true;var c=[],h="",u=Wa(t);var d=e["!data"]!=null;var v=d&&e["!data"][t]||[];for(var p=r.s.c;p<=r.e.c;++p){if(!a[p])continue;var m=d?v[p]:e[a[p]+u];if(m==null)h="";else if(m.v!=null){o=false;h=""+(l.rawNumbers&&m.t=="n"?m.v:tn(m,null,l));for(var g=0,b=0;g!==h.length;++g)if((b=h.charCodeAt(g))===n||b===i||b===34||l.forceQuotes){h='"'+h.replace(Pk,'""')+'"';break}if(h=="ID"&&f==0&&c.length==0)h='"ID"'}else if(m.f!=null&&!m.F){o=false;h="="+m.f;if(h.indexOf(",")>=0)h='"'+h.replace(Pk,'""')+'"'}else h="";c.push(h)}if(l.strip)while(c[c.length-1]==="")--c.length;if(l.blankrows===false&&o)return null;return c.join(s)}function Mk(e,r){var t=[];var a=r==null?{}:r;if(e==null||e["!ref"]==null)return"";var n=en(e["!ref"]);var i=a.FS!==undefined?a.FS:",",s=i.charCodeAt(0);var f=a.RS!==undefined?a.RS:"\n",l=f.charCodeAt(0);var o="",c=[];var h=a.skipHidden&&e["!cols"]||[];var u=a.skipHidden&&e["!rows"]||[];for(var d=n.s.c;d<=n.e.c;++d)if(!(h[d]||{}).hidden)c[d]=$a(d);var v=0;for(var p=n.s.r;p<=n.e.r;++p){if((u[p]||{}).hidden)continue;o=Lk(e,n,p,c,s,l,i,v,a);if(o==null){continue}if(o||a.blankrows!==false)t.push((v++?f:"")+o)}return t.join("")}function Uk(e,r){if(!r)r={};r.FS="\t";r.RS="\n";var t=Mk(e,r);if(typeof a=="undefined"||r.type=="string")return t;var n=a.utils.encode(1200,t,"str");return String.fromCharCode(255)+String.fromCharCode(254)+n}function Bk(e,r){var t="",a,n="";if(e==null||e["!ref"]==null)return[];var i=en(e["!ref"]),s="",f=[],l;var o=[];var c=e["!data"]!=null;for(l=i.s.c;l<=i.e.c;++l)f[l]=$a(l);for(var h=i.s.r;h<=i.e.r;++h){s=Wa(h);for(l=i.s.c;l<=i.e.c;++l){t=f[l]+s;a=c?(e["!data"][h]||[])[l]:e[t];n="";if(a===undefined)continue;else if(a.F!=null){t=a.F;if(!a.f)continue;n=a.f;if(t.indexOf(":")==-1)t=t+":"+t}if(a.f!=null)n=a.f;else if(r&&r.values===false)continue;else if(a.t=="z")continue;else if(a.t=="n"&&a.v!=null)n=""+a.v;else if(a.t=="b")n=a.v?"TRUE":"FALSE";else if(a.w!==undefined)n="'"+a.w;else if(a.v===undefined)continue;else if(a.t=="s")n="'"+a.v;else n=""+a.v;o[o.length]=t+"="+n}}return o}function Wk(e,r,t){var a=t||{};var n=e?e["!data"]!=null:a.dense;if(b!=null&&n==null)n=b;var i=+!a.skipHeader;var s=e||{};if(!e&&n)s["!data"]=[];var f=0,l=0;if(s&&a.origin!=null){if(typeof a.origin=="number")f=a.origin;else{var o=typeof a.origin=="string"?Ka(a.origin):a.origin;f=o.r;l=o.c}}var c={s:{c:0,r:0},e:{c:l,r:f+r.length-1+i}};if(s["!ref"]){var h=en(s["!ref"]);c.e.c=Math.max(c.e.c,h.e.c);c.e.r=Math.max(c.e.r,h.e.r);if(f==-1){f=h.e.r+1;c.e.r=f+r.length-1+i}}else{if(f==-1){f=0;c.e.r=r.length-1+i}}var u=a.header||[],d=0;var v=[];r.forEach(function(e,r){if(n&&!s["!data"][f+r+i])s["!data"][f+r+i]=[];if(n)v=s["!data"][f+r+i];ir(e).forEach(function(t){if((d=u.indexOf(t))==-1)u[d=u.length]=t;var o=e[t];var c="z";var h="";var p=n?"":$a(l+d)+Wa(f+r+i);var m=n?v[l+d]:s[p];if(o&&typeof o==="object"&&!(o instanceof Date)){if(n)v[l+d]=o;else s[p]=o}else{if(typeof o=="number")c="n";else if(typeof o=="boolean")c="b";else if(typeof o=="string")c="s";else if(o instanceof Date){c="d";if(!a.UTC)o=Dr(o);if(!a.cellDates){c="n";o=dr(o)}h=m!=null&&m.z&&Le(m.z)?m.z:a.dateNF||q[14]}else if(o===null&&a.nullError){c="e";o=0}if(!m){if(!n)s[p]=m={t:c,v:o};else v[l+d]=m={t:c,v:o}}else{m.t=c;m.v=o;delete m.w;delete m.R;if(h)m.z=h}if(h)m.z=h}})});c.e.c=Math.max(c.e.c,l+u.length-1);var p=Wa(f);if(n&&!s["!data"][f])s["!data"][f]=[];if(i)for(d=0;d<u.length;++d){if(n)s["!data"][f][d+l]={t:"s",v:u[d]};else s[$a(d+l)+p]={t:"s",v:u[d]}}s["!ref"]=Ja(c);return s}function zk(e,r){return Wk(null,e,r)}function Hk(e,r,t){if(typeof r=="string"){if(e["!data"]!=null){var a=Ka(r);if(!e["!data"][a.r])e["!data"][a.r]=[];return e["!data"][a.r][a.c]||(e["!data"][a.r][a.c]={t:"z"})}return e[r]||(e[r]={t:"z"})}if(typeof r!="number")return Hk(e,Ya(r));return Hk(e,$a(t||0)+Wa(r))}function Vk(e,r){if(typeof r=="number"){if(r>=0&&e.SheetNames.length>r)return r;throw new Error("Cannot find sheet # "+r)}else if(typeof r=="string"){var t=e.SheetNames.indexOf(r);if(t>-1)return t;throw new Error("Cannot find sheet name |"+r+"|")}else throw new Error("Cannot find sheet |"+r+"|")}function $k(e,r){var t={SheetNames:[],Sheets:{}};if(e)Xk(t,e,r||"Sheet1");return t}function Xk(e,r,t,a){var n=1;if(!t)for(;n<=65535;++n,t=undefined)if(e.SheetNames.indexOf(t="Sheet"+n)==-1)break;if(!t||e.SheetNames.length>=65535)throw new Error("Too many worksheets");if(a&&e.SheetNames.indexOf(t)>=0&&t.length<32){var i=t.match(/\d+$/);n=i&&+i[0]||0;var s=i&&t.slice(0,i.index)||t;for(++n;n<=65535;++n)if(e.SheetNames.indexOf(t=s+n)==-1)break}Fm(t);if(e.SheetNames.indexOf(t)>=0)throw new Error("Worksheet with name |"+t+"| already exists!");e.SheetNames.push(t);e.Sheets[t]=r;return t}function Gk(e,r,t){if(!e.Workbook)e.Workbook={};if(!e.Workbook.Sheets)e.Workbook.Sheets=[];var a=Vk(e,r);if(!e.Workbook.Sheets[a])e.Workbook.Sheets[a]={};switch(t){case 0:;case 1:;case 2:break;default:throw new Error("Bad sheet visibility setting "+t);}e.Workbook.Sheets[a].Hidden=t}function jk(e,r){e.z=r;return e}function Kk(e,r,t){if(!r){delete e.l}else{e.l={Target:r};if(t)e.l.Tooltip=t}return e}function Yk(e,r,t){return Kk(e,"#"+r,t)}function Zk(e,r,t){if(!e.c)e.c=[];e.c.push({t:r,a:t||"SheetJS"})}function Jk(e,r,t,a){var n=typeof r!="string"?r:en(r);var i=typeof r=="string"?r:Ja(r);for(var s=n.s.r;s<=n.e.r;++s)for(var f=n.s.c;f<=n.e.c;++f){var l=Hk(e,s,f);l.t="n";l.F=i;delete l.v;if(s==n.s.r&&f==n.s.c){l.f=t;if(a)l.D=true}}var o=Za(e["!ref"]);if(o.s.r>n.s.r)o.s.r=n.s.r;if(o.s.c>n.s.c)o.s.c=n.s.c;if(o.e.r<n.e.r)o.e.r=n.e.r;if(o.e.c<n.e.c)o.e.c=n.e.c;e["!ref"]=Ja(o);return e}var qk={encode_col:$a,encode_row:Wa,encode_cell:Ya,encode_range:Ja,decode_col:Va,decode_row:Ba,split_cell:ja,decode_cell:Ka,decode_range:Za,format_cell:tn,sheet_new:nn,sheet_add_aoa:sn,sheet_add_json:Wk,sheet_add_dom:xb,aoa_to_sheet:fn,json_to_sheet:zk,table_to_sheet:Ob,table_to_book:Ib,sheet_to_csv:Mk,sheet_to_txt:Uk,sheet_to_json:Dk,sheet_to_html:Sb,sheet_to_formulae:Bk,sheet_to_row_object_array:Dk,sheet_get_cell:Hk,book_new:$k,book_append_sheet:Xk,book_set_sheet_visibility:Gk,cell_set_number_format:jk,cell_set_hyperlink:Kk,cell_set_internal_link:Yk,cell_add_comment:Zk,sheet_set_array_formula:Jk,consts:{SHEET_VISIBLE:0,SHEET_HIDDEN:1,SHEET_VERY_HIDDEN:2}};var Qk;function eA(e){Qk=e}function rA(e,r){var t=Qk();var a=r==null?{}:r;if(e==null||e["!ref"]==null){t.push(null);return t}var n=en(e["!ref"]);var i=a.FS!==undefined?a.FS:",",s=i.charCodeAt(0);var f=a.RS!==undefined?a.RS:"\n",l=f.charCodeAt(0);var o="",c=[];var h=a.skipHidden&&e["!cols"]||[];var u=a.skipHidden&&e["!rows"]||[];for(var d=n.s.c;d<=n.e.c;++d)if(!(h[d]||{}).hidden)c[d]=$a(d);var v=n.s.r;var p=false,m=0;t._read=function(){if(!p){p=true;return t.push("\ufeff")}while(v<=n.e.r){++v;if((u[v-1]||{}).hidden)continue;o=Lk(e,n,v-1,c,s,l,i,m,a);if(o!=null){if(o||a.blankrows!==false)return t.push((m++?f:"")+o)}}return t.push(null)};return t}function tA(e,r){var t=Qk();var a=r||{};var n=a.header!=null?a.header:yb;var i=a.footer!=null?a.footer:Eb;t.push(n);var s=Za(e["!ref"]);t.push(_b(e,s,a));var f=s.s.r;var l=false;t._read=function(){if(f>s.e.r){if(!l){l=true;t.push("</table>"+i)}return t.push(null)}while(f<=s.e.r){t.push(Tb(e,s,f,a));++f;break}};return t}function aA(e,r){var t=Qk({objectMode:true});if(e==null||e["!ref"]==null){t.push(null);return t}var a={t:"n",v:0},n=0,i=1,s=[],f=0,l="";var o={s:{r:0,c:0},e:{r:0,c:0}};var c=r||{};var h=c.range!=null?c.range:e["!ref"];if(c.header===1)n=1;else if(c.header==="A")n=2;else if(Array.isArray(c.header))n=3;switch(typeof h){case"string":o=en(h);break;case"number":o=en(e["!ref"]);o.s.r=h;break;default:o=h;}if(n>0)i=0;var u=Wa(o.s.r);var d=[];var v=0;var p=e["!data"]!=null;var m=o.s.r,g=0;var b={};if(p&&!e["!data"][m])e["!data"][m]=[];var w=c.skipHidden&&e["!cols"]||[];var k=c.skipHidden&&e["!rows"]||[];for(g=o.s.c;g<=o.e.c;++g){if((w[g]||{}).hidden)continue;d[g]=$a(g);a=p?e["!data"][m][g]:e[d[g]+u];switch(n){case 1:s[g]=g-o.s.c;break;case 2:s[g]=d[g];break;case 3:s[g]=c.header[g-o.s.c];break;default:if(a==null)a={w:"__EMPTY",t:"s"};l=f=tn(a,null,c);v=b[f]||0;if(!v)b[f]=1;else{do{l=f+"_"+v++}while(b[l]);b[f]=v;b[l]=1}s[g]=l;}}m=o.s.r+i;t._read=function(){while(m<=o.e.r){if((k[m-1]||{}).hidden)continue;var r=Fk(e,o,m,d,n,s,c);++m;if(r.isempty===false||(n===1?c.blankrows!==false:!!c.blankrows)){t.push(r.row);return}}return t.push(null)};return t}function nA(e,r){var t=Qk();var a=r==null?{}:r;var n=+a.stride||10;if(!e.SSF)e.SSF=Ar(q);if(e.SSF){$e();Ve(e.SSF);a.revssf=lr(e.SSF);a.revssf[e.SSF[65535]]=0;a.ssf=e.SSF;a.cellXfs=[];Tv(a.cellXfs,{},{revssf:{General:0}})}e.SheetNames.forEach(function(r){var t=e.Sheets[r];if(!t||!t["!ref"])return;var n=Za(t["!ref"]);var i=t["!data"]!=null;var s=i?t["!data"]:[];var f={r:0,c:0};for(var l=n.s.r;l<=n.e.r;++l){f.r=l;if(i&&!s[l])continue;for(var o=n.s.c;o<=n.e.c;++o){f.c=o;var c=i?s[l][o]:t[$a(o)+Wa(l)];if(!c)continue;if(c.t=="d"&&c.z==null){c=Ar(c);c.z=q[14]}void Tv(a.cellXfs,c,a)}}});var i=xg(e,a);var s=0,f=0,l=e.Sheets[e.SheetNames[f]],o=en(l),c=-1,h=false;var u=[],d=0,v=false,p=[],m={r:0,c:0};t._read=function(){switch(s){case 0:{s=1;t.push(at);t.push("<Workbook"+Ut({xmlns:Gt.ss,"xmlns:o":Gt.o,"xmlns:x":Gt.x,"xmlns:ss":Gt.ss,"xmlns:dt":Gt.dt,"xmlns:html":Gt.html})+">")}break;case 1:{s=2;t.push(_g(e,a));t.push(Sg(e,a))}break;case 2:{s=3;t.push(i);t.push(Ig(e,a))}break;case 3:{h=false;if(f>=e.SheetNames.length){s=-1;t.push("");break}t.push("<Worksheet"+Ut({"ss:Name":bt(e.SheetNames[f])})+">");l=e.Sheets[e.SheetNames[f]];if(!l){t.push("</Worksheet>");return void++f}var r=Rg(l,a,f,e);if(r.length)t.push("<Names>"+r+"</Names>");if(!l["!ref"])return s=5;o=en(l["!ref"]);c=o.s.r;s=4}break;case 4:{if(c<0||c>o.e.r){if(h)t.push("</Table>");return void(s=5)}if(c<=o.s.r){if(l["!cols"])l["!cols"].forEach(function(e,r){oc(e);var a=!!e.width;var n=kv(r,e);var i={"ss:Index":r+1};if(a)i["ss:Width"]=nc(n.width);if(e.hidden)i["ss:Hidden"]="1";if(!h){h=true;t.push("<Table>")}t.push(Bt("Column",null,i))});v=l["!data"]!=null;if(v)p=l["!data"];m.r=m.c=0}for(var g=0;c<=o.e.r&&g<n;++c,++g){var b=[Pg(c,(l["!rows"]||[])[c])];m.r=c;if(!(v&&!p[c]))for(var w=o.s.c;w<=o.e.c;++w){m.c=w;var k=false;for(d=0;d!=u.length;++d){if(u[d].s.c>w)continue;if(u[d].s.r>c)continue;if(u[d].e.c<w)continue;if(u[d].e.r<c)continue;if(u[d].s.c!=w||u[d].s.r!=c)k=true;break}if(k)continue;var A=$a(w)+Wa(c),T=v?p[c][w]:l[A];b.push(Dg(T,A,l,a,f,e,m))}b.push("</Row>");if(!h){h=true;t.push("<Table>")}t.push(b.join(""))}}break;case 5:{t.push(Ng(l,a,f,e));if(l&&l["!autofilter"])t.push('<AutoFilter x:Range="'+nu(qa(l["!autofilter"].ref),{r:0,c:0})+'" xmlns="urn:schemas-microsoft-com:office:excel"></AutoFilter>');t.push("</Worksheet>");f++;c=-1;return void(s=3)};case-1:{s=-2;t.push("</Workbook>")}break;case-2:t.push(null);break;}};return t}var iA={to_json:aA,to_html:tA,to_csv:rA,to_xlml:nA,set_readable:eA};if(typeof Kg!=="undefined")e.parse_xlscfb=Kg;e.parse_zip=nk;e.read=mk;e.readFile=gk;e.readFileSync=gk;e.write=xk;e.writeFile=Ik;e.writeFileSync=Ik;e.writeFileAsync=Nk;e.utils=qk;e.writeXLSX=Sk;e.writeFileXLSX=Rk;e.set_fs=rr;e.set_cptable=g;e.SSF=Xe;if(typeof iA!=="undefined")e.stream=iA;if(typeof Qe!=="undefined")e.CFB=Qe;if(typeof require!=="undefined"){var sA=undefined;if((sA||{}).Readable)eA(sA.Readable);try{er=undefined}catch(au){}}}if(typeof exports!=="undefined")make_xlsx_lib(exports);else if(typeof module!=="undefined"&&module.exports)make_xlsx_lib(module.exports);else if(typeof define==="function"&&define.amd)define("xlsx",function(){if(!XLSX.version)make_xlsx_lib(XLSX);return XLSX});else make_xlsx_lib(XLSX);if(typeof window!=="undefined"&&!window.XLSX)try{window.XLSX=XLSX}catch(e){}
 </script>
-<script id="cf-engine">
-/* Confronto regimi — motore fiscale e previdenziale.
+<script id="cf-dati">
+/* Confronto regimi — i dati che la pagina mostra.
 
-   Da dove viene. È il motore del calcolatore sviluppato fuori dal sito,
-   verificato riga per riga il 21 agosto 2026 e portato qui. I punti fiscali
-   difficili erano già giusti e sono stati conservati: le soglie del
-   forfettario, il 5% indipendente dal fatturato dell'anno, il massimale che
-   limita la base contributiva e non il compenso, e — il più delicato — la
-   contribuzione di Cassa calcolata sull'utile societario attribuibile e non
-   sul dividendo distribuito.
+   Quello che sta qui non e' il motore: sono le cose che l'utente vede e, per le
+   regole dei costi, modifica riga per riga nella tabella dei costi. Tenerle sul
+   server e poi ristamparle a schermo non nasconderebbe niente e aggiungerebbe
+   un viaggio di rete a ogni apertura.
 
-   Cosa è cambiato nel porting, e perché:
-
-   1. I parametri stavano dentro le funzioni, in ternari `anno === 2026 ? a : b`.
-      Con due soli anni selezionabili funzionava, ma i sentinelle erano
-      incoerenti — i contributi confrontavano con 2026, l'IRPEF con 2025 —
-      quindi il primo anno aggiunto avrebbe mescolato parametri di annate
-      diverse senza dirlo. Ora c'è una tabella per anno: aggiungere un anno
-      significa aggiungere una voce, e un anno non previsto viene rifiutato
-      invece di ereditare numeri sbagliati.
-
-   2. I contributi obbligatori sono oneri deducibili dal reddito COMPLESSIVO.
-      Prima erano sottratti solo dal reddito che li generava, e l'eccedenza
-      andava perduta: nel caso «solo dividendo» la Cassa sull'utile
-      attribuibile veniva pagata senza produrre alcun risparmio d'imposta, e
-      il confronto penalizzava la società di tutto quell'importo. Corretto in
-      tutti e tre i regimi, perché correggerlo in uno solo falserebbe il
-      confronto, che è l'unica cosa che questo tool deve fare bene.
-
-   3. I costi avevano solo percentuali piatte. Mancavano la percentuale di uso
-      professionale e i tetti, che il brief chiede espressamente. Le spese di
-      rappresentanza erano deducibili al 100% senza limite: ora portano il
-      loro tetto sui compensi.
-
-   Cosa NON fa. Non decide: espone i numeri e dichiara le assunzioni. Ogni
-   punto che dipende dal caso concreto finisce in `verifiche()` e compare a
-   schermo. */
+   Il motore — parametri per anno, imposte, contributi, scenari, ottimizzatore —
+   sta nel servizio di calcolo e non viene consegnato al browser. */
 
 'use strict';
 
-/* ---------------------------------------------------------------- parametri */
-
-/* Una voce per anno. Le fonti stanno in CF_FONTI, che «Come si usa» stampa in
-   pagina: un parametro senza fonte visibile è un parametro che nessuno può
-   controllare. */
-const CF_PARAMS = {
-  2026: {
-    /* Forfettario */
-    coefficiente: 0.78,          // avvocati e commercialisti, salvo diverso ATECO
-    sostitutivaOrdinaria: 0.15,
-    sostitutivaStartup: 0.05,
-    sogliaPermanenza: 85000,
-    sogliaCessazioneImmediata: 100000,
-    sogliaLavoroDipendente: 35000,
-    sogliaSpesePersonale: 20000,
-
-    /* IRPEF: [limite superiore dello scaglione, aliquota] */
-    scaglioni: [[28000, 0.23], [50000, 0.33], [Infinity, 0.43]],
-
-    /* Cassa Forense */
-    forense: {
-      soggettivo: 0.17, sogliaSoggettivo: 130000, oltreSoglia: 0.03,
-      minimoSoggettivo: 2790, integrativo: 0.04, minimoIntegrativo: 355
-    },
-    /* CNPADC */
-    cnpadc: {
-      soggettivoMin: 0.12, soggettivoMax: 1.00, massimale: 209300,
-      minimoSoggettivo: 3180, integrativo: 0.04, minimoIntegrativo: 954
-    },
-    /* Gestione Separata INPS per l'amministratore */
-    inps: {
-      massimale: 122295, conAltraCopertura: 0.24, senzaAltraCopertura: 0.3372,
-      quotaAmministratore: 1 / 3
-    },
-    ires: 0.24,
-    ritenutaDividendo: 0.26
-  },
-  2025: {
-    coefficiente: 0.78,
-    sostitutivaOrdinaria: 0.15,
-    sostitutivaStartup: 0.05,
-    sogliaPermanenza: 85000,
-    sogliaCessazioneImmediata: 100000,
-    sogliaLavoroDipendente: 35000,
-    sogliaSpesePersonale: 20000,
-    scaglioni: [[28000, 0.23], [50000, 0.35], [Infinity, 0.43]],
-    forense: {
-      soggettivo: 0.16, sogliaSoggettivo: 130000, oltreSoglia: 0.03,
-      minimoSoggettivo: 2750, integrativo: 0.04, minimoIntegrativo: 350
-    },
-    cnpadc: {
-      soggettivoMin: 0.12, soggettivoMax: 1.00, massimale: 206800,
-      minimoSoggettivo: 3140, integrativo: 0.04, minimoIntegrativo: 942
-    },
-    inps: {
-      massimale: 120607, conAltraCopertura: 0.24, senzaAltraCopertura: 0.3372,
-      quotaAmministratore: 1 / 3
-    },
-    ires: 0.24,
-    ritenutaDividendo: 0.26
-  }
-};
-
-/* La versione del ruleset accompagna ogni risultato e ogni Excel esportato:
-   un working paper senza l'indicazione delle regole con cui e' stato prodotto
-   non e' ripercorribile a distanza di mesi, quando i parametri sono cambiati. */
 const CF_RULESET = { versione: '2026.2.0', aggiornato: '2026-08-23' };
 
 const CF_FONTI = [
@@ -1393,37 +1300,6 @@ const CF_FONTI = [
   ['Dividendi', 'Agenzia delle Entrate / FiscoOggi — plusvalenze e dividendi', 'https://www.fiscooggi.it/portale/-/fiscalit%C3%A0-plusvalenze-e-dividendi-cosa-cambia-dopo-il-bilancio-2026']
 ];
 
-/* Il minimo integrativo di Cassa Forense era dichiarato fra i parametri da
-   verificare perché non l'avevo trovato in una fonte citabile. Ora c'è: la
-   pagina dei contributi minimi obbligatori espone 355,00 euro per il 2026,
-   dimezzati a 177,50 nei primi sei anni per chi si è iscritto prima dei 35
-   anni. Il parametro esce dall'elenco e la fonte entra in CF_FONTI. Resta
-   dichiarato l'azzeramento dell'integrativo nello scenario societario, che è
-   un'assunzione sul soggetto che lo addebita, non un importo. */
-const CF_PARAMETRI_DA_VERIFICARE = [];
-
-function params(year) {
-  const p = CF_PARAMS[Number(year)];
-  if (!p) {
-    /* Meglio fermarsi che ereditare i numeri dell'anno sbagliato. Era il
-       difetto latente del motore di partenza. */
-    throw new Error('Anno ' + year + ' non previsto: i parametri esistono per ' +
-      Object.keys(CF_PARAMS).sort().join(' e ') + '.');
-  }
-  return p;
-}
-
-/* ------------------------------------------------------------------- costi */
-
-/* Ogni voce dichiara:
-     iva      aliquota IVA tipica
-     ivaOrd   quota di IVA detraibile per il professionista
-     ivaSoc   quota di IVA detraibile per la società
-     dedOrd   quota deducibile ai fini IRPEF
-     dedSoc   quota deducibile ai fini IRES
-     irap     quota deducibile ai fini IRAP
-     uso      percentuale di uso professionale (il resto è personale)
-     tetto    tetto di deducibilità come quota dei compensi; null se non c'è */
 const CF_COSTI_DEFAULT = [
   { id: 'studio', nome: 'Affitto o coworking', nota: 'IVA secondo il contratto di locazione', iva: 0, ivaOrd: 0, ivaSoc: 0, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
   { id: 'utenze', nome: 'Utenze e gestione studio', nota: 'Energia, pulizie, spese di gestione', iva: .22, ivaOrd: 1, ivaSoc: 1, dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null },
@@ -1443,673 +1319,6 @@ const CF_COSTI_DEFAULT = [
 ];
 
 const CF_CAMPI_REGOLA = ['iva', 'ivaOrd', 'ivaSoc', 'dedOrd', 'dedSoc', 'irap', 'uso', 'tetto'];
-
-/* ---------------------------------------------------------------- utilità */
-
-const cfNum = (v, min = 0, max = Infinity) =>
-  Math.min(max, Math.max(min, Number(v) || 0));
-
-/* Somma progressiva su scaglioni [limite, aliquota]. */
-function cfProgressivo(base, scaglioni) {
-  let precedente = 0;
-  return scaglioni.reduce((tot, [limite, aliquota]) => {
-    const fetta = Math.max(0, Math.min(base, limite) - precedente);
-    precedente = limite;
-    return tot + fetta * aliquota;
-  }, 0);
-}
-
-/* --------------------------------------------------------------- il motore */
-
-function cfEngine(input) {
-  const P = params(input.year);
-  const compensi = cfNum(input.revenue);
-  const altriRedditi = cfNum(input.otherIncome);
-
-  /* ---- IRPEF -------------------------------------------------------- */
-
-  const irpefLorda = (base) => cfProgressivo(cfNum(base), P.scaglioni);
-
-  const detrazioneAutonomo = (r) => {
-    if (r <= 0) return 0;
-    let d = 0;
-    if (r <= 5500) d = 1265;
-    else if (r <= 28000) d = 500 + 765 * (28000 - r) / 22500;
-    else if (r <= 50000) d = 500 * (50000 - r) / 22000;
-    if (r > 11000 && r <= 17000) d += 50;
-    return Math.min(irpefLorda(r), Math.max(0, d));
-  };
-  const detrazioneDipendente = (r) => {
-    if (r <= 0) return 0;
-    let d = 0;
-    if (r <= 15000) d = 1955;
-    else if (r <= 28000) d = 1910 + 1190 * (28000 - r) / 13000;
-    else if (r <= 50000) d = 1910 * (50000 - r) / 22000;
-    if (r > 25000 && r <= 35000) d += 65;
-    return Math.min(irpefLorda(r), Math.max(0, d));
-  };
-
-  /* Le addizionali si applicano alla stessa base dell'IRPEF. È una
-     semplificazione: la base delle addizionali non coincide in tutto con
-     quella dell'imposta. È dichiarata fra le verifiche. */
-  const impostaPersonale = (base, tipo = 'autonomo') => {
-    const b = cfNum(base);
-    const detr = tipo === 'dipendente' ? detrazioneDipendente(b) : detrazioneAutonomo(b);
-    return Math.max(0, irpefLorda(b) - detr)
-      + b * cfNum(input.regionalRate) / 100
-      + b * cfNum(input.municipalRate) / 100;
-  };
-  /* La detrazione dipende dalla natura del reddito, e gli altri redditi
-     possono essere di categorie diverse. Il modello ne tiene conto in modo
-     approssimato: si applica la detrazione da lavoro dipendente quando quella
-     e' la componente prevalente degli altri redditi correnti, altrimenti
-     quella da lavoro autonomo. Non e' il calcolo per categoria che vorrebbe la
-     norma — quello richiede una base separata per ciascuna — ed e' dichiarato
-     fra le verifiche. Senza questa distinzione un pensionato con redditi
-     professionali vedeva applicata la detrazione sbagliata su tutto. */
-  const dipendenteCorrente = cfNum(input.employeeIncomeCurr);
-  const tipoAltriRedditi = dipendenteCorrente > altriRedditi / 2 ? 'dipendente' : 'autonomo';
-  const impostaBase = impostaPersonale(altriRedditi, tipoAltriRedditi);
-
-  /* ---- contributi --------------------------------------------------- */
-
-  /* RE-008. Cassa Forense dimezza entrambi i minimi per chi si e' iscritto
-     prima dei 35 anni, nei primi sei anni di iscrizione: 1.395 invece di 2.790
-     e 177,50 invece di 355 (pagina dei contributi minimi obbligatori 2026).
-     Senza questa riduzione il tool sovrastimava di 1.572,50 euro l'anno i
-     contributi minimi di un giovane avvocato, che e' esattamente il profilo per
-     cui la scelta del regime pesa di piu'. Per CNPADC non ho trovato una fonte
-     citabile con gli importi ridotti: la riduzione non e' modellata e viene
-     dichiarata fra le assunzioni invece di essere applicata a occhio. */
-  const minimiRidotti = !!input.reducedMinimums && input.profession === 'avvocato';
-
-  /* `volumeAffari` serve al contributo integrativo, che il professionista
-     addebita in fattura: pesa solo per la parte che non copre il minimo.
-     `inSocieta` azzera l'integrativo perché in una STP/STA lo addebita la
-     società — assunzione dichiarata fra le verifiche. */
-  function contributi(reddito, volumeAffari, inSocieta = false) {
-    const base = cfNum(reddito);
-    if (input.profession === 'commercialista') {
-      const c = P.cnpadc;
-      const aliquota = Math.min(c.soggettivoMax,
-        Math.max(c.soggettivoMin, cfNum(input.pensionRate) / 100));
-      const soggettivo = Math.max(c.minimoSoggettivo, Math.min(base, c.massimale) * aliquota);
-      const integrativo = inSocieta ? 0
-        : Math.max(0, c.minimoIntegrativo - cfNum(volumeAffari) * c.integrativo);
-      return soggettivo + integrativo + cfNum(input.maternity);
-    }
-    const f = P.forense;
-    const quotaMinimi = minimiRidotti ? 0.5 : 1;
-    const soggettivo = Math.max(f.minimoSoggettivo * quotaMinimi,
-      Math.min(base, f.sogliaSoggettivo) * f.soggettivo
-      + Math.max(0, base - f.sogliaSoggettivo) * f.oltreSoglia);
-    const integrativo = inSocieta ? 0
-      : Math.max(0, f.minimoIntegrativo * quotaMinimi - cfNum(volumeAffari) * f.integrativo);
-    return soggettivo + integrativo + cfNum(input.maternity);
-  }
-
-  /* ---- costi -------------------------------------------------------- */
-
-  /* Restituisce, per ogni voce, il costo che esce di cassa e la quota
-     deducibile, separati: sono due numeri diversi e confonderli è il modo
-     più rapido per sbagliare il confronto fra forfettario e ordinario. */
-  function totaliCosti(fattore = 1) {
-    const t = { lordo: 0, cassaOrd: 0, dedOrd: 0, cassaSoc: 0, dedSoc: 0, dedIrap: 0, voci: [] };
-    (input.costs || []).forEach((c) => {
-      const inserito = cfNum(c.amount) * fattore;
-      /* La quota di uso personale non è un costo professionale: esce di
-         tasca ma non entra nel confronto fra regimi. */
-      const uso = cfNum(c.uso, 0, 1);
-      const rilevante = inserito * uso;
-      const iva = cfNum(c.iva, 0, 1);
-      const netto = c.gross && iva > 0 ? rilevante / (1 + iva) : rilevante;
-      const impostaIva = c.gross ? rilevante - netto : netto * iva;
-      const lordo = netto + impostaIva;
-
-      /* L'IVA non detraibile diventa costo, e come tale è deducibile. */
-      const cassaOrd = netto + impostaIva * (1 - cfNum(c.ivaOrd, 0, 1));
-      const cassaSoc = netto + impostaIva * (1 - cfNum(c.ivaSoc, 0, 1));
-
-      /* Il tetto è espresso in quota dei compensi e si applica dopo la
-         percentuale di deducibilità: è il limite superiore, non un secondo
-         abbattimento. */
-      const limite = c.tetto == null ? Infinity : cfNum(c.tetto, 0, 1) * compensi;
-      /* `lordo`, non `inserito`: nel forfettario l'IVA non si detrae, quindi
-         di tasca esce netto + IVA anche quando l'importo è stato inserito al
-         netto. Sommare l'inserito sottostimava il costo del forfettario
-         esattamente dell'IVA, e lo faceva sembrare più conveniente di quanto
-         sia — il difetto è emerso dal confronto di fedeltà col motore di
-         partenza, non dalla lettura del codice. */
-      /* RE-011. Gli importi dedotti e il tetto effettivamente applicato escono
-         per riga, non solo sommati: il working paper deve permettere di
-         ricostruire perche' il totale deducibile differisce dal costo di cassa,
-         e ricalcolarli nell'esportatore avrebbe creato una seconda verita'. */
-      const dedottoOrd = Math.min(cassaOrd * cfNum(c.dedOrd, 0, 1), limite);
-      const dedottoSoc = Math.min(cassaSoc * cfNum(c.dedSoc, 0, 1), limite);
-      const dedottoIrap = Math.min(cassaSoc * cfNum(c.irap, 0, 1), limite);
-
-      t.lordo += lordo;
-      t.cassaOrd += cassaOrd;
-      t.dedOrd += dedottoOrd;
-      t.cassaSoc += cassaSoc;
-      t.dedSoc += dedottoSoc;
-      t.dedIrap += dedottoIrap;
-      t.voci.push({
-        id: c.id, nome: c.nome, inserito, lordo, netto, impostaIva, cassaOrd, cassaSoc,
-        dedottoOrd, dedottoSoc, dedottoIrap,
-        limite: limite === Infinity ? null : limite,
-        /* Il tetto «morde» solo se ha ridotto qualcosa: dirlo applicato quando
-           non lo e' renderebbe il foglio inutile proprio dove serve. */
-        tettoApplicato: limite !== Infinity && (
-          cassaOrd * cfNum(c.dedOrd, 0, 1) > limite + 1e-9 ||
-          cassaSoc * cfNum(c.dedSoc, 0, 1) > limite + 1e-9)
-      });
-    });
-    return t;
-  }
-
-  /* RE-001. Lo zero esplicito deve restare zero.
-     Qui c'era `cfNum(input.costFactor, 0, 100) || 1`, e in JavaScript `0 || 1`
-     fa 1: il fattore zero — «e se non avessi nessun costo?» — diventava «con i
-     costi di adesso». La soglia di pareggio dei costi apre proprio con quella
-     domanda, quindi rispondeva sull'ipotesi sbagliata e concludeva che
-     l'ordinario pareggia a costo zero: nel caso dimostrativo a 90.001 mostrava
-     zero invece di 52.334,66. Il fallback deve distinguere «parametro assente»
-     da «parametro uguale a zero», e non c'e' modo di farlo con `||`. */
-  /* `Number(null)` fa 0, non NaN: un fattore nullo sarebbe stato letto come
-     «zero costi» invece che come «non dichiarato». E' lo stesso genere di
-     scorciatoia che ha prodotto il difetto, in direzione opposta. */
-  const dichiarato = input.costFactor != null && input.costFactor !== '';
-  const fattoreChiesto = dichiarato ? Number(input.costFactor) : NaN;
-  const costFactor = Number.isFinite(fattoreChiesto) ? cfNum(fattoreChiesto, 0, 100) : 1;
-  const tot = totaliCosti(costFactor);
-
-  /* ---- 1. forfettario ----------------------------------------------- */
-
-  const spesePersonale = (input.costs || [])
-    .filter((c) => c.id === 'personale').reduce((s, c) => s + cfNum(c.amount), 0);
-
-  /* RE-007. La soglia sui redditi da lavoro dipendente dell'anno precedente
-     non si applica se quel rapporto di lavoro e' cessato: l'Agenzia lo dice
-     esplicitamente. L'eccezione cade pero' se nell'anno sono arrivati redditi
-     da un nuovo rapporto o da pensione — altrimenti basterebbe cambiare datore
-     per aggirare la causa ostativa. Per questo la deroga chiede due cose: che
-     il rapporto sia dichiarato cessato e che i redditi da lavoro dipendente o
-     pensione dell'anno corrente siano nulli. */
-  const dipendentePrec = cfNum(input.employeeIncomePrev);
-  const rapportoCessato = !!input.employmentEnded && dipendenteCorrente <= 0;
-  const derogaCessazione = rapportoCessato && dipendentePrec > P.sogliaLavoroDipendente;
-
-  const forfApplicabile =
-    cfNum(input.previousRevenue) <= P.sogliaPermanenza &&
-    compensi <= P.sogliaCessazioneImmediata &&
-    /* Il reddito da lavoro dipendente che conta per la causa ostativa e'
-       quello dell'anno PRECEDENTE. Prima il campo era uno solo, etichettato
-       come quota degli altri redditi correnti e usato qui: un dato inserito
-       secondo l'etichetta finiva in una regola di un altro periodo. */
-    (dipendentePrec <= P.sogliaLavoroDipendente || rapportoCessato) &&
-    spesePersonale <= P.sogliaSpesePersonale &&
-    !input.incompatible && !input.employer;
-
-  const forfReddito = compensi * P.coefficiente;
-  const forfContributi = contributi(forfReddito, compensi);
-  const forfBase = Math.max(0, forfReddito - forfContributi);
-  const forfEccedenza = Math.max(0, forfContributi - forfReddito);
-  const forfImposta = forfBase * (input.startup ? P.sostitutivaStartup : P.sostitutivaOrdinaria);
-  /* L'eccedenza dei contributi sul reddito forfettario è deducibile dal
-     reddito complessivo: senza questo i contributi sarebbero trattati in tre
-     modi diversi nei tre regimi, e il confronto non starebbe in piedi. */
-  const forfSgravio = forfEccedenza > 0
-    ? impostaBase - impostaPersonale(Math.max(0, altriRedditi - Math.min(forfEccedenza, altriRedditi)))
-    : 0;
-  const forfNetto = compensi - tot.lordo - forfContributi - forfImposta + forfSgravio;
-
-  /* ---- 2. ordinario ------------------------------------------------- */
-
-  const ordUtile = Math.max(0, compensi - tot.dedOrd);
-  const ordContributi = contributi(ordUtile, compensi);
-  const ordLordo = altriRedditi + ordUtile;
-  const ordDedotto = Math.min(ordContributi, ordLordo);
-  const ordImponibile = Math.max(0, ordLordo - ordDedotto);
-  /* Nessun troncamento a zero sul differenziale: se la deduzione trova
-     capienza negli altri redditi l'imposta incrementale è davvero negativa,
-     perché quei redditi c'erano comunque. */
-  const ordImposta = impostaPersonale(ordImponibile, tipoAltriRedditi) - impostaBase;
-  const ordNetto = compensi - tot.cassaOrd - ordContributi - ordImposta;
-
-  /* ---- 3. società professionale ------------------------------------- */
-
-  const quota = cfNum(input.ownership, 0, 100) / 100;
-  const inpsSuCompenso = input.profession === 'commercialista'
-    && input.adminTreatment === 'inps';
-  const inpsAliq = inpsSuCompenso ? cfNum(input.inpsRate) / 100 : 0;
-  const inpsMax = P.inps.massimale;
-  const quotaSoc = inpsAliq * (1 - P.inps.quotaAmministratore);
-  const struttura = cfNum(input.companyOverhead);
-  const cassaPreCompenso = Math.max(0, compensi - tot.cassaSoc - struttura);
-
-  /* Il massimale limita la base contributiva, non il compenso: sopra il
-     massimale la società non paga più contributi, quindi può erogare di più. */
-  const compensoPrimaDelTetto = cassaPreCompenso / (1 + quotaSoc);
-  const tettoContributivo = inpsSuCompenso
-    ? (compensoPrimaDelTetto <= inpsMax
-      ? compensoPrimaDelTetto
-      : Math.max(0, cassaPreCompenso - inpsMax * quotaSoc))
-    : cassaPreCompenso;
-
-  /* La capienza vera. Il tetto contributivo guarda solo i contributi: non
-     riservava la cassa per le imposte della società. L'IRAP si calcola su una
-     base che NON deduce il compenso amministratore, quindi è dovuta qualunque
-     compenso si eroghi; l'IRES dipende dal compenso ma non scende sotto zero.
-     Erogando tutta la cassa, l'utile distribuibile finiva negativo e il
-     `Math.max(0, ...)` lo azzerava in silenzio: l'IRAP restava fra le imposte
-     esposte e non veniva sottratta dal netto. Misurato a 195.000 di compensi e
-     44.000 di costi: il confronto sovrastimava la società di 5.889 euro,
-     esattamente l'IRAP dovuta.
-
-     Qui il compenso ha un secondo tetto: il più alto che lascia la società in
-     grado di pagare le proprie imposte. `distribuibileGrezzo` è decrescente nel
-     compenso — la derivata è −(1 + quota INPS)(1 − aliquota IRES) — quindi la
-     bisezione trova il limite. */
-  function distribuibileGrezzo(c) {
-    const bInps = Math.min(c, inpsMax);
-    const inpsSocGrezzo = bInps * inpsAliq * (1 - P.inps.quotaAmministratore);
-    const bIres = Math.max(0, compensi - tot.dedSoc - struttura - c - inpsSocGrezzo);
-    const iresGrezza = bIres * P.ires;
-    const bIrap = Math.max(0, compensi - tot.dedIrap - struttura);
-    const irapGrezza = bIrap * cfNum(input.irapRate) / 100;
-    return compensi - tot.cassaSoc - struttura - c - inpsSocGrezzo - iresGrezza - irapGrezza;
-  }
-
-  const capienzaAZero = distribuibileGrezzo(0);
-  let tettoCapienza;
-  if (capienzaAZero <= 0) {
-    /* La società non ha cassa nemmeno per le proprie imposte: non c'è compenso
-       erogabile, e il fatto va dichiarato invece di essere assorbito. */
-    tettoCapienza = 0;
-  } else if (distribuibileGrezzo(tettoContributivo) >= 0) {
-    tettoCapienza = tettoContributivo;
-  } else {
-    let lo = 0, hi = tettoContributivo;
-    for (let i = 0; i < 60 && hi - lo > 0.005; i++) {
-      const m = (lo + hi) / 2;
-      if (distribuibileGrezzo(m) >= 0) lo = m; else hi = m;
-    }
-    tettoCapienza = lo;
-  }
-  const compensoMax = Math.min(tettoContributivo, tettoCapienza);
-  /* Quanto manca alla società per pagare le proprie imposte, se manca. Zero nel
-     caso normale: serve a dichiarare il caso in cui nemmeno un compenso nullo
-     basta. */
-  const scopertoSocieta = Math.max(0, -capienzaAZero);
-
-  /* Lo scenario societario come funzione delle due leve che lo governano: il
-     compenso amministratore richiesto e quanto dell'utile distribuibile resta
-     in società. Prima questo blocco era codice lineare che leggeva `input`
-     direttamente, e non c'era modo di valutarlo a parametri diversi da quelli
-     inseriti: e' la ragione per cui l'ottimizzazione promessa a schermo non
-     esisteva. Qui e' una funzione pura, quindi si puo' cercare. */
-  function scenarioSocieta(compensoRichiesto, opzioni) {
-    const compenso = Math.min(Math.max(0, compensoRichiesto), compensoMax);
-    const baseInps = Math.min(compenso, inpsMax);
-    const inpsSocio = baseInps * inpsAliq * P.inps.quotaAmministratore;
-    const inpsSocieta = baseInps * inpsAliq * (1 - P.inps.quotaAmministratore);
-
-    const baseIres = Math.max(0, compensi - tot.dedSoc - struttura - compenso - inpsSocieta);
-    const ires = baseIres * P.ires;
-    const baseIrap = Math.max(0, compensi - tot.dedIrap - struttura);
-    const irap = baseIrap * cfNum(input.irapRate) / 100;
-
-    const distribuibile = Math.max(0,
-      compensi - tot.cassaSoc - struttura - compenso - inpsSocieta - ires - irap);
-
-    /* Due modi di dire la stessa cosa. In manuale l'utente fissa la quota
-       distribuita in percentuale, com'e' sempre stato. In automatico dichiara
-       quanti euro devono restare in società — capitale circolante, investimenti
-       — e la quota si ricava da quelli: un vincolo in euro e' quello che si sa,
-       una percentuale dell'utile distribuibile e' quello che si scopre dopo. */
-    let quotaDistribuita;
-    if (opzioni && opzioni.trattieni != null) {
-      const trattieni = Math.min(Math.max(0, opzioni.trattieni), distribuibile);
-      quotaDistribuita = distribuibile > 0 ? (distribuibile - trattieni) / distribuibile : 0;
-    } else {
-      quotaDistribuita = cfNum(opzioni && opzioni.quota, 0, 1);
-    }
-
-    const dividendo = distribuibile * quotaDistribuita * quota;
-    const ritenuta = dividendo * P.ritenutaDividendo;
-    const trattenuto = distribuibile * (1 - quotaDistribuita) * quota;
-
-    /* La contribuzione professionale grava sull'utile attribuibile, distribuito
-       o no. È il punto che il brief chiede di non perdere. */
-    const baseCassa = baseIres * quota + (inpsSuCompenso ? 0 : compenso);
-    const cassaSocio = contributi(baseCassa, compensi * quota, true);
-
-    const contributiPersonali = cassaSocio + inpsSocio;
-    const socLordo = altriRedditi + compenso;
-    const socDedotto = Math.min(contributiPersonali, socLordo);
-    const socImponibile = Math.max(0, socLordo - socDedotto);
-    const socImposta = impostaPersonale(socImponibile,
-      inpsSuCompenso ? 'dipendente' : 'autonomo') - impostaBase;
-
-    return {
-      compenso, baseInps, inpsSocio, inpsSocieta, baseIres, ires, irap,
-      distribuibile, quotaDistribuita, dividendo, ritenuta, trattenuto,
-      baseCassa, cassaSocio, contributiPersonali, socDedotto, socImposta,
-      netto: dividendo - ritenuta + compenso - contributiPersonali - socImposta
-    };
-  }
-
-  /* L'ottimizzatore. Massimizza il netto personale disponibile al variare del
-     compenso, tenuto fermo il vincolo su quanto resta in società.
-
-     Non si deriva analiticamente: la funzione ha gomiti nel massimale della
-     Gestione Separata, negli scaglioni IRPEF e nei minimi di Cassa. Griglia
-     grossa piu' affinamento locale — 33 punti e poi una sezione aurea sul
-     tratto migliore — e' robusto sui gomiti e costa qualche decina di
-     valutazioni aritmetiche. */
-  /* Il vincolo e' un vincolo, non un desiderio.
-
-     L'utile distribuibile scende al crescere del compenso: se l'ottimizzatore
-     spinge il compenso fino a consumarlo, in societa' non resta niente e il
-     vincolo dichiarato dall'utente viene disatteso in silenzio. Provato: con
-     20.000 da trattenere l'ottimo proponeva 65.900 di compenso e lasciava zero.
-     Quindi il compenso ha un tetto: il piu' alto che lascia ancora in societa'
-     quello che deve restarci. Se nemmeno a compenso zero c'e' capienza, il
-     vincolo e' irrealizzabile e resta in societa' tutto quello che c'e'. */
-  function tettoDelVincolo(trattieni) {
-    if (trattieni <= 0) return compensoMax;
-    if (scenarioSocieta(0, { quota: 1 }).distribuibile < trattieni) return 0;
-    let lo = 0, hi = compensoMax;
-    for (let i = 0; i < 40 && hi - lo > 1; i++) {
-      const m = (lo + hi) / 2;
-      if (scenarioSocieta(m, { quota: 1 }).distribuibile >= trattieni) lo = m; else hi = m;
-    }
-    return lo;
-  }
-
-  function ottimizzaMix(trattieni) {
-    const limite = tettoDelVincolo(trattieni);
-    const valuta = (c) => scenarioSocieta(c, { trattieni: trattieni }).netto;
-    const passi = 32;
-    let migliore = 0, netto = valuta(0), valutazioni = 1;
-    for (let i = 1; i <= passi; i++) {
-      const c = limite * i / passi;
-      const n = valuta(c); valutazioni++;
-      if (n > netto) { netto = n; migliore = c; }
-    }
-    /* Affinamento fra i due punti adiacenti al migliore. */
-    const larghezza = limite / passi;
-    let lo = Math.max(0, migliore - larghezza);
-    let hi = Math.min(limite, migliore + larghezza);
-    const phi = (Math.sqrt(5) - 1) / 2;
-    let a = hi - phi * (hi - lo), b = lo + phi * (hi - lo);
-    let fa = valuta(a), fb = valuta(b);
-    valutazioni += 2;
-    for (let i = 0; i < 34 && hi - lo > 1; i++) {
-      if (fa > fb) { hi = b; b = a; fb = fa; a = hi - phi * (hi - lo); fa = valuta(a); }
-      else { lo = a; a = b; fa = fb; b = lo + phi * (hi - lo); fb = valuta(b); }
-      valutazioni++;
-    }
-    if (valuta((lo + hi) / 2) > netto) { migliore = (lo + hi) / 2; netto = valuta(migliore); }
-    valutazioni += 2;
-
-    /* Arrotondato ai 100 euro, perche' un compenso deliberato non ha i
-       centesimi e proporne 27.413,86 darebbe una precisione che il modello non
-       ha. Ma si sceglie fra il centinaio sotto e quello sopra invece di
-       arrotondare al piu' vicino: arrotondando per difetto si perdeva netto —
-       misurato, 10,78 euro sul caso dimostrativo — e proporre un ottimo che non
-       e' l'ottimo e' esattamente il difetto che questa funzione doveva chiudere. */
-    const candidati = [Math.floor(migliore / 100) * 100, Math.ceil(migliore / 100) * 100]
-      .map((c) => Math.max(0, Math.min(c, limite)));
-    let scelto = candidati[0], nettoScelto = valuta(candidati[0]);
-    valutazioni++;
-    candidati.slice(1).forEach((c) => {
-      const n = valuta(c); valutazioni++;
-      if (n > nettoScelto) { nettoScelto = n; scelto = c; }
-    });
-    return {
-      compenso: scelto,
-      limitatoDalVincolo: trattieni > 0 && limite < compensoMax - 1,
-      limitatoDallaCapienza: scelto >= limite - 1 && limite >= compensoMax - 1,
-      vincoloIrrealizzabile: trattieni > 0 && limite <= 0,
-      valutazioni: valutazioni
-    };
-  }
-
-  const mixAutomatico = input.mixMode !== 'manual';
-  const trattieniChiesto = cfNum(input.retainInCompany);
-  let soc, mixInfo;
-  if (mixAutomatico) {
-    const ott = ottimizzaMix(trattieniChiesto);
-    soc = scenarioSocieta(ott.compenso, { trattieni: trattieniChiesto });
-    mixInfo = { modo: 'auto', compensoProposto: ott.compenso,
-      trattieniChiesto: trattieniChiesto, valutazioni: ott.valutazioni,
-      limitatoDalVincolo: ott.limitatoDalVincolo,
-      limitatoDallaCapienza: ott.limitatoDallaCapienza,
-      vincoloIrrealizzabile: ott.vincoloIrrealizzabile };
-  } else {
-    const richiesto = input.extractionMode === 'dividend' ? 0 : cfNum(input.admin);
-    const quotaManuale = input.extractionMode === 'admin' ? 0
-      : cfNum(input.distribution, 0, 100) / 100;
-    soc = scenarioSocieta(richiesto, { quota: quotaManuale });
-    mixInfo = { modo: 'manuale', compensoRichiesto: richiesto,
-      quotaDistribuita: quotaManuale };
-  }
-
-  const compensoRichiesto = mixAutomatico
-    ? mixInfo.compensoProposto : mixInfo.compensoRichiesto;
-  const compenso = soc.compenso;
-  const inpsSocio = soc.inpsSocio, inpsSocieta = soc.inpsSocieta;
-  const baseIres = soc.baseIres, ires = soc.ires, irap = soc.irap;
-  const distribuibile = soc.distribuibile;
-  const dividendo = soc.dividendo, ritenuta = soc.ritenuta, trattenuto = soc.trattenuto;
-  const baseCassa = soc.baseCassa, cassaSocio = soc.cassaSocio;
-  const contributiPersonali = soc.contributiPersonali;
-  const socDedotto = soc.socDedotto, socImposta = soc.socImposta;
-  const socNetto = soc.netto;
-
-  /* ---- esito -------------------------------------------------------- */
-
-  const etichetta = input.startup
-    ? Math.round(P.sostitutivaStartup * 100) : Math.round(P.sostitutivaOrdinaria * 100);
-
-  return {
-    params: P,
-    ruleset: CF_RULESET,
-    totali: tot,
-    costFactor: costFactor,
-    detrazioneApplicata: tipoAltriRedditi,
-    derogaCessazione: derogaCessazione,
-    minimiRidotti: minimiRidotti,
-    scenari: [
-      {
-        id: 'forfettario', nome: 'Regime forfettario', applicabile: forfApplicabile,
-        netto: forfNetto, imposte: forfImposta - forfSgravio, contributi: forfContributi,
-        costi: tot.lordo, trattenuto: 0,
-        stato: forfApplicabile
-          ? (compensi > P.sogliaPermanenza
-            ? etichetta + '% · uscita dal periodo successivo'
-            : etichetta + '% · applicabile')
-          : 'Non applicabile',
-        dettaglio: { reddito: forfReddito, base: forfBase, eccedenzaContributi: forfEccedenza, sgravio: forfSgravio }
-      },
-      {
-        id: 'ordinario', nome: 'Partita IVA ordinaria', applicabile: true,
-        netto: ordNetto, imposte: ordImposta, contributi: ordContributi,
-        costi: tot.cassaOrd, trattenuto: 0,
-        stato: 'Applicabile · IRAP non dovuta',
-        dettaglio: { utile: ordUtile, imponibile: ordImponibile, contributiDedotti: ordDedotto }
-      },
-      {
-        id: 'societa',
-        nome: input.profession === 'commercialista' ? 'STP S.r.l.' : 'STA S.r.l.',
-        applicabile: true,
-        netto: socNetto,
-        imposte: ires * quota + irap * quota + ritenuta + socImposta,
-        contributi: contributiPersonali + inpsSocieta * quota,
-        costi: (tot.cassaSoc + struttura) * quota, trattenuto,
-        stato: 'IRES, IRAP e remunerazione del socio',
-        dettaglio: {
-          compenso, compensoMax, compensoRichiesto,
-          /* Il mix usato, e come e' stato scelto: senza questo l'utente non
-             puo' sapere se sta guardando un'ottimizzazione o la propria
-             ipotesi. */
-          mix: mixInfo,
-          quotaDistribuita: soc.quotaDistribuita,
-          scopertoSocieta: scopertoSocieta,
-          tettoContributivo: tettoContributivo,
-          /* Il ponte dal lato del socio, che quadra a qualunque quota: quello
-             che la societa' eroga meno quello che il socio paga fa il netto.
-             Serve alla card, che con le voci scalate alla quota non poteva
-             quadrare — il compenso al socio non e' pro quota. */
-          erogatoLordo: soc.compenso + soc.dividendo,
-          impostePersonali: soc.ritenuta + soc.socImposta,
-          contributiPersonali: soc.contributiPersonali,
-          /* RE-003. Il massimale riduce il compenso in silenzio: chi chiede
-             40.000 e ne vede erogare 35.920 deve poterlo leggere, altrimenti
-             confronta una struttura che non e' quella che ha impostato. */
-          compensoRidotto: compensoRichiesto - compenso > 0.005,
-          dividendo, ritenuta, distribuibile,
-          baseCassa, cassaSocio, inpsSocio, inpsSocieta: inpsSocieta * quota,
-          ires, irap, baseIres, contributiDedotti: socDedotto
-        }
-      }
-    ]
-  };
-}
-
-
-/* ------------------------------------------------- assunzioni e avvisi */
-
-/* Un elenco solo, letto dalla pagina e dall'Excel.
-
-   Prima le assunzioni stavano scritte a mano in `renderVerifiche()` e l'Excel
-   ne esportava un sottoinsieme diverso: due elenchi separati divergono al primo
-   cambiamento, e il re-audit ha trovato esattamente questo — il working paper
-   non riportava il compenso ridotto ne' la maternita' non determinata, cioe' le
-   due cose che spostano il risultato. Qui la fonte e' una.
-
-   `severita` vale 'alta' quando l'assunzione puo' cambiare la conclusione,
-   'media' quando cambia gli importi ma non il verdetto, 'nota' quando serve
-   solo a ricostruire il calcolo. */
-function cfAssunzioni(input, esito) {
-  const A = [];
-  const agg = (id, titolo, dettaglio, severita) =>
-    A.push({ id: id, titolo: titolo, dettaglio: dettaglio, severita: severita });
-
-  const soc = (esito.scenari || []).find((x) => x.id === 'societa');
-  const altri = cfNum(input.otherIncome);
-
-  if (soc && soc.dettaglio && soc.dettaglio.compensoRidotto) {
-    agg('compenso-ridotto', 'Il compenso amministratore è stato ridotto',
-      'Hai chiesto ' + Math.round(soc.dettaglio.compensoRichiesto) + ' euro, ma con questi '
-      + 'compensi e questi costi la società può erogarne al massimo '
-      + Math.round(soc.dettaglio.compensoMax) + '. Il confronto usa il massimo, non il valore '
-      + 'chiesto: se il compenso è un vincolo, cambia i costi o i compensi.', 'alta');
-  }
-
-  if (cfNum(input.maternity) <= 0) {
-    agg('maternita-non-determinata', 'Il contributo di maternità non è ancora determinato',
-      'Per il 2026 la Cassa non ha ancora deliberato l\u2019importo: il calcolo lo tratta come '
-      + 'zero, quindi i contributi dei tre scenari sono sottostimati dello stesso importo. '
-      + 'Non cambia il confronto, cambia la cassa netta di tutti e tre. Se conosci l\u2019importo '
-      + 'dell\u2019anno scorso, inseriscilo nei parametri avanzati.', 'alta');
-  }
-
-  if (input.profession === 'commercialista' && input.reducedMinimums) {
-    agg('minimi-ridotti-non-modellati', 'La riduzione per i neo-iscritti non è modellata per CNPADC',
-      'Hai dichiarato la prima iscrizione prima dei 35 anni. Per Cassa Forense la riduzione '
-      + 'dei minimi è pubblicata e viene applicata; per la CNPADC gli importi '
-      + 'ridotti non risultano in una fonte citabile, quindi il calcolo usa i minimi interi. Verifica la '
-      + 'tua posizione: se la riduzione ti spetta, i contributi qui sono sovrastimati.', 'alta');
-  }
-
-  const socScenario = (esito.scenari || []).find((x) => x.id === 'societa');
-  if (socScenario && socScenario.dettaglio && socScenario.dettaglio.scopertoSocieta > 0.5) {
-    agg('societa-senza-capienza', 'La società non ha cassa per le proprie imposte',
-      'Con questi compensi e questi costi, IRES e IRAP superano quello che resta in società '
-      + 'dopo i costi: mancano ' + Math.round(socScenario.dettaglio.scopertoSocieta) + ' euro. '
-      + 'Il compenso amministratore erogabile è zero, e lo scenario societario richiederebbe '
-      + 'un apporto dei soci. Verificalo prima di considerarlo un\u2019alternativa.', 'alta');
-  }
-
-  if (esito.derogaCessazione) {
-    agg('rapporto-cessato', 'Applicata la deroga per il rapporto di lavoro cessato',
-      'I redditi da lavoro dipendente dell\u2019anno precedente superano la soglia, ma hai '
-      + 'dichiarato il rapporto cessato e nessun reddito da lavoro o pensione nell\u2019anno: '
-      + 'la causa ostativa non opera. Se nell\u2019anno arriva un nuovo rapporto o una '
-      + 'pensione, la deroga cade.', 'alta');
-  }
-
-  agg('precheck-parziale', 'Il controllo preliminare sul forfettario non copre tutte le cause ostative',
-    'Sono controllate le cause che hai dichiarato: compensi, redditi da lavoro dipendente '
-    + 'dell\u2019anno precedente, spese per il personale, partecipazioni e rapporto con il '
-    + 'datore. Restano fuori i casi che dipendono da situazioni non chieste qui, per esempio '
-    + 'la residenza fiscale e alcune partecipazioni indirette.', 'media');
-
-  if (altri > 0) {
-    agg('redditi-misti', 'La detrazione degli altri redditi è approssimata',
-      'Gli altri redditi sono trattati come un blocco unico e la detrazione applicata è '
-      + 'quella della categoria prevalente (' + (esito.detrazioneApplicata === 'dipendente'
-        ? 'lavoro dipendente' : 'lavoro autonomo') + '). La norma vorrebbe una base per '
-      + 'categoria: con redditi di natura diversa e importi simili il risultato è una stima.',
-      'media');
-  }
-
-  agg('addizionali', 'Addizionali regionale e comunale semplificate',
-    'Le aliquote che hai inserito si applicano alla stessa base dell\u2019IRPEF. La base delle '
-    + 'addizionali non coincide in tutto con quella dell\u2019imposta, e le aliquote comunali '
-    + 'cambiano per comune e per fascia di reddito.', 'media');
-
-  agg('irap-semplificata', 'La base IRAP della società è semplificata',
-    'L\u2019IRAP è calcolata sui compensi meno i costi deducibili e la struttura, con '
-    + 'l\u2019aliquota che hai indicato. Non tiene conto delle deduzioni per il personale né '
-    + 'delle variazioni regionali.', 'media');
-
-  agg('ires-ordinaria', 'IRES all\u2019aliquota ordinaria del 24%',
-    'La riduzione al 20% introdotta dalla legge di bilancio 2025 è subordinata a condizioni '
-    + 'sull\u2019accantonamento degli utili e sugli investimenti in beni strumentali: non è '
-    + 'modellata qui.', 'nota');
-
-  agg('integrativo-societa', 'Nello scenario societario l\u2019integrativo è azzerato',
-    'Il contributo integrativo è addebitato in fattura dalla società, non dal socio: '
-    + 'il calcolo lo azzera in capo alla persona. La qualificazione va verificata con la Cassa, '
-    + 'che è anche il punto in cui la posizione individuale può divergere.', 'media');
-
-  /* Le regole toccate a mano devono comparire nel working paper: chi rilegge il
-     file mesi dopo non ha modo di sapere che una percentuale non e' quella
-     predefinita. */
-  const modificate = [];
-  (input.costs || []).forEach((c) => {
-    const base = CF_COSTI_DEFAULT.find((d) => d.id === c.id);
-    if (!base) return;
-    const diff = CF_CAMPI_REGOLA.filter((k) => {
-      const a = base[k], b = c[k];
-      if (a == null || b == null) return (a == null) !== (b == null);
-      return Math.abs(Number(a) - Number(b)) > 1e-9;
-    });
-    if (diff.length) modificate.push(c.nome + ' (' + diff.join(', ') + ')');
-  });
-  if (modificate.length) {
-    agg('regole-modificate', 'Regole dei costi modificate a mano',
-      'Non sono quelle predefinite: ' + modificate.join('; ') + '. Il calcolo usa i tuoi '
-      + 'valori, e il foglio dei costi li riporta riga per riga.', 'alta');
-  }
-
-  agg('costi-aggregati', 'Le regole dei costi sono aggregate',
-    'Auto, beni pluriennali, formazione, vitto e alloggio e rappresentanza hanno limiti, '
-    + 'ammortamenti e basi che possono divergere fra professionista e società: qui '
-    + 'ciascuna voce usa una sola percentuale e un solo tetto per entrambi.', 'media');
-
-  agg('ruleset', 'Versione delle regole',
-    'Parametri ' + CF_RULESET.versione + ', aggiornati al ' + CF_RULESET.aggiornato
-    + ', anno d\u2019imposta ' + input.year + '. Un risultato salvato prima di questa data '
-    + 'può essere stato prodotto con parametri diversi.', 'nota');
-
-  return A;
-}
-
 </script>
 <script id="cf-render">
 /* Confronto regimi — risultati e grafici.
@@ -2352,7 +1561,7 @@ function articoloA(scenario) {
    tenerla. Una narrativa unica per tutti risponderebbe a nessuno. */
 function frasePrincipale(esito, vincente, secondo, attuale, stato) {
   const E = euro(), X = esc();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const conferma = attuale && attuale.id === vincente.id;
 
   if (!attuale) {
@@ -2409,7 +1618,7 @@ function frasePrincipale(esito, vincente, secondo, attuale, stato) {
 function renderPerche(esito, conv, vincente, secondo, attuale) {
   const box = $('cfPerche');
   const stato = window.cfStato(), E = euro(), X = esc();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const forf = esito.scenari[0], ord = esito.scenari[1];
 
   const riconosciuti = stato.revenue * (1 - P.coefficiente);
@@ -2489,7 +1698,7 @@ function renderPerche(esito, conv, vincente, secondo, attuale) {
 function renderCostoSalto(conv, esito) {
   const box = $('cfCostoSalto');
   const stato = window.cfStato(), E = euro();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   /* Svuotato quando si nasconde: un blocco invisibile che conserva i numeri di
      una simulazione precedente e' una trappola per il prossimo che lo mostra. */
   if (!conv.applicabileA85) { box.hidden = true; box.innerHTML = ''; return; }
@@ -2607,7 +1816,7 @@ function conclusioneSotto(idGrafico, testo) {
 
 function concludiAnni(conv) {
   const stato = window.cfStato(), E = euro();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const oltre = stato.revenue > P.sogliaPermanenza;
   conclusioneSotto('cfChartYears', oltre
     ? 'La decisione riguarda il secondo anno: nel ' + stato.year + ' il confronto tiene ancora conto ' +
@@ -2619,7 +1828,7 @@ function concludiAnni(conv) {
 
 function concludiCurva(conv, esito) {
   const stato = window.cfStato(), E = euro();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   let testo;
   if (!conv.applicabileA85) {
     testo = 'Il forfettario non è applicabile con i dati inseriti: le due curve che restano sono ' +
@@ -2656,7 +1865,7 @@ function concludiPonte(esito, vincente) {
    trasformare la prima schermata in un prospetto. */
 function dettaglioCalcolo(scenario, esito, stato) {
   const E = euro(), X = esc();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const d = scenario.dettaglio || {};
   const t = esito.totali;
   const righe = [];
@@ -2669,7 +1878,7 @@ function dettaglioCalcolo(scenario, esito, stato) {
     riga('Reddito forfettario', E(d.reddito));
     riga('Contributi previdenziali', '− ' + E(scenario.contributi), 'deducibili dal reddito');
     riga('Base imponibile', E(d.base));
-    riga('Imposta sostitutiva', '− ' + E(d.base * (stato.startup ? P.sostitutivaStartup : P.sostitutivaOrdinaria)),
+    riga('Imposta sostitutiva', '− ' + E(scenario.imposte + d.sgravio),
       (stato.startup ? Math.round(P.sostitutivaStartup * 100) : Math.round(P.sostitutivaOrdinaria * 100)) +
       '% al posto di IRPEF e addizionali');
     if (d.sgravio > 0) {
@@ -2754,7 +1963,7 @@ function contoDellaCard(s, esito, stato) {
 function renderAvviso(conv) {
   const stato = window.cfStato(), E = euro();
   const box = $('cfAlert');
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const oltre100 = stato.revenue > P.sogliaCessazioneImmediata;
   const oltre85 = stato.revenue > P.sogliaPermanenza;
   /* L'avviso non dipende dal regime attuale: chi è in ordinario e simula
@@ -2776,7 +1985,7 @@ function renderAvviso(conv) {
 function renderSoglia(conv) {
   const E = euro();
   const stato = window.cfStato();
-  const P0 = CF_PARAMS[stato.year];
+  const P0 = window.cfParametri();
   /* Inquadrato come ipotesi, non come soglia operativa. Con 120.000 di
      compensi il forfettario non è applicabile: dire «netto fermandosi a
      85.000» senza dire che è un'altra strada fa leggere un controfattuale
@@ -2833,7 +2042,7 @@ function graficoCurva(conv) {
   const W = 860, H = 400, L = 74, R = 24, T = 22, B = 54;
   const s = svgPulito('cfChartMain', W, H);
   const stato = window.cfStato();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const punti = conv.punti;
 
   const serie = ['forfettario', 'ordinario', 'societa'];
@@ -3238,7 +2447,7 @@ function graficoDriver(esito, vincente, secondo) {
    supera la soglia e cosa nell'anno dopo, e sono due regole diverse. */
 function timelineAnni(conv, esito) {
   const stato = window.cfStato(), E = euro();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const svg = $('cfChartYears');
   const sezione = svg ? svg.closest('.cf-section') : null;
   if (!sezione) return;
@@ -3286,7 +2495,7 @@ function graficoAnni(conv) {
   const stato = window.cfStato(), E = euro();
   const W = 860, H = 260, L = 78, R = 30, T = 34, B = 62;
   const s = svgPulito('cfChartYears', W, H);
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
 
   /* Nel periodo successivo il forfettario non è più applicabile se nell'anno
      simulato i compensi hanno superato la soglia: è la stessa regola che il
@@ -3339,7 +2548,7 @@ function graficoAnni(conv) {
 function renderVerifiche(esito) {
   const stato = window.cfStato(), E = euro(), X = esc();
   const v = [];
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
 
   /* Gli esiti del foglio «Esiti AI» vengono per primi: sono i dubbi che chi
      ha preparato il file ha lasciato aperti, e vanno letti prima delle
@@ -3395,7 +2604,7 @@ function renderVerifiche(esito) {
   v.push([false, 'Il dividendo non genera IRPEF progressiva né contributi sulla distribuzione. L’utile trattenuto in società non è denaro disponibile al socio.']);
 
   /* RE-011. Le assunzioni del modello non sono più riscritte qui: arrivano da
-     cfAssunzioni(), lo stesso elenco che finisce nel foglio «Assunzioni e
+     il servizio di calcolo, lo stesso elenco che finisce nel foglio «Assunzioni e
      controlli» dell'Excel. Erano due elenchi paralleli, e divergevano — il
      working paper non riportava né il compenso ridotto né la maternità non
      determinata, cioè le due voci che spostano il risultato. */
@@ -3502,8 +2711,15 @@ window.cfRenderDati = function () {
 };
 
 window.cfRenderAiuto = function () {
+  /* Questa schermata si apre anche senza aver mai fatto un confronto, quindi i
+     parametri non sono ancora arrivati: si chiedono, e poi si disegna. Costano
+     zero calcoli al servizio — è una lettura, non un calcolo. */
+  return window.cfAssicuraParametri().then(disegnaAiuto);
+};
+
+function disegnaAiuto() {
   const stato = window.cfStato(), E = euro(), X = esc();
-  const P = CF_PARAMS[stato.year];
+  const P = window.cfParametri();
   const f = P.forense, c = P.cnpadc, i = P.inps;
   $('cfHelp').innerHTML =
     '<div class="cf-section"><h3>Cosa fa</h3>' +
@@ -3946,9 +3162,9 @@ function valida() {
   }
 
   const anno = Number($('cfYear').value);
-  if (!CF_PARAMS[anno]) {
+  if (window.cfAnniPrevisti().indexOf(anno) === -1) {
     agg('cfYear', 'Anno d\u2019imposta', 'I parametri esistono per '
-      + Object.keys(CF_PARAMS).sort().join(' e ') + '.');
+      + window.cfAnniPrevisti().join(' e ') + '.');
   }
 
   const negativi = (costi || []).filter((c) => Number(c.amount) < 0).map((c) => c.nome);
@@ -4007,6 +3223,9 @@ function applicaValidazione(v) {
 
 window.cfValida = valida;
 window.cfApplicaValidazione = applicaValidazione;
+/* La tabella dei nomi leggibili dei campi: serve anche a chi mostra un errore
+   arrivato dal servizio, che il campo lo nomina come lo chiama il codice. */
+window.cfNomiDeiCampi = () => CF_CAMPI_VALIDATI;
 
 /* ------------------------------------------------------------- il calcolo */
 
@@ -4014,91 +3233,12 @@ function inputMotore(extra) {
   return Object.assign({}, stato, { costs: costi }, extra || {});
 }
 
-function calcola(extra) {
-  return cfEngine(inputMotore(extra));
-}
-
-/* La soglia di convenienza. Il pareggio sul fatturato tiene i costi fermi:
-   è la domanda «quanto devo fatturare in ordinario per avere lo stesso netto
-   che avrei fermandomi a 85.000». La soglia sui costi è una domanda diversa —
-   «con quanti costi l'ordinario diventa migliore» — e lì i costi si muovono
-   per definizione. */
-function convenienza() {
-  const P = CF_PARAMS[stato.year];
-  const soglia = P.sogliaPermanenza;
-  const rifer = cfEngine(inputMotore({ revenue: soglia })).scenari[0];
-  const nettoOrdinarioA = (r) => cfEngine(inputMotore({ revenue: r })).scenari[1].netto;
-
-  let pareggio = null;
-  if (rifer.applicabile) {
-    const alto = 800000;
-    if (nettoOrdinarioA(alto) >= rifer.netto) {
-      let lo = soglia, hi = alto;
-      if (nettoOrdinarioA(lo) >= rifer.netto) hi = lo;
-      else for (let i = 0; i < 40; i++) {
-        const m = (lo + hi) / 2;
-        if (nettoOrdinarioA(m) >= rifer.netto) hi = m; else lo = m;
-      }
-      pareggio = Math.ceil(hi / 100) * 100;
-    }
-  }
-
-  /* La soglia di costo si calcola AL FATTURATO DELL'UTENTE, non a 85.000. Nel
-     calcolatore di partenza era sempre 85.000 e il testo non lo diceva: due
-     utenti a 150.000 e a 300.000 leggevano lo stesso numero. */
-  const costiAttuali = calcola().totali.lordo;
-  let sogliaCosti = null;
-  const rifCosti = Math.max(1, stato.revenue);
-  if (costiAttuali > 0) {
-    const delta = (f) => {
-      const s = cfEngine(inputMotore({ revenue: rifCosti, costFactor: f })).scenari;
-      return s[1].netto - s[0].netto;
-    };
-    if (delta(0) >= 0) sogliaCosti = 0;
-    else if (delta(8) >= 0) {
-      let lo = 0, hi = 8;
-      for (let i = 0; i < 40; i++) {
-        const m = (lo + hi) / 2;
-        if (delta(m) >= 0) hi = m; else lo = m;
-      }
-      sogliaCosti = costiAttuali * hi;
-    }
-  }
-
-  /* «Quanto costa superare la soglia adesso». Stava dentro renderCostoSalto(),
-     che per calcolarlo doveva conoscere la soglia di permanenza. Da qui in poi
-     la soglia la conosce solo il motore — nella pagina non c'e' piu' — quindi
-     il numero nasce insieme alla soglia da cui dipende, e la pagina lo riceve
-     gia' fatto. Sono le stesse due righe di prima, spostate. */
-  const oltre = stato.revenue > soglia ? stato.revenue : soglia + 5000;
-  const nettoOrdinarioOltre = nettoOrdinarioA(oltre);
-
-  const min = Math.max(10000, Math.floor((soglia * 0.5) / 10000) * 10000);
-  const max = Math.min(600000, Math.max(160000,
-    Math.ceil(((pareggio || 160000) * 1.2) / 10000) * 10000,
-    Math.ceil((stato.revenue * 1.25) / 10000) * 10000));
-  const punti = [];
-  for (let i = 0; i <= 36; i++) {
-    const r = min + (max - min) * i / 36;
-    const s = cfEngine(inputMotore({ revenue: r })).scenari;
-    punti.push({ r,
-      forfettario: s[0].applicabile ? s[0].netto : null,
-      ordinario: s[1].netto,
-      societa: s[2].netto });
-  }
-  return { soglia, nettoRiferimento: rifer.netto, applicabileA85: rifer.applicabile,
-    pareggio, extra: pareggio == null ? null : Math.max(0, pareggio - soglia),
-    sogliaCosti, costiAttuali, rifCosti, oltre, nettoOrdinarioOltre, min, max, punti };
-}
-
-window.cfConvenienza = convenienza;
-window.cfCalcola = calcola;
 /* L'archivio ricalcola simulazioni salvate, che sono input completi e non
    varianti di quella aperta: passa da qui perche' chi le calcola possa
    cambiare senza che l'elenco se ne accorga. L'identificativo serve a chi le
    calcola altrove e deve poi ritrovarle. */
-window.cfCalcolaSalvata = (id, input) => cfEngine(input);
-/* Serve a cfAssunzioni(), che deve vedere lo stesso input del motore:
+window.cfCalcolaSalvata = null;   /* lo fa il servizio: vedi cf-api */
+/* È l’input che si manda al servizio di calcolo, e deve essere completo:
    professione, campi dichiarati e regole dei costi effettivamente in uso. */
 window.cfInputMotore = () => inputMotore();
 window.cfStato = () => stato;
@@ -4518,16 +3658,12 @@ else avvia();
    strumenti per sviluppatori se lo porta via per intero. Da qui in poi gira
    su un server, e la pagina chiede i numeri invece di produrli.
 
-   Come si accende. Non c'e' nessun indirizzo scritto qui dentro e non c'e'
-   nessuna chiave: il modo si legge dalle preferenze del browser.
-
-     localStorage.setItem('tal-api-modo', 'api')   // usa il servizio
-     localStorage.setItem('tal-api-modo', 'locale')// calcola in pagina (default)
-
-   Il valore predefinito e' 'locale': finche' non si decide, la pagina si
-   comporta esattamente come prima e nessuna richiesta parte. E' la stessa
-   ragione per cui la migrazione e' reversibile — si torna indietro togliendo
-   una preferenza, non ripubblicando il sito.
+   Non c'e' nessun interruttore, e non c'e' piu' niente da accendere: il
+   calcolo lo fa il servizio, sempre. Fino al 27 agosto 2026 questa pagina
+   conteneva anche il motore e si poteva scegliere chi calcolasse; da quando il
+   motore non c'e' piu', l'unica scelta possibile e' quella. Non c'e' nessuna
+   chiave scritta qui dentro, e nessun indirizzo: il servizio sta sulla stessa
+   origine del sito.
 
    Perche' l'indirizzo non e' scritto qui. In produzione l'API sta sulla
    stessa origine del sito (`/api/...`): una Route di Cloudflare la
@@ -4554,15 +3690,16 @@ else avvia();
 
 (function () {
 
-const MODI = ['locale', 'api', 'api-con-riserva'];
+/* Un modo solo. Il calcolo lo fa il servizio: la pagina non sa piu' farlo. */
+const MODI = ['api'];
 
-/* Il servizio calcola, e se non risponde calcola la pagina.
-   Era 'locale' finche' il servizio non esisteva. Da quando c'e', il valore
-   predefinito e' quello che usa il servizio tenendo la rete sotto: i numeri
-   sono gli stessi — verificati su 327 casi — quindi ripiegare non cambia il
-   risultato, cambia solo chi lo ha calcolato. Diventera' 'api' secco quando il
-   motore uscira' dalla pagina e non ci sara' piu' niente su cui ripiegare. */
-const MODO_PREDEFINITO = 'api-con-riserva';
+/* Calcola il servizio. Non c'e' alternativa, ed e' la conclusione di un
+   percorso in tre tempi: prima la pagina sapeva parlare col servizio ma
+   calcolava da sola; poi calcolava il servizio con la pagina sotto come rete;
+   dal 27 agosto 2026 il motore non e' piu' qui e la rete non c'e'. Se il
+   servizio non risponde il tool lo dice e offre di riprovare — non inventa
+   numeri e non ne mostra di vecchi. */
+const MODO_PREDEFINITO = 'api';
 
 const PERCORSO = '/api/confronto-regimi/calcola';
 const SONDA = '/api/stato';
@@ -4576,17 +3713,11 @@ const preferenza = (chiave) => {
   try { return localStorage.getItem(chiave); } catch (_) { return null; }
 };
 
-const motoreInPagina = () => typeof window.cfCalcolaLocale === 'function';
-
-/* Quando il motore e' stato tolto dalla pagina, 'locale' e 'api-con-riserva'
-   non sono piu' scelte disponibili: non c'e' niente con cui ripiegare. La
-   preferenza resta scritta nel browser di chi l'aveva messa, e verrebbe
-   applicata dando una pagina muta; qui si ignora. */
-const modo = () => {
-  if (!motoreInPagina()) return 'api';
-  const m = preferenza('tal-api-modo');
-  return MODI.indexOf(m) !== -1 ? m : MODO_PREDEFINITO;
-};
+/* Il motore non e' piu' in pagina. Chi avesse messo 'locale' o
+   'api-con-riserva' nelle preferenze del browser se lo ritrova scritto, e va
+   ignorato: applicarlo darebbe una pagina muta. */
+const motoreInPagina = () => false;
+const modo = () => 'api';
 
 const radice = () => {
   const b = (preferenza('tal-api-base') || '').trim();
@@ -4644,12 +3775,19 @@ function guasto(genere, extra) {
  * risponde cosi', per il resto della sessione non parte nessun POST e la
  * pagina calcola da sola.
  *
- * Una volta per sessione, non una per calcolo. */
+ * Il «sì» vale per tutta la sessione, il «no» no.
+ *
+ * Se il servizio c'e', c'e': non ha senso ribussare a ogni calcolo. Ma se non
+ * risponde, ricordarselo per sempre significa che il pulsante «Riprova»
+ * promette una cosa che non puo' riuscire. L'ho visto succedere: il servizio
+ * tornava disponibile e la pagina continuava a dire di no fino al
+ * ricaricamento. Sull'esito negativo si ribussa, e costa una GET che non porta
+ * niente. */
 let servizioPronto = null;       /* null = non ancora chiesto */
 let sondaInCorso = null;
 
 async function ilServizioCe() {
-  if (servizioPronto !== null) return servizioPronto;
+  if (servizioPronto === true) return true;
   if (sondaInCorso) return sondaInCorso;
   sondaInCorso = (async () => {
     try {
@@ -4933,6 +4071,20 @@ function chiudiAttesa() {
   if (cards) cards.removeAttribute('aria-busy');
 }
 
+/* Il servizio nomina i campi come li chiama il codice — `revenue`,
+   `retainInCompany`. All'utente non dicono niente: la pagina ha gia' la tabella
+   dei nomi leggibili, e la usa. Se un campo non e' in tabella si dice quello che
+   si sa, che e' meglio di un nome tecnico spacciato per italiano. */
+function nomeLeggibile(campo) {
+  const radice = String(campo).replace(/\[\d+\].*$/, '');
+  const voce = (window.cfNomiDeiCampi ? window.cfNomiDeiCampi() : [])
+    .find((c) => c.chiave === radice);
+  if (voce) return 'Il dato da correggere è «' + voce.nome + '».';
+  if (radice === 'costs') return 'Il dato da correggere è fra le voci di costo.';
+  if (radice === 'year') return 'Il dato da correggere è l’anno d’imposta.';
+  return 'Controlla i dati inseriti e riprova.';
+}
+
 function mostraGuasto(g, riprova) {
   const el = riquadro();
   if (!el) return;
@@ -4943,33 +4095,12 @@ function mostraGuasto(g, riprova) {
   el.innerHTML =
     '<h3>' + window.cfEsc(testo[0]) + '</h3>' +
     '<p>' + window.cfEsc(g.spiegazione || testo[1]) + '</p>' +
-    (g.campo ? '<p>Campo: <b>' + window.cfEsc(g.campo) + '</b></p>' : '') +
+    (g.campo ? '<p>' + window.cfEsc(nomeLeggibile(g.campo)) + '</p>' : '') +
     (g.riferimento ? '<p class="cf-api-rif">Riferimento: ' +
       window.cfEsc(g.riferimento) + '</p>' : '') +
     '<button class="btn secondary" id="cfApiRiprova" type="button">Riprova</button>';
   const b = document.getElementById('cfApiRiprova');
   if (b) b.addEventListener('click', riprova);
-}
-
-/* Il ripiego si dichiara quando e' successo qualcosa, e tace quando non e'
-   successo niente.
-
-   «Non collegato» non e' un guasto: e' lo stato in cui il servizio non e'
-   ancora stato attaccato al dominio. L'utente non puo' farci nulla, i numeri
-   sono gli stessi — 327 casi lo dimostrano — e un avviso giallo su ogni
-   calcolo racconterebbe a chi usa il tool una cosa che riguarda noi. Resta
-   scritto in console e nella diagnostica, per chi verifica.
-
-   Un servizio che invece cade *dopo* essere stato collegato e' un fatto, e si
-   dice: quello e' uno stato che non dovrebbe durare. */
-function mostraRiserva(genere) {
-  if (genere === 'assente') { chiudiAttesa(); return; }
-  const el = riquadro();
-  if (!el) return;
-  el.hidden = false;
-  el.className = 'cf-api-stato is-riserva';
-  el.innerHTML = '<p><b>Il servizio di calcolo non risponde.</b> I numeri qui sotto ' +
-    'sono stati calcolati dal browser con le regole che questa pagina conosce.</p>';
 }
 
 /* Svuota il risultato invece di lasciarlo com'era. Numeri vecchi accanto a un
@@ -4981,18 +4112,14 @@ function svuotaRisultato() {
 
 /* ---------------------------------------------------- sostituzione dei ponti */
 
-/* Le funzioni originali restano raggiungibili: servono al modo 'locale', alla
-   riserva, e a poter tornare indietro senza ripubblicare niente. */
-window.cfCalcolaLocale = window.cfCalcola;
-window.cfConvenienzaLocale = window.cfConvenienza;
-window.cfCalcolaSalvataLocale = window.cfCalcolaSalvata;
+/* Restano i due disegnatori: sono la pagina, e la pagina c'e' ancora. Quello
+   che non c'e' piu' sono le funzioni che calcolavano. */
 const renderConfrontoLocale = window.cfRenderConfronto;
 const renderArchivioLocale = window.cfRenderArchivio;
 
-const daServer = () => modo() !== 'locale' && !usaRiserva;
+const daServer = () => true;
 
 window.cfCalcola = function (extra) {
-  if (!daServer()) return window.cfCalcolaLocale(extra);
   if (!CACHE) throw new Error('cfCalcola: il risultato non è ancora arrivato dal servizio');
   const k = chiave(extra);
   if (k === '{}') return CACHE.base;
@@ -5002,13 +4129,11 @@ window.cfCalcola = function (extra) {
 };
 
 window.cfConvenienza = function () {
-  if (!daServer()) return window.cfConvenienzaLocale();
   if (!CACHE) throw new Error('cfConvenienza: il risultato non è ancora arrivato dal servizio');
   return CACHE.conv;
 };
 
 window.cfCalcolaSalvata = function (id, input) {
-  if (!daServer()) return window.cfCalcolaSalvataLocale(id, input);
   const r = CACHE_ARCHIVIO[id];
   if (!r) throw new Error('archivio: simulazione non ricalcolata');
   return r;
@@ -5019,27 +4144,17 @@ window.cfCalcolaSalvata = function (id, input) {
    Le due strade danno gli stessi numeri — il test di equivalenza lo verifica —
    e averle entrambe e' cio' che rende la migrazione reversibile. */
 window.cfParametri = function (anno) {
-  if (!daServer() && typeof CF_PARAMS !== 'undefined') {
-    return CF_PARAMS[Number(anno || window.cfStato().year)];
-  }
-  const p = parametriNoti(anno);
-  if (p) return p;
-  if (typeof CF_PARAMS !== 'undefined') {
-    return CF_PARAMS[Number(anno || window.cfStato().year)];
-  }
-  return null;
+  return parametriNoti(anno);
 };
 
 /* Le assunzioni: dal servizio quando c'e', dalla pagina quando calcola lei. */
 window.cfAssunzioniCorrenti = function () {
-  if (daServer() && CACHE) return CACHE.assunzioni || [];
-  return cfAssunzioni(window.cfInputMotore(), window.cfCalcola());
+  return (CACHE && CACHE.assunzioni) || [];
 };
 
 /* ------------------------------------------------------------- i due render */
 
 window.cfRenderConfronto = function () {
-  if (modo() === 'locale') { chiudiAttesa(); return renderConfrontoLocale(); }
   mostraAttesa();
   return precarica().then(() => {
     chiudiAttesa();
@@ -5058,18 +4173,12 @@ window.cfRenderConfronto = function () {
     }
   }).catch((g) => {
     chiudiAttesa();
-    if (modo() === 'api-con-riserva' && motoreInPagina()) {
-      usaRiserva = true;
-      try { renderConfrontoLocale(); mostraRiserva(g.genere); return; }
-      catch (e) { console.error('cf-api: fallita anche la riserva', e); }
-    }
     svuotaRisultato();
     mostraGuasto(g, () => window.cfRenderConfronto());
   });
 };
 
 window.cfRenderArchivio = function () {
-  if (modo() === 'locale') return renderArchivioLocale();
   const elenco = (window.cfLeggiArchivio() || []).map((s) => ({
     id: s.id,
     input: Object.assign({}, window.cfStatoDefault(), s.stato, {
@@ -5098,7 +4207,6 @@ const PARAMETRI_PER_ANNO = {};
 
 window.cfAssicuraParametri = async function (anno) {
   const y = Number(anno || window.cfStato().year);
-  if (!daServer()) return window.cfParametri(y);
   if (PARAMETRI_PER_ANNO[y]) return PARAMETRI_PER_ANNO[y];
   if (CACHE && CACHE.base && CACHE.base.params && window.cfStato().year === y) {
     PARAMETRI_PER_ANNO[y] = CACHE.base.params;
@@ -5109,11 +4217,8 @@ window.cfAssicuraParametri = async function (anno) {
     PARAMETRI_PER_ANNO[y] = r.parametri;
     return r.parametri;
   } catch (g) {
-    /* Finche' il motore e' in pagina i parametri ci sono comunque, e sono gli
-       stessi. Quando non ci sara' piu', questo `return` dara' null e chi
-       disegna se ne accorgera' — che e' il comportamento giusto: meglio una
+    /* Niente parametri di ripiego: senza servizio non ci sono. Meglio una
        schermata vuota di una schermata con dei numeri inventati. */
-    if (motoreInPagina()) return window.cfParametri(y);
     throw g;
   }
 };
@@ -5137,9 +4242,6 @@ const parametriNoti = (anno) => {
    L'ultima parola resta comunque al server, che rifiuta un anno che non
    conosce: questo serve a dirlo prima, non al posto suo. */
 window.cfAnniPrevisti = function () {
-  if (typeof CF_PARAMS !== 'undefined') {
-    return Object.keys(CF_PARAMS).map(Number).sort();
-  }
   const sel = document.getElementById('cfYear');
   const anni = sel ? [...sel.options].map((o) => Number(o.value)).filter(Number.isFinite) : [];
   return anni.sort();
@@ -5488,9 +4590,9 @@ function importaWorkbook(wb, opzioni) {
   applica(leggiCoppie(wb, 'COMPENSI'), CAMPI_COMPENSI, 'compensi', 'COMPENSI');
 
   /* --- l'anno si valida prima di tutto il resto --------------------- */
-  if (!CF_PARAMS[stato.year]) {
+  if (window.cfAnniPrevisti().indexOf(Number(stato.year)) === -1) {
     throw new Error('anno ' + stato.year + ' non previsto: i parametri esistono per ' +
-      Object.keys(CF_PARAMS).sort().join(' e ') + '.');
+      window.cfAnniPrevisti().join(' e ') + '.');
   }
 
   /* --- COSTI --------------------------------------------------------- */

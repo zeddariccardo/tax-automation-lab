@@ -162,6 +162,15 @@ test('output · i cinque comandi partono disabilitati e seguono automaticamente 
     'i pulsanti devono riattivarsi quando cliente ed elaborazione diventano disponibili');
 });
 
+test('ingresso · i dati dimostrativi sono raggiungibili da Da dove vuoi partire', () => {
+  assert.match(html, /<button class="tal-start-demo" data-load-demo="" type="button">Prova con i dati dimostrativi<\/button>/,
+    'l’esempio deve essere disponibile prima di creare o importare un cliente');
+  assert.equal((html.match(/data-load-demo=""/g) || []).length, 2,
+    'il nuovo ingresso e il comando negli importi devono condividere lo stesso flusso demo');
+  assert.match(html, /querySelectorAll\('\[data-load-demo\]'\)\.forEach\(b=>b\.onclick=loadDemo\)/,
+    'entrambi i comandi devono riusare loadDemo senza duplicarne la logica');
+});
+
 test('backup · resta un solo flusso completo, senza il vecchio pulsante proxy', () => {
   assert.doesNotMatch(html, /lipe-data-exp-all/);
   assert.equal((html.match(/id="lipe-export-full-backup"/g) || []).length, 1);

@@ -1,9 +1,9 @@
 /* La schermata «Comunicazione», e le due cose che la possono rompere in silenzio.
  *
- * Fase 2, 28 agosto 2026. La schermata è passata da un flusso verticale unico a
- * due colonne: a sinistra il lavoro sul periodo, a destra un pannello appeso che
- * risponde alla sola domanda per cui si apre questa pagina — «posso procedere
- * oppure no?».
+ * Fase 2, 28 agosto 2026. Stato, saldo e controlli vengono prima del Quadro VP,
+ * a tutta larghezza: nessun pannello laterale può sottrarre spazio alla colonna
+ * Credito. La domanda «posso procedere oppure no?» riceve risposta prima dei
+ * righi che si possono correggere.
  *
  * LA PRIMA COSA che si può rompere è il ponte. Il riquadro «servizio non
  * disponibile» nasce con `sezione.insertBefore(el, ancora)`, dove `sezione` è
@@ -33,14 +33,17 @@ const sezione = (() => {
   return i < 0 ? '' : html.slice(i, html.indexOf('</section>', i));
 })();
 
-test('la struttura a due colonne c’è, con il lavoro a sinistra e il pannello a destra', () => {
+test('il pannello di stato precede il Quadro VP e non gli sottrae larghezza', () => {
   assert.ok(sezione, 'non trovo più la sezione della comunicazione');
   assert.match(sezione, /<div class="com-grid">/);
   assert.match(sezione, /<div class="com-main">/);
   assert.match(sezione, /<aside class="com-side" id="com-side">/);
 
-  const main = sezione.slice(sezione.indexOf('com-main'), sezione.indexOf('com-side'));
-  const side = sezione.slice(sezione.indexOf('com-side'));
+  const sideIndex = sezione.indexOf('com-side');
+  const mainIndex = sezione.indexOf('com-main');
+  assert.ok(sideIndex < mainIndex, 'il riepilogo deve essere in cima anche nell’ordine del DOM');
+  const side = sezione.slice(sideIndex, mainIndex);
+  const main = sezione.slice(mainIndex);
   for (const id of ['period-tabs', 'period-panels', 'detail-table']) {
     assert.ok(main.includes(`id="${id}"`), `${id} deve stare nella colonna principale`);
   }
@@ -78,6 +81,17 @@ test('il dettaglio analitico è chiuso di default', () => {
   assert.doesNotMatch(d[1], /\bopen\b/,
     'deve essere chiuso all’apertura della schermata: sedici righe di dettaglio ' +
     'sono la cosa che si guarda per ultima, non per prima');
+});
+
+test('il dettaglio usa una riga per codice IVA e mostra tutte le destinazioni VP', () => {
+  assert.match(sezione, /<th>Confluisce nel quadro VP<\/th>/,
+    'la colonna deve dichiarare esplicitamente dove confluisce il codice');
+  assert.match(html, /function raggruppaDettagliPerCodice\(details\)/);
+  assert.match(html, /DETTAGLIO_VP_LABELS=\{VP2:'Imponibile vendite',VP3:'Imponibile acquisti',VP4:'IVA a debito',VP5:'IVA detraibile'\}/);
+  assert.match(html, /raggruppaDettagliPerCodice\(vals\.flatMap\(v=>v\.details\)\)/,
+    'il renderer deve raggruppare le allocazioni senza modificare i dati calcolati dal ponte');
+  assert.match(html, /class="detail-destination"/,
+    'ogni destinazione VP deve restare leggibile nella singola riga del codice');
 });
 
 test('c’è una sola chiamata all’azione, e porta agli output', () => {
@@ -134,6 +148,8 @@ test('i controlli superati sono compressi a una riga, senza perdere il testo', (
   assert.match(html, /\.com-card \.check-item\{[^}]*min-height:0/,
     'senza togliere il minimo di 112px della griglia originale dieci controlli ' +
     'occupano mille pixel di riquadri mezzi vuoti');
+  assert.match(html, /\.com-card \.check-item\{[^}]*flex:0 0 auto/,
+    'le righe devono scorrere nel pannello, non comprimersi fino a diventare illeggibili');
   const i = html.indexOf('<script id="lipe-comunicazione-stato">');
   const script = html.slice(i, html.indexOf('</script>', i));
   assert.match(script, /superati\[i\]\.title =/,
@@ -147,11 +163,11 @@ test('il pannello non può superare lo schermo', () => {
     'a scorrere devono essere i controlli, non saldo e stato');
 });
 
-test('sotto i 1080 il pannello va sopra, non sparisce', () => {
+test('il pannello è sempre in cima e sotto i 1080 i controlli restano apribili', () => {
+  assert.match(html, /\.com-side\{position:static;order:-1;/,
+    'il pannello non deve tornare laterale o sticky sul desktop');
   const m = /@media \(max-width:1080px\)\{([\s\S]*?)\n\}/.exec(html);
   assert.ok(m, 'manca l’adattamento per lo schermo stretto');
-  assert.match(m[1], /\.com-side\{position:static;order:-1\}/,
-    'saldo e stato restano la prima cosa che si legge');
   assert.match(m[1], /\.com-card \.check-item\.ok\{display:none\}/,
     'i controlli superati restano contati nella riga di stato ma non elencati');
 });

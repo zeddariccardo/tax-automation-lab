@@ -432,10 +432,10 @@ footer a:hover{color:#F7F7F5!important}
    schermata deve risolvere è una sola — «posso procedere oppure no?» — e la
    risposta stava nel posto più lontano dagli occhi.
 
-   Adesso: a sinistra il lavoro sul periodo, a destra un pannello appeso che
-   risponde alla domanda e non si muove mentre si lavora. */
+   Adesso la risposta viene prima del quadro: il pannello usa tutta la
+   larghezza, poi il VP conserva entrambe le colonne Debito e Credito. */
 
-.com-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;align-items:start}
+.com-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
 .com-main{min-width:0}
 /* La griglia del quadro VP era larga 754 px in una colonna da 713: i 41 che
    avanzavano non scorrevano, sparivano — e dentro c'era la colonna «Crediti».
@@ -443,17 +443,16 @@ footer a:hover{color:#F7F7F5!important}
 .com-main .vp-grid{grid-template-columns:74px minmax(150px,1fr) minmax(120px,168px) minmax(120px,168px)}
 .com-main .tab-panel{overflow-x:auto;-webkit-overflow-scrolling:touch}
 
-/* Il pannello resta appeso sotto l'intestazione del sito e sotto la barra di
-   contesto della Fase 1, con lo stesso aggancio della barra comandi degli
-   altri tool. */
-.com-side{position:sticky;top:calc(var(--tal-global-header-height, 92px) + 150px);align-self:start}
+/* Stato, controlli e azione precedono il quadro anche nell'ordine del DOM.
+   Non sono sticky: nessuna fascia resta sovrapposta ai righi mentre si lavora. */
+.com-side{position:static;order:-1;align-self:auto;min-width:0}
 .com-card{
   background:#fff;border:1px solid var(--g2);border-radius:12px;
   box-shadow:var(--shadow);overflow:hidden;
   /* Se i controlli sono tanti, a scorrere sono loro: saldo, stato e chiamata
      all'azione non devono mai finire fuori dallo schermo. */
   display:flex;flex-direction:column;
-  max-height:calc(100vh - var(--tal-global-header-height, 92px) - 170px)}
+  max-height:calc(100vh - var(--tal-global-header-height, 92px) - 120px)}
 .com-card .checks-grid{overflow-y:auto;min-height:0;flex:0 1 auto}
 .com-card .summary-bar,.com-stato,.com-azione{flex:0 0 auto}
 
@@ -488,6 +487,17 @@ footer a:hover{color:#F7F7F5!important}
 .com-card .summary-bar .item:last-child .label{letter-spacing:.16em}
 .com-card .summary-bar .item:last-child .value{font-size:27px;line-height:1.05;letter-spacing:-.02em;font-weight:650}
 
+/* Sul desktop il riquadro nero non deve diventare una seconda pagina sopra
+   il quadro: saldo e quattro totali condividono una fascia leggibile. */
+@media (min-width:900px){
+  .com-card .summary-bar{display:grid;grid-template-columns:minmax(250px,1.5fr) repeat(4,minmax(120px,1fr));padding:0}
+  .com-card .summary-bar .item{min-width:0;flex-direction:column;align-items:flex-start;
+    justify-content:center;gap:4px;padding:14px 18px;border-left:1px solid rgba(255,255,255,.14)}
+  .com-card .summary-bar .item:last-child{order:-1;margin:0;border:0;border-bottom:0;
+    padding:14px 18px}
+  .com-card #results-summary .item:last-child .value{font-size:24px!important}
+}
+
 /* ────────────────────────────────────────── pronta / avvisi / bloccata */
 .com-stato{padding:15px 18px;border-bottom:1px solid var(--g2);font-size:13.5px;line-height:1.5}
 .com-stato:empty{display:none}
@@ -512,7 +522,11 @@ footer a:hover{color:#F7F7F5!important}
   /* La griglia originale dava a ogni controllo un rettangolo di 112px, perche'
      stavano affiancati tre per riga e dovevano essere alti uguali. In colonna
      quel minimo diventa mille pixel di riquadri mezzi vuoti. */
-  min-height:0}
+  min-height:0;
+  /* Il pannello desktop ha un'altezza massima e fa scorrere questa lista.
+     Senza una base non comprimibile Flexbox divideva lo spazio residuo fra
+     tutte le righe, riducendole fino a rendere il testo illeggibile. */
+  flex:0 0 auto}
 .com-card .check-item:last-child{border-bottom:0}
 .com-card .check-item .name{font-size:13px;font-weight:650;margin:0}
 .com-card .check-item .value{font-size:12.5px;margin:2px 0 0}
@@ -555,13 +569,15 @@ footer a:hover{color:#F7F7F5!important}
 .com-dettaglio-tit{font-weight:650;font-size:15px}
 .com-dettaglio-nota{font-size:11.5px;color:var(--g4)}
 .com-dettaglio .table-scroll{border:0;border-top:1px solid var(--g2);border-radius:0}
+.detail-destinations{display:flex;flex-wrap:wrap;gap:6px 8px;min-width:220px}
+.detail-destination{display:inline-flex;align-items:baseline;gap:7px;padding:5px 8px;
+  border:1px solid var(--g2);border-radius:6px;background:var(--g1);white-space:nowrap}
+.detail-destination b{font-size:11.5px;letter-spacing:.01em}
+.detail-destination span{font-size:12px;font-variant-numeric:tabular-nums}
 
 @media (max-width:1080px){
-  /* Sotto i 1080 il pannello non sta accanto a niente. Va sopra, non sotto:
-     saldo e stato sono la ragione per cui si apre questa schermata, e restano
-     la prima cosa che si legge. Il redesign vero del telefono è la Fase 3. */
-  .com-grid{grid-template-columns:minmax(0,1fr);gap:18px}
-  .com-side{position:static;order:-1}
+  /* Su schermo stretto la fascia torna verticale e i controlli superati
+     partono chiusi, ma restano contati e apribili. */
   .com-card .summary-bar .item:last-child .value{font-size:24px}
   /* Su schermo stretto i controlli superati partono chiusi: dieci righe che
      dicono «va bene», coi valori che vanno a capo tre volte, mettevano mille
@@ -843,7 +859,7 @@ html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{
 
 
 <section class="block lipe-view active" id="client-config"><div class="set-tabs" role="tablist"><button class="set-tab is-on" data-lipeview="client-config" role="tab" type="button">Anagrafica</button><button class="set-tab" data-lipeview="telematic-config" role="tab" type="button">Dati telematici</button><button class="set-tab" data-lipeview="vat-codes" role="tab" type="button">Codici IVA</button></div>
-<h2 class="bt"><span class="num">Impostazioni cliente</span>Anagrafica, dati telematici e codici IVA</h2><div class="tal-start"><p class="tal-start-lead">Da dove vuoi partire?</p><div class="tal-start-cards"><button class="tal-start-card" data-apre="mapping-upload" type="button"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI: un solo file con anagrafica e codiciario IVA. Il cliente nasce dal file.</span></button><button class="tal-start-card" data-preme="new-client" type="button"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Crea il cliente e configura il codiciario IVA una volta sola.</span></button></div></div><div class="rule"></div>
+<h2 class="bt"><span class="num">Impostazioni cliente</span>Anagrafica, dati telematici e codici IVA</h2><div class="tal-start"><p class="tal-start-lead">Da dove vuoi partire?</p><div class="tal-start-cards"><button class="tal-start-card" data-apre="mapping-upload" type="button"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI: un solo file con anagrafica e codiciario IVA. Il cliente nasce dal file.</span></button><button class="tal-start-card" data-preme="new-client" type="button"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Crea il cliente e configura il codiciario IVA una volta sola.</span></button></div><button class="tal-start-demo" data-load-demo="" type="button">Prova con i dati dimostrativi</button></div><div class="rule"></div>
 <p class="bd">Gestisci l’anagrafica e il codiciario permanente oppure accedi direttamente all’archivio dei clienti già salvati. Gli importi del periodo restano separati.</p>
 <div class="btn-row client-config-actions"><button class="btn secondary" id="open-saved-clients" type="button">Archivio clienti salvati</button></div>
 <div class="panel">
@@ -939,13 +955,6 @@ html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{
 <div class="empty-state" id="results-empty"><h3>Nessuna elaborazione disponibile</h3><p>Seleziona un cliente e importa gli importi del periodo.</p></div>
 <div hidden="" id="results-content">
 <div class="com-grid">
-<div class="com-main">
-<div class="tabs" id="period-tabs"></div><div id="period-panels"></div>
-<details class="com-dettaglio" id="detail-block">
-<summary><span class="com-dettaglio-tit">Dettaglio per rigo</span><span class="com-dettaglio-nota">Ogni importo riconciliato con codice IVA, mese e riga di origine</span></summary>
-<div class="table-scroll"><table class="data-table" id="detail-table"><thead><tr><th>Periodo</th><th>Rigo</th><th>Codice IVA</th><th>Descrizione</th><th class="r">Importo</th><th>Fonte</th></tr></thead><tbody></tbody></table></div>
-</details>
-</div>
 <aside class="com-side" id="com-side">
 <div class="com-card">
 <div class="summary-bar" id="results-summary"></div>
@@ -954,6 +963,13 @@ html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{
 <div class="com-azione"><button class="btn com-cta" data-lipeview="exports-section" type="button">Vai a 3 · Output</button></div>
 </div>
 </aside>
+<div class="com-main">
+<div class="tabs" id="period-tabs"></div><div id="period-panels"></div>
+<details class="com-dettaglio" id="detail-block">
+<summary><span class="com-dettaglio-tit">Dettaglio per codice IVA</span><span class="com-dettaglio-nota">Una riga per codice, con tutti i righi VP alimentati</span></summary>
+<div class="table-scroll"><table class="data-table" id="detail-table"><thead><tr><th>Periodo</th><th>Codice IVA</th><th>Descrizione</th><th>Confluisce nel quadro VP</th><th>Fonte</th></tr></thead><tbody></tbody></table></div>
+</details>
+</div>
 </div>
 </div>
 </section>
@@ -1677,6 +1693,21 @@ function buildVpGrid(d,v){
   h+=`<div class="vp-code">VP13</div><div>Acconto dovuto</div><div class="vp-value"><input data-manual-key="${d.key}" data-manual-field="vp13" value="${esc(man.vp13||'')}" inputmode="decimal" placeholder="0,00"></div><div class="flags"><label>Metodo <select data-manual-key="${d.key}" data-manual-field="metodo"><option value="" ${!man.metodo?'selected':''}>—</option><option value="1" ${String(man.metodo)==='1'?'selected':''}>1 · storico</option><option value="2" ${String(man.metodo)==='2'?'selected':''}>2 · previsionale</option><option value="3" ${String(man.metodo)==='3'?'selected':''}>3 · analitico</option><option value="4" ${String(man.metodo)==='4'?'selected':''}>4 · settori particolari</option></select></label></div>`;
   h+=`<div class="vp-code vp-result">VP14</div><div class="vp-result">IVA da versare / a credito</div><div class="vp-value vp-result">${fmt(v.vp14deb)}</div><div class="vp-value vp-result">${fmt(v.vp14cre)}</div>`;return h
 }
+const DETTAGLIO_VP_LABELS={VP2:'Imponibile vendite',VP3:'Imponibile acquisti',VP4:'IVA a debito',VP5:'IVA detraibile'};
+function raggruppaDettagliPerCodice(details){
+  const gruppi=new Map();
+  details.forEach(d=>{
+    const key=String(d.period)+'\u001f'+String(d.code),g=gruppi.get(key)||{
+      period:d.period,code:d.code,description:d.description||'—',sources:new Set(),destinations:new Map()
+    };
+    if(d.description)g.description=d.description;
+    if(d.source)g.sources.add(d.source);
+    g.destinations.set(d.row,round2((g.destinations.get(d.row)||0)+Number(d.amount||0)));
+    gruppi.set(key,g);
+  });
+  return [...gruppi.values()].map(g=>({period:g.period,code:g.code,description:g.description,
+    sources:[...g.sources],destinations:[...g.destinations].map(([row,amount])=>({row,amount,label:DETTAGLIO_VP_LABELS[row]||'Rigo VP'}))}));
+}
 function renderResults(){
   const demoGuide=$('demo-guide');if(demoGuide)demoGuide.hidden=!(state.activeClientKey===DEMO_PIVA&&state.sourceFile==='Esempio completo guidato');
   const ready=!!(state.activeRecord&&state.rows.length),empty=$('results-empty'),content=$('results-content');empty.hidden=ready;content.hidden=!ready;if(!ready)return;
@@ -1686,7 +1717,8 @@ function renderResults(){
   $('period-tabs').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{$('period-tabs').querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$('period-panels').querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector(`[data-panel="${b.dataset.tab}"]`).classList.add('active')});
   $('period-panels').querySelectorAll('[data-manual-field]').forEach(inp=>inp.onchange=()=>{const m=manualFor(inp.dataset.manualKey),field=inp.dataset.manualField;if(inp.type==='checkbox')m[field]=inp.checked;else if((field==='vp7'||field==='vp8')&&!String(inp.value).trim())delete m[field];else m[field]=inp.value;persistWork(true);renderResults();renderExportState()});
   $('checks-grid').innerHTML=checks().map(c=>`<div class="check-item ${c.status}"><div class="name">${esc(c.name)}</div><div class="value">${esc(c.value)}</div><div class="desc">${esc(c.desc)}</div></div>`).join('');
-  const details=vals.flatMap(v=>v.details);$('detail-table').querySelector('tbody').innerHTML=details.length?details.map(d=>`<tr><td>${esc(d.period)}</td><td><span class="badge dark">${esc(d.row)}</span></td><td class="mono">${esc(d.code)}</td><td>${esc(d.description||'—')}</td><td class="r">${fmt(d.amount)}</td><td>${esc(d.source)}</td></tr>`).join(''):'<tr><td colspan="6">Nessun importo allocato. I codici potrebbero essere esclusi dalla LIPE.</td></tr>'
+  const details=raggruppaDettagliPerCodice(vals.flatMap(v=>v.details));
+  $('detail-table').querySelector('tbody').innerHTML=details.length?details.map(d=>`<tr><td>${esc(d.period)}</td><td class="mono">${esc(d.code)}</td><td>${esc(d.description)}</td><td><div class="detail-destinations">${d.destinations.map(v=>`<span class="detail-destination"><b>${esc(v.row)} · ${esc(v.label)}</b><span>€ ${fmt(v.amount)}</span></span>`).join('')}</div></td><td>${d.sources.map(esc).join(' · ')||'—'}</td></tr>`).join(''):'<tr><td colspan="5">Nessun importo allocato. I codici potrebbero essere esclusi dalla LIPE.</td></tr>'
 }
 function renderExportState(){
   const pronti=!!(state.activeRecord&&state.rows.length);

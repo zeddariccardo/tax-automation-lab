@@ -506,17 +506,17 @@ footer a:hover{color:#F7F7F5!important}
 <div class="panel">
 <div class="panel-heading"><div><h3>Dati telematici XML IVP18</h3><p>Questi dati alimentano l’intestazione e il frontespizio del file telematico. Le firme sono valorizzate dal tool con il codice 1; il file dovrà poi essere firmato o sigillato prima dell’invio.</p></div><span class="badge dark">Tracciato IVP18</span></div>
 <div class="grid">
-<div class="field"><label>CF società dichiarante</label><input id="cfg-decl-company-cf" maxlength="16" type="text"/><div class="hint">Da compilare nei casi previsti, ad esempio con codice carica 9.</div></div>
-<div class="field"><label>Ultimo mese gruppo</label><input id="cfg-last-month" max="99" min="1" placeholder="Es. 03 o 99" type="number"/></div>
+<div class="field"><label>CF società dichiarante</label><input id="cfg-decl-company-cf" inputmode="numeric" maxlength="11" type="text"/><div class="hint">Undici cifre numeriche: nel tracciato IVP18 questo campo è di tipo numerico, non un codice fiscale alfanumerico. Da compilare nei casi previsti, ad esempio con codice carica 9.</div></div>
+<div class="field"><label>Ultimo mese gruppo</label><input id="cfg-last-month" max="99" min="1" placeholder="Es. 3 o 99" type="number"/></div>
 <div class="field"><label>Liquidazione del gruppo</label><select id="cfg-group-liquidation"><option value="">No</option><option value="1">Sì</option></select></div>
-<div class="field"><label>Impegno presentazione</label><select id="cfg-commitment"><option value="">Non indicato</option><option value="1">1 · predisposta dal contribuente</option><option value="2">2 · predisposta dall’intermediario</option></select></div>
+<div class="field"><label>Impegno presentazione</label><select id="cfg-commitment"><option value="">Non indicato</option><option value="1">1 · predisposta dal contribuente</option><option value="2">2 · predisposta da chi effettua l’invio</option></select></div>
 <div class="field"><label>Data impegno</label><input id="cfg-commitment-date" type="date"/></div>
 <div class="field"><label>Identificativo soggetto trasmittente</label><input id="cfg-transmitter-id" maxlength="16" placeholder="11–16 caratteri" type="text"/><div class="hint">Identifica il soggetto che trasmette e determina il nome univoco del file, non il contribuente.</div></div>
 <div class="field"><label>FlagConferma</label><select id="cfg-flag-conferma"><option value="">Non indicato</option><option value="1">1 · conferma esplicita dopo controllo</option></select><div class="hint">Non viene mai impostato automaticamente. Usalo solo dopo aver verificato le anomalie con il controllo ufficiale.</div></div>
 <div class="field wide"><label>Struttura della comunicazione</label><select id="cfg-module-profile"><option value="single">Periodo omogeneo · struttura supportata</option><option value="mixed">Periodicità mista nello stesso trimestre</option><option value="dual-q4">Quarto trimestre con doppio modulo</option></select><div class="hint">I casi misti o a doppio modulo restano lavorabili e stampabili, ma l’XML è bloccato finché non sono modellati in modo completo.</div></div>
-<div class="field wide"><label>Identificativo produttore software</label><input id="cfg-software-id" maxlength="16" placeholder="Lascia vuoto se non richiesto" type="text"/><div class="hint">Nel tracciato IVP18 questo campo identifica <b>chi ha prodotto il software</b> che genera il file, non chi presenta la comunicazione: è un codice fiscale di 11 cifre oppure un codice fiscale alfanumerico. <b>Tax Automation Lab non ne inserisce uno.</b> Se lasci il campo vuoto l’elemento non viene scritto nel file. Compilalo solo se il tuo canale di trasmissione lo richiede, con il codice fiscale del soggetto che assume quel ruolo. In caso di dubbio verifica il file con il software di controllo dell’Agenzia delle Entrate prima dell’invio.</div></div>
+<div class="field wide"><label>Identificativo produttore software</label><input id="cfg-software-id" maxlength="16" placeholder="Lascia vuoto se non richiesto" type="text"/><div class="hint">Nel tracciato IVP18 questo campo identifica <b>chi ha prodotto il software</b> che genera il file, non chi presenta la comunicazione: Le specifiche tecniche lo descrivono come «un elemento opzionale che espone un identificativo del produttore di software»: non deve essere un codice fiscale e non ha controlli previsti, basta che sia in lettere maiuscole e cifre. <b>Tax Automation Lab non ne inserisce uno.</b> Se lasci il campo vuoto l’elemento non viene scritto nel file, e il file resta valido. Compilalo solo se il tuo canale di trasmissione lo richiede.</div></div>
 </div>
-<div class="notice warn"><b>Controllo telematico.</b> Per generare l’XML sono obbligatori codice fiscale del contribuente, CF dichiarante e codice carica. Se è indicato il CF intermediario diventano obbligatori anche impegno e data dell’impegno.</div>
+<div class="notice warn"><b>Controllo telematico.</b> Per generare l’XML sono sempre obbligatori il codice fiscale e la partita IVA del contribuente. Il riquadro del dichiarante va compilato solo se chi sottoscrive è un soggetto diverso dal contribuente, ma è <b>obbligatorio per i contribuenti diversi dalle persone fisiche</b>; se lo compili servono insieme il CF di 16 caratteri e il codice carica. Se è indicato il CF intermediario diventano obbligatori anche impegno e data dell’impegno.</div>
 </div>
 </section>
 <section class="block lipe-view" id="vat-codes"><div class="set-tabs" role="tablist"><button class="set-tab" data-lipeview="client-config" role="tab" type="button">Anagrafica</button><button class="set-tab" data-lipeview="telematic-config" role="tab" type="button">Dati telematici</button><button class="set-tab is-on" data-lipeview="vat-codes" role="tab" type="button">Codici IVA</button></div>
@@ -3202,27 +3202,207 @@ function nextSequence(key){var all={};try{all=JSON.parse(localStorage.getItem('l
 function softwareIdValid(v){return !v||/^(?:\d{11}|[A-Z0-9]{16})$/.test(String(v).trim().toUpperCase());}
 function xmlPushMoney(tags,name,value){if(Math.abs(Number(value)||0)>.004)tags.push(xmlTag(name,xmlMoney(value),4));}
 
+/* ─────────────────────────── IVP18 · le regole dei campi telematici, in un posto solo.
+
+   Stavano dentro buildXml, mescolate ai numeri e alla stringa XML. Da qui si
+   possono eseguire in Node e mettere alla prova contro lo schema XSD ufficiale
+   senza aprire un browser: lo fa test/lipe-xml-ivp18.test.mjs nel repository
+   privato, che estrae questa funzione dalla pagina come già fa con il resto.
+
+   Le tre liste che tornano non sono la stessa cosa, e la differenza è quella
+   che fa l'Allegato A al provvedimento 14 marzo 2024:
+
+     problemi     controlli di validazione (scarto dell'intera fornitura) e
+                  controlli bloccanti (scarto della singola comunicazione).
+                  Qui l'XML non si genera;
+     rispondenza  controlli di rispondenza: la comunicazione si può trasmettere
+                  lo stesso, ma «valorizzando l'elemento denominato
+                  FlagConferma». Senza FlagConferma diventano problemi; con
+                  FlagConferma a 1 restano avvisi;
+     avvisi       quello che il tracciato non impone e noi facciamo notare.
+
+   Fase 1.5, 28 agosto 2026. */
+
+/* Controllo di rispondenza sull'elemento UltimoMese: per ogni trimestre i soli
+   valori previsti. Il 99 solo nel quarto. */
+function ivp18MesiGruppo(trimestre) {
+  return ({ 1: [1, 2, 12, 13], 2: [3, 4, 5, 13], 3: [6, 7, 8, 13], 4: [9, 10, 11, 13, 99] })[Number(trimestre)] || [];
+}
+
+/* I due pattern copiati da typesDati_v3.xsd. Sono controlli di validazione:
+   se il valore non li rispetta, l'Agenzia scarta la fornitura intera. */
+var IVP18_AN = /^([0-9A-Z-]|")([ 0-9A-Z&]|['\-.,\/°^()ÀÈÉÌÒÙÜ"\\|+])*$/;
+var IVP18_CF16 = /^[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$/;
+var IVP18_CF11 = /^[0-9]{11}$/;
+
+/* DatoCF_Type: codice fiscale numerico di 11 cifre oppure alfanumerico di 16.
+   La cifra di controllo la verifica xmlCf, che è un requisito nostro in
+   più: lo schema guarda solo la forma. */
+function ivp18CfFormale(v) {
+  var s = String(v || '').trim().toUpperCase();
+  return IVP18_CF11.test(s) || IVP18_CF16.test(s);
+}
+
+function ivp18Telematici(c, ctx) {
+  var problemi = [], rispondenza = [], avvisi = [], fronte = [], testa = [];
+  var oggi = (ctx && ctx.oggi) instanceof Date ? ctx.oggi : new Date();
+  var q = Number(ctx.trimestre);
+  var anno = Number(ctx.anno);
+  var cf = String(c.cf || '').trim().toUpperCase();
+  /* «Non può essere presente se l'elemento CodiceFiscale è lungo 16 caratteri»:
+     è il modo in cui l'Allegato A dice «se il contribuente è una persona
+     fisica». Il discrimine è suo, non nostro. */
+  var fisica = cf.length === 16;
+
+  /* ───────────────────────────────────────────────── il contribuente */
+  if (!xmlValidPiva(ctx.piva)) problemi.push('Partita IVA del contribuente formalmente non valida.');
+  if (!ivp18CfFormale(cf) || !xmlCf(cf)) problemi.push('Codice fiscale del contribuente obbligatorio e non valido.');
+  if (!/^\d{4}$/.test(String(ctx.anno))) problemi.push('Anno d’imposta non valido.');
+  else if (anno < 2023 || anno > oggi.getFullYear()) problemi.push('Anno d’imposta non supportato per la generazione ufficiale: sono verificate le regole dal 2023 all’anno corrente.');
+
+  testa.push(['CodiceFornitura', 'IVP18']);
+  fronte.push(['CodiceFiscale', cf], ['AnnoImposta', ctx.anno], ['PartitaIVA', ctx.piva]);
+
+  /* ─────────────────────────────────────────────── la liquidazione di gruppo */
+  var um = String(c.lastMonth || '').trim();
+  var umN = um ? Number(um) : null;
+  var umValido = um !== '' && /^(?:[1-9]|1[0-3]|99)$/.test(String(umN));
+
+  if (c.groupVat) {
+    if (!xmlValidPiva(c.groupVat)) problemi.push('Partita IVA controllante formalmente non valida.');
+    if (c.groupLiquidation) problemi.push('P.IVA controllante e Liquidazione del gruppo non possono essere presenti insieme.');
+    if (fisica) problemi.push('La P.IVA della controllante non può essere presente quando il codice fiscale del contribuente è di 16 caratteri.');
+    /* Il contribuente non ha partecipato al gruppo per l’intero trimestre:
+       l’Agenzia vieta la coppia. */
+    var vietato = ({ 1: 12, 2: 3, 3: 6, 4: 9 })[q];
+    if (vietato && umN === vietato) {
+      problemi.push('Con «Ultimo mese» ' + vietato + ' nel ' + q + '° trimestre la P.IVA della controllante non va indicata: la partecipazione al gruppo non copre l’intero periodo della comunicazione.');
+    }
+    fronte.push(['PIVAControllante', String(c.groupVat).trim()]);
+  }
+
+  if (um) {
+    if (!umValido) {
+      problemi.push('Ultimo mese gruppo non valido: il tracciato IVP18 ammette i valori da 1 a 13 e 99, senza zero iniziale.');
+    } else {
+      if (fisica) problemi.push('«Ultimo mese» non può essere presente quando il codice fiscale del contribuente è di 16 caratteri.');
+      if (umN === 13 && (String(c.groupVat || '').trim() !== String(ctx.piva || '').trim() || !IVP18_CF11.test(String(c.declCompanyCf || '').trim()))) {
+        problemi.push('Il valore 13 in «Ultimo mese» è ammesso solo se la P.IVA della controllante coincide con quella del contribuente e il CF della società dichiarante è indicato.');
+      }
+      var ammessi = ivp18MesiGruppo(q);
+      if (ammessi.length && ammessi.indexOf(umN) < 0) {
+        rispondenza.push('«Ultimo mese» ' + umN + ' non è previsto per il ' + q + '° trimestre: sono ammessi ' + ammessi.join(', ') + '.');
+      }
+      /* Senza zero iniziale: 3, non 03. Lo zero è giusto sul modello cartaceo,
+         dove le istruzioni dicono «indicare 02 per febbraio», ma qui il tipo è
+         DatoNP_Type e l’enumerazione va da 1 a 13. */
+      fronte.push(['UltimoMese', String(umN)]);
+    }
+  }
+
+  if (c.groupLiquidation) {
+    if (fisica) problemi.push('«Liquidazione del gruppo» non può essere presente quando il codice fiscale del contribuente è di 16 caratteri.');
+    fronte.push(['LiquidazioneGruppo', '1']);
+  }
+
+  /* ────────────────────────────────────────────────────── il dichiarante */
+  /* Le istruzioni al modello: «Il presente riquadro deve essere compilato
+     soltanto nel caso in cui il dichiarante sia un soggetto diverso dal
+     contribuente». L’Allegato A aggiunge il controllo bloccante: obbligatorio
+     per i contribuenti diversi dalle persone fisiche, alfanumerico di 16
+     caratteri. Fino alla Fase 1.5 il riquadro vuoto produceva
+     `<iv:CFDichiarante></iv:CFDichiarante>`: elemento vuoto, scarto dell’intera
+     fornitura. */
+  var rep = String(c.repCf || '').trim().toUpperCase();
+  var ruolo = String(c.repRole || '').trim();
+  if (rep) {
+    if (!IVP18_CF16.test(rep) || !xmlCf(rep)) {
+      problemi.push('CF del dichiarante non valido: il tracciato IVP18 lo vuole alfanumerico di 16 caratteri, ed è il codice fiscale personale di chi sottoscrive.');
+    }
+    if (!xmlRole(ruolo)) problemi.push('Con il CF del dichiarante indicato, il codice carica è obbligatorio: sono ammessi 1–9 e 11–15.');
+    fronte.push(['CFDichiarante', rep], ['CodiceCaricaDichiarante', ruolo]);
+    testa.push(['CodiceFiscaleDichiarante', rep], ['CodiceCarica', ruolo]);
+  } else {
+    if (!fisica) {
+      problemi.push('Per un contribuente diverso dalle persone fisiche il CF del dichiarante è obbligatorio: è il codice fiscale personale, di 16 caratteri, di chi sottoscrive la comunicazione.');
+    } else {
+      avvisi.push('Riquadro del dichiarante lasciato vuoto: il file non conterrà il dichiarante. Va compilato solo se chi sottoscrive la comunicazione è un soggetto diverso dal contribuente.');
+    }
+    if (ruolo) problemi.push('Il codice carica non può essere indicato senza il CF del dichiarante.');
+  }
+
+  /* CodiceFiscaleSocieta è DatoCN_Type: undici cifre numeriche, non un codice
+     fiscale alfanumerico. Un valore di 16 caratteri qui scarta la fornitura. */
+  var soc = String(c.declCompanyCf || '').trim().toUpperCase();
+  if (soc) {
+    if (!IVP18_CF11.test(soc)) problemi.push('Codice fiscale della società dichiarante non valido: il tracciato IVP18 lo vuole numerico di 11 cifre.');
+    else fronte.push(['CodiceFiscaleSocieta', soc]);
+  }
+  if (ruolo === '9' && !IVP18_CF11.test(soc)) problemi.push('Con codice carica 9 è obbligatorio il CF della società dichiarante, numerico di 11 cifre.');
+
+  fronte.push(['FirmaDichiarazione', '1']);
+
+  /* ─────────────────────────────────────────────────────── l’incaricato */
+  var inter = String(c.interCf || '').trim().toUpperCase();
+  var hasInter = !!(inter || c.commitment || c.commitmentDate);
+  if (hasInter) {
+    if (!ivp18CfFormale(inter) || !xmlCf(inter)) problemi.push('CF intermediario non valido.');
+    if (!/^[12]$/.test(String(c.commitment || ''))) {
+      problemi.push('Impegno alla presentazione obbligatorio quando è indicato il CF dell’incaricato: 1 se la comunicazione è stata predisposta dal contribuente, 2 se da chi effettua l’invio.');
+    }
+    var d = xmlDate(c.commitmentDate);
+    if (!/^\d{8}$/.test(d)) {
+      problemi.push('Data dell’impegno non valida.');
+    } else {
+      var quando = new Date(Number(d.slice(4, 8)), Number(d.slice(2, 4)) - 1, Number(d.slice(0, 2)));
+      var limite = new Date(oggi.getFullYear() - 4, 0, 1);
+      if (quando > oggi) problemi.push('La data dell’impegno non può essere successiva a oggi.');
+      else if (quando < limite) problemi.push('La data dell’impegno non può essere precedente al 1° gennaio ' + limite.getFullYear() + '.');
+    }
+    fronte.push(['CFIntermediario', inter], ['ImpegnoPresentazione', String(c.commitment || '')],
+      ['DataImpegno', d], ['FirmaIntermediario', '1']);
+  }
+
+  /* ───────────────────────────────────────────── conferma e produttore */
+  if (c.flagConferma && !/^1$/.test(String(c.flagConferma))) problemi.push('FlagConferma non valido.');
+  if (String(c.flagConferma) === '1') fronte.push(['FlagConferma', '1']);
+
+  /* DatoAN_Type, e nient’altro: l’Allegato A dice soltanto «è un elemento
+     opzionale che espone un identificativo del produttore di software».
+     Nessun vincolo di codice fiscale, nessun controllo previsto. */
+  var sw = String(c.softwareId || '').trim().toUpperCase();
+  if (sw) {
+    if (!IVP18_AN.test(sw)) problemi.push('Identificativo produttore software non valido: il tracciato lo vuole in lettere maiuscole e cifre.');
+    else fronte.push(['IdentificativoProdSoftware', sw]);
+  }
+
+  /* ──────────────────────────────────────────── il resto, come prima */
+  var trasmittente = String(c.transmitterId || '').trim().toUpperCase();
+  if (!/^[A-Z0-9]{11,16}$/.test(trasmittente)) problemi.push('Identificativo del soggetto trasmittente obbligatorio: inserire 11–16 caratteri alfanumerici.');
+  if ((c.moduleProfile || 'single') !== 'single') problemi.push('La struttura selezionata richiede moduli misti o doppi: il caso resta disponibile per il prospetto di lavoro, ma l’XML non è ancora supportato.');
+
+  /* I controlli di rispondenza: FlagConferma è la porta che l’Agenzia lascia
+     aperta, e serve a questo. Senza, qui si ferma. */
+  rispondenza.forEach(function (r) {
+    if (String(c.flagConferma) === '1') avvisi.push(r + ' FlagConferma è a 1: la comunicazione resta trasmissibile.');
+    else problemi.push(r + ' È un controllo di rispondenza: per trasmettere lo stesso occorre valorizzare FlagConferma.');
+  });
+
+  return { problemi: problemi, avvisi: avvisi, rispondenza: rispondenza,
+    intestazione: testa, frontespizio: fronte, trasmittente: trasmittente };
+}
+
 window.buildXml=function(){
   var problems=[],warnings=[];if(!state.activeRecord){problems.push('Nessun cliente selezionato.');return {xml:'',problems:problems,warnings:warnings,filename:''};}
   lipeOfficialProblems().forEach(function(p){problems.push(p);});
-  var c=Object.assign({},defaultClient(),state.activeRecord.client),year=Number(state.year),transmitter=String(c.transmitterId||'').trim().toUpperCase();
-  if(!xmlValidPiva(state.activeClientKey))problems.push('Partita IVA del contribuente formalmente non valida.');
-  if(!xmlCf(c.cf))problems.push('Codice fiscale del contribuente obbligatorio e non valido.');
-  if(!/^\d{4}$/.test(String(state.year)))problems.push('Anno d’imposta non valido.');
-  else if(year<2023||year>new Date().getFullYear())problems.push('Anno d’imposta non supportato per la generazione ufficiale: sono verificate le regole dal 2023 all’anno corrente.');
-  /* Non blocca: nel tracciato dipende dalla casistica. Si avvisa. */if(!xmlCf(c.repCf))warnings.push('CF dichiarante non indicato. Nel tracciato IVP18 è richiesto quando la comunicazione è presentata da un soggetto diverso dal contribuente: verifica il tuo caso prima di trasmettere.');
-  if(/^\d{11}$/.test(String(c.cf||'').replace(/\D/g,''))&&!/^[A-Z0-9]{16}$/.test(String(c.repCf||'').trim().toUpperCase()))problems.push('Per un contribuente non persona fisica il CF dichiarante deve essere il codice fiscale personale di 16 caratteri del soggetto che sottoscrive la comunicazione.');
-  if(!xmlRole(c.repRole))problems.push('Codice carica non valido: sono ammessi 1–9 e 11–15.');
-  if(!/^[A-Z0-9]{11,16}$/.test(transmitter))problems.push('Identificativo del soggetto trasmittente obbligatorio: inserire 11–16 caratteri alfanumerici.');
-  if(c.flagConferma&&!/^1$/.test(String(c.flagConferma)))problems.push('FlagConferma non valido.');
-  if((c.moduleProfile||'single')!=='single')problems.push('La struttura selezionata richiede moduli misti o doppi: il caso resta disponibile per il prospetto di lavoro, ma l’XML non è ancora supportato.');
-  if(c.groupVat&&!xmlValidPiva(c.groupVat))problems.push('Partita IVA controllante formalmente non valida.');
-  if(c.groupVat&&c.groupLiquidation)problems.push('P.IVA controllante e Liquidazione del gruppo non possono essere presenti insieme.');
-  if(c.lastMonth&&!/^(?:[1-9]|1[0-3]|99)$/.test(String(Number(c.lastMonth))))problems.push('Ultimo mese gruppo non valido: usare 1–13 oppure 99.');
-  if(c.declCompanyCf&&!xmlCf(c.declCompanyCf))problems.push('Codice fiscale della società dichiarante non valido.');
-  if(String(c.repRole)==='9'&&!xmlCf(c.declCompanyCf))problems.push('Con codice carica 9 è obbligatorio il CF della società dichiarante.');
-  var hasInter=!!(c.interCf||c.commitment||c.commitmentDate);if(hasInter){if(!xmlCf(c.interCf))problems.push('CF intermediario non valido.');if(!/^[12]$/.test(String(c.commitment||'')))problems.push('Impegno alla presentazione obbligatorio.');if(!/^\d{8}$/.test(xmlDate(c.commitmentDate)))problems.push('Data dell’impegno non valida.');}
-  if(!softwareIdValid(c.softwareId))problems.push('Identificativo produttore software non valido.');
+  var c=Object.assign({},defaultClient(),state.activeRecord.client),year=Number(state.year);
+  /* Le regole dei campi telematici stanno tutte in ivp18Telematici, qui sopra:
+     una funzione pura, che i test del repository privato eseguono in Node e
+     mettono alla prova contro lo schema XSD ufficiale. */
+  var tele=ivp18Telematici(c,{piva:state.activeClientKey,anno:state.year,trimestre:state.quarter});
+  var transmitter=tele.trasmittente;
+  tele.problemi.forEach(function(p){problems.push(p);});
+  tele.avvisi.forEach(function(w){warnings.push(w);});
   var pending=typeof window.lipePendingEdits==='function'?window.lipePendingEdits():[];pending=pending.concat(unsavedFields(c)).filter(function(v,i,a){return a.indexOf(v)===i;});if(pending.length)problems.push('Configurazione non salvata: '+pending.join(', ')+'. Salva il cliente prima di generare l’XML.');
   if(!state.rows.length)problems.push('Nessun importo caricato.');
   var descriptors=periodDescriptors();if(!descriptors.length||descriptors.length>5)problems.push('Numero di moduli non valido.');
@@ -3254,8 +3434,8 @@ window.buildXml=function(){
     return '      <iv:Modulo>\n'+tags.join('\n')+'\n      </iv:Modulo>';
   }).join('\n');
 
-  var front=[xmlTag('CodiceFiscale',c.cf,3),xmlTag('AnnoImposta',state.year,3),xmlTag('PartitaIVA',state.activeClientKey,3)];if(c.groupVat)front.push(xmlTag('PIVAControllante',c.groupVat,3));if(c.lastMonth)front.push(xmlTag('UltimoMese',String(Number(c.lastMonth)).padStart(2,'0'),3));if(c.groupLiquidation)front.push(xmlTag('LiquidazioneGruppo','1',3));front.push(xmlTag('CFDichiarante',c.repCf,3),xmlTag('CodiceCaricaDichiarante',c.repRole,3));if(c.declCompanyCf)front.push(xmlTag('CodiceFiscaleSocieta',c.declCompanyCf,3));front.push(xmlTag('FirmaDichiarazione','1',3));if(hasInter)front.push(xmlTag('CFIntermediario',c.interCf,3),xmlTag('ImpegnoPresentazione',c.commitment,3),xmlTag('DataImpegno',xmlDate(c.commitmentDate),3),xmlTag('FirmaIntermediario','1',3));if(c.flagConferma==='1')front.push(xmlTag('FlagConferma','1',3));if(c.softwareId)front.push(xmlTag('IdentificativoProdSoftware',c.softwareId,3));
-  var xml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<iv:Fornitura xmlns:iv="urn:www.agenziaentrate.gov.it:specificheTecniche:sco:ivp" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">\n  <iv:Intestazione>\n'+xmlTag('CodiceFornitura','IVP18',2)+'\n'+xmlTag('CodiceFiscaleDichiarante',c.repCf,2)+'\n'+xmlTag('CodiceCarica',c.repRole,2)+'\n  </iv:Intestazione>\n  <iv:Comunicazione identificativo="00001">\n    <iv:Frontespizio>\n'+front.join('\n')+'\n    </iv:Frontespizio>\n    <iv:DatiContabili>\n'+moduleBlocks+'\n    </iv:DatiContabili>\n  </iv:Comunicazione>\n</iv:Fornitura>\n';
+  var front=tele.frontespizio.map(function(t){return xmlTag(t[0],t[1],3);});
+  var xml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<iv:Fornitura xmlns:iv="urn:www.agenziaentrate.gov.it:specificheTecniche:sco:ivp" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">\n  <iv:Intestazione>\n'+tele.intestazione.map(function(t){return xmlTag(t[0],t[1],2);}).join('\n')+'\n  </iv:Intestazione>\n  <iv:Comunicazione identificativo="00001">\n    <iv:Frontespizio>\n'+front.join('\n')+'\n    </iv:Frontespizio>\n    <iv:DatiContabili>\n'+moduleBlocks+'\n    </iv:DatiContabili>\n  </iv:Comunicazione>\n</iv:Fornitura>\n';
   var seqKey='IVP18_'+transmitter,seq=nextSequence(seqKey);if(seq>99999)problems.push('Progressivo del nome file esaurito per il soggetto trasmittente.');
   return {xml:xml,problems:problems,warnings:warnings,filename:'IT'+transmitter+'_LI_'+String(seq).padStart(5,'0')+'.xml',__seqKey:seqKey};
 };

@@ -64,7 +64,10 @@ for(const [dove,re] of [
 assert.match(lipe,/xmlPushMoney\(tags,'VersamentiAutoUE',v\.vp10\)/);
 assert.match(lipe,/if\(!q5\|\|sub\)xmlPushMoney\(tags,'CreditiImposta',v\.vp11\)/);
 assert.match(lipe,/if\(!q5\|\|sub\)\{if\(v\.vp14deb/);
-assert.match(lipe,/front\.push\(xmlTag\('FlagConferma','1',3\)\)/);
+/* FlagConferma finisce nell'XML solo quando vale 1, e non viene mai messo
+   da solo: dalla Fase 1.5 la riga sta in ivp18Telematici invece che dentro
+   buildXml, ma la regola e' la stessa e va sorvegliata uguale. */
+assert.match(lipe,/if \(String\(c\.flagConferma\) === '1'\) fronte\.push\(\['FlagConferma', '1'\]\)/);
 assert.match(lipe,/seqKey='IVP18_'\+transmitter/);
 assert.match(lipe,/filename:'IT'\+transmitter\+'_LI_'/);
 /* Il tetto VP7 per anno non è più nella pagina: dal 27 agosto 2026 lo decide il

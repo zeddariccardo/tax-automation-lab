@@ -97,31 +97,76 @@ test('controlli · aperti scorrono dentro invece di allungare la pagina', () => 
 
 /* ══════════════════════════════════════ 4 · i righi VP */
 
-test('righi VP · due colonne invece di quattro, senza scorrimento di lato', () => {
-  const m = /@media \(max-width:760px\)\{([\s\S]*?)\n\}/g;
-  const blocchi = [...html.matchAll(m)].map((x) => x[1]).join('\n');
-  assert.match(blocchi, /\.vp-grid\{grid-template-columns:60px minmax\(0,1fr\);overflow-x:visible\}/,
-    'le stesse quattro celle in due righe da due: sopra il rigo e che cos’è, ' +
-    'sotto quanto fa');
-  assert.match(blocchi, /\.vp-grid > \.vp-head\{display:none\}/,
-    'le intestazioni di colonna, in due colonne, mentono');
+test('righi VP · diventano card anche sul tablet, senza scorrimento di lato', () => {
+  assert.match(html, /@media \(max-width:820px\)\{/,
+    'a 768 px la vecchia griglia a quattro colonne richiedeva ancora lo scorrimento laterale');
+  assert.match(html, /\.vp-grid,\.com-main \.vp-grid\{\s*grid-template-columns:64px minmax\(0,1fr\);gap:0;overflow-x:visible/,
+    'codice e descrizione formano la testata della card');
+  assert.match(html, /\.vp-grid > :nth-child\(4n\+3\),\s*\n?\s*\.vp-grid > :nth-child\(4n\+4\)\{\s*grid-column:1 \/ -1/,
+    'debito e credito devono usare tutta la larghezza disponibile');
+  assert.match(html, /\.vp-grid > \.vp-head\{display:none\}/,
+    'le intestazioni della tabella desktop non descrivono più la card');
 });
 
 test('righi VP · l’etichetta va addosso al valore, visto che le colonne non ci sono più', () => {
-  assert.match(html, /\.vp-grid > :nth-child\(4n\+3\)::before\{content:"Debito \/ valore"/);
+  assert.match(html, /flex:0 0 104px;content:"Debito \/ valore"/);
   assert.match(html, /\.vp-grid > :nth-child\(4n\+4\)::before\{content:"Credito"/);
   assert.match(html, /\.vp-grid > \.flags::before\{content:none\}/,
     'la riga dei contrassegni non è un importo');
 });
 
-test('righi VP · una cella vuota resta al suo posto', () => {
+test('righi VP · una cella vuota resta al suo posto e si legge come vuota', () => {
   /* È il punto in cui si sbaglia: togliere una cella vuota con display:none
      sfalsa di uno tutte le righe successive, e da lì in poi «Credito»
      etichetta il codice del rigo. */
-  assert.match(html, /:nth-child\(4n\+3\):empty::before,\s*\n?\s*\.vp-grid > :nth-child\(4n\+4\):empty::before\{content:none\}/,
-    'la cella vuota perde l’etichetta ma non il posto');
+  assert.match(html, /:nth-child\(4n\+3\):empty::after,\s*\n?\s*\.vp-grid > :nth-child\(4n\+4\):empty::after\{content:"—"/,
+    'una cella senza importo deve restare comprensibile, non sembrare scomparsa');
   assert.doesNotMatch(html, /:nth-child\(4n\+4\):empty\{display:none/,
     'toglierla dal flusso sfalserebbe tutti i righi che vengono dopo');
+});
+
+test('menu · il comando occupa spazio nella barra e non galleggia sui contenuti', () => {
+  assert.match(html, /#lipe-context-bar > #sb-toggle\{\s*display:inline-flex!important;position:static!important/);
+  assert.match(html, /id="lipe-context-bar"><button[^>]+id="sb-toggle"/,
+    'il comando deve stare nel flusso della barra di contesto');
+});
+
+/* ══════════════════════════════════════ 5 · benvenuto e output vuoti */
+
+test('benvenuto · ha chiusura accessibile, corpo scorrevole e altezza nel visual viewport', () => {
+  assert.match(html, /<dialog aria-labelledby="lipe-benvenuto-titolo"[^>]+id="lipe-benvenuto"/);
+  assert.match(html, /aria-label="Chiudi il benvenuto"[^>]+id="lipe-benvenuto-x"/);
+  assert.match(html, /height:min\(650px,calc\(100dvh - 24px/,
+    'il dialogo deve restare dentro il visual viewport, non dentro un’altezza teorica della pagina');
+  assert.match(html, /\.lipe-benvenuto\[open\]\{display:grid;grid-template-rows:auto minmax\(0,1fr\) auto\}/,
+    'titolo e CTA restano raggiungibili mentre scorre soltanto il corpo');
+  assert.match(html, /\.lipe-benvenuto-corpo\{min-height:0;overflow-y:auto/);
+});
+
+test('benvenuto · fuoco iniziale e ritorno non passano dalla skip-link', () => {
+  assert.match(html, /requestAnimationFrame\(sistemaFuocoIniziale\)/);
+  assert.match(html, /\(chiudiX \|\| document\.getElementById\('lipe-benvenuto-titolo'\)\)\.focus\(\{ preventScroll: true \}\)/);
+  assert.match(html, /function destinazione\(\)/);
+  assert.match(html, /bersaglio\.focus\(\{ preventScroll: true \}\)/);
+  assert.doesNotMatch(html, /destinazione[\s\S]{0,500}skip-link/,
+    'la skip-link non deve essere usata come ripiego visibile alla chiusura');
+});
+
+test('output · i cinque comandi partono disabilitati e seguono automaticamente i prerequisiti', () => {
+  for (const id of ['export-pdf', 'export-excel', 'export-xml', 'save-history', 'clear-period']) {
+    const re = new RegExp('<button[^>]*aria-disabled="true"[^>]*disabled[^>]*id="' + id + '"');
+    assert.match(html, re, id + ' non è semanticamente disabilitato nello stato vuoto');
+  }
+  assert.match(html, /const pronti=!!\(state\.activeRecord&&state\.rows\.length\)/);
+  assert.match(html, /b\.disabled=!pronti;b\.setAttribute\('aria-disabled',String\(!pronti\)\)/,
+    'i pulsanti devono riattivarsi quando cliente ed elaborazione diventano disponibili');
+});
+
+test('backup · resta un solo flusso completo, senza il vecchio pulsante proxy', () => {
+  assert.doesNotMatch(html, /lipe-data-exp-all/);
+  assert.equal((html.match(/id="lipe-export-full-backup"/g) || []).length, 1);
+  assert.equal((html.match(/id="lipe-import-full-backup"/g) || []).length, 1);
+  assert.match(html, /appendChild\(box\)/, 'il nodo con gli handler deve essere spostato, non ricreato');
 });
 
 /* ═════════════════════════════════════ la riga rossa, anche qui */

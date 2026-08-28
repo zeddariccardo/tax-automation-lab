@@ -16,7 +16,9 @@
      tests/responsive.e2e.mjs in CI.
 
      Attenzione: env(safe-area-inset-*) vale 0 in un browser desktop, quindi qui
-     si misurano i 12/16 px di fallback. La safe area va provata sul dispositivo
+     si misurano i 12/16 px di fallback dei comandi flottanti. LIPE usa invece
+     un comando nel flusso della barra di contesto: il test verifica che resti
+     lì e non possa coprire contenuti. La safe area va provata sul dispositivo
      fisico: questa pagina non la sostituisce. -->
 <title>Verifica responsive — Tax Automation Lab</title>
 <meta charset="utf-8">
@@ -57,8 +59,9 @@
 <h1>Verifica responsive dei tool</h1>
 <p class="lede">Misura il comando del menu e lo scorrimento orizzontale a ogni
 breakpoint, caricando i tool in un iframe. Le attese: sotto 981&nbsp;px il
-comando è un quadrato di 44&times;44 in basso a sinistra, senza testo visibile e
-con l'icona al posto suo; a 981&nbsp;px non c'è; mai scorrimento orizzontale.</p>
+comando è un quadrato di 44&times;44, senza testo visibile e con l'icona al posto
+suo; in LIPE occupa spazio nella barra di contesto, negli altri tool resta in
+basso a sinistra; a 981&nbsp;px non c'è; mai scorrimento orizzontale.</p>
 
 <button id="run" type="button">Esegui la verifica</button>
 <div id="verdict" role="status"></div>
@@ -179,7 +182,8 @@ function measure(frame){
        il contenuto — e' il compromesso scelto — ma quello che sta in fondo deve
        poter essere portato sopra di lui. Misurato a 375x812 prima della
        correzione: il piede finiva esattamente sotto il pulsante. */
-    if (b && w.getComputedStyle(b).display !== 'none') {
+    if (b && w.getComputedStyle(b).display !== 'none' &&
+        w.getComputedStyle(b).position === 'fixed') {
       /* `behavior: 'instant'` non e' un vezzo: LIPE imposta
          `scroll-behavior: smooth`, quindi con lo scorrimento animato la misura
          presa subito dopo legge la posizione di partenza. Il primo giro di
@@ -241,6 +245,8 @@ function measure(frame){
     out.w = Math.round(r.width); out.h = Math.round(r.height);
     out.left = Math.round(r.left);
     out.bottomGap = Math.round(w.innerHeight - r.bottom);
+    out.position = cs.position;
+    out.inLipeContext = !!b.closest('#lipe-context-bar');
     out.radius = cs.borderRadius;
     out.textHidden = parseFloat(cs.fontSize) === 0;
     out.icon = (bf.content || '').replace(/["']/g, '');
@@ -251,7 +257,7 @@ function measure(frame){
   return out;
 }
 
-function judge(width, m){
+function judge(name, width, m){
   const fails = [];
   const shouldShow = width <= 980;
   if (m.error) return ['—', ['iframe: ' + m.error]];
@@ -285,8 +291,13 @@ function judge(width, m){
     if (!m.present) fails.push('comando assente');
     else {
       if (m.w !== 44 || m.h !== 44) fails.push('non è 44×44 (' + m.w + '×' + m.h + ')');
-      if (m.left !== 12)      fails.push('non è a 12px da sinistra (' + m.left + ')');
-      if (m.bottomGap !== 16) fails.push('non è a 16px dal fondo (' + m.bottomGap + ')');
+      if (name === 'LIPE') {
+        if (m.position !== 'static') fails.push('in LIPE non occupa spazio nella barra (' + m.position + ')');
+        if (!m.inLipeContext) fails.push('in LIPE non è nella barra di contesto');
+      } else {
+        if (m.left !== 12)      fails.push('non è a 12px da sinistra (' + m.left + ')');
+        if (m.bottomGap !== 16) fails.push('non è a 16px dal fondo (' + m.bottomGap + ')');
+      }
       if (!m.textHidden)      fails.push('mostra il nome del tool');
       if (m.icon !== '☰')     fails.push('icona assente');
       if (!m.ariaLabel)       fails.push('aria-label mancante');
@@ -296,7 +307,7 @@ function judge(width, m){
   } else if (m.present) {
     fails.push('comando ancora presente a ' + width + 'px');
   }
-  return [shouldShow ? 'presente 44×44' : 'assente', fails];
+  return [shouldShow ? (name === 'LIPE' ? 'presente 44×44 nella barra' : 'presente 44×44') : 'assente', fails];
 }
 
 async function run(){
@@ -308,7 +319,7 @@ async function run(){
       let m;
       try { m = measure(frame); } catch(e){ m = {error: e.message}; }
       frame.remove();
-      const [expected, fails] = judge(width, m);
+      const [expected, fails] = judge(name, width, m);
       results.push({tool: name, width, expected, ok: fails.length === 0, fails, measured: m});
 
       const tr = document.createElement('tr');

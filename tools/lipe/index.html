@@ -627,42 +627,58 @@ footer a:hover{color:#F7F7F5!important}
   .com-card.superati-aperti .checks-grid{max-height:46vh;overflow-y:auto}
 }
 
-/* ═══════════════════════════════ 3 · i righi VP, uno sotto l'altro */
-/* La griglia è quattro colonne per 632 pixel dentro una scatola da 337: si
-   scorreva di lato per leggere gli importi, e il numero del rigo se ne andava
-   fuori insieme al resto. Le stesse quattro celle, in due righe da due: sopra
-   il rigo e che cos'è, sotto quanto fa. */
-@media (max-width:760px){
-  /* Stessa specificita' della regola per lo schermo grande, altrimenti quella
-     vince anche qui dentro: le media query non aggiungono peso. */
-  .vp-grid,.com-main .vp-grid{grid-template-columns:60px minmax(0,1fr);overflow-x:visible}
+/* ═══════════════════════════════ 3 · i righi VP, come card leggibili */
+/* Sotto 820 px anche la griglia tablet richiedeva uno scorrimento laterale.
+   Le quattro celle restano identiche nel DOM, ma ogni rigo diventa una card:
+   codice e descrizione in testa, valori su righe larghe quanto il pannello. */
+@media (max-width:820px){
+  .vp-grid,.com-main .vp-grid{
+    grid-template-columns:64px minmax(0,1fr);gap:0;overflow-x:visible;
+    border:0;border-radius:0;background:transparent}
+  .com-main .tab-panel{overflow-x:visible}
   .vp-grid > .vp-head{display:none}
-  /* Ogni quarto elemento riparte: è l'inizio di un rigo nuovo. */
-  .vp-grid > :nth-child(4n+1){border-top:2px solid var(--g2);padding-top:11px}
-  .vp-grid > :nth-child(4n+2){border-top:2px solid var(--g2);padding-top:11px}
+  .vp-grid > *{min-width:0;max-width:100%;overflow-wrap:normal;word-break:normal;hyphens:none}
+
+  /* Ogni quarto elemento riparte: codice e descrizione condividono la testata. */
+  .vp-grid > :nth-child(4n+1){
+    grid-column:1;margin-top:12px;padding:11px 10px;
+    border:1px solid var(--g2);border-right:0;border-radius:10px 0 0 0;
+    background:var(--g1);align-items:flex-start}
+  .vp-grid > :nth-child(4n+2){
+    grid-column:2;margin-top:12px;padding:11px 12px;
+    border:1px solid var(--g2);border-left:0;border-radius:0 10px 0 0;
+    background:var(--g1);font-weight:600;line-height:1.4;align-items:flex-start}
   .vp-grid > :nth-child(4n+3),
-  .vp-grid > :nth-child(4n+4){padding-top:2px;padding-bottom:11px}
-  /* Gli importi senza intestazione di colonna non si distinguono più: qui
-     l'etichetta va addosso al valore. */
-  .vp-grid > :nth-child(4n+3)::before{content:"Debito / valore";display:block;
-    font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--g4);margin-bottom:2px}
-  .vp-grid > :nth-child(4n+4)::before{content:"Credito";display:block;
-    font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--g4);margin-bottom:2px}
-  /* Una cella vuota resta al suo posto — toglierla sfalserebbe tutte le righe
-     successive — ma senza etichetta e senza spazio sprecato. */
-  .vp-grid > :nth-child(4n+3):empty::before,
-  .vp-grid > :nth-child(4n+4):empty::before{content:none}
-  .vp-grid > :nth-child(4n+3):empty,
-  .vp-grid > :nth-child(4n+4):empty{padding:0;min-height:0}
-  /* Le caselle e la riga dei contrassegni non sono importi: niente etichetta. */
+  .vp-grid > :nth-child(4n+4){
+    grid-column:1 / -1;padding:9px 12px;min-height:48px;
+    border:0;border-left:1px solid var(--g2);border-right:1px solid var(--g2);
+    background:#fff;justify-content:flex-start;gap:8px;white-space:nowrap}
+  .vp-grid > :nth-child(4n+4){border-bottom:1px solid var(--g2);border-radius:0 0 10px 10px}
+
+  /* Le etichette diventano parte del rigo; i numeri non vengono mai spezzati. */
+  .vp-grid > :nth-child(4n+3)::before,
+  .vp-grid > :nth-child(4n+4)::before{
+    flex:0 0 104px;content:"Debito / valore";font-size:9px;line-height:1.3;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--g4);white-space:normal}
+  .vp-grid > :nth-child(4n+4)::before{content:"Credito"}
+  .vp-grid > :nth-child(4n+3):empty::after,
+  .vp-grid > :nth-child(4n+4):empty::after{content:"—";color:var(--g4)}
+  .vp-grid > .flags{display:flex;flex-direction:row;flex-wrap:wrap;gap:6px 14px;align-items:center;white-space:normal}
   .vp-grid > .flags::before{content:none}
-  .vp-grid .vp-code{font-weight:700}
-  /* Le celle non devono sporgere dal loro contenitore: gli elementi dentro
-     hanno larghezze minime loro, e su 320 px sommate sforano. */
-  .vp-grid > *{min-width:0;max-width:100%;overflow-wrap:anywhere}
-  .vp-grid input,.vp-grid select{width:100%;max-width:100%;min-height:44px;box-sizing:border-box}
-  .vp-grid .flags{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-  .vp-grid .flags label{display:flex;align-items:center;gap:7px;min-height:44px;font-size:12.5px}
+  .vp-grid .flags label{display:flex;align-items:center;gap:7px;min-height:44px;font-size:12.5px;white-space:normal}
+  .vp-grid .vp-code{font-weight:700;white-space:nowrap}
+  .vp-grid .vp-value{font-variant-numeric:tabular-nums}
+  html.tal-tool-page .vp-grid input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  html.tal-tool-page .vp-grid select{
+    width:min(100%,260px);max-width:100%;min-height:44px!important;box-sizing:border-box}
+  html.tal-tool-page .vp-grid input[type="checkbox"]{
+    flex:0 0 18px;width:18px;height:18px;min-height:18px!important;margin:0}
+  .vp-grid > .vp-result{background:var(--fg);color:#fff;border-color:var(--fg)}
+  .vp-grid > .vp-result::before{color:rgba(255,255,255,.72)}
+}
+@media (max-width:360px){
+  .vp-grid > :nth-child(4n+3)::before,
+  .vp-grid > :nth-child(4n+4)::before{flex-basis:84px}
 }
 
 /* ═══════════════════════════ 4 · il menu, quando è una sovrapposizione */
@@ -671,6 +687,27 @@ footer a:hover{color:#F7F7F5!important}
      dietro stesse ferma: si scorreva il contenuto sotto il menu aperto. */
   body.lipe-menu-aperto{overflow:hidden;touch-action:none}
   #sidebar.open{overscroll-behavior:contain}
+  .app-main main{padding-top:16px}
+  /* In LIPE il comando delle sezioni vive subito sotto la sessione. Rendere
+     entrambe le barre sticky crea una fascia sovrapposta diversa fra browser:
+     la sessione resta quindi nel flusso e non puo' intercettare i controlli. */
+  html.tal-tool-page .tal-session-bar{position:relative!important;inset:auto!important}
+
+  /* Il comando non e' piu' flottante: vive nella barra di contesto e occupa
+     spazio reale. Non puo' quindi coprire errori, CTA, toast o modali; essendo
+     nel flusso eredita anche i margini di safe-area del contenuto. */
+  .lipe-ctx{position:static}
+  html.tal-tool-page #lipe-context-bar > #sb-toggle{
+    display:inline-flex!important;position:static!important;inset:auto!important;
+    transform:none!important;flex:0 0 44px!important;order:-1!important;
+    margin-left:auto!important;align-self:center!important}
+  .lipe-ctx-cap{flex:1 1 auto;order:-2}
+}
+@media (max-width:760px){
+  .lipe-ctx{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center}
+  .lipe-ctx-riassunto{grid-column:1;grid-row:1;width:auto;min-width:0}
+  html.tal-tool-page #lipe-context-bar > #sb-toggle{grid-column:2;grid-row:1;margin:0!important}
+  .lipe-ctx > :is(.grid,#active-client-card,.lipe-ctx-cap,.btn:not(#sb-toggle)){grid-column:1 / -1}
 }
 </style>
 <style id="lipe-import-v430">
@@ -704,13 +741,25 @@ footer a:hover{color:#F7F7F5!important}
 
 /* ─────────────────────────────────────────────── il benvenuto */
 .lipe-benvenuto{
-  max-width:620px;width:calc(100% - 32px);
-  border:1px solid var(--g2);border-radius:14px;padding:0;
+  position:fixed;inset:auto;left:50dvw;top:50dvh;margin:0;transform:translate(-50%,-50%);
+  width:min(620px,calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));
+  height:min(650px,calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));
+  max-width:none;max-height:none;min-height:0;
+  border:1px solid var(--g2);border-radius:14px;padding:0;overflow:hidden;
   box-shadow:0 24px 60px rgba(0,0,0,.22);color:var(--fg);background:#fff}
 .lipe-benvenuto::backdrop{background:rgba(20,18,14,.5)}
-.lipe-benvenuto[hidden]{display:none}
-.lipe-benvenuto > h2{
-  margin:0;padding:24px 28px 6px;font-size:22px;font-weight:650;letter-spacing:-.01em}
+.lipe-benvenuto:not([open]),.lipe-benvenuto[hidden]{display:none}
+.lipe-benvenuto[open]{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{
+  margin:0!important;padding:24px 64px 10px 28px!important;
+  font-size:22px;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.lipe-benvenuto-x{
+  position:absolute;z-index:2;top:12px;right:12px;width:44px;height:44px;
+  display:grid;place-items:center;border:1px solid var(--g2);border-radius:999px;
+  background:#fff;color:var(--fg);font:400 27px/1 var(--sans);cursor:pointer}
+.lipe-benvenuto-x:hover{background:var(--g1);border-color:var(--g4)}
+.lipe-benvenuto-x:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.lipe-benvenuto-corpo{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 .lipe-benvenuto-passi{margin:0;padding:14px 28px 4px 52px;display:flex;flex-direction:column;gap:15px}
 .lipe-benvenuto-passi li{padding-left:4px}
 .lipe-benvenuto-passi li::marker{font-weight:700;color:var(--g4)}
@@ -722,22 +771,27 @@ footer a:hover{color:#F7F7F5!important}
   font-size:13px;line-height:1.55;color:var(--ink2)}
 .lipe-benvenuto-fondo{
   display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  margin-top:20px;padding:16px 28px 22px;border-top:1px solid var(--g2);background:var(--g1)}
+  margin:0;padding:14px 28px max(18px,env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--g2);background:var(--g1)}
 .lipe-benvenuto-mai{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--g5);
   cursor:pointer;min-height:44px}
 .lipe-benvenuto-mai input{width:17px;height:17px}
 .lipe-benvenuto-fondo .btn{min-height:44px}
+#exports-section .btn:disabled{
+  opacity:.48;filter:saturate(.35);cursor:not-allowed;box-shadow:none;transform:none}
+#exports-section .btn:disabled:hover{transform:none;box-shadow:none}
 
 @media (max-width:560px){
-  .lipe-benvenuto > h2{padding:20px 20px 4px;font-size:19px}
+  html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{padding:18px 60px 9px 18px!important;font-size:19px}
+  .lipe-benvenuto-x{top:8px;right:8px}
   .lipe-benvenuto-passi{padding:12px 20px 4px 42px;gap:13px}
   .lipe-benvenuto-nota{margin:14px 20px 0}
-  .lipe-benvenuto-fondo{padding:14px 20px 18px}
+  .lipe-benvenuto-fondo{gap:8px;padding:10px 18px max(12px,env(safe-area-inset-bottom,0px))}
+  .lipe-benvenuto-mai{min-height:36px}
   .lipe-benvenuto-fondo .btn{width:100%;justify-content:center}
 }
 </style>
 </head><body class="tal-tool-page">
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di LIPE" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
 <div class="sb-brand">
 <span class="sb-logo">VP</span>
@@ -778,7 +832,7 @@ footer a:hover{color:#F7F7F5!important}
 <div class="status-row"><span class="status-chip">Codiciario permanente</span><span class="status-chip subtle">Caricamento periodico essenziale</span><span class="status-chip subtle">Multi-cliente</span><span class="status-chip subtle">Excel e incolla</span></div>
 </header>
 <main>
-<div class="lipe-ctx" id="lipe-context-bar"><span class="lipe-ctx-cap">Cliente attivo</span>
+<div class="lipe-ctx" id="lipe-context-bar"><button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di LIPE" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button><span class="lipe-ctx-cap">Cliente attivo</span>
 <div class="grid">
 <div class="field wide"><label>Cliente configurato</label><select id="run-client"><option value="">Seleziona un cliente</option></select></div>
 <div class="field"><label>Anno d’imposta</label><input id="run-year" max="2100" min="2000" type="number"/></div>
@@ -905,7 +959,7 @@ footer a:hover{color:#F7F7F5!important}
 </section>
 <section class="block lipe-view" id="exports-section">
 <h2 class="bt"><span class="num">3 · Output</span>File da trasmettere, prospetti e storico</h2><div class="rule"></div>
-<div class="panel"><h3>Esportazioni</h3><p>Il PDF è sempre disponibile come prospetto di lavoro e riproduce frontespizio e quadro VP, senza informativa privacy né istruzioni. Se i controlli ufficiali non sono superati viene dichiarato non presentabile. L’XML IVP18 è invece bloccato finché i dati e il caso dichiarativo non risultano supportati; prima dell’invio deve comunque essere controllato e firmato o sigillato con gli strumenti ufficiali vigenti.</p><div class="btn-row"><button class="btn" id="export-pdf">Esporta PDF · prospetto di lavoro</button><button class="btn secondary" id="export-excel">Esporta working paper Excel</button><button class="btn ghost" id="export-xml">Genera XML IVP18</button><button class="btn ghost" id="save-history">Salva riepilogo</button><button class="btn danger" id="clear-period">Rimuovi importi del periodo</button></div><div id="export-status"></div></div>
+<div class="panel"><h3>Esportazioni</h3><p>Il PDF è sempre disponibile come prospetto di lavoro e riproduce frontespizio e quadro VP, senza informativa privacy né istruzioni. Se i controlli ufficiali non sono superati viene dichiarato non presentabile. L’XML IVP18 è invece bloccato finché i dati e il caso dichiarativo non risultano supportati; prima dell’invio deve comunque essere controllato e firmato o sigillato con gli strumenti ufficiali vigenti.</p><div class="btn-row"><button aria-disabled="true" class="btn" disabled id="export-pdf">Esporta PDF · prospetto di lavoro</button><button aria-disabled="true" class="btn secondary" disabled id="export-excel">Esporta working paper Excel</button><button aria-disabled="true" class="btn ghost" disabled id="export-xml">Genera XML IVP18</button><button aria-disabled="true" class="btn ghost" disabled id="save-history">Salva riepilogo</button><button aria-disabled="true" class="btn danger" disabled id="clear-period">Rimuovi importi del periodo</button></div><div aria-live="polite" id="export-status"></div></div>
 <div class="panel"><h3>Storico locale</h3><div class="history-list" id="history-list"></div></div>
 </section>
 </main>
@@ -1635,7 +1689,14 @@ function renderResults(){
   const details=vals.flatMap(v=>v.details);$('detail-table').querySelector('tbody').innerHTML=details.length?details.map(d=>`<tr><td>${esc(d.period)}</td><td><span class="badge dark">${esc(d.row)}</span></td><td class="mono">${esc(d.code)}</td><td>${esc(d.description||'—')}</td><td class="r">${fmt(d.amount)}</td><td>${esc(d.source)}</td></tr>`).join(''):'<tr><td colspan="6">Nessun importo allocato. I codici potrebbero essere esclusi dalla LIPE.</td></tr>'
 }
 function renderExportState(){
-  if(!state.rows.length){$('export-status').innerHTML='';return}
+  const pronti=!!(state.activeRecord&&state.rows.length);
+  ['export-pdf','export-excel','export-xml','save-history','clear-period'].forEach(id=>{
+    const b=$(id);if(!b)return;b.disabled=!pronti;b.setAttribute('aria-disabled',String(!pronti));
+  });
+  if(!pronti){
+    $('export-status').innerHTML='<div class="notice"><b>Output non ancora disponibili.</b> Seleziona o configura un cliente e completa un’elaborazione: i comandi si attiveranno automaticamente.</div>';
+    return;
+  }
   const xmlProblems=(buildXml().problems||[]),warnings=checks().filter(c=>c.status==='warn');
   if(xmlProblems.length){
     $('export-status').innerHTML='<div class="notice warn"><b>PDF disponibile.</b> L’XML richiede la correzione dei requisiti formali o tecnici indicati nelle verifiche. Gli altri controlli restano avvisi di revisione.</div>';
@@ -3236,20 +3297,17 @@ function buildSections(){
     d.id='lipe-data';d.className='block lipe-view';
     d.innerHTML='<h2 class="bt"><span class="num">Dati e backup</span>Archivio clienti, configurazioni e cancellazione</h2><div class="rule"></div>'+
       '<p class="bd">Tutto è salvato nel browser di questo dispositivo. Nulla viene inviato a un server: se cambi computer o svuoti i dati del browser, l’archivio si perde. Esporta un backup periodicamente.</p>'+
-      '<div class="panel"><h3>Archivio completo</h3><p>Tutti i clienti, i codiciari e lo storico dei periodi elaborati, come file JSON.</p>'+
-        '<div class="btn-row"><button class="btn secondary" type="button" id="lipe-data-exp-all">Scarica un backup dell’archivio</button>'+
-        '<label class="btn ghost" for="lipe-import-full-backup">Ripristina l’archivio da backup</label></div></div>'+
+      '<div class="panel"><h3>Archivio completo</h3><p>Tutti i clienti, i codiciari e lo storico dei periodi elaborati, come file JSON.</p></div>'+
       '<div class="panel"><h3>Configurazione del cliente corrente</h3><p>Il backup del singolo cliente sta nella sua scheda, insieme all’anagrafica: è lì che si guarda quando si sposta una pratica su un altro dispositivo.</p>'+
         '<div class="btn-row"><button class="btn ghost" type="button" id="lipe-data-go-clients">Vai a Impostazioni cliente</button></div></div>';
     main.appendChild(d);
-    /* La scatola del backup dell’archivio la crea `injectBackup()` dentro
-       Esporta, e fin qui esisteva due volte: li’ e qui, con questa che
-       delegava a quella. Adesso e’ lo stesso identico nodo, spostato: stessi
-       id, stessi gestori, un posto solo. */
+    /* Il vecchio comando di questa sezione simulava un clic sul comando creato
+       da `injectBackup()`: stesso export, stesso input di ripristino. Ora resta
+       soltanto quel nodo, con gli stessi id e gestori, spostato qui. */
+    if(!document.getElementById('lipe-export-full-backup')&&typeof injectBackup==='function')injectBackup();
     var scatola=document.querySelector('#lipe-export-full-backup');
     if(scatola){var box=scatola.closest('.notice');if(box)d.querySelector('.panel').appendChild(box);}
     var on=function(id,fn){var e=document.getElementById(id);if(e)e.addEventListener('click',fn);};
-    on('lipe-data-exp-all',function(){var b=document.getElementById('lipe-export-full-backup');if(b)b.click();else if(window.exportClientJson)exportClientJson();});
     on('lipe-data-go-clients',function(){go('client-config');});
   }
   if(!document.getElementById('lipe-help')){
@@ -4132,11 +4190,12 @@ window.TAL_SESSION={
        non c'e', perche' la riga di riassunto e' gia' il modo per aprirla. Lo
        stile va messo in linea: dal foglio non passa. */
     var stretto = window.matchMedia('(max-width:760px)');
-    var scorciatoia = barra.querySelector(':scope > .btn');
+    var scorciatoia = barra.querySelector(':scope > .btn:not(#sb-toggle)');
     function sistemaScorciatoia() {
       if (!scorciatoia) return;
       var nascondi = stretto.matches && !barra.classList.contains('is-aperta');
-      scorciatoia.style.display = nascondi ? 'none' : '';
+      if(nascondi)scorciatoia.style.setProperty('display','none','important');
+      else scorciatoia.style.removeProperty('display');
     }
     if (stretto.addEventListener) stretto.addEventListener('change', sistemaScorciatoia);
 
@@ -4192,8 +4251,10 @@ window.TAL_SESSION={
   })();
 })();
 </script>
-<dialog class="lipe-benvenuto" id="lipe-benvenuto">
-<h2>Come funziona, in quattro passaggi</h2>
+<dialog aria-labelledby="lipe-benvenuto-titolo" class="lipe-benvenuto" id="lipe-benvenuto">
+<button aria-label="Chiudi il benvenuto" class="lipe-benvenuto-x" id="lipe-benvenuto-x" type="button"><span aria-hidden="true">×</span></button>
+<h2 id="lipe-benvenuto-titolo" tabindex="-1">Come funziona, in quattro passaggi</h2>
+<div class="lipe-benvenuto-corpo" id="lipe-benvenuto-corpo">
 <ol class="lipe-benvenuto-passi">
 <li><b>Configura il cliente</b><span>Anagrafica e codici IVA: si fa <b>una volta sola</b>. Il tool impara che cosa significa ogni codice del tuo gestionale, e se lo ricorda.</span></li>
 <li><b>Carica gli importi del periodo</b><span>Un file Excel per ogni trimestre, con codice IVA, imponibile e IVA. Questo si rifà ogni volta.</span></li>
@@ -4201,6 +4262,7 @@ window.TAL_SESSION={
 <li><b>Scarica i file</b><span>XML per l’invio, PDF del modello, foglio di lavoro per il fascicolo.</span></li>
 </ol>
 <p class="lipe-benvenuto-nota"><b>Due cose che conviene sapere.</b> I file che carichi <b>restano su questo dispositivo</b>: non vengono caricati da nessuna parte. E l’XML, prima di trasmetterlo, va comunque verificato con il software di controllo dell’Agenzia — questo tool lo prepara, non lo invia.</p>
+</div>
 <div class="lipe-benvenuto-fondo">
 <label class="lipe-benvenuto-mai"><input id="lipe-benvenuto-mai" type="checkbox"/> Non mostrarlo più</label>
 <button class="btn" id="lipe-benvenuto-chiudi" type="button">Ho capito, cominciamo</button>
@@ -4351,33 +4413,71 @@ window.TAL_SESSION={
     if (!d) return;
     var mai = document.getElementById('lipe-benvenuto-mai');
     var chiudi = document.getElementById('lipe-benvenuto-chiudi');
+    var chiudiX = document.getElementById('lipe-benvenuto-x');
+    var corpo = document.getElementById('lipe-benvenuto-corpo');
     var CHIAVE = 'lipe.benvenuto';
+    var tornaA = null;
+    var paginaX = 0, paginaY = 0;
 
     var giaVisto;
     try { giaVisto = localStorage.getItem(CHIAVE) === 'no'; } catch (_) { giaVisto = false; }
 
-    function apri() {
-      if (typeof d.showModal === 'function') { try { d.showModal(); return; } catch (_) { } }
+    function visibile(el) { return !!(el && document.contains(el) && el.offsetParent !== null && !d.contains(el)); }
+    function destinazione() {
+      if (visibile(tornaA)) return tornaA;
+      var candidati = [
+        document.querySelector('.lipe-ctx-riassunto'),
+        document.getElementById('run-client'),
+        document.querySelector('.lipe-view.active h2')
+      ];
+      for (var i = 0; i < candidati.length; i++) if (visibile(candidati[i])) return candidati[i];
+      return null;
+    }
+    function sistemaFuocoIniziale() {
+      d.scrollTop = 0;
+      if (corpo) corpo.scrollTop = 0;
+      try { (chiudiX || document.getElementById('lipe-benvenuto-titolo')).focus({ preventScroll: true }); }
+      catch (_) { }
+    }
+    function apri(apritore) {
+      if (d.open) return;
+      d.hidden = false;
+      /* Il benvenuto automatico e' l'ingresso nella pagina: una posizione
+         ripristinata dal browser non deve farlo partire a meta' schermata. Un
+         richiamo esplicito da «Come si usa» conserva invece il punto raggiunto. */
+      if (apritore) { paginaX = window.scrollX;paginaY = window.scrollY; }
+      else { paginaX = 0;paginaY = 0;window.scrollTo(0,0); }
+      tornaA = apritore || (visibile(document.activeElement) ? document.activeElement : null);
+      if (typeof d.showModal === 'function') { try { d.showModal(); requestAnimationFrame(sistemaFuocoIniziale); return; } catch (_) { } }
       d.hidden = false;
       d.setAttribute('open', '');
+      requestAnimationFrame(sistemaFuocoIniziale);
     }
     function via() {
       if (mai && mai.checked) { try { localStorage.setItem(CHIAVE, 'no'); } catch (_) { } }
       if (typeof d.close === 'function' && d.open) { try { d.close(); } catch (_) { } }
       d.hidden = true;
       d.removeAttribute('open');
+      var bersaglio = destinazione();
+      tornaA = null;
+      requestAnimationFrame(function () {
+        if (bersaglio) { try { bersaglio.focus({ preventScroll: true }); } catch (_) { } }
+        window.scrollTo(paginaX,paginaY);
+      });
     }
 
     if (chiudi) chiudi.addEventListener('click', via);
+    if (chiudiX) chiudiX.addEventListener('click', via);
     d.addEventListener('cancel', function (e) { e.preventDefault(); via(); });
     /* Il clic sullo sfondo del dialogo chiude, come ci si aspetta. */
     d.addEventListener('click', function (e) { if (e.target === d) via(); });
 
-    if (!giaVisto) setTimeout(apri, 500);
+    if (!giaVisto) setTimeout(function () { apri(null); }, 500);
 
     /* Sempre raggiungibile da «Come si usa», anche dopo averlo spento. */
     document.addEventListener('click', function (e) {
-      if (e.target.closest('[data-apre-benvenuto]')) { e.preventDefault(); apri(); }
+      var apertura = e.target.closest('[data-apre-benvenuto]');
+      if (apertura) { e.preventDefault(); apri(apertura); }
     });
   })();
 })();

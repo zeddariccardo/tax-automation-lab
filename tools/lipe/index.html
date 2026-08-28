@@ -422,7 +422,143 @@ footer a:hover{color:#F7F7F5!important}
 .set-tab:hover{color:var(--fg);border-color:var(--g3)}
 .set-tab.is-on{color:#fff;background:var(--fg);border-color:var(--fg)}
 .set-tab:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-</style></head><body class="tal-tool-page">
+</style><style id="lipe-comunicazione-v410">
+/* Fase 2 — la schermata «Comunicazione».
+
+   Prima era un flusso verticale unico: griglia VP, poi le verifiche, poi il
+   dettaglio per rigo. Per sapere se si poteva procedere bisognava scorrere
+   fino in fondo, e per correggere un valore tornare su. La domanda che la
+   schermata deve risolvere è una sola — «posso procedere oppure no?» — e la
+   risposta stava nel posto più lontano dagli occhi.
+
+   Adesso: a sinistra il lavoro sul periodo, a destra un pannello appeso che
+   risponde alla domanda e non si muove mentre si lavora. */
+
+.com-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;align-items:start}
+.com-main{min-width:0}
+
+/* Il pannello resta appeso sotto l'intestazione del sito e sotto la barra di
+   contesto della Fase 1, con lo stesso aggancio della barra comandi degli
+   altri tool. */
+.com-side{position:sticky;top:calc(var(--tal-global-header-height, 92px) + 150px);align-self:start}
+.com-card{
+  background:#fff;border:1px solid var(--g2);border-radius:12px;
+  box-shadow:var(--shadow);overflow:hidden;
+  /* Se i controlli sono tanti, a scorrere sono loro: saldo, stato e chiamata
+     all'azione non devono mai finire fuori dallo schermo. */
+  display:flex;flex-direction:column;
+  max-height:calc(100vh - var(--tal-global-header-height, 92px) - 170px)}
+.com-card .checks-grid{overflow-y:auto;min-height:0;flex:0 1 auto}
+.com-card .summary-bar,.com-stato,.com-azione{flex:0 0 auto}
+
+/* ───────────────────────────────────────────────── il saldo, per primo */
+/* Il riquadro dei totali è disegnato dalla pagina e non si tocca: qui cambia
+   solo come si dispone. L'ultima voce è il saldo, ed è la sola cifra per cui
+   si apre questa schermata: va sopra tutte le altre e grande. */
+.com-card .summary-bar{
+  display:flex;flex-direction:column;align-items:stretch;gap:0;
+  margin:0;border-radius:0;box-shadow:none;padding:0 0 4px}
+.com-card .summary-bar .spacer{display:none}
+.com-card .summary-bar .item{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:7px 18px;font-size:12px}
+.com-card .summary-bar .item .label{margin:0;font-size:9.5px}
+.com-card .summary-bar .item .value{font-size:13.5px;font-style:normal;font-family:var(--sans);
+  font-variant-numeric:tabular-nums}
+.com-card .summary-bar .item:last-child{
+  order:-1;flex-direction:column;align-items:flex-start;gap:3px;
+  padding:16px 18px 13px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:6px}
+.com-card .summary-bar .item:last-child .label{font-size:10px;letter-spacing:.16em}
+.com-card .summary-bar .item:last-child .value{font-size:27px;line-height:1.05;letter-spacing:-.02em;font-weight:650}
+
+/* ────────────────────────────────────────── pronta / avvisi / bloccata */
+.com-stato{padding:13px 18px;border-bottom:1px solid var(--g2);font-size:12.5px;line-height:1.45}
+.com-stato:empty{display:none}
+.com-stato .tit{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;margin-bottom:3px}
+.com-stato .pallino{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.com-stato .det{color:var(--g4);font-size:11.5px}
+.com-stato.is-pronta{background:var(--ok-bg)}
+.com-stato.is-pronta .tit{color:var(--ok)} .com-stato.is-pronta .pallino{background:var(--ok)}
+.com-stato.is-avvisi{background:var(--gold-bg)}
+.com-stato.is-avvisi .tit{color:var(--gold)} .com-stato.is-avvisi .pallino{background:var(--gold)}
+.com-stato.is-bloccata{background:var(--warn-bg)}
+.com-stato.is-bloccata .tit{color:var(--warn)} .com-stato.is-bloccata .pallino{background:var(--warn)}
+
+/* ─────────────────────────────────────── i controlli, per gravità */
+/* Dieci controlli tutti uguali costringono a leggerli tutti per trovare quello
+   che parla. Chi blocca sta in cima e per esteso; chi va bene diventa una riga
+   sola, perché «va bene» non ha bisogno di spiegazioni. */
+.com-card .checks-grid{display:flex;flex-direction:column;gap:0;padding:0;margin:0}
+.com-card .check-item{
+  border:0;border-radius:0;border-bottom:1px solid var(--g1);
+  padding:10px 18px;margin:0;background:#fff;display:block;
+  /* La griglia originale dava a ogni controllo un rettangolo di 112px, perche'
+     stavano affiancati tre per riga e dovevano essere alti uguali. In colonna
+     quel minimo diventa mille pixel di riquadri mezzi vuoti. */
+  min-height:0}
+.com-card .check-item:last-child{border-bottom:0}
+.com-card .check-item .name{font-size:12px;font-weight:650;margin:0}
+.com-card .check-item .value{font-size:11.5px;margin:1px 0 0}
+.com-card .check-item .desc{font-size:11px;color:var(--g4);margin:4px 0 0;line-height:1.45}
+
+.com-card .check-item.fail{order:1;background:var(--warn-bg);border-left:3px solid var(--warn)}
+.com-card .check-item.fail .name,.com-card .check-item.fail .value{color:var(--warn)}
+.com-card .check-item.warn{order:2;background:var(--gold-bg);border-left:3px solid var(--gold)}
+.com-card .check-item.warn .name,.com-card .check-item.warn .value{color:var(--gold)}
+
+/* I superati: una riga, nome a sinistra e valore a destra, spiegazione via. */
+.com-card .check-item.ok{
+  order:3;display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:6px 18px;border-bottom:1px solid var(--g1)}
+/* Una riga sola, sempre: e' il senso di «fortemente compressi». Il testo per
+   intero non si perde — resta nel DOM per chi legge con la voce, e lo script
+   dello stato lo mette anche nel suggerimento del puntatore. */
+.com-card .check-item.ok .name{font-weight:500;color:var(--g5);font-size:11.5px;
+  white-space:nowrap;flex:0 0 auto}
+.com-card .check-item.ok .value{color:var(--ok);font-size:11.5px;text-align:right;margin:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+.com-card .check-item.ok .desc{display:none}
+
+/* ────────────────────────────────────────────────────── la chiamata */
+.com-azione{padding:14px 18px;border-top:1px solid var(--g2);background:var(--g1)}
+.com-cta{width:100%;justify-content:center}
+
+/* ─────────────────────────────────── il dettaglio, chiuso di default */
+.com-dettaglio{
+  background:#fff;border:1px solid var(--g2);border-left:4px solid var(--g3);
+  border-radius:8px;margin:20px 0 0;overflow:hidden}
+.com-dettaglio > summary{
+  cursor:pointer;padding:15px 20px;list-style:none;
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.com-dettaglio > summary::-webkit-details-marker{display:none}
+.com-dettaglio > summary::after{
+  content:"▸";margin-left:auto;color:var(--g4);font-size:13px;transition:transform .15s}
+.com-dettaglio[open] > summary::after{transform:rotate(90deg)}
+.com-dettaglio > summary:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.com-dettaglio-tit{font-weight:650;font-size:15px}
+.com-dettaglio-nota{font-size:11.5px;color:var(--g4)}
+.com-dettaglio .table-scroll{border:0;border-top:1px solid var(--g2);border-radius:0}
+
+@media (max-width:1080px){
+  /* Sotto i 1080 il pannello non sta accanto a niente. Va sopra, non sotto:
+     saldo e stato sono la ragione per cui si apre questa schermata, e restano
+     la prima cosa che si legge. Il redesign vero del telefono è la Fase 3. */
+  .com-grid{grid-template-columns:minmax(0,1fr);gap:18px}
+  .com-side{position:static;order:-1}
+  .com-card .summary-bar .item:last-child .value{font-size:24px}
+  /* Su schermo stretto i controlli superati restano contati nella riga di
+     stato ma non elencati: dieci righe che dicono «va bene», con i valori che
+     vanno a capo tre volte, mettevano mille pixel fra il saldo e la griglia in
+     cui si scrivono i numeri. Chi ferma e chi avvisa resta, ed è quello che
+     serve. L'elenco intero è a un dito di distanza, sullo schermo grande, e il
+     trattamento vero del telefono è la Fase 3. */
+  .com-card{max-height:none}
+  .com-card .checks-grid{overflow:visible}
+  .com-card .check-item.ok{display:none}
+  .com-card .checks-grid:empty{display:none}
+}
+</style>
+</head><body class="tal-tool-page">
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di LIPE" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
 <div class="sb-brand">
@@ -568,10 +704,23 @@ footer a:hover{color:#F7F7F5!important}
 </div>
 <div class="empty-state" id="results-empty"><h3>Nessuna elaborazione disponibile</h3><p>Seleziona un cliente e importa gli importi del periodo.</p></div>
 <div hidden="" id="results-content">
-<div class="summary-bar" id="results-summary"></div>
+<div class="com-grid">
+<div class="com-main">
 <div class="tabs" id="period-tabs"></div><div id="period-panels"></div>
-<div class="panel"><h3>Verifiche</h3><p>La bozza XML rimane bloccata se esistono codici non mappati o dati incoerenti.</p><div class="checks-grid" id="checks-grid"></div></div>
-<div class="panel"><h3>Dettaglio per rigo</h3><p>Ogni importo è riconciliato con codice IVA, mese e riga di origine.</p><div class="table-scroll"><table class="data-table" id="detail-table"><thead><tr><th>Periodo</th><th>Rigo</th><th>Codice IVA</th><th>Descrizione</th><th class="r">Importo</th><th>Fonte</th></tr></thead><tbody></tbody></table></div></div>
+<details class="com-dettaglio" id="detail-block">
+<summary><span class="com-dettaglio-tit">Dettaglio per rigo</span><span class="com-dettaglio-nota">Ogni importo riconciliato con codice IVA, mese e riga di origine</span></summary>
+<div class="table-scroll"><table class="data-table" id="detail-table"><thead><tr><th>Periodo</th><th>Rigo</th><th>Codice IVA</th><th>Descrizione</th><th class="r">Importo</th><th>Fonte</th></tr></thead><tbody></tbody></table></div>
+</details>
+</div>
+<aside class="com-side" id="com-side">
+<div class="com-card">
+<div class="summary-bar" id="results-summary"></div>
+<div class="com-stato" id="com-stato"></div>
+<div class="checks-grid" id="checks-grid"></div>
+<div class="com-azione"><button class="btn com-cta" data-lipeview="exports-section" type="button">Vai a 3 · Output</button></div>
+</div>
+</aside>
+</div>
 </div>
 </section>
 <section class="block lipe-view" id="exports-section">
@@ -1523,7 +1672,7 @@ window.addEventListener('DOMContentLoaded',init);
   window.lipeUpdateContext=updateContext;
   // Navigazione: sidebar + card "data-scroll" (che prima scrollavano, ora cambiano vista)
   document.addEventListener('click',function(e){
-    var link=e.target.closest('[data-lipeview]');if(link){showSection(link.dataset.lipeview);return;}
+    var link=e.target.closest('[data-lipeview]');if(link){/* `go` aggiorna anche l'indirizzo; `showSection` no. Fuori dalla sidebar passavano tutti da showSection, e dopo un clic sulle schede o sulla chiamata all'azione la barra dell'indirizzo restava indietro: bastava ricaricare per tornare dove non si era piu'. */(window.lipeGo||showSection)(link.dataset.lipeview);return;}
     var sc=e.target.closest('[data-scroll]');if(sc){showSection(sc.dataset.scroll);return;}
   });
   var archiveBtn=$id('open-saved-clients');
@@ -3525,4 +3674,75 @@ window.TAL_SESSION={
 
 <script src="/assets/tal-xlsx-guard.js?v=20260824b"></script>
 <script src="/assets/tal-focus-guard.js?v=20260824"></script>
+<script id="lipe-comunicazione-stato">
+/* Fase 2 — la riga che dice se si può procedere.
+ *
+ * Legge i controlli **già disegnati** e li conta. Non chiama `checks()`, non
+ * chiede niente al servizio, non tocca lo stato: se lo facesse aggiungerebbe
+ * una richiesta per ogni ridisegno, e il contatore `rifiuti` di
+ * `window.lipeApiDiagnostica()` smetterebbe di voler dire qualcosa.
+ *
+ * Il conteggio dal DOM è fedele: `qualcosaBlocca` è vero quando almeno un
+ * controllo ha stato `fail`, ed è esattamente la classe che il disegno mette
+ * sull'elemento. Il caso «nessuna riga» non passa di qui, perché con zero righe
+ * `#results-content` resta nascosto.
+ */
+(function () {
+  'use strict';
+  var griglia = document.getElementById('checks-grid');
+  var box = document.getElementById('com-stato');
+  if (!griglia || !box) return;
+
+  var quanti = function (classe) {
+    return griglia.querySelectorAll('.check-item.' + classe).length;
+  };
+  var plurale = function (n, uno, molti) { return n === 1 ? uno : molti; };
+
+  function disegna() {
+    var fermi = quanti('fail'), avvisi = quanti('warn'), ok = quanti('ok');
+    var totale = fermi + avvisi + ok;
+    if (!totale) { box.className = 'com-stato'; box.innerHTML = ''; return; }
+
+    var classe, titolo, dettaglio;
+    if (fermi) {
+      classe = 'is-bloccata';
+      titolo = 'Comunicazione bloccata';
+      dettaglio = fermi + ' ' + plurale(fermi, 'controllo non superato', 'controlli non superati') +
+        '. Il file telematico resta bloccato finché non ' + plurale(fermi, 'lo risolvi', 'li risolvi') + '.';
+    } else if (avvisi) {
+      classe = 'is-avvisi';
+      titolo = 'Pronta, con ' + avvisi + ' ' + plurale(avvisi, 'avviso', 'avvisi');
+      dettaglio = 'Gli altri ' + ok + ' controlli sono superati. ' +
+        plurale(avvisi, 'L’avviso non ferma', 'Gli avvisi non fermano') +
+        ' i file, ma ' + plurale(avvisi, 'va guardato', 'vanno guardati') + ' prima di trasmettere.';
+    } else {
+      classe = 'is-pronta';
+      titolo = 'Comunicazione pronta';
+      dettaglio = 'Tutti i ' + ok + ' controlli sono superati. Puoi generare i file.';
+    }
+
+    box.className = 'com-stato ' + classe;
+    box.innerHTML = '<div class="tit"><span aria-hidden="true" class="pallino"></span>' + titolo + '</div>' +
+      '<div class="det">' + dettaglio + '</div>';
+
+    /* I controlli superati stanno su una riga sola e il valore lungo viene
+       tagliato. Il testo intero resta nel DOM, e da qui finisce anche nel
+       suggerimento del puntatore: tagliare non deve voler dire nascondere. */
+    var superati = griglia.querySelectorAll('.check-item.ok');
+    for (var i = 0; i < superati.length; i++) {
+      var n = superati[i].querySelector('.name'), v = superati[i].querySelector('.value'),
+          d = superati[i].querySelector('.desc');
+      superati[i].title = [n && n.textContent, v && v.textContent, d && d.textContent]
+        .filter(Boolean).join(' — ');
+    }
+  }
+
+  /* Il disegno dei controlli passa da `renderResults`, che riscrive
+     `innerHTML`: si guarda quello, non si va a cercare i punti che lo chiamano.
+     Un punto di disegno nuovo verrebbe coperto senza doverlo sapere. */
+  box.setAttribute('role', 'status');
+  new MutationObserver(disegna).observe(griglia, { childList: true });
+  disegna();
+})();
+</script>
 </body></html>

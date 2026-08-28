@@ -546,16 +546,107 @@ footer a:hover{color:#F7F7F5!important}
   .com-grid{grid-template-columns:minmax(0,1fr);gap:18px}
   .com-side{position:static;order:-1}
   .com-card .summary-bar .item:last-child .value{font-size:24px}
-  /* Su schermo stretto i controlli superati restano contati nella riga di
-     stato ma non elencati: dieci righe che dicono «va bene», con i valori che
-     vanno a capo tre volte, mettevano mille pixel fra il saldo e la griglia in
-     cui si scrivono i numeri. Chi ferma e chi avvisa resta, ed è quello che
-     serve. L'elenco intero è a un dito di distanza, sullo schermo grande, e il
-     trattamento vero del telefono è la Fase 3. */
+  /* Su schermo stretto i controlli superati partono chiusi: dieci righe che
+     dicono «va bene», coi valori che vanno a capo tre volte, mettevano mille
+     pixel fra il saldo e la griglia in cui si scrivono i numeri. Chi ferma e
+     chi avvisa resta sempre in vista; i superati si contano nella riga di
+     stato e si aprono con un tocco (Fase 3). */
   .com-card{max-height:none}
   .com-card .checks-grid{overflow:visible}
   .com-card .check-item.ok{display:none}
   .com-card .checks-grid:empty{display:none}
+}
+</style>
+<style id="lipe-mobile-v420">
+/* Fase 3 — lo schermo stretto.
+   Quattro cose, e nessuna tocca il desktop. */
+
+/* ═══════════════════════════════ 1 · la barra di contesto, richiusa */
+/* Occupava 269 pixel in cima a ogni schermata: un terzo di un telefono per tre
+   caselle che si cambiano una volta a trimestre. Richiusa è una riga che dice
+   di chi e di quando stiamo parlando — che è l'unica cosa che serve sapere
+   mentre si guardano i numeri — e si apre al tocco quando si deve cambiare. */
+.lipe-ctx-riassunto{display:none}
+@media (max-width:760px){
+  .lipe-ctx{position:sticky;top:calc(var(--tal-global-header-height, 92px));z-index:40;
+    padding:9px 12px;gap:8px;border-radius:0 0 10px 10px}
+  .lipe-ctx-riassunto{
+    display:flex;align-items:center;gap:10px;width:100%;order:0;
+    background:none;border:0;padding:4px 2px;text-align:left;cursor:pointer;
+    font:inherit;color:var(--fg);min-height:44px}
+  .lipe-ctx-riassunto .chi{flex:1 1 auto;min-width:0;line-height:1.25}
+  .lipe-ctx-riassunto .chi b{display:block;font-size:13.5px;font-weight:650;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lipe-ctx-riassunto .chi span{display:block;font-size:11px;color:var(--g4)}
+  .lipe-ctx-riassunto .freccia{flex:0 0 auto;color:var(--g4);font-size:13px;transition:transform .15s}
+  .lipe-ctx.is-aperta .lipe-ctx-riassunto .freccia{transform:rotate(90deg)}
+
+  /* Richiusa: restano nel DOM, spariscono dallo schermo. */
+  .lipe-ctx:not(.is-aperta) .grid,
+  .lipe-ctx:not(.is-aperta) #active-client-card{display:none}
+  /* La scorciatoia alle impostazioni la nasconde lo script, con lo stile in
+     linea: sul pulsante arrivano regole condivise che nessun selettore
+     ragionevole batte, e mettere !important qui vorrebbe dire vincere una gara
+     invece di dichiarare una regola. */
+  /* La didascalia è il titolo della sezione quando è aperta; da chiusa la
+     riga di riassunto dice già di che cosa si tratta. */
+  .lipe-ctx:not(.is-aperta) .lipe-ctx-cap{display:none}
+}
+
+/* ═════════════════════════════ 2 · i controlli superati, richiusi */
+/* Prima sparivano e basta. Adesso si contano nella riga di stato e si aprono
+   con un tocco: comprimere, non escludere. */
+.com-superati{display:none}
+@media (max-width:1080px){
+  .com-superati{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    min-height:44px;padding:9px 18px;border-top:1px solid var(--g2);
+    background:#fff;border-left:0;border-right:0;border-bottom:0;cursor:pointer;
+    font:inherit;font-size:12px;font-weight:600;color:var(--g5);text-align:left}
+  .com-superati .freccia{color:var(--g4);font-size:12px;transition:transform .15s}
+  .com-card.superati-aperti .com-superati .freccia{transform:rotate(90deg)}
+  .com-card.superati-aperti .check-item.ok{display:flex}
+  /* Aperti, i superati scorrono dentro invece di allungare la pagina. */
+  .com-card.superati-aperti .checks-grid{max-height:46vh;overflow-y:auto}
+}
+
+/* ═══════════════════════════════ 3 · i righi VP, uno sotto l'altro */
+/* La griglia è quattro colonne per 632 pixel dentro una scatola da 337: si
+   scorreva di lato per leggere gli importi, e il numero del rigo se ne andava
+   fuori insieme al resto. Le stesse quattro celle, in due righe da due: sopra
+   il rigo e che cos'è, sotto quanto fa. */
+@media (max-width:760px){
+  .vp-grid{grid-template-columns:60px minmax(0,1fr);overflow-x:visible}
+  .vp-grid > .vp-head{display:none}
+  /* Ogni quarto elemento riparte: è l'inizio di un rigo nuovo. */
+  .vp-grid > :nth-child(4n+1){border-top:2px solid var(--g2);padding-top:11px}
+  .vp-grid > :nth-child(4n+2){border-top:2px solid var(--g2);padding-top:11px}
+  .vp-grid > :nth-child(4n+3),
+  .vp-grid > :nth-child(4n+4){padding-top:2px;padding-bottom:11px}
+  /* Gli importi senza intestazione di colonna non si distinguono più: qui
+     l'etichetta va addosso al valore. */
+  .vp-grid > :nth-child(4n+3)::before{content:"Debito / valore";display:block;
+    font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--g4);margin-bottom:2px}
+  .vp-grid > :nth-child(4n+4)::before{content:"Credito";display:block;
+    font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--g4);margin-bottom:2px}
+  /* Una cella vuota resta al suo posto — toglierla sfalserebbe tutte le righe
+     successive — ma senza etichetta e senza spazio sprecato. */
+  .vp-grid > :nth-child(4n+3):empty::before,
+  .vp-grid > :nth-child(4n+4):empty::before{content:none}
+  .vp-grid > :nth-child(4n+3):empty,
+  .vp-grid > :nth-child(4n+4):empty{padding:0;min-height:0}
+  /* Le caselle e la riga dei contrassegni non sono importi: niente etichetta. */
+  .vp-grid > .flags::before{content:none}
+  .vp-grid .vp-code{font-weight:700}
+  .vp-grid input,.vp-grid select{width:100%;min-height:44px}
+}
+
+/* ═══════════════════════════ 4 · il menu, quando è una sovrapposizione */
+@media (max-width:980px){
+  /* Il velo e la chiusura toccando fuori c'erano già. Mancava che la pagina
+     dietro stesse ferma: si scorreva il contenuto sotto il menu aperto. */
+  body.lipe-menu-aperto{overflow:hidden;touch-action:none}
+  #sidebar.open{overscroll-behavior:contain}
 }
 </style>
 </head><body class="tal-tool-page">
@@ -3743,6 +3834,174 @@ window.TAL_SESSION={
   box.setAttribute('role', 'status');
   new MutationObserver(disegna).observe(griglia, { childList: true });
   disegna();
+})();
+</script>
+<script id="lipe-mobile">
+/* Fase 3 — quello che sullo schermo stretto il CSS non può fare da solo.
+ *
+ * Tre cose, e nessuna tocca i numeri: qui non si chiama il servizio, non si
+ * legge lo stato fiscale, non si tocca niente che finisca in un file. Si
+ * guarda il DOM già disegnato e si aggiungono un pulsante e qualche classe.
+ */
+(function () {
+  'use strict';
+
+  /* ═══════════════════════════ 1 · il menu: Esc, fuoco, pagina ferma */
+  /* Il velo e la chiusura toccando fuori li faceva già `setSidebar`. Mancavano
+     le tre cose che si notano solo usandolo davvero con una mano sola o con la
+     tastiera: Esc non chiudeva, il fuoco restava sulla pagina dietro — e con
+     Tab si girava fra elementi che non si vedevano — e la pagina sotto
+     scorreva insieme al menu. */
+  (function () {
+    var sb = document.getElementById('sidebar');
+    var tog = document.getElementById('sb-toggle');
+    if (!sb || !tog) return;
+
+    var eraAperto = false, tornaA = null;
+
+    var fuocabili = function () {
+      return [].slice.call(sb.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(function (e) { return e.offsetParent !== null; });
+    };
+
+    function tasti(e) {
+      if (e.key === 'Escape') { e.preventDefault(); chiudi(); return; }
+      if (e.key !== 'Tab') return;
+      /* La trappola: dentro un pannello che copre la pagina, Tab deve girare
+         qui e non andare a finire su quello che sta sotto il velo. */
+      var f = fuocabili();
+      if (!f.length) return;
+      var primo = f[0], ultimo = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === primo) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primo.focus(); }
+    }
+
+    /* Il pulsante commuta in base allo stato: da aperto, un clic chiude. Si
+       passa di lì invece di toccare la classe a mano, così velo e
+       aria-expanded restano in mano a chi li ha sempre gestiti. */
+    function chiudi() { tog.click(); }
+
+    function apri() {
+      document.body.classList.add('lipe-menu-aperto');
+      document.addEventListener('keydown', tasti, true);
+      tornaA = document.activeElement;
+      var f = fuocabili();
+      /* Sulla voce attiva, non sulla prima: il menu si apre dove si è. */
+      var attiva = sb.querySelector('.lipe-link.active');
+      try { (attiva && attiva.offsetParent ? attiva : f[0]).focus({ preventScroll: true }); }
+      catch (_) { if (f[0]) f[0].focus(); }
+    }
+
+    function chiuso() {
+      document.body.classList.remove('lipe-menu-aperto');
+      document.removeEventListener('keydown', tasti, true);
+      /* Chi ha aperto il menu deve ritrovarsi dove l'aveva aperto. */
+      try { (tornaA && document.contains(tornaA) ? tornaA : tog).focus({ preventScroll: true }); }
+      catch (_) { }
+      tornaA = null;
+    }
+
+    /* Si guarda la classe invece di intercettare i clic: `setSidebar` viene
+       chiamata anche da `go()` quando si sceglie una voce, e da lì un
+       ascoltatore sul pulsante non passerebbe mai. */
+    new MutationObserver(function () {
+      var aperto = sb.classList.contains('open');
+      if (aperto === eraAperto) return;
+      eraAperto = aperto;
+      if (aperto) apri(); else chiuso();
+    }).observe(sb, { attributes: true, attributeFilter: ['class'] });
+  })();
+
+  /* ═════════════════════ 2 · la barra di contesto, richiusa e riassunta */
+  (function () {
+    var barra = document.getElementById('lipe-context-bar');
+    if (!barra) return;
+    var cliente = document.getElementById('run-client');
+    var anno = document.getElementById('run-year');
+    var trimestre = document.getElementById('run-quarter');
+    if (!cliente || !anno || !trimestre) return;
+
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lipe-ctx-riassunto';
+    b.setAttribute('aria-expanded', 'false');
+    b.innerHTML = '<span class="chi"><b></b><span></span></span><span aria-hidden="true" class="freccia">▸</span>';
+    barra.insertBefore(b, barra.firstChild);
+
+    function scrivi() {
+      var opt = cliente.options[cliente.selectedIndex];
+      var nome = (opt && cliente.value) ? opt.textContent.trim() : 'Nessun cliente selezionato';
+      var q = trimestre.options[trimestre.selectedIndex];
+      var periodo = ((q && q.textContent.trim()) || '') + (anno.value ? ' ' + anno.value : '');
+      b.querySelector('.chi b').textContent = nome;
+      b.querySelector('.chi span').textContent = periodo.trim() || 'periodo da scegliere';
+      b.setAttribute('aria-label', 'Cliente e periodo: ' + nome + ', ' + periodo.trim() +
+        '. Tocca per cambiarli.');
+    }
+
+    /* La scorciatoia alle impostazioni segue lo stato della barra: da chiusa
+       non c'e', perche' la riga di riassunto e' gia' il modo per aprirla. Lo
+       stile va messo in linea: dal foglio non passa. */
+    var stretto = window.matchMedia('(max-width:760px)');
+    var scorciatoia = barra.querySelector(':scope > .btn');
+    function sistemaScorciatoia() {
+      if (!scorciatoia) return;
+      var nascondi = stretto.matches && !barra.classList.contains('is-aperta');
+      scorciatoia.style.display = nascondi ? 'none' : '';
+    }
+    if (stretto.addEventListener) stretto.addEventListener('change', sistemaScorciatoia);
+
+    b.addEventListener('click', function () {
+      var aperta = barra.classList.toggle('is-aperta');
+      b.setAttribute('aria-expanded', String(aperta));
+      sistemaScorciatoia();
+      if (aperta) { try { cliente.focus({ preventScroll: true }); } catch (_) { } }
+    });
+    sistemaScorciatoia();
+    [cliente, anno, trimestre].forEach(function (e) {
+      e.addEventListener('change', scrivi);
+      e.addEventListener('input', scrivi);
+    });
+    /* Il cliente attivo viene riscritto dalla pagina quando cambia: si guarda
+       quello, così il riassunto segue anche i cambi che non passano dal
+       menu a tendina. */
+    var card = document.getElementById('active-client-card');
+    if (card) new MutationObserver(scrivi).observe(card, { childList: true, subtree: true });
+    scrivi();
+  })();
+
+  /* ══════════════════════ 3 · i controlli superati, contati e richiusi */
+  (function () {
+    var griglia = document.getElementById('checks-grid');
+    var card = document.querySelector('.com-card');
+    if (!griglia || !card) return;
+
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'com-superati';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', 'checks-grid');
+    b.addEventListener('click', function () {
+      var aperti = card.classList.toggle('superati-aperti');
+      b.setAttribute('aria-expanded', String(aperti));
+      scrivi();
+    });
+    card.insertBefore(b, griglia);
+
+    function scrivi() {
+      var n = griglia.querySelectorAll('.check-item.ok').length;
+      if (!n) { b.hidden = true; card.classList.remove('superati-aperti'); return; }
+      b.hidden = false;
+      var aperti = card.classList.contains('superati-aperti');
+      b.innerHTML = '<span>' + (aperti ? 'Nascondi' : 'Mostra') + ' ' + n + ' ' +
+        (n === 1 ? 'controllo superato' : 'controlli superati') + '</span>' +
+        '<span aria-hidden="true" class="freccia">▸</span>';
+    }
+
+    new MutationObserver(scrivi).observe(griglia, { childList: true });
+    scrivi();
+  })();
 })();
 </script>
 </body></html>

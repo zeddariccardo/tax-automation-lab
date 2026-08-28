@@ -207,12 +207,18 @@ try {
     'ogni importo valorizzato deve ripulire il proprio campo una volta sola');
   pretendi(testi.some((e) => e.value === 'T' && e.font === 'courier' && e.size === 12),
     'i codici del frontespizio non usano Courier 12');
+  const anno = testi.filter((e) => Math.abs(e.y - 54.4) < 0.01);
+  pretendi(anno.map((e) => e.value).join('') === '2026',
+    'l’anno non è stato battuto nelle quattro caselle del frontespizio');
+  pretendi(JSON.stringify(anno.map((e) => Number(e.x.toFixed(2)))) === JSON.stringify([63.9, 68.98, 74.06, 79.14]),
+    'l’anno non segue il passo delle caselle del frontespizio');
 
   console.log(JSON.stringify({
     pdf: output,
     bytes: fs.statSync(output).size,
     pagineAttese: 3,
     importiVerificati: valoriAttesi.length,
+    annoCaselle: anno.length,
     campiRipuliti: importi.length
   }));
 } finally {

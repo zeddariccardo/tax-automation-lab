@@ -1826,7 +1826,7 @@ function exportPdf(){
   const {jsPDF}=window.jspdf||{};if(!jsPDF){toast('Libreria PDF non disponibile.',true);return}
   const doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true}),c=state.activeRecord.client;
   doc.addImage(MINISTERIAL_FRONT_TEMPLATE,'PNG',0,0,210,297,'frontMinisteriale','FAST');
-  writeModelBoxes(doc,c.cf||state.activeClientKey,90.15,22.9,16,5.13);writeModelText(doc,String(state.year),63.9,54.4);writeModelBoxes(doc,state.activeClientKey,73.64,67.1,11,5.03);writeModelBoxes(doc,c.groupVat,73.64,75.25,11,5.03);
+  writeModelBoxes(doc,c.cf||state.activeClientKey,90.15,22.9,16,5.13);writeModelBoxes(doc,String(state.year),63.9,54.4,4,5.08);writeModelBoxes(doc,state.activeClientKey,73.64,67.1,11,5.03);writeModelBoxes(doc,c.groupVat,73.64,75.25,11,5.03);
   if(c.lastMonth)writeModelBoxes(doc,String(c.lastMonth).padStart(2,'0'),159.6,75.25,2,5.03);writeModelMark(doc,c.groupLiquidation==='1',200.5,75.15);
   writeModelBoxes(doc,c.repCf,65.77,87.7,16,5.05);if(c.repRole)writeModelText(doc,String(c.repRole).slice(0,2),195.1,87.7,10,'center');writeModelBoxes(doc,c.declCompanyCf,65.77,96.1,16,5.05);
   writeModelBoxes(doc,c.interCf,76.18,118.45,16,5.05);if(c.commitment)writeModelText(doc,String(c.commitment),75.2,128.7,12,'center');const dt=xmlDate(c.commitmentDate);if(dt)writeModelText(doc,dt.slice(0,2)+'/'+dt.slice(2,4)+'/'+dt.slice(4,8),62.2,143.4);

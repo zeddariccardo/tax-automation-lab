@@ -168,11 +168,13 @@ test('codici fiscali e partita IVA usano Courier 12 con passo di casella', () =>
   assert.ok(testi.every((t) => t.font === 'courier' && t.size === 12));
 });
 
-test('anno e data del frontespizio sono battute monospaziate leggibili', () => {
+test('l’anno occupa le quattro caselle del frontespizio e la data resta monospaziata', () => {
   const doc = new DocumentoFinto();
-  api.writeModelText(doc, '2026', 63.9, 54.4);
+  api.writeModelBoxes(doc, '2026', 63.9, 54.4, 4, 5.08);
   api.writeModelText(doc, '28/08/2026', 62.2, 144.2);
-  assert.deepStrictEqual(doc.eventi.map((e) => e.value), ['2026', '28/08/2026']);
+  assert.deepStrictEqual(doc.eventi.map((e) => e.value), ['2', '0', '2', '6', '28/08/2026']);
+  assert.deepStrictEqual(doc.eventi.slice(0, 4).map((e) => Number(e.x.toFixed(2))),
+    [63.9, 68.98, 74.06, 79.14]);
   assert.ok(doc.eventi.every((e) => e.font === 'courier' && e.size === 12));
 });
 
@@ -191,6 +193,8 @@ test('exportPdf conserva tutti i righi VP e separa debito e credito', () => {
   for (const chiamata of chiamate) {
     assert.ok(corpo.includes('writeModelValue(doc,' + chiamata + ')'), `manca ${chiamata}`);
   }
+  assert.ok(corpo.includes("writeModelBoxes(doc,String(state.year),63.9,54.4,4,5.08)"),
+    'l’anno deve essere posizionato casella per casella nel frontespizio');
   assert.ok(corpo.includes('v.vp6>0?v.vp6:0,146.4,100.45'));
   assert.ok(corpo.includes('v.vp6<0?-v.vp6:0,196.8,100.45'));
 });

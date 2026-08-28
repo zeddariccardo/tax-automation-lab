@@ -666,6 +666,69 @@ footer a:hover{color:#F7F7F5!important}
   #sidebar.open{overscroll-behavior:contain}
 }
 </style>
+<style id="lipe-import-v430">
+/* L'area di trascinamento, e il benvenuto. */
+
+.lipe-drop{
+  display:flex;align-items:center;gap:16px;
+  margin:16px 0 10px;padding:22px 24px;
+  border:2px dashed var(--g3);border-radius:12px;background:var(--g1);
+  cursor:pointer;text-align:left;
+  transition:border-color .12s,background .12s}
+.lipe-drop:hover{border-color:var(--fg);background:#fff}
+.lipe-drop:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.lipe-drop.is-sopra{border-color:var(--ok);background:var(--ok-bg);border-style:solid}
+.lipe-drop-ic{font-size:26px;line-height:1;color:var(--g4);flex:0 0 auto}
+.lipe-drop.is-sopra .lipe-drop-ic{color:var(--ok)}
+.lipe-drop-testo{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lipe-drop-testo b{font-size:16px;font-weight:650}
+.lipe-drop-testo span{font-size:12.5px;color:var(--g4)}
+
+.lipe-drop-esito{margin:0 0 14px;font-size:13px;line-height:1.5;min-height:1px}
+.lipe-drop-esito:empty{margin:0}
+.lipe-drop-esito.is-bene{color:var(--ok);font-weight:600}
+.lipe-drop-esito.is-male{color:var(--warn);font-weight:600}
+.lipe-drop-esito.is-attesa{color:var(--g4)}
+
+@media (max-width:560px){
+  .lipe-drop{flex-direction:column;text-align:center;gap:10px;padding:20px 16px}
+  .lipe-drop-testo{align-items:center}
+}
+
+/* ─────────────────────────────────────────────── il benvenuto */
+.lipe-benvenuto{
+  max-width:620px;width:calc(100% - 32px);
+  border:1px solid var(--g2);border-radius:14px;padding:0;
+  box-shadow:0 24px 60px rgba(0,0,0,.22);color:var(--fg);background:#fff}
+.lipe-benvenuto::backdrop{background:rgba(20,18,14,.5)}
+.lipe-benvenuto[hidden]{display:none}
+.lipe-benvenuto > h2{
+  margin:0;padding:24px 28px 6px;font-size:22px;font-weight:650;letter-spacing:-.01em}
+.lipe-benvenuto-passi{margin:0;padding:14px 28px 4px 52px;display:flex;flex-direction:column;gap:15px}
+.lipe-benvenuto-passi li{padding-left:4px}
+.lipe-benvenuto-passi li::marker{font-weight:700;color:var(--g4)}
+.lipe-benvenuto-passi b{display:block;font-size:15px;font-weight:650;margin-bottom:2px}
+.lipe-benvenuto-passi span{display:block;font-size:13.5px;line-height:1.55;color:var(--g5)}
+.lipe-benvenuto-nota{
+  margin:18px 28px 0;padding:14px 16px;border-radius:9px;
+  background:var(--gold-bg);border:1px solid var(--gold-line, #e8d9a8);
+  font-size:13px;line-height:1.55;color:var(--ink2)}
+.lipe-benvenuto-fondo{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-top:20px;padding:16px 28px 22px;border-top:1px solid var(--g2);background:var(--g1)}
+.lipe-benvenuto-mai{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--g5);
+  cursor:pointer;min-height:44px}
+.lipe-benvenuto-mai input{width:17px;height:17px}
+.lipe-benvenuto-fondo .btn{min-height:44px}
+
+@media (max-width:560px){
+  .lipe-benvenuto > h2{padding:20px 20px 4px;font-size:19px}
+  .lipe-benvenuto-passi{padding:12px 20px 4px 42px;gap:13px}
+  .lipe-benvenuto-nota{margin:14px 20px 0}
+  .lipe-benvenuto-fondo{padding:14px 20px 18px}
+  .lipe-benvenuto-fondo .btn{width:100%;justify-content:center}
+}
+</style>
 </head><body class="tal-tool-page">
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Apri o chiudi il menu di LIPE" class="sb-toggle" id="sb-toggle" type="button">☰ Menu</button>
 <nav aria-label="Navigazione principale" class="appbar" id="sidebar">
@@ -719,7 +782,7 @@ footer a:hover{color:#F7F7F5!important}
 
 
 <section class="block lipe-view active" id="client-config"><div class="set-tabs" role="tablist"><button class="set-tab is-on" data-lipeview="client-config" role="tab" type="button">Anagrafica</button><button class="set-tab" data-lipeview="telematic-config" role="tab" type="button">Dati telematici</button><button class="set-tab" data-lipeview="vat-codes" role="tab" type="button">Codici IVA</button></div>
-<h2 class="bt"><span class="num">Impostazioni cliente</span>Anagrafica, dati telematici e codici IVA</h2><div class="tal-start"><p class="tal-start-lead">Da dove vuoi partire?</p><div class="tal-start-cards"><button class="tal-start-card" type="button" onclick="document.getElementById('lipe-nav-import').click()"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI: un solo file con anagrafica e codiciario IVA. Il cliente nasce dal file.</span></button><button class="tal-start-card" type="button" onclick="document.querySelector('#new-client').click()"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Crea il cliente e configura il codiciario IVA una volta sola.</span></button></div></div><div class="rule"></div>
+<h2 class="bt"><span class="num">Impostazioni cliente</span>Anagrafica, dati telematici e codici IVA</h2><div class="tal-start"><p class="tal-start-lead">Da dove vuoi partire?</p><div class="tal-start-cards"><button class="tal-start-card" data-apre="mapping-upload" type="button"><span class="tal-start-ic" aria-hidden="true">⇩</span><b>Importa da Excel</b><span>Parti dal template compilato con l’AI: un solo file con anagrafica e codiciario IVA. Il cliente nasce dal file.</span></button><button class="tal-start-card" data-preme="new-client" type="button"><span class="tal-start-ic" aria-hidden="true">✎</span><b>Inizia a mano</b><span>Crea il cliente e configura il codiciario IVA una volta sola.</span></button></div></div><div class="rule"></div>
 <p class="bd">Gestisci l’anagrafica e il codiciario permanente oppure accedi direttamente all’archivio dei clienti già salvati. Gli importi del periodo restano separati.</p>
 <div class="btn-row client-config-actions"><button class="btn secondary" id="open-saved-clients" type="button">Archivio clienti salvati</button></div>
 <div class="panel">
@@ -789,7 +852,9 @@ footer a:hover{color:#F7F7F5!important}
 <p class="bd">Il file periodico può contenere righe aggregate o il dettaglio completo. Le righe duplicate per codice e mese vengono sommate automaticamente.</p>
 <div class="panel">
 <h3>1. Importa gli importi</h3><p id="import-format-hint">Formato minimo: <b>Codice IVA</b>, <b>Imponibile</b>, <b>IVA</b>, <b>Mese</b>. Per i contribuenti trimestrali viene predisposto un solo modulo; per i contribuenti mensili vengono elaborati i tre mesi del trimestre.</p><details class="nota-piega"><summary>Come devono essere indicati i segni</summary><div class="nota-corpo"><p>Gli importi entrano nel quadro VP con il segno che hanno nel file: il tool li somma, non li converte.</p><ul><li><b>Vendite</b> e IVA a debito positive. Le <b>note di credito su vendite</b> vanno negative: abbassano VP2 e VP4.</li><li><b>Acquisti</b> e IVA detraibile positivi. Le <b>note di credito su acquisti</b> vanno negative: abbassano VP3 e VP5.</li><li>Gli <b>storni</b> seguono il segno del documento che rettificano.</li><li>Il <b>reverse charge</b> non si risolve col segno: si imposta nel codiciario, mappando il codice perché alimenti sia l&#8217;IVA a debito sia quella detraibile. Nell&#8217;esempio dimostrativo è il codice RC22.</li></ul><p class="hint">Se il gestionale esporta l&#8217;IVA vendite già negativa, va invertita prima dell&#8217;import: il tool prende i numeri come sono.</p></div></details>
-<div class="btn-row"><button class="btn secondary" id="download-amounts-template">Scarica Excel importi</button><label class="btn" for="amounts-upload">Carica Excel importi</label><input accept=".xlsx,.xls" id="amounts-upload" type="file"/><button class="btn ghost" id="toggle-paste-amounts">Incolla da Excel</button><button class="btn ghost" data-load-demo="" id="load-demo">Carica esempio dimostrativo</button></div>
+<div class="lipe-drop" id="lipe-dropzone" role="button" tabindex="0" aria-controls="amounts-upload" aria-describedby="lipe-drop-esito"><span aria-hidden="true" class="lipe-drop-ic">⇩</span><span class="lipe-drop-testo"><b>Trascina qui il file Excel</b><span>oppure tocca per sceglierlo · .xlsx o .xls</span></span></div>
+<p aria-live="polite" class="lipe-drop-esito" id="lipe-drop-esito"></p>
+<div class="btn-row"><button class="btn" data-load-demo="" id="load-demo">Carica dati dimostrativi</button><button class="btn secondary" id="download-amounts-template">Scarica Excel importi</button><label class="btn ghost" for="amounts-upload">Scegli il file</label><input accept=".xlsx,.xls" id="amounts-upload" type="file"/><button class="btn ghost" id="toggle-paste-amounts">Incolla da Excel</button><button class="btn ghost" data-apre-benvenuto="" type="button">Come funziona</button></div>
 <div class="paste-box" hidden="" id="paste-amounts-box">
 <label class="mini-label" for="amounts-paste">Incolla le risultanze del gestionale</label>
 <textarea id="amounts-paste" placeholder="Codice IVA[TAB]Imponibile[TAB]IVA[TAB]Mese"></textarea>
@@ -3863,6 +3928,31 @@ window.TAL_SESSION={
 (function () {
   'use strict';
 
+  /* ═══════════════ -1 · le scorciatoie che aprono qualcos'altro */
+  /* Le due card di «Da dove vuoi partire?» chiamavano un `onclick` in linea che
+     faceva `getElementById('lipe-nav-import').click()`. Quella voce di menu e'
+     stata tolta in Fase 1: da allora il click lanciava un TypeError e la card
+     non faceva niente — un pulsante morto, senza un segno sullo schermo.
+     Adesso il bersaglio e' un attributo, il gestore e' uno solo, e se il
+     bersaglio non c'e' piu' lo si dice invece di tacere. */
+  (function () {
+    function bersaglio(el) {
+      return document.getElementById(el.dataset.apre || el.dataset.preme || '');
+    }
+    document.addEventListener('click', function (e) {
+      var el = e.target.closest('[data-apre],[data-preme]');
+      if (!el) return;
+      e.preventDefault();
+      var b = bersaglio(el);
+      if (!b) {
+        if (window.toast) window.toast('Questa scorciatoia non è più collegata: apri la sezione dal menu.', true);
+        else console.error('scorciatoia rotta: manca #' + (el.dataset.apre || el.dataset.preme));
+        return;
+      }
+      b.click();
+    });
+  })();
+
   /* ═══════════ 0 · la barra di contesto si appende sotto la barra comandi */
   /* Erano tutt'e due sticky allo stesso `top`, e si coprivano: della barra
      comandi si vedeva mezza riga tagliata. L'altezza della barra comandi non
@@ -4055,6 +4145,196 @@ window.TAL_SESSION={
 
     new MutationObserver(scrivi).observe(griglia, { childList: true });
     scrivi();
+  })();
+})();
+</script>
+<dialog class="lipe-benvenuto" id="lipe-benvenuto">
+<h2>Come funziona, in quattro passaggi</h2>
+<ol class="lipe-benvenuto-passi">
+<li><b>Configura il cliente</b><span>Anagrafica e codici IVA: si fa <b>una volta sola</b>. Il tool impara che cosa significa ogni codice del tuo gestionale, e se lo ricorda.</span></li>
+<li><b>Carica gli importi del periodo</b><span>Un file Excel per ogni trimestre, con codice IVA, imponibile e IVA. Questo si rifà ogni volta.</span></li>
+<li><b>Controlla il quadro VP</b><span>I righi si compilano da soli. A destra vedi il saldo e se la comunicazione è pronta, ha avvisi o è bloccata.</span></li>
+<li><b>Scarica i file</b><span>XML per l’invio, PDF del modello, foglio di lavoro per il fascicolo.</span></li>
+</ol>
+<p class="lipe-benvenuto-nota"><b>Due cose che conviene sapere.</b> I file che carichi <b>restano su questo dispositivo</b>: non vengono caricati da nessuna parte. E l’XML, prima di trasmetterlo, va comunque verificato con il software di controllo dell’Agenzia — questo tool lo prepara, non lo invia.</p>
+<div class="lipe-benvenuto-fondo">
+<label class="lipe-benvenuto-mai"><input id="lipe-benvenuto-mai" type="checkbox"/> Non mostrarlo più</label>
+<button class="btn" id="lipe-benvenuto-chiudi" type="button">Ho capito, cominciamo</button>
+</div>
+</dialog>
+<script id="lipe-import-e-benvenuto">
+/* L'area di trascinamento, la conferma della demo e il benvenuto.
+ *
+ * Un solo gestore per il file: il selettore e il trascinamento finiscono
+ * tutt'e due in `passa(file)`. Due strade separate vogliono dire due
+ * comportamenti che un giorno divergono — e il file letto in un modo ma non
+ * nell'altro è esattamente il genere di difetto che non si vede finché non
+ * capita a qualcuno.
+ *
+ * Il file non esce dal browser: si mette nell'input che la pagina già legge, e
+ * la lettura resta quella di prima. Qui non si tocca il contenuto.
+ */
+(function () {
+  'use strict';
+
+  /* ═════════════════════════════════ 1 · trascina, o scegli */
+  (function () {
+    var zona = document.getElementById('lipe-dropzone');
+    var input = document.getElementById('amounts-upload');
+    var esito = document.getElementById('lipe-drop-esito');
+    if (!zona || !input || !esito) return;
+
+    function dillo(testo, genere) {
+      esito.textContent = testo;
+      esito.className = 'lipe-drop-esito' + (genere ? ' is-' + genere : '');
+    }
+
+    /* Il trascinamento mette il file nell'input e lascia partire il `change`;
+       il selettore quel `change` lo fa da sé. Da lì in poi la strada è una
+       sola — due letture per due strade sono la cosa che un giorno diverge in
+       silenzio, e il file letto in un modo ma non nell'altro non lo scopre
+       nessuno finché non capita a qualcuno. */
+    function passa(file) {
+      if (!file) return;
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    /* Il messaggio e la sorveglianza stanno qui: un posto solo, qualunque sia
+       la strada da cui il file è arrivato. */
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      if (!file) return;
+      if (!/\.(xlsx|xls)$/i.test(file.name)) {
+        dillo('«' + file.name + '» non è un foglio Excel: servono file .xlsx o .xls. ' +
+          'Se il tuo gestionale esporta in CSV, aprilo con Excel e salvalo in .xlsx.', 'male');
+        return;
+      }
+      dillo('Lettura di «' + file.name + '» in corso…', 'attesa');
+      /* La lettura e' asincrona e puo' fallire senza dire niente a nessuno.
+         Se dopo qualche secondo non e' cambiato nulla, il file non e'
+         leggibile: meglio dirlo che restare su «Sto leggendo» per sempre. */
+      clearTimeout(passa._sveglia);
+      passa._sveglia = setTimeout(function () {
+        /* `state` vive in una closure e non sta su window: non lo si puo'
+           interrogare da qui. Si guarda invece se il riepilogo ha parlato: se
+           siamo ancora su «Sto leggendo», non ha parlato nessuno. */
+        if (!esito.classList.contains('is-attesa')) return;
+        dillo('«' + file.name + '» non è stato letto. ' +
+          'Deve essere un foglio Excel valido, con le intestazioni delle colonne ' +
+          'nella prima riga.', 'male');
+      }, 3500);
+    });
+
+    /* L'esito vero lo sa la pagina, che scrive il riepilogo: si guarda quello
+       invece di indovinare. Se dopo la lettura non ci sono righe, il file
+       c'era ma dentro non c'era niente di utilizzabile. */
+    var riepilogo = document.getElementById('import-summary');
+    if (riepilogo) {
+      new MutationObserver(function () {
+        var righe = (window.state && window.state.rows) ? window.state.rows.length : 0;
+        var nome = (window.state && window.state.sourceFile) || '';
+        if (!nome) return;
+        if (righe > 0) dillo('«' + nome + '» caricato: ' + righe + (righe === 1 ? ' riga letta.' : ' righe lette.'), 'bene');
+        else dillo('«' + nome + '» è stato aperto ma non contiene righe leggibili: ' +
+          'servono le colonne Codice IVA, Imponibile e IVA.', 'male');
+      }).observe(riepilogo, { childList: true, subtree: true });
+    }
+
+    zona.addEventListener('click', function () { input.click(); });
+    zona.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+    });
+
+    ['dragenter', 'dragover'].forEach(function (n) {
+      zona.addEventListener(n, function (e) { e.preventDefault(); zona.classList.add('is-sopra'); });
+    });
+    ['dragleave', 'dragend'].forEach(function (n) {
+      zona.addEventListener(n, function () { zona.classList.remove('is-sopra'); });
+    });
+    zona.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zona.classList.remove('is-sopra');
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) { dillo('Nessun file ricevuto. Riprova, oppure usa «Scegli il file».', 'male'); return; }
+      passa(f);
+    });
+
+    /* Un file lasciato cadere fuori dall'area apre il download nel browser e
+       la pagina sparisce: si annulla, e si dice dov'era da lasciare. */
+    window.addEventListener('dragover', function (e) { e.preventDefault(); });
+    window.addEventListener('drop', function (e) {
+      if (zona.contains(e.target)) return;
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        dillo('Il file va lasciato dentro il riquadro qui sopra.', 'male');
+        zona.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+  })();
+
+  /* ═════════════════════════ 2 · la demo non sovrascrive in silenzio */
+  (function () {
+    var cta = document.getElementById('load-demo');
+    if (!cta) return;
+    /* `state` vive in una closure: da qui non si vede. Che ci siano già dei
+       dati lo dice l'anteprima delle righe, che è poi quello che vede
+       anche chi sta usando il tool. */
+    function giaCaricati() {
+      /* Non il riepilogo: a vuoto contiene «Nessun importo caricato», che è
+         testo e basterebbe a far scattare la domanda ogni volta. L'anteprima
+         invece esiste solo quando ci sono davvero delle righe. */
+      var wrap = document.getElementById('amounts-preview-wrap');
+      if (wrap && !wrap.hidden) return true;
+      var t = document.querySelector('#amounts-preview tbody');
+      return !!(t && t.rows.length);
+    }
+    cta.addEventListener('click', function (e) {
+      if (!giaCaricati()) return;
+      if (!confirm('Ci sono già dei dati caricati.\n\n' +
+        'I dati dimostrativi li sostituiscono, insieme al cliente attivo. Vuoi continuare?')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
+  })();
+
+  /* ═════════════════════════════════════ 3 · il benvenuto */
+  (function () {
+    var d = document.getElementById('lipe-benvenuto');
+    if (!d) return;
+    var mai = document.getElementById('lipe-benvenuto-mai');
+    var chiudi = document.getElementById('lipe-benvenuto-chiudi');
+    var CHIAVE = 'lipe.benvenuto';
+
+    var giaVisto;
+    try { giaVisto = localStorage.getItem(CHIAVE) === 'no'; } catch (_) { giaVisto = false; }
+
+    function apri() {
+      if (typeof d.showModal === 'function') { try { d.showModal(); return; } catch (_) { } }
+      d.hidden = false;
+      d.setAttribute('open', '');
+    }
+    function via() {
+      if (mai && mai.checked) { try { localStorage.setItem(CHIAVE, 'no'); } catch (_) { } }
+      if (typeof d.close === 'function' && d.open) { try { d.close(); } catch (_) { } }
+      d.hidden = true;
+      d.removeAttribute('open');
+    }
+
+    if (chiudi) chiudi.addEventListener('click', via);
+    d.addEventListener('cancel', function (e) { e.preventDefault(); via(); });
+    /* Il clic sullo sfondo del dialogo chiude, come ci si aspetta. */
+    d.addEventListener('click', function (e) { if (e.target === d) via(); });
+
+    if (!giaVisto) setTimeout(apri, 500);
+
+    /* Sempre raggiungibile da «Come si usa», anche dopo averlo spento. */
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-apre-benvenuto]')) { e.preventDefault(); apri(); }
+    });
   })();
 })();
 </script>

@@ -8,6 +8,7 @@
   "scripts": {
     "test": "node --test \"tests/*.test.mjs\"",
     "test:e2e": "node tests/responsive.e2e.mjs",
+    "test:e2e:lipe": "node tests/lipe-azioni.e2e.mjs",
     "serve": "python -m http.server 4173"
   },
   "devDependencies": {

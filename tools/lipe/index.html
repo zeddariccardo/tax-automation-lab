@@ -3317,14 +3317,14 @@ function ivp18Telematici(c, ctx) {
   var ruolo = String(c.repRole || '').trim();
   if (rep) {
     if (!IVP18_CF16.test(rep) || !xmlCf(rep)) {
-      problemi.push('CF del dichiarante non valido: il tracciato IVP18 lo vuole alfanumerico di 16 caratteri, ed è il codice fiscale personale di chi sottoscrive.');
+      problemi.push('Campo «CF dichiarante»: serve il codice fiscale personale di chi firma, alfanumerico di 16 caratteri (es. RSSMRA80A01H501U). Non è il campo «CF società dichiarante», che invece vuole 11 cifre.');
     }
     if (!xmlRole(ruolo)) problemi.push('Con il CF del dichiarante indicato, il codice carica è obbligatorio: sono ammessi 1–9 e 11–15.');
     fronte.push(['CFDichiarante', rep], ['CodiceCaricaDichiarante', ruolo]);
     testa.push(['CodiceFiscaleDichiarante', rep], ['CodiceCarica', ruolo]);
   } else {
     if (!fisica) {
-      problemi.push('Per un contribuente diverso dalle persone fisiche il CF del dichiarante è obbligatorio: è il codice fiscale personale, di 16 caratteri, di chi sottoscrive la comunicazione.');
+      problemi.push('Campo «CF dichiarante» obbligatorio: il contribuente non è una persona fisica, quindi il tracciato pretende il codice fiscale personale di chi firma, alfanumerico di 16 caratteri.');
     } else {
       avvisi.push('Riquadro del dichiarante lasciato vuoto: il file non conterrà il dichiarante. Va compilato solo se chi sottoscrive la comunicazione è un soggetto diverso dal contribuente.');
     }
@@ -3335,10 +3335,10 @@ function ivp18Telematici(c, ctx) {
      fiscale alfanumerico. Un valore di 16 caratteri qui scarta la fornitura. */
   var soc = String(c.declCompanyCf || '').trim().toUpperCase();
   if (soc) {
-    if (!IVP18_CF11.test(soc)) problemi.push('Codice fiscale della società dichiarante non valido: il tracciato IVP18 lo vuole numerico di 11 cifre.');
+    if (!IVP18_CF11.test(soc)) problemi.push('Campo «CF società dichiarante»: serve il codice fiscale numerico di 11 cifre della società che presenta per conto di un altro contribuente. Non è il campo «CF dichiarante», che invece vuole 16 caratteri.');
     else fronte.push(['CodiceFiscaleSocieta', soc]);
   }
-  if (ruolo === '9' && !IVP18_CF11.test(soc)) problemi.push('Con codice carica 9 è obbligatorio il CF della società dichiarante, numerico di 11 cifre.');
+  if (ruolo === '9' && !IVP18_CF11.test(soc)) problemi.push('Con codice carica 9 è obbligatorio il campo «CF società dichiarante», numerico di 11 cifre.');
 
   fronte.push(['FirmaDichiarazione', '1']);
 

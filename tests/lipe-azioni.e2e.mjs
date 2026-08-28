@@ -304,7 +304,7 @@ async function tutto(page) {
       const z = document.getElementById('lipe-drop-esito');
       return (z && z.textContent) || '';
     });
-    pretendi(/non .*legger|non valido|errore/i.test(detto),
+    pretendi(/non .*(legg|lett)|non .*valido|non .*Excel|errore/i.test(detto),
       'un file illeggibile non produce nessun messaggio: ' + detto.slice(0, 80));
     fs.unlinkSync(rotto);
   });

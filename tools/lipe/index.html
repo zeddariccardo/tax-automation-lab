@@ -362,13 +362,14 @@ footer a:hover{color:#F7F7F5!important}
    della barra comandi degli altri tool: `--tal-global-header-height` la misura
    tal-app.js, così il valore segue l'intestazione anche quando si compatta. */
 .lipe-ctx{
-  position:sticky;top:calc(var(--tal-global-header-height, 92px) + 8px);z-index:40;
+  position:sticky;top:calc(var(--tal-global-header-height, 92px) + var(--lipe-cmdbar-h, 0px) + 8px);z-index:39;
   display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px;
   background:#fff;border:1px solid var(--g2);border-radius:10px;
   padding:12px 16px;margin:0 0 22px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
 .lipe-ctx-cap{
-  align-self:center;flex:0 0 auto;font-size:10px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--g4);padding-right:2px}
+  flex:0 0 100%;order:-1;margin-bottom:2px;
+  font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--g4)}
 .lipe-ctx .grid{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px;
   flex:1 1 420px;margin:0}
 .lipe-ctx .field{gap:3px;flex:1 1 auto}
@@ -389,7 +390,7 @@ footer a:hover{color:#F7F7F5!important}
   gap:6px 14px;font-size:11px;color:var(--g5)}
 .lipe-ctx .client-card > div{display:flex;gap:6px;align-items:baseline}
 .lipe-ctx .client-card b{font-size:12px;font-weight:650}
-.lipe-ctx .client-card > *:not(:last-child)::after{content:" b7";margin-left:14px;color:var(--g3)}
+.lipe-ctx .client-card > *:not(:last-child)::after{content:"·";margin-left:14px;color:var(--g3)}
 .lipe-ctx .notice{margin:0;padding:6px 10px;font-size:11px;border-radius:6px}
 
 @media (max-width:760px){
@@ -436,6 +437,11 @@ footer a:hover{color:#F7F7F5!important}
 
 .com-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:26px;align-items:start}
 .com-main{min-width:0}
+/* La griglia del quadro VP era larga 754 px in una colonna da 713: i 41 che
+   avanzavano non scorrevano, sparivano — e dentro c'era la colonna «Crediti».
+   Colonne che si stringono, e uno scorrimento come rete se non bastasse. */
+.com-main .vp-grid{grid-template-columns:74px minmax(150px,1fr) minmax(120px,168px) minmax(120px,168px)}
+.com-main .tab-panel{overflow-x:auto;-webkit-overflow-scrolling:touch}
 
 /* Il pannello resta appeso sotto l'intestazione del sito e sotto la barra di
    contesto della Fase 1, con lo stesso aggancio della barra comandi degli
@@ -460,23 +466,34 @@ footer a:hover{color:#F7F7F5!important}
   margin:0;border-radius:0;box-shadow:none;padding:0 0 4px}
 .com-card .summary-bar .spacer{display:none}
 .com-card .summary-bar .item{
-  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-  padding:7px 18px;font-size:12px}
-.com-card .summary-bar .item .label{margin:0;font-size:9.5px}
-.com-card .summary-bar .item .value{font-size:13.5px;font-style:normal;font-family:var(--sans);
-  font-variant-numeric:tabular-nums}
+  display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  padding:9px 18px;font-size:13px}
+/* Erano 10px grigi su fondo scuro: rapporto di contrasto 3,24, sotto la soglia
+   di leggibilità. Serve l'identificativo: per nome di classe la regola non
+   passa, e non e' la prima volta che succede su questa pagina. */
+/* Il tema condiviso (assets/tal-app.css) impone colore e dimensione dentro
+   .summary-bar con !important. Non e' una gara che si vince con la
+   specificita': qui si dichiara che questo pannello ha regole sue. */
+.com-card .summary-bar#results-summary .item .label{margin:0!important;font-size:11.5px!important;
+  color:#cfcbc3!important;letter-spacing:.1em!important}
+.com-card .summary-bar#results-summary .item .value{font-size:15px!important;font-weight:600!important;
+  color:#fff!important}
+.com-card #results-summary .item:last-child .label{font-size:11.5px!important;color:#e6e2da!important}
+.com-card #results-summary .item:last-child .value{font-size:27px!important}
+.com-card .summary-bar .item .value{font-size:15px;font-style:normal;font-family:var(--sans);
+  font-variant-numeric:tabular-nums;font-weight:600}
 .com-card .summary-bar .item:last-child{
   order:-1;flex-direction:column;align-items:flex-start;gap:3px;
   padding:16px 18px 13px;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:6px}
-.com-card .summary-bar .item:last-child .label{font-size:10px;letter-spacing:.16em}
+.com-card .summary-bar .item:last-child .label{letter-spacing:.16em}
 .com-card .summary-bar .item:last-child .value{font-size:27px;line-height:1.05;letter-spacing:-.02em;font-weight:650}
 
 /* ────────────────────────────────────────── pronta / avvisi / bloccata */
-.com-stato{padding:13px 18px;border-bottom:1px solid var(--g2);font-size:12.5px;line-height:1.45}
+.com-stato{padding:15px 18px;border-bottom:1px solid var(--g2);font-size:13.5px;line-height:1.5}
 .com-stato:empty{display:none}
-.com-stato .tit{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;margin-bottom:3px}
+.com-stato .tit{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin-bottom:5px}
 .com-stato .pallino{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-.com-stato .det{color:var(--g4);font-size:11.5px}
+.com-stato .det{color:var(--g5);font-size:12.5px;line-height:1.5}
 .com-stato.is-pronta{background:var(--ok-bg)}
 .com-stato.is-pronta .tit{color:var(--ok)} .com-stato.is-pronta .pallino{background:var(--ok)}
 .com-stato.is-avvisi{background:var(--gold-bg)}
@@ -491,15 +508,15 @@ footer a:hover{color:#F7F7F5!important}
 .com-card .checks-grid{display:flex;flex-direction:column;gap:0;padding:0;margin:0}
 .com-card .check-item{
   border:0;border-radius:0;border-bottom:1px solid var(--g1);
-  padding:10px 18px;margin:0;background:#fff;display:block;
+  padding:13px 18px;margin:0;background:#fff;display:block;
   /* La griglia originale dava a ogni controllo un rettangolo di 112px, perche'
      stavano affiancati tre per riga e dovevano essere alti uguali. In colonna
      quel minimo diventa mille pixel di riquadri mezzi vuoti. */
   min-height:0}
 .com-card .check-item:last-child{border-bottom:0}
-.com-card .check-item .name{font-size:12px;font-weight:650;margin:0}
-.com-card .check-item .value{font-size:11.5px;margin:1px 0 0}
-.com-card .check-item .desc{font-size:11px;color:var(--g4);margin:4px 0 0;line-height:1.45}
+.com-card .check-item .name{font-size:13px;font-weight:650;margin:0}
+.com-card .check-item .value{font-size:12.5px;margin:2px 0 0}
+.com-card .check-item .desc{font-size:12px;color:var(--g5);margin:5px 0 0;line-height:1.5}
 
 .com-card .check-item.fail{order:1;background:var(--warn-bg);border-left:3px solid var(--warn)}
 .com-card .check-item.fail .name,.com-card .check-item.fail .value{color:var(--warn)}
@@ -508,14 +525,14 @@ footer a:hover{color:#F7F7F5!important}
 
 /* I superati: una riga, nome a sinistra e valore a destra, spiegazione via. */
 .com-card .check-item.ok{
-  order:3;display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  padding:6px 18px;border-bottom:1px solid var(--g1)}
+  order:3;display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:8px 18px;border-bottom:1px solid var(--g1)}
 /* Una riga sola, sempre: e' il senso di «fortemente compressi». Il testo per
    intero non si perde — resta nel DOM per chi legge con la voce, e lo script
    dello stato lo mette anche nel suggerimento del puntatore. */
-.com-card .check-item.ok .name{font-weight:500;color:var(--g5);font-size:11.5px;
+.com-card .check-item.ok .name{font-weight:500;color:var(--g5);font-size:12.5px;
   white-space:nowrap;flex:0 0 auto}
-.com-card .check-item.ok .value{color:var(--ok);font-size:11.5px;text-align:right;margin:0;
+.com-card .check-item.ok .value{color:var(--ok);font-size:12.5px;text-align:right;margin:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
 .com-card .check-item.ok .desc{display:none}
 
@@ -3845,6 +3862,43 @@ window.TAL_SESSION={
  */
 (function () {
   'use strict';
+
+  /* ═══════════ 0 · la barra di contesto si appende sotto la barra comandi */
+  /* Erano tutt'e due sticky allo stesso `top`, e si coprivano: della barra
+     comandi si vedeva mezza riga tagliata. L'altezza della barra comandi non
+     e' fissa — cambia con la larghezza e con quello che ci sta dentro — quindi
+     va misurata, non indovinata. */
+  (function () {
+    /* La barra comandi la crea uno script differito: quando questo parte può
+       non esserci ancora. Si aspetta, invece di rinunciare in silenzio. */
+    var cmd = document.querySelector('.tal-cmdbar, .tal-session-bar');
+    if (!cmd) {
+      var attesa = new MutationObserver(function () {
+        var c = document.querySelector('.tal-cmdbar, .tal-session-bar');
+        if (!c) return;
+        attesa.disconnect();
+        aggancia(c);
+      });
+      attesa.observe(document.body, { childList: true, subtree: true });
+      window.addEventListener('load', function () {
+        var c = document.querySelector('.tal-cmdbar, .tal-session-bar');
+        if (c) { attesa.disconnect(); aggancia(c); }
+      });
+      return;
+    }
+    aggancia(cmd);
+
+    function aggancia(cmd) {
+    function misura() {
+      var h = Math.ceil(cmd.getBoundingClientRect().height);
+      var appesa = getComputedStyle(cmd).position === 'sticky';
+      document.documentElement.style.setProperty('--lipe-cmdbar-h', (appesa ? h + 8 : 0) + 'px');
+    }
+    if (window.ResizeObserver) new ResizeObserver(misura).observe(cmd);
+    window.addEventListener('resize', misura);
+    misura();
+    }
+  })();
 
   /* ═══════════════════════════ 1 · il menu: Esc, fuoco, pagina ferma */
   /* Il velo e la chiusura toccando fuori li faceva già `setSidebar`. Mancavano

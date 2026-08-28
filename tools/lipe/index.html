@@ -633,7 +633,9 @@ footer a:hover{color:#F7F7F5!important}
    fuori insieme al resto. Le stesse quattro celle, in due righe da due: sopra
    il rigo e che cos'è, sotto quanto fa. */
 @media (max-width:760px){
-  .vp-grid{grid-template-columns:60px minmax(0,1fr);overflow-x:visible}
+  /* Stessa specificita' della regola per lo schermo grande, altrimenti quella
+     vince anche qui dentro: le media query non aggiungono peso. */
+  .vp-grid,.com-main .vp-grid{grid-template-columns:60px minmax(0,1fr);overflow-x:visible}
   .vp-grid > .vp-head{display:none}
   /* Ogni quarto elemento riparte: è l'inizio di un rigo nuovo. */
   .vp-grid > :nth-child(4n+1){border-top:2px solid var(--g2);padding-top:11px}
@@ -655,7 +657,12 @@ footer a:hover{color:#F7F7F5!important}
   /* Le caselle e la riga dei contrassegni non sono importi: niente etichetta. */
   .vp-grid > .flags::before{content:none}
   .vp-grid .vp-code{font-weight:700}
-  .vp-grid input,.vp-grid select{width:100%;min-height:44px}
+  /* Le celle non devono sporgere dal loro contenitore: gli elementi dentro
+     hanno larghezze minime loro, e su 320 px sommate sforano. */
+  .vp-grid > *{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .vp-grid input,.vp-grid select{width:100%;max-width:100%;min-height:44px;box-sizing:border-box}
+  .vp-grid .flags{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .vp-grid .flags label{display:flex;align-items:center;gap:7px;min-height:44px;font-size:12.5px}
 }
 
 /* ═══════════════════════════ 4 · il menu, quando è una sovrapposizione */
@@ -811,17 +818,17 @@ footer a:hover{color:#F7F7F5!important}
 <section class="block lipe-view" id="telematic-config"><div class="set-tabs" role="tablist"><button class="set-tab" data-lipeview="client-config" role="tab" type="button">Anagrafica</button><button class="set-tab is-on" data-lipeview="telematic-config" role="tab" type="button">Dati telematici</button><button class="set-tab" data-lipeview="vat-codes" role="tab" type="button">Codici IVA</button></div>
 <h2 class="bt"><span class="num">Dati telematici</span>Intestazione dell’XML e impegno alla trasmissione</h2>
 <div class="panel">
-<div class="panel-heading"><div><h3>Dati telematici XML IVP18</h3><p>Questi dati alimentano l’intestazione e il frontespizio del file telematico. Le firme sono valorizzate dal tool con il codice 1; il file dovrà poi essere firmato o sigillato prima dell’invio.</p></div><span class="badge dark">Tracciato IVP18</span></div>
+<div class="panel-heading"><div><h3>Dati telematici XML IVP18</h3><p>Sono i dati che finiscono nell’intestazione del file telematico: chi firma la comunicazione, chi la trasmette, e i casi particolari della liquidazione di gruppo. <b>Nel caso ordinario servono solo i primi due campi.</b> Le firme le mette il tool; il file va poi firmato o sigillato prima dell’invio.</p></div><span class="badge dark">Tracciato IVP18</span></div>
 <div class="grid">
 <div class="field"><label>CF società dichiarante</label><input id="cfg-decl-company-cf" inputmode="numeric" maxlength="11" type="text"/><div class="hint">Undici cifre numeriche: nel tracciato IVP18 questo campo è di tipo numerico, non un codice fiscale alfanumerico. Da compilare nei casi previsti, ad esempio con codice carica 9.</div></div>
 <div class="field"><label>Ultimo mese gruppo</label><input id="cfg-last-month" max="99" min="1" placeholder="Es. 3 o 99" type="number"/></div>
 <div class="field"><label>Liquidazione del gruppo</label><select id="cfg-group-liquidation"><option value="">No</option><option value="1">Sì</option></select></div>
 <div class="field"><label>Impegno presentazione</label><select id="cfg-commitment"><option value="">Non indicato</option><option value="1">1 · predisposta dal contribuente</option><option value="2">2 · predisposta da chi effettua l’invio</option></select></div>
 <div class="field"><label>Data impegno</label><input id="cfg-commitment-date" type="date"/></div>
-<div class="field"><label>Identificativo soggetto trasmittente</label><input id="cfg-transmitter-id" maxlength="16" placeholder="11–16 caratteri" type="text"/><div class="hint">Identifica il soggetto che trasmette e determina il nome univoco del file, non il contribuente.</div></div>
-<div class="field"><label>FlagConferma</label><select id="cfg-flag-conferma"><option value="">Non indicato</option><option value="1">1 · conferma esplicita dopo controllo</option></select><div class="hint">Non viene mai impostato automaticamente. Usalo solo dopo aver verificato le anomalie con il controllo ufficiale.</div></div>
+<div class="field"><label>Chi trasmette il file</label><input id="cfg-transmitter-id" maxlength="16" placeholder="Codice fiscale, 11–16 caratteri" type="text"/><div class="hint"><b>Obbligatorio.</b> Il codice fiscale di chi invia materialmente il file all’Agenzia: tu, oppure il tuo intermediario. Non è il contribuente, e <b>non è il produttore del software</b> (campo diverso, più sotto). Serve a comporre il nome del file, che l’Agenzia pretende diverso da ogni altro già inviato.</div></div>
+<div class="field"><label>Trasmetti comunque nonostante una segnalazione</label><select id="cfg-flag-conferma"><option value="">No — comportamento normale</option><option value="1">Sì — segnalazione verificata, trasmetti lo stesso</option></select><div class="hint"><b>Quasi sempre va lasciato su «No».</b> Il software di controllo dell’Agenzia distingue due cose: gli <b>errori</b>, che fermano l’invio e vanno corretti, e le <b>segnalazioni di rispondenza</b>, che sono avvisi — il dato è insolito, ma se è giusto si può trasmettere lo stesso. Questa opzione serve solo al secondo caso, e solo dopo aver guardato la segnalazione. <b>Non fa passare un errore</b>, e Tax Automation Lab non la attiva mai da sé. Nel tracciato si chiama <code>FlagConferma</code>.</div></div>
 <div class="field wide"><label>Struttura della comunicazione</label><select id="cfg-module-profile"><option value="single">Periodo omogeneo · struttura supportata</option><option value="mixed">Periodicità mista nello stesso trimestre</option><option value="dual-q4">Quarto trimestre con doppio modulo</option></select><div class="hint">I casi misti o a doppio modulo restano lavorabili e stampabili, ma l’XML è bloccato finché non sono modellati in modo completo.</div></div>
-<div class="field wide"><label>Identificativo produttore software</label><input id="cfg-software-id" maxlength="16" placeholder="Lascia vuoto se non richiesto" type="text"/><div class="hint">Nel tracciato IVP18 questo campo identifica <b>chi ha prodotto il software</b> che genera il file, non chi presenta la comunicazione: Le specifiche tecniche lo descrivono come «un elemento opzionale che espone un identificativo del produttore di software»: non deve essere un codice fiscale e non ha controlli previsti, basta che sia in lettere maiuscole e cifre. <b>Tax Automation Lab non ne inserisce uno.</b> Se lasci il campo vuoto l’elemento non viene scritto nel file, e il file resta valido. Compilalo solo se il tuo canale di trasmissione lo richiede.</div></div>
+<div class="field wide"><label>Chi ha prodotto il software (facoltativo)</label><input id="cfg-software-id" maxlength="16" placeholder="Lascia vuoto se non richiesto" type="text"/><div class="hint">Nel tracciato IVP18 questo campo identifica <b>chi ha prodotto il software</b> che genera il file, non chi presenta la comunicazione: Le specifiche tecniche lo descrivono come «un elemento opzionale che espone un identificativo del produttore di software»: non deve essere un codice fiscale e non ha controlli previsti, basta che sia in lettere maiuscole e cifre. <b>Tax Automation Lab non ne inserisce uno.</b> Se lasci il campo vuoto l’elemento non viene scritto nel file, e il file resta valido. Compilalo solo se il tuo canale di trasmissione lo richiede.</div></div>
 </div>
 <div class="notice warn"><b>Controllo telematico.</b> Per generare l’XML sono sempre obbligatori il codice fiscale e la partita IVA del contribuente. Il riquadro del dichiarante va compilato solo se chi sottoscrive è un soggetto diverso dal contribuente, ma è <b>obbligatorio per i contribuenti diversi dalle persone fisiche</b>; se lo compili servono insieme il CF di 16 caratteri e il codice carica. Se è indicato il CF intermediario diventano obbligatori anche impegno e data dell’impegno.</div>
 </div>
@@ -1671,12 +1678,49 @@ function writeModelBoxes(doc,value,x,y,count,boxWidth=5.08,fontSize=7.4){
   doc.setFont('helvetica','normal');doc.setFontSize(fontSize);doc.setTextColor(0,0,0);
   for(let i=0;i<count;i++){if(s[i]!==' ')doc.text(s[i],x+boxWidth*(i+.5),y,{align:'center'})}
 }
+/* Il modello ministeriale ha la virgola già stampata e due caselle sue per i
+   decimali. Scrivere «262500,00» tutto attaccato e allineato a destra, com'era
+   prima, mette la nostra virgola sopra la loro e i due decimali fuori dalle
+   caselle — e con gli importi a sei cifre l'intero sfora a sinistra.
+
+   Le tre posizioni qui sotto sono misurate sull'immagine del modello, riga per
+   riga: la virgola e i due divisori delle caselle dei centesimi. Le due colonne
+   (debiti e crediti) non hanno lo stesso passo, quindi hanno la loro voce. */
+const MODELLO_IMPORTO={
+  146.4:{virgola:136.36,celle:[139.09,144.29]},
+  196.8:{virgola:187.05,celle:[189.75,195.15]}
+};
+/* Dove va ogni pezzo. Funzione pura: la si può provare senza disegnare nulla. */
+function posizioniImporto(value,xRight,maxWidth=31.5){
+  const n=round2(num(value));
+  if(!(Math.abs(n)>0.004))return null;
+  const assoluto=Math.abs(n).toFixed(2);
+  const intero=(n<0?'-':'')+assoluto.slice(0,-3);
+  const dec=assoluto.slice(-2);
+  const geo=MODELLO_IMPORTO[xRight];
+  /* Senza geometria nota si torna al comportamento di prima: meglio un importo
+     allineato alla vecchia maniera che uno messo a caso. */
+  if(!geo)return{intero:intero+','+dec,xIntero:xRight,dec:null,xDec:null,largo:maxWidth};
+  return{
+    intero:intero,
+    xIntero:geo.virgola-0.9,
+    dec:dec,
+    xDec:geo.celle,
+    largo:maxWidth-(xRight-geo.virgola)-0.9
+  };
+}
 function writeModelValue(doc,value,xRight,y,maxWidth=31.5){
-  const s=modelNumber(value);if(!s)return;
+  const p=posizioniImporto(value,xRight,maxWidth);if(!p)return;
   doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);
+  if(p.dec){
+    /* Una cifra per casella, centrata: è così che il modello se le aspetta. */
+    doc.setFontSize(7.2);
+    doc.text(p.dec[0],p.xDec[0],y,{align:'center'});
+    doc.text(p.dec[1],p.xDec[1],y,{align:'center'});
+  }
   let size=7.2;doc.setFontSize(size);
-  while(size>5.2&&doc.getTextWidth(s)>maxWidth){size-=.3;doc.setFontSize(size)}
-  doc.text(s,xRight,y,{align:'right'});
+  while(size>5.2&&doc.getTextWidth(p.intero)>p.largo){size-=.3;doc.setFontSize(size)}
+  doc.text(p.intero,p.xIntero,y,{align:'right'});
 }
 function writeModelMark(doc,enabled,x,y){if(!enabled)return;doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(0,0,0);doc.text('X',x,y,{align:'center'})}
 function exportPdf(){

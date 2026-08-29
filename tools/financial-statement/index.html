@@ -3303,7 +3303,7 @@ renderSavedList();
    leggono tutti di qui. I commenti di blocco tengono la versione in cui il
    blocco è nato — è storia, non lo stato corrente. */
 const FS_PATCH_VERSION=(window.FS_VERSION='1.4.2');
-const BAL_TOL=0.01;
+const BAL_TOL=(window.FS_BAL_TOL=0.01);
 
 function fsAddVoce(list,code,label){if(!list.some(v=>v.code===code))list.push({code:code,label:label,sec:'ce'});window.CODE_SECTION[code]='ce';}
 function fsFindNode(root,code){let found=null;(function walk(nodes){(nodes||[]).some(n=>{if(n.code===code){found=n;return true;}return walk(n.children||[]);});})(root.nodes||[]);return found;}
@@ -3414,7 +3414,7 @@ computeFrom=function(){
     if(type==='storno'){b.sumStornoRaw+=cur;b.sumStornoRawPrev+=prev||0;}else if(type==='adj'){b.sumAdj+=cur;b.sumAdjPrev+=prev||0;}else{b.sumRaw+=cur;b.sumRawPrev+=prev||0;}if(acc)b.accounts.push(acc);
   }
   function signAnomaly(ac,leaf,value,period){if(Math.abs(value)<0.005)return;const sec=sectionOfLeaf(leaf),cost=V13.ceSign(leaf)===-1,desc=String(ac.desc||'').toLowerCase(),contra=/f\.?do|fondo|ammort|svalut|rettific|accanton/.test(desc);let bad=false,expected='';if(sec==='sp_attivo'){bad=value<0&&!contra;expected='positivo nell’attivo, salvo poste rettificative';}else if(sec==='sp_passivo'){bad=value>0;expected='negativo nel passivo';}else if(sec==='ce'){bad=cost?value<0:value>0;expected=cost?'positivo per costi/oneri':'negativo per ricavi/proventi';}if(bad)sideAnomalies.push({code:ac.code,desc:ac.desc,leaf:leaf,period:period,value:value,expected:expected});}
-  STATE.accounts.forEach(ac=>{const key=V13.accountKey(ac);seen[key]=(seen[key]||0)+1;const ov=V13.getOverride(ac),manual=ov!==undefined&&ov!==null&&ov!=='',rawLeaf=manual?ov:ac.voce,leaf=V13.canonicalLeaf(rawLeaf,mode);if(!leaf||!V13.allowedLeaf(ac,leaf,mode)){const reason=!rawLeaf?'Voce non indicata':(!leaf?'Codice voce non previsto dallo schema selezionato':'Voce appartenente a una sezione non compatibile con il conto');const u=Object.assign({},ac,{invalid:!!rawLeaf,invalidLeaf:rawLeaf||'',reason:reason});unmapped.push(u);if(rawLeaf)invalidMappings.push(u);accountRows.push(Object.assign({},ac,{leaf:null,manual:manual,status:'unmapped',reason:reason}));return;}addTo(leaf,+ac.importo||0,+ac.importo_prev||0,Object.assign({},ac,{presented:+ac.importo||0,presentedPrev:+ac.importo_prev||0,accountKey:key}),'raw');signAnomaly(ac,leaf,+ac.importo||0,'corrente');if(STATE.comparativeColumnPresent)signAnomaly(ac,leaf,+ac.importo_prev||0,'precedente');accountRows.push(Object.assign({},ac,{leaf:leaf,manual:manual,status:'mapped',accountKey:key}));});
+  STATE.accounts.forEach(ac=>{const key=V13.accountKey(ac),normalizedCode=V13.norm(ac.code);if(normalizedCode){const duplicateKey=String(ac.source||'')+'::'+normalizedCode;seen[duplicateKey]=(seen[duplicateKey]||0)+1;}const ov=V13.getOverride(ac),manual=ov!==undefined&&ov!==null&&ov!=='',rawLeaf=manual?ov:ac.voce,leaf=V13.canonicalLeaf(rawLeaf,mode);if(!leaf||!V13.allowedLeaf(ac,leaf,mode)){const reason=!rawLeaf?'Voce non indicata':(!leaf?'Codice voce non previsto dallo schema selezionato':'Voce appartenente a una sezione non compatibile con il conto');const u=Object.assign({},ac,{invalid:!!rawLeaf,invalidLeaf:rawLeaf||'',reason:reason});unmapped.push(u);if(rawLeaf)invalidMappings.push(u);accountRows.push(Object.assign({},ac,{leaf:null,manual:manual,status:'unmapped',reason:reason}));return;}addTo(leaf,+ac.importo||0,+ac.importo_prev||0,Object.assign({},ac,{presented:+ac.importo||0,presentedPrev:+ac.importo_prev||0,accountKey:key}),'raw');signAnomaly(ac,leaf,+ac.importo||0,'corrente');if(STATE.comparativeColumnPresent)signAnomaly(ac,leaf,+ac.importo_prev||0,'precedente');accountRows.push(Object.assign({},ac,{leaf:leaf,manual:manual,status:'mapped',accountKey:key}));});
   Object.keys(seen).forEach(k=>{if(seen[k]>1)duplicates.push(k);});
   (STATE.storni||[]).forEach(s=>{if(s.active===false)return;const amount=+s.amount||0,amountPrev=+s.amountPrev||0,from=V13.canonicalLeaf(s.fromLeaf,mode),to=V13.canonicalLeaf(s.toLeaf,mode);if(!to||(!amount&&!amountPrev)||from===to)return;if(from)addTo(from,-amount,-amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'verso '+to),importo:-amount,importo_prev:-amountPrev,presented:null,presentedPrev:null,storno:true},'storno');addTo(to,amount,amountPrev,{code:s.accCode||'–',desc:'(storno) '+(s.note||'da '+(from||'esterno')),importo:amount,importo_prev:amountPrev,presented:null,presentedPrev:null,storno:true},'storno');});
   let adjAtt=0,adjPas=0,adjResult=0,adjAttPrev=0,adjPasPrev=0,adjResultPrev=0;const adjustmentRows=[];
@@ -3645,7 +3645,7 @@ function exportGate(){
   if(pendingRows().length){toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima di esportare.',true);goChecks();return false;}
   const r=(typeof RESULT!=='undefined'&&RESULT)?RESULT:null;
   if(!r){toast('Export bloccato: risultati non disponibili o non aggiornati.',true);return false;}
-  if(Math.abs(n(r.totAtt)-n(r.totPas))>.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);goChecks();return false;}
+  if(Math.abs(n(r.totAtt)-n(r.totPas))>window.FS_BAL_TOL){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);goChecks();return false;}
   const inv=(r.invalidMappings||[]).length;
   if(inv){toast('Export bloccato: '+inv+(inv===1?' mappatura non valida. Correggila':' mappature non valide. Correggile')+' nella scheda Verifiche.',true);goChecks();return false;}
   const bad=unbalancedAdjustments();
@@ -4378,7 +4378,7 @@ setTimeout(function(){
         if(pending.length){if(window.toast)toast('Conferma la voce tecnica A.IX nella scheda Verifiche prima di esportare.',true);
           window.fsShowView('results');var b=document.querySelector('[data-tab="checks"]');if(b)b.click();return;}
         if(typeof RESULT==='undefined'||!RESULT){if(window.toast)toast('Export bloccato: risultati non disponibili.',true);return;}
-        if(Math.abs(num(RESULT.totAtt)-num(RESULT.totPas))>0.5){
+        if(Math.abs(num(RESULT.totAtt)-num(RESULT.totPas))>window.FS_BAL_TOL){
           if(window.toast)toast('Export bloccato: Stato Patrimoniale non quadrato.',true);
           window.fsShowView('results');var c=document.querySelector('[data-tab="checks"]');if(c)c.click();return;}
       }
@@ -4778,7 +4778,7 @@ window.exportXBRL=function(){
     }
     var d=buildFacts();
     if(!d){toast('Nessun bilancio da esportare',true);return;}
-    if(Math.abs(num(d.result.totAtt)-num(d.result.totPas))>0.5){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);return;}
+    if(Math.abs(num(d.result.totAtt)-num(d.result.totPas))>window.FS_BAL_TOL){toast('Export bloccato: Stato Patrimoniale non quadrato.',true);return;}
     /* Il bilancio civilistico si redige in euro: l'istanza dichiara l'unità EUR
        e non esiste conversione. Meglio fermarsi che dichiarare euro altro. */
     if((gv('an_valuta')||'EUR')!=='EUR'){toast('Export bloccato: l’istanza XBRL è in euro. Riporta la valuta a EUR in Anagrafica.',true);window.fsShowView('anagrafica');return;}

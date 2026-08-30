@@ -4,17 +4,17 @@
   "cases": {
     "abbreviato_utile_erp_comparativo": {
       "fingerprints": {
-        "calculationSha256": "b01b9e4d1b639fc43ff2559d072634675fdc61014fd85595b53890608f60fffe",
+        "calculationSha256": "2395eb16fc8c188b2d51a279152da0da112ec4616a3fd5c12ad3db74d9cac642",
         "leavesSha256": "5fdaf26c8a01279b8e9c2a80f79050146247c910b07a956a2f92e2e5629879d8",
         "nodesSha256": "4104096b5646bb26d3c0b8df4c999b144bfdfcec536eeb3d495c31192779b504",
         "totalsSha256": "05a6edb455e2f8731ffb515ba71d7970acbe39f3a0b4820702890d02aef008b8",
         "mappingSha256": "a4b1a85bbd077462155aef4920e70990aced10b7c859a056365987adf9e11034",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "9f3c2687c1f513257241bcd124e92a0f54610f2b9e5e66bbaf78934fe8b6ea2f",
+        "checksGateSha256": "1b85d0acb4e7d07d2b64e0c3b865e70dc78bf4b7f7501acf2ce979bda1ae843d",
         "xbrlFactsSha256": "f486aaa8ede14fe1b215747292311511d70a0f6af36b951d89ec093a7762c7b9",
         "excelSemanticSha256": "dd4e16bce6363da28111e94560cb3b701c5a47ab983a2ad9623ce17f48694738",
-        "pdfSemanticSha256": "7a38234af2507e70cae6c32eff77860aac648a1f51b4df7a63e69cb86b25a355"
+        "pdfSemanticSha256": "ad4072de8563b761a7df346a81cea85395d194787db22f7de0289338b4d600a4"
       },
       "summary": {
         "mode": "abbrev",
@@ -80,12 +80,12 @@
           "Quadratura precedente": "ok",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -164,7 +164,7 @@
             "textItems": 10,
             "tables": 3,
             "tableRows": 24,
-            "semanticSha256": "a5f7e26c38f7683d9ed13c2921d058411d8c07514e2f1c5ceab987be06559b0e"
+            "semanticSha256": "43eae3a4eda5b5a71a2e73fe597d7644974eea522a57a32bef7b0c914b8a0f99"
           },
           {
             "pages": 2,
@@ -178,14 +178,14 @@
     },
     "abbreviato_perdita_tal_aix": {
       "fingerprints": {
-        "calculationSha256": "a801e451d260004b18614b92c5687f88e5ce3ee3c953834b96217df20f523c25",
+        "calculationSha256": "102acb8fd220eb4ce654796d6c9a04dcf05c51715925eb8a8239ac1ff85e82e6",
         "leavesSha256": "5ae9c2d3e948738407e46d31d4c5be770c425b8d77690989e5a27649cf484b15",
         "nodesSha256": "5a1c578ce3f8a74c7b9ab59fe27b2b52df9ef882deda78ed9d6e5ef77f418d95",
         "totalsSha256": "cbde2cd7ccec7ea66a6f7efeab4181c47bcaff4ffce79ba34a1079bc473eb440",
-        "mappingSha256": "13cfebcd67123c7c0399d3edf2723fb73faa6cecb884594337c123ca57fa4112",
+        "mappingSha256": "58bd02239c701a5acaad221cfd3d5a1be1e3c7f7ac9e9bfe8f5a6b9618762e27",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "3bd1a5b658c999408ced80d82e7dfb15ad7792f080ad5cc40293755b931e61e5",
+        "checksGateSha256": "89be46ab484c5055435e30ed917a996ce2775cc933c2c093b7d026960b2ec322",
         "xbrlFactsSha256": "c0ad8ffe8dbc03ef9b04f5a92033f24f39552f156cacf8132e570c29ea9c6c73",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -237,21 +237,21 @@
           }
         },
         "mapping": {
-          "accounts": 5,
-          "mapped": 5,
+          "accounts": 4,
+          "mapped": 4,
           "manualOverrides": 0,
           "unmapped": 0,
           "invalid": 0,
           "duplicates": 0,
-          "sideAnomalies": 1
+          "sideAnomalies": 0
         },
         "storni": 0,
         "adjustments": 0,
         "technicalAix": [
           {
-            "origin": "tool",
+            "origin": "INPUT_TECNICO",
             "status": "confirmed",
-            "current": 20,
+            "current": -20,
             "previous": 0
           }
         ],
@@ -261,12 +261,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
-          "Conti mappati": "ok",
-          "Segni contabili": "warn",
-          "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
           "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Rettifiche non quadrate": "ok",
+          "Conti mappati": "ok",
+          "Segni contabili": "ok",
+          "Mappature non valide": "ok",
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -281,17 +281,17 @@
     },
     "ordinario_codici_b_c_d_qualificati": {
       "fingerprints": {
-        "calculationSha256": "0d95aa0c5022180b638661baa383a2366ead10b5ba4dc6987d63b16477019285",
+        "calculationSha256": "846abf81cf94cec23b44f56dd9e9d8d9a5a0b0d983d68dce94aab78f302fbb11",
         "leavesSha256": "689314efc6c01c2f1cc96a62832b85d398970e6ac4e622b56ddd21abaafa5c1c",
         "nodesSha256": "2e42591ce892f34cf6f902851ebb26221e55a9f0830ea1bd1582c3a30ae544d8",
         "totalsSha256": "05665cef0fb41af7248f969dcc20d7f4e217af743f1bac195bdc6ed18e1471ce",
-        "mappingSha256": "19c97eae5fc945c678062806d66c01b371b29d0597b83573412c58c94fa4a0f7",
+        "mappingSha256": "b7d4733e58e98e571c82477dc7ea63af644c3c21eee226dae89dd4b709d6a1e7",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "ca972600df5058705c9dc0b73014799a492e54bf249e8136d3c4a70f750ad795",
+        "checksGateSha256": "253903236a060e9a4941e9fd7cb605f580ce419966e3be791dc23c2d610e6728",
         "xbrlFactsSha256": "038794e21dcdae93516dd44c3d49eb408e6b41797f1d530e45c23579d30e72a1",
         "excelSemanticSha256": "8e352c2e8d224cfeacb6d5946f119d7414faa52333357129f5e49597c6d1391f",
-        "pdfSemanticSha256": "373fac321af81b9238cb744f22a77ea2d74c8edcd5c7cf15b5a740fb4431fc0f"
+        "pdfSemanticSha256": "98d639264f692d67047ddabc06737b5587ff0a544ea43139b5e4b76c52562bfe"
       },
       "summary": {
         "mode": "ordinary",
@@ -357,12 +357,12 @@
           "Quadratura precedente": "ok",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "warn",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -441,7 +441,7 @@
             "textItems": 10,
             "tables": 3,
             "tableRows": 39,
-            "semanticSha256": "52d918a6a0eb696ec9f6693ddc9839de26d829ebcab04547134ed9e3c1e51032"
+            "semanticSha256": "60896e8783bd1d7da2db60a1c4e3675bebf91d3314fd5fbf19cbe3cb3bdb5209"
           },
           {
             "pages": 2,
@@ -455,14 +455,14 @@
     },
     "comparativo_assente_subcentesimi": {
       "fingerprints": {
-        "calculationSha256": "6aa844a52a0868d52862206092ee8239de02bf58b198e0c6502a7502dfbd58b6",
+        "calculationSha256": "474b59bbfd36a1a1d2eff95c93066121fb642d1e9766be57668e446af2eaac0c",
         "leavesSha256": "88fdc073d18f293dca5913aeb8dd08e037ea847447fc4127f66fb2626beb8022",
         "nodesSha256": "8627fe64ba49d2bc681142dd3e69806927f47187d68cc1c1437bb30c0cd5d63c",
         "totalsSha256": "dc919fa6f5e309523daf7ee5438ae8a752654466a235b7134d7a61d0f436626c",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "6f20a6fbae67fe9d5e3797d41acc912fa9a12f69b60d8c5cebfbfe230c09a369",
+        "checksGateSha256": "1b186305aac881cebba7af0bc31120c3de9d3cca809caf72831e86b256491739",
         "xbrlFactsSha256": "268c01c736c45b9914738b01878ad0d81bdaa280c9e7374853bc2ce4b77ea0a8",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -531,12 +531,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -551,14 +551,14 @@
     },
     "segni_opposti": {
       "fingerprints": {
-        "calculationSha256": "ec21228bacd8286efed3da27b23ef2841bfb3a37a391a905eede2cf6d7282fef",
+        "calculationSha256": "33396e596d5bcd228b810ad723d1687e452d9d314828feefdd39baf20ee8e0e3",
         "leavesSha256": "71c0664336a595f29569f271f2576382b89ff4cd92ff58ac4fb556dad6d11b7e",
         "nodesSha256": "bfbbb75cbcbccfd3882e6cdfe27064ba885d138335a5e80b2488ec066df90ba1",
         "totalsSha256": "5a274edaab73d45b41c34e057e9f82e5539ececb5734002016ca8a3ed287fdac",
-        "mappingSha256": "9913311ad493148917b7f61241b1d2fd27daafee6743b959b47afe01aeb3f4a1",
+        "mappingSha256": "103b0e72806bca8cddf67171a359747006627bcca4f45b070e588e43cc1c669d",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "dc08649ea5d62c16f01b139e2abfbf32b350715c9c8602bb5b72aecc3e575ca8",
+        "checksGateSha256": "963adc710c9e00468e8a4df1e212c1239dd7549ce5a2c960ce275d4b535db258",
         "xbrlFactsSha256": "99d0ce2713075a536669a88f06cac02962b83621d719958d44dc4582fa70eed1",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -627,12 +627,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "warn",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -647,14 +647,14 @@
     },
     "duplicati_non_mappati_override": {
       "fingerprints": {
-        "calculationSha256": "ca55c95580923af723e103a90c79c09a141fcc5d7297a56e8d8a25b50f277128",
+        "calculationSha256": "4598a2b49c6b42eaffd44b08c9b2d7528a30125c79cb451031d6cb4e5d56191e",
         "leavesSha256": "9622a56738ffcd1e81fffa10600a439fa2ec0dd383c1e152e72a58a612567b4f",
         "nodesSha256": "9561522d51f77e998a1ef8b2264a04e0252e17957571c55d73e6e7c5c7405628",
         "totalsSha256": "dc919fa6f5e309523daf7ee5438ae8a752654466a235b7134d7a61d0f436626c",
         "mappingSha256": "37536e56796940f3c02351937f5ed49c702af83dc7fbf16372a8e115c57b77dc",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "6e8249c3aeab1a3f7aa4dd8fd53af2bc32a832d7a65bcd4364c39049f376fdeb",
+        "checksGateSha256": "76923911540cccc898df60ec230e918af683fb7e38c612c06d04a439997a78c6",
         "xbrlFactsSha256": "3dc0cca7336263128e1d9f1a97cdf4cc680059bd7a521ce9b7aea950ec681073",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -723,12 +723,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "warn",
           "Segni contabili": "ok",
           "Mappature non valide": "fail",
-          "Codici duplicati": "warn",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "warn"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -743,14 +743,14 @@
     },
     "storno_fra_sezioni_con_segni": {
       "fingerprints": {
-        "calculationSha256": "b4aa97ef46e115db9d0d76ca2a1db09c0c66ccdcac511a75c4f7733dd07d65ca",
+        "calculationSha256": "09e599b60d797efb42b5234a2ba30b198fb74641dda1176967583157bf2c34f4",
         "leavesSha256": "c9b5da182679be8030056aa0d138675a5df76eda79cb0ad7b4114f675f3bff7a",
         "nodesSha256": "9031c82dea60451709c93a5115219bee879bee584e9b9ba7ae18ad5b27f4ff49",
         "totalsSha256": "e7e7718523c90c151a0db6443ba9dc60dc8a956b07c4934ef237c28fcaa3b697",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "2b6b164a056cb64dacd4b89b26171809062cda35d599e4b6781a5d5cae9f941c",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "45391962863e00c3982b91258edcb5e57e1dec65f8739e866a1297c57b1e7c6d",
+        "checksGateSha256": "10bac313ea4bb0a51cfa2fea78426baa83a674e87e67a494519991140e663800",
         "xbrlFactsSha256": "5940260cce9b99722f16487bd29773e2ab137cfcba6f1e617c0294ae1ce95aaf",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -819,12 +819,13 @@
           "Quadratura precedente": "ok",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
           "Codici duplicati": "ok",
-          "Storni da verificare": "warn",
-          "Rettifiche non quadrate": "ok"
+          "Storni spenti da verificare": "warn"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -839,14 +840,14 @@
     },
     "storno_esterno_da_verificare": {
       "fingerprints": {
-        "calculationSha256": "e6cd2594f3ee3ce844394c84d7e97437f06de16858dced452d9882e3b8c48b50",
+        "calculationSha256": "27ecba29b83f2c3b580120e14e0f8e9d1b26857ea6f55d4b9d480e9960952208",
         "leavesSha256": "9dabe351a34ee99ad043ef9d7cc7dfbe8cc9181212b335af788ee475b8408c0a",
         "nodesSha256": "40a379d7b597c0a15c115ae56fca0e388cc09075094f8dd4de726f54df87967a",
         "totalsSha256": "311e50aafa707c5aa586804131738aa13b57072d9a84ddc402d65730dee52015",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "d5caa98a62655bd8e54f4a851bc5f1b1cc660624a6806c0d516b231c841b15ef",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "281994b1e2dd335f19e5a1c873a37cac6ac2365b7f9b1a8c87488ea4300d8fdd",
+        "checksGateSha256": "c06742ad5867a26cc2b42ea59a4b868c94afa0c6fc7952b12339e39796fe3e3a",
         "xbrlFactsSha256": "0e3803b33dfe87bd7a2b32617e3050366b7c872471d3c35b53f49dac33f878fa",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -915,12 +916,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "warn",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "warn",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -935,14 +936,14 @@
     },
     "rettifica_quadrata_tal_aix": {
       "fingerprints": {
-        "calculationSha256": "368d2b432ed0db6612a95fb0478023ad599a56a23dd1f82148eec0b479ac6ad9",
-        "leavesSha256": "dee31b3a018bb96c9485d43f95c0df02c2b9001a9ca09e5998889c4f79e671f8",
+        "calculationSha256": "e13045abddeeda57ab7c5e7d4d192c577ce66e42c87f9066e769a1b0411e9bcf",
+        "leavesSha256": "7be1c61231e268c9e34543c0803969386f00534e3b7239f0612a54aaa197f9f8",
         "nodesSha256": "06f484dd1414d476d4f81558d0e5173ebd3169757a02ddfc7ecdecb02ea1f72f",
         "totalsSha256": "5bfce6b7f96a507ccee712864e7009136f99cd761028376cd893ff47d0a7585b",
-        "mappingSha256": "e5740b3430d3a4aec0f37c937d7bc2d9d7cb27685900ce3dd6e6f34332764b5a",
+        "mappingSha256": "58bd02239c701a5acaad221cfd3d5a1be1e3c7f7ac9e9bfe8f5a6b9618762e27",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "18e1018533052de79f3cd440322ca8f14d969fed7a7c53f96c42a61f17dcb568",
-        "checksGateSha256": "0dcd7bb7eb805a9005d2e151cb4f44542707fdc08245373564a454bc2fa36375",
+        "checksGateSha256": "89be46ab484c5055435e30ed917a996ce2775cc933c2c093b7d026960b2ec322",
         "xbrlFactsSha256": "cd3a9570d5ec87518691f7f5a29bd8861df1657943f4dff3d9e6c0d242874e45",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -994,8 +995,8 @@
           }
         },
         "mapping": {
-          "accounts": 5,
-          "mapped": 5,
+          "accounts": 4,
+          "mapped": 4,
           "manualOverrides": 0,
           "unmapped": 0,
           "invalid": 0,
@@ -1006,9 +1007,9 @@
         "adjustments": 1,
         "technicalAix": [
           {
-            "origin": "tool",
+            "origin": "INPUT_TECNICO",
             "status": "confirmed",
-            "current": -10,
+            "current": 10,
             "previous": 0
           }
         ],
@@ -1018,12 +1019,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -1038,14 +1039,14 @@
     },
     "rettifica_non_quadrata_e_spenta": {
       "fingerprints": {
-        "calculationSha256": "54ff5abe0cc1f2d81b29185ce8b67bbfe1c337a794656239ae23183f5f998783",
+        "calculationSha256": "c7ad9d282462e88b8807303aed7e9eef694b80a220ec3e908f39f400d7d07cbb",
         "leavesSha256": "4e07923b7441f112ef1a3ff5f74fcdb5f2b97c6a14fc03ca9269b328e8ddb970",
         "nodesSha256": "0f44652361c4ffeb4a32d0705b6a2d131ec4e59d0d84bc1b90054624670dbb06",
         "totalsSha256": "0ec77c42dc1ad820ed2f20649f3f34f0bef209a295b144df16975151567e44fa",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "84346ef373bfefb171cb70047666ac419bccc9ee69b8046ac96ff009c3b75414",
-        "checksGateSha256": "2ea9ca70e193f2fcb78766d5585140fc9d8215934c56597ab2822a783f205ecc",
+        "checksGateSha256": "1a0b47ac0ea590c2d1535913d76fa40725f738d592a5eee08857a3266cf38fcf",
         "xbrlFactsSha256": "7f895c54afd7595cbb4d41a91adc5304faf0056e869840470cac7c57bfc9ee98",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -1114,12 +1115,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "fail",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "fail"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -1134,17 +1135,17 @@
     },
     "importi_grandi_e_decimali": {
       "fingerprints": {
-        "calculationSha256": "cac54ec5a619537b96f73f462a91c05415ce8c94048c6fc4ca9b25aa509187a0",
+        "calculationSha256": "1d0611f2a12fa2aeac2c9265958cfe1e0d938aaef7e09a84207065149bd0db29",
         "leavesSha256": "5ae53a34b4fd22e51223a2449434e6e9e6658c527547212c0e4b8561f888cf0d",
         "nodesSha256": "288470e190ed68073f7b63b011a1571fa37e1ccf0bc74192f38655b16e5f0d7d",
         "totalsSha256": "a18cf972c25c06b781b50b7a0b208566847f295e20e5c50255b59dc81cd2642d",
         "mappingSha256": "58bd02239c701a5acaad221cfd3d5a1be1e3c7f7ac9e9bfe8f5a6b9618762e27",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "eeb5a9827345949a852977ea28f2366dfa6a02a6ede1cf8645bea6471d629ca0",
+        "checksGateSha256": "bfd579b5193bdb4099094cba8925ee12fa5494b8e1e28f65783c20d02e6b6633",
         "xbrlFactsSha256": "b1cf528090cf8ccdb7d6cb164721a177133e18ef80a39af7c27f731688119da3",
         "excelSemanticSha256": "2b0021b1938a0de9c0864cadb398588d2258b22af4a5107df5301e4dcd7540aa",
-        "pdfSemanticSha256": "e3d718f2521ba51deec736237be1f51fedc0e3cf374e0f9070d4858b9f5332b7"
+        "pdfSemanticSha256": "36d4b5dccf88af8411c312a630329d9c9105543b463661f99ece19e5c728dc95"
       },
       "summary": {
         "mode": "abbrev",
@@ -1210,12 +1211,12 @@
           "Quadratura precedente": "ok",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -1294,7 +1295,7 @@
             "textItems": 10,
             "tables": 3,
             "tableRows": 20,
-            "semanticSha256": "804ade9c87df3eb86865aa5d202b1c140060872c87c3d491c015e04dd32ca776"
+            "semanticSha256": "5136f04ae44b87dfaf6def7b49de62d4aa9ea06c32da5aa5eb8a12916c659aaa"
           },
           {
             "pages": 2,
@@ -1308,14 +1309,14 @@
     },
     "soglia_delta_0_004": {
       "fingerprints": {
-        "calculationSha256": "6aa844a52a0868d52862206092ee8239de02bf58b198e0c6502a7502dfbd58b6",
+        "calculationSha256": "474b59bbfd36a1a1d2eff95c93066121fb642d1e9766be57668e446af2eaac0c",
         "leavesSha256": "88fdc073d18f293dca5913aeb8dd08e037ea847447fc4127f66fb2626beb8022",
         "nodesSha256": "8627fe64ba49d2bc681142dd3e69806927f47187d68cc1c1437bb30c0cd5d63c",
         "totalsSha256": "dc919fa6f5e309523daf7ee5438ae8a752654466a235b7134d7a61d0f436626c",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "6f20a6fbae67fe9d5e3797d41acc912fa9a12f69b60d8c5cebfbfe230c09a369",
+        "checksGateSha256": "1b186305aac881cebba7af0bc31120c3de9d3cca809caf72831e86b256491739",
         "xbrlFactsSha256": "268c01c736c45b9914738b01878ad0d81bdaa280c9e7374853bc2ce4b77ea0a8",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -1384,12 +1385,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -1404,14 +1405,14 @@
     },
     "soglia_delta_0_011": {
       "fingerprints": {
-        "calculationSha256": "0a5320799d3ac465f77e7cf0648a42ad6bd890ce6f81a9dccf0032ca67624f55",
+        "calculationSha256": "ef68e49616a3b23cf71046e2ea511aafde2a4783f0b55634fa12f4854ec53363",
         "leavesSha256": "25055d8a18bac281d37ecab41628a3019f31549846d69914575db44b76c0b3d1",
         "nodesSha256": "9863b4613953a61742d1c7f6943a47e5d94d0b17e1638668e0b8f644ad0b1832",
         "totalsSha256": "6f220f59a2e0f267c29a249cd30337c791de91f2618c89d304da680cd9082c82",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "d1b71b0faaa3991ec9b6605ad0335db1ecfc8dc11bc237c2a9a2febbcdec11f3",
+        "checksGateSha256": "ee58a324ab2bd3554adaf835beb60067bc41be8940f224cc18ab667b60ee7c1d",
         "xbrlFactsSha256": "aaa866e51df8a87ec043439c33c281bf798245f00dfbba40b2637ab0a90dda4f",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -1480,12 +1481,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {
@@ -1500,14 +1501,14 @@
     },
     "soglia_delta_0_50": {
       "fingerprints": {
-        "calculationSha256": "505ee9e6153d676460f3a87270255d4cdf5228a1ca03fef02023c68f02bdcf0b",
+        "calculationSha256": "2ee1dd4eb12c7504a6f51e4984eb4565baf7933a2750ef8cb160aa759f29c68a",
         "leavesSha256": "7d12511b0c75b5e293076ea2a62836dd410f6af7919d924731eaf9da0604c53f",
         "nodesSha256": "8bdeb275b15c619dd909598b1b14beb9ec7e852cfb675afbda422fc1009c4843",
         "totalsSha256": "96f283d4f89ce10404f803474f3c761eaeb332aa4a0729d7cc1b13a50ee80c1c",
         "mappingSha256": "d977513fe9e54277d35aa5e95e4bf73fb4e571c618b9fb82c47fd2e9920772e5",
         "storniSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
         "adjustmentsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-        "checksGateSha256": "8656a1b78011927a0c500e81269512e09b3a0d112a23462f8d18350d6f1fd103",
+        "checksGateSha256": "1e047f6a1fbf2edb29b10ba1da5a732ffa6f0fb355e92b813d9c02fbe1663566",
         "xbrlFactsSha256": "3a002bb19a06a6a4f8a62d219d34d9dcb66d588af6eb8a4e8840560e8d72acfc",
         "excelSemanticSha256": null,
         "pdfSemanticSha256": null
@@ -1576,12 +1577,12 @@
           "Quadratura precedente": "warn",
           "Coerenza CE": "ok",
           "CE ↔ Patrimonio netto": "ok",
+          "Storni da verificare": "ok",
+          "Rettifiche non quadrate": "ok",
           "Conti mappati": "ok",
           "Segni contabili": "ok",
           "Mappature non valide": "ok",
-          "Codici duplicati": "ok",
-          "Storni da verificare": "ok",
-          "Rettifiche non quadrate": "ok"
+          "Codici duplicati": "ok"
         },
         "ordinaryScenarioVerified": false,
         "xbrl": {

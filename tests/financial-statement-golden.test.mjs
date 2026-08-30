@@ -4,6 +4,7 @@ import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { financialStatementCases } from './financial-statement-cases.mjs';
 import { buildFinancialStatementSnapshot } from './financial-statement-golden-utils.mjs';
+import { financialStatementFixtureApi, financialStatementFixtureMeta } from './financial-statement-fixture-api.mjs';
 import { startFinancialStatementHarness } from './financial-statement-harness.mjs';
 
 const goldenUrl = new URL('./golden/financial-statement-v1.4.2.json', import.meta.url);
@@ -11,7 +12,7 @@ const golden = JSON.parse(await readFile(fileURLToPath(goldenUrl), 'utf8'));
 let harness;
 
 before(async () => {
-  harness = await startFinancialStatementHarness();
+  harness = await startFinancialStatementHarness({ apiHandler: financialStatementFixtureApi });
 });
 after(async () => {
   if (!harness) return;
@@ -23,6 +24,7 @@ after(async () => {
 test('baseline golden post-mapping del Bilancio civilistico', async t => {
   assert.equal(golden.schemaVersion, 1);
   assert.equal(golden.toolVersion, '1.4.2');
+  assert.equal(financialStatementFixtureMeta.version, 1);
   assert.deepEqual(Object.keys(golden.cases), financialStatementCases.map(scenario => scenario.name));
 
   for (const scenario of financialStatementCases) {

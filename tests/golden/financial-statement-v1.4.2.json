@@ -14,7 +14,7 @@
         "checksGateSha256": "1b85d0acb4e7d07d2b64e0c3b865e70dc78bf4b7f7501acf2ce979bda1ae843d",
         "xbrlFactsSha256": "f486aaa8ede14fe1b215747292311511d70a0f6af36b951d89ec093a7762c7b9",
         "excelSemanticSha256": "dd4e16bce6363da28111e94560cb3b701c5a47ab983a2ad9623ce17f48694738",
-        "pdfSemanticSha256": "ad4072de8563b761a7df346a81cea85395d194787db22f7de0289338b4d600a4"
+        "pdfSemanticSha256": "2a3425e12230837f4d83a9d266e5ded0ede218555b9612bc32b67e5ae6f3840f"
       },
       "summary": {
         "mode": "abbrev",
@@ -167,11 +167,11 @@
             "semanticSha256": "43eae3a4eda5b5a71a2e73fe597d7644974eea522a57a32bef7b0c914b8a0f99"
           },
           {
-            "pages": 2,
-            "textItems": 7,
+            "pages": 3,
+            "textItems": 12,
             "tables": 4,
             "tableRows": 32,
-            "semanticSha256": "8ef766cf27af89401cb59308546393ecef81a22c6876629f8520a0c3f8adb88c"
+            "semanticSha256": "da7494d533ba7cf2466fc5f098ba174b63fe6902df2817f552d80a36aa7c32c6"
           }
         ]
       }
@@ -291,7 +291,7 @@
         "checksGateSha256": "253903236a060e9a4941e9fd7cb605f580ce419966e3be791dc23c2d610e6728",
         "xbrlFactsSha256": "038794e21dcdae93516dd44c3d49eb408e6b41797f1d530e45c23579d30e72a1",
         "excelSemanticSha256": "8e352c2e8d224cfeacb6d5946f119d7414faa52333357129f5e49597c6d1391f",
-        "pdfSemanticSha256": "98d639264f692d67047ddabc06737b5587ff0a544ea43139b5e4b76c52562bfe"
+        "pdfSemanticSha256": "f88066e539cff6b09b42de65e104b8f9a359e3482b51d1cd87b25d26d7d25e8b"
       },
       "summary": {
         "mode": "ordinary",
@@ -444,11 +444,11 @@
             "semanticSha256": "60896e8783bd1d7da2db60a1c4e3675bebf91d3314fd5fbf19cbe3cb3bdb5209"
           },
           {
-            "pages": 2,
-            "textItems": 7,
+            "pages": 3,
+            "textItems": 12,
             "tables": 4,
             "tableRows": 50,
-            "semanticSha256": "0b9f08bff6d90cf66c34b35d30fa1ca9c1e17b7fd8657b88aced9d958628638d"
+            "semanticSha256": "842fde3e0411bdbe6951fa74445facad20685ae5338bf3aa86ee985189bc2d39"
           }
         ]
       }
@@ -1145,7 +1145,7 @@
         "checksGateSha256": "bfd579b5193bdb4099094cba8925ee12fa5494b8e1e28f65783c20d02e6b6633",
         "xbrlFactsSha256": "b1cf528090cf8ccdb7d6cb164721a177133e18ef80a39af7c27f731688119da3",
         "excelSemanticSha256": "2b0021b1938a0de9c0864cadb398588d2258b22af4a5107df5301e4dcd7540aa",
-        "pdfSemanticSha256": "36d4b5dccf88af8411c312a630329d9c9105543b463661f99ece19e5c728dc95"
+        "pdfSemanticSha256": "515d34e5f14325bb4d34e86b72b0044d89671d4837fb28ea92d2f4f800493dd2"
       },
       "summary": {
         "mode": "abbrev",
@@ -1298,11 +1298,11 @@
             "semanticSha256": "5136f04ae44b87dfaf6def7b49de62d4aa9ea06c32da5aa5eb8a12916c659aaa"
           },
           {
-            "pages": 2,
-            "textItems": 7,
+            "pages": 3,
+            "textItems": 12,
             "tables": 4,
             "tableRows": 30,
-            "semanticSha256": "016ec66750354127f5e909f23d5592a818dbe0297433eb42c7ede031f4669578"
+            "semanticSha256": "4bd7adf28038bc8706d2fc8f26b1149ab01e92493c0dceab503f3d2dfaf635d6"
           }
         ]
       }

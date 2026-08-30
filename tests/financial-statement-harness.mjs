@@ -332,6 +332,9 @@ const PAGE_BRIDGE = String.raw`
       setFontSize() { return this; }
       setTextColor() { return this; }
       setFillColor() { return this; }
+      setDrawColor() { return this; }
+      setLineWidth() { return this; }
+      line() { return this; }
       rect() { return this; }
       text(value) {
         const rendered = Array.isArray(value) ? value.map(cellValue).join(' | ') : cellValue(value);
@@ -587,6 +590,39 @@ export async function startFinancialStatementHarness(options = {}) {
     },
     async serviceState() {
       return page.evaluate(() => window.__financialStatementGolden.serviceState());
+    },
+    async uiAudit(width, height) {
+      await page.setViewportSize({ width, height });
+      return page.evaluate(() => {
+        window.fsShowView('anagrafica');
+        const root = document.documentElement;
+        const form = document.querySelector('#view-anagrafica .grid');
+        const formFields = [...document.querySelectorAll('#view-anagrafica input, #view-anagrafica select, #view-anagrafica textarea')];
+        const columnCount = form ? getComputedStyle(form).gridTemplateColumns.split(/\s+/).filter(Boolean).length : 0;
+        const fieldsOffscreen = formFields.filter(element => {
+          const rect = element.getBoundingClientRect();
+          return rect.left < -1 || rect.right > root.clientWidth + 1;
+        }).map(element => element.id);
+
+        window.fsShowView('results');
+        document.querySelector('#results_tabs [data-tab="checks"]')?.click();
+        const tabs = [...document.querySelectorAll('#results_tabs .tab')].map(element => {
+          const rect = element.getBoundingClientRect();
+          return { text: element.textContent.trim(), width: rect.width, height: rect.height };
+        });
+        const details = document.querySelector('.fs-check-details');
+        return {
+          viewport: { width: innerWidth, height: innerHeight },
+          horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
+          columnCount,
+          fieldsOffscreen,
+          tabMaxHeight: Math.max(0, ...tabs.map(tab => tab.height)),
+          tabMaxWidth: Math.max(0, ...tabs.map(tab => tab.width)),
+          headline: document.querySelector('.fs-check-status h3')?.textContent.trim() || '',
+          detailsClosed: !!details && !details.open,
+          controlCount: document.querySelectorAll('.fs-check-details .check-item').length,
+        };
+      });
     },
     async clickRetry() {
       await page.click('#fs_api_state button');

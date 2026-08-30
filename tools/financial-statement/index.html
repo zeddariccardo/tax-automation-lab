@@ -587,6 +587,90 @@ tr.raw-split .split-to{color:var(--fg);font-weight:600}
 footer a{color:inherit!important}
 footer a:hover{color:#F7F7F5!important}
 .mobile-nav{display:none!important}
+</style>
+<style id="tal-fs-v143-ui-polish">
+/* Bilancio 1.4.3 — polish locale: griglie elastiche, toolbar compatta e
+   verifiche progressive. Nessuna regola contabile o dato viene ricalcolato. */
+.app-main,.app-main main,.fs-view,.panel,.grid,.field{min-width:0}
+.app-main main{max-width:min(1200px,100%)}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.field input,.field select,.field textarea{width:100%;max-width:100%;min-width:0}
+.field label,.field .hint,.bd{overflow-wrap:anywhere}
+
+#results_tabs.tabs{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;
+  gap:8px;position:sticky;top:8px;z-index:20;margin:0 0 16px;padding:8px;
+  overflow:visible;border:1px solid var(--line);border-radius:14px;
+  background:rgba(246,245,241,.96);box-shadow:0 7px 22px rgba(14,22,36,.07);
+  backdrop-filter:blur(10px)
+}
+#results_tabs .tabgroup{gap:4px;padding:0 8px}
+#results_tabs .tabgroup+.tabgroup{padding-left:12px;border-left:1px solid var(--line)}
+#results_tabs .tabgroup-cap{font-size:8.5px;line-height:1.2;color:#615e58}
+#results_tabs .tabgroup-tabs{gap:4px;flex-wrap:wrap}
+#results_tabs .tab{
+  min-height:34px;padding:6px 10px;border:1px solid #d8d5cd;border-radius:8px;
+  background:#fff;color:#45423d;font-size:10px;line-height:1.2;letter-spacing:.065em;
+  box-shadow:0 1px 2px rgba(14,22,36,.025)
+}
+#results_tabs .tab:hover{border-color:#77736b;background:#fbfaf7;transform:none;box-shadow:none}
+#results_tabs .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+#results_tabs .tab .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:5px;padding:0 5px;font-size:9px}
+
+.fs-check-overview{
+  display:grid;grid-template-columns:minmax(240px,1.25fr) minmax(360px,1fr);gap:20px;
+  align-items:center;padding:20px 22px;margin-bottom:12px;border:1px solid var(--line);
+  border-left:5px solid var(--ok);border-radius:14px;background:#fff;box-shadow:0 5px 18px rgba(14,22,36,.045)
+}
+.fs-check-overview.needs-review{border-left-color:var(--warn)}
+.fs-check-kicker{display:block;margin-bottom:5px;color:var(--g5);font-size:9px;font-weight:750;letter-spacing:.15em;text-transform:uppercase}
+.fs-check-status h3{display:flex;align-items:center;gap:9px;margin:0 0 4px;font:700 clamp(19px,2vw,24px)/1.15 var(--sans)!important}
+.fs-check-status p{margin:0;color:var(--g5);font-size:12px;line-height:1.45}
+.fs-check-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e8f3eb;color:var(--ok);font-size:15px;flex:0 0 auto}
+.fs-check-overview.needs-review .fs-check-icon{background:var(--warn-bg);color:var(--warn)}
+.fs-check-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.fs-check-metrics>div{min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#faf9f6}
+.fs-check-metrics dt{color:var(--g5);font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.fs-check-metrics dd{margin:3px 0 0;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fs-check-counts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.fs-check-count{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:#f2f1ed;color:var(--g5);font-size:10px;font-weight:700}
+.fs-check-count.fail{background:var(--warn-bg);color:var(--warn)}
+.fs-check-count.warn{background:#fff5d9;color:#72520b}
+.fs-check-details{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.fs-check-details>summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 15px;cursor:pointer;color:var(--ink);font-size:11px;font-weight:750;letter-spacing:.055em;text-transform:uppercase;list-style:none}
+.fs-check-details>summary::-webkit-details-marker{display:none}
+.fs-check-details>summary::after{content:'+';font-size:18px;font-weight:500;line-height:1}
+.fs-check-details[open]>summary{border-bottom:1px solid var(--line)}
+.fs-check-details[open]>summary::after{content:'−'}
+.fs-check-details-body{padding:14px}
+.fs-check-details .checks-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fs-check-details .check-item{min-height:0;padding:12px 13px}
+.fs-check-details .check-item .value{font-size:16px}
+
+@media(max-width:1300px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .field.wide{grid-column:span 2}
+}
+@media(max-width:900px){
+  #results_tabs.tabs{grid-template-columns:1fr 1fr}
+  #results_tabs .tabgroup:last-child{grid-column:1/-1;padding:8px 8px 0;border-left:0;border-top:1px solid var(--line)}
+  .fs-check-overview{grid-template-columns:1fr;gap:14px}
+  .fs-check-details .checks-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  #results_tabs.tabs{grid-template-columns:1fr;position:relative;top:auto;gap:0;padding:6px}
+  #results_tabs .tabgroup,#results_tabs .tabgroup+.tabgroup,#results_tabs .tabgroup:last-child{grid-column:auto;padding:8px;border:0;border-top:1px solid var(--line)}
+  #results_tabs .tabgroup:first-child{border-top:0}
+  #results_tabs .tab{min-height:32px;padding:6px 9px;font-size:9.5px}
+  .fs-check-overview{padding:17px 16px}
+  .fs-check-metrics{grid-template-columns:1fr 1fr}
+  .fs-check-metrics>div:last-child{grid-column:1/-1}
+  .fs-check-details .checks-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .field.wide{grid-column:auto}
+}
 </style><link href="/assets/site-shell.css?v=20260823" rel="stylesheet"/>
 <meta name="description" content="Tool gratuito per riclassificare trial balance e bilanci IAS/IFRS secondo gli schemi civilistici italiani, con mappatura dei conti, rettifiche, quadrature, archivio clienti ed esportazione Excel e PDF.">
 <meta name="author" content="Riccardo Zedda">
@@ -763,7 +847,7 @@ footer a:hover{color:#F7F7F5!important}
 <button class="tab" data-tab="storni" onclick="showTab(event,'storni')">Storni <span class="badge" id="cntStorni">0</span></button>
 <button class="tab" data-tab="rettifiche" onclick="showTab(event,'rettifiche')">Rettifiche IAS→OIC <span class="badge" id="cntAdj">0</span></button>
 </div></div>
-<div class="tabgroup"><span class="tabgroup-cap">Controllo</span><div class="tabgroup-tabs">
+<div class="tabgroup"><span class="tabgroup-cap">Controlli</span><div class="tabgroup-tabs">
 <button class="tab" data-tab="checks" onclick="showTab(event,'checks')">Verifiche</button>
 </div></div>
 </div>
@@ -2999,8 +3083,17 @@ renderChecks=function(){
   if(inactive)checks.push({name:'Storni spenti da verificare',value:inactive,desc:'Informazione locale: non incidono su calcoli o gate e non vengono inviati.',status:'warn'});
   const findings=STATE.aiFindings||[],openF=findings.filter(f=>!f.closed);
   if(findings.length)checks.push({name:'Eccezioni «Esiti AI»',value:openF.length||'tutte chiuse',desc:openF.length?'Dubbi e assunzioni presenti nel file importato.':findings.length+' segnalazioni chiuse.',status:openF.length?'warn':'ok'});
-  let h='<div class="checks-grid">'+checks.map(c=>'<div class="check-item '+c.status+'"><div class="name">'+c.name+'</div><div class="value">'+c.value+'</div><div class="desc">'+c.desc+'</div></div>').join('')+'</div>';
-  if(findings.length)h+=findings.map((f,i)=>'<div class="storno-row '+(f.closed?'off':'warn')+'"><div class="storno-main"><label class="adj-toggle"><input type="checkbox" data-aiclose="'+i+'" '+(f.closed?'checked':'')+'> verificata</label><span class="storno-flow"><b>'+escapeHtml(f.elemento)+'</b></span>'+(f.osservazione?'<span class="storno-note">'+escapeHtml(f.osservazione)+'</span>':'')+'</div></div>').join('');
+  const errors=checks.filter(c=>c.status==='fail').length,warnings=checks.filter(c=>c.status==='warn').length;
+  const arithmeticOk=C.quadraturaCorrente.status==='ok'&&C.quadraturaPrecedente.status!=='fail';
+  const previousDelta=C.quadraturaPrecedente.status==='warn'?'Non valorizzato':'Δ '+fmt(C.quadraturaPrecedente.current);
+  let details='<div class="checks-grid">'+checks.map(c=>'<div class="check-item '+c.status+'"><div class="name">'+c.name+'</div><div class="value">'+c.value+'</div><div class="desc">'+c.desc+'</div></div>').join('')+'</div>';
+  if(findings.length)details+=findings.map((f,i)=>'<div class="storno-row '+(f.closed?'off':'warn')+'"><div class="storno-main"><label class="adj-toggle"><input type="checkbox" data-aiclose="'+i+'" '+(f.closed?'checked':'')+'> verificata</label><span class="storno-flow"><b>'+escapeHtml(f.elemento)+'</b></span>'+(f.osservazione?'<span class="storno-note">'+escapeHtml(f.osservazione)+'</span>':'')+'</div></div>').join('');
+  const h='<div class="fs-check-overview '+(arithmeticOk?'is-balanced':'needs-review')+'" role="status">'+
+    '<div class="fs-check-status"><span class="fs-check-kicker">Esito immediato</span><h3><span class="fs-check-icon" aria-hidden="true">'+(arithmeticOk?'✓':'!')+'</span>'+(arithmeticOk?'Bilancio quadrato':'Da verificare')+'</h3>'+
+    '<p>'+(arithmeticOk?'Le quadrature aritmetiche risultano coerenti. Gli altri esiti restano disponibili nel dettaglio.':'Almeno una quadratura richiede attenzione. Apri il dettaglio per individuare lo scostamento.')+'</p>'+
+    '<div class="fs-check-counts"><span class="fs-check-count fail">'+errors+' errori</span><span class="fs-check-count warn">'+warnings+' warning</span><span class="fs-check-count">'+checks.length+' controlli</span></div></div>'+
+    '<dl class="fs-check-metrics"><div><dt>Delta corrente</dt><dd>Δ '+fmt(C.quadraturaCorrente.current)+'</dd></div><div><dt>Delta comparativo</dt><dd>'+previousDelta+'</dd></div><div><dt>Risultato</dt><dd>'+fmtX(r.ceResult)+'</dd></div></dl></div>'+
+    '<details class="fs-check-details"><summary>Dettaglio delle '+checks.length+' verifiche</summary><div class="fs-check-details-body">'+details+'</div></details>';
   $('#tab_checks').innerHTML=h;
   document.querySelectorAll('[data-aiclose]').forEach(cb=>cb.addEventListener('change',()=>{const f=STATE.aiFindings[+cb.getAttribute('data-aiclose')];if(f){f.closed=cb.checked;refreshAll();}}));
 };
@@ -3721,7 +3814,7 @@ window.refreshAll=function(){var out=baseRefresh.apply(this,arguments);try{rende
 try{refreshAll=window.refreshAll;}catch(_){}
 
 /* ---------------- PDF in formato di deposito ---------------- */
-var BAND=[202,223,240];
+var BAND=[200,222,237],STRIPE=[242,249,252],GROUP=[228,242,249],LINE=[184,207,220],PDF_INK=[28,42,49];
 function safe(s){return window.V13&&V13.pdfSafeText?V13.pdfSafeText(s):String(s==null?'':s);}
 
 window.exportOfficialPDF=function(){
@@ -3731,33 +3824,37 @@ window.exportOfficialPDF=function(){
     if(!d){if(window.toast)toast('Nessun bilancio da esportare',true);return;}
     var jsPDF=window.jspdf.jsPDF,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
 
-    doc.setFont('times','bold');doc.setFontSize(16);doc.setTextColor(20);
-    doc.text(safe(d.denom),14,18);
+    doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(20,83,104);
+    doc.text(safe('BILANCIO CIVILISTICO'),14,14);
+    doc.setDrawColor.apply(doc,LINE);doc.setLineWidth(.35);doc.line(14,17,196,17);
+    doc.setFont('times','bold');doc.setFontSize(16);doc.setTextColor.apply(doc,PDF_INK);
+    doc.text(safe(d.denom),14,25);
     doc.setFont('times','normal');doc.setFontSize(12);
-    doc.text(safe('Bilancio di esercizio al '+(d.closing||'—')),14,25);
+    doc.text(safe('Bilancio di esercizio al '+(d.closing||'—')),14,32);
     doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90);
-    doc.text(safe(d.schema),14,30.5);doc.setTextColor(20);
+    doc.text(safe(d.schema),14,37.5);doc.setTextColor.apply(doc,PDF_INK);
 
     doc.autoTable({
-      startY:35,head:[[{content:safe('Dati anagrafici'),colSpan:2,styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold'}}]],
+      startY:43,head:[[{content:safe('Dati anagrafici'),colSpan:2,styles:{fillColor:BAND,textColor:PDF_INK,fontStyle:'bold'}}]],
       body:d.anag.map(function(r){return [safe(r[0]),safe(r[1])];}),
-      theme:'striped',styles:{font:'helvetica',fontSize:7.2,cellPadding:1.3,textColor:[20,20,20],lineWidth:0},
-      bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:[246,248,250]},
-      columnStyles:{0:{cellWidth:110},1:{cellWidth:72}},margin:{left:14,right:14,bottom:16}
+      theme:'striped',styles:{font:'times',fontSize:8,cellPadding:1.6,textColor:PDF_INK,lineColor:LINE,lineWidth:{bottom:.08}},
+      bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:STRIPE},
+      columnStyles:{0:{cellWidth:105,fontStyle:'bold'},1:{cellWidth:77}},margin:{left:14,right:14,bottom:16},
+      rowPageBreak:'avoid',showHead:'everyPage'
     });
 
     function table(caption,rows,startY){
       doc.autoTable({
         startY:startY,
         head:[[
-          {content:safe(caption),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'left'}},
-          {content:safe(d.closing||'Corrente'),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'right'}},
-          {content:safe(d.prior||'Precedente'),styles:{fillColor:BAND,textColor:[20,20,20],fontStyle:'bold',halign:'right'}}
+          {content:safe(caption),styles:{fillColor:BAND,textColor:PDF_INK,fontStyle:'bold',halign:'left'}},
+          {content:safe(d.closing||'Corrente'),styles:{fillColor:BAND,textColor:PDF_INK,fontStyle:'bold',halign:'right'}},
+          {content:safe(d.prior||'Precedente'),styles:{fillColor:BAND,textColor:PDF_INK,fontStyle:'bold',halign:'right'}}
         ]],
         body:rows.map(function(x){
-          var st=x.grand?{fontStyle:'bold',fillColor:BAND,textColor:[20,20,20]}
-                :(x.total?{fontStyle:'bold'}
-                :(x.group?{fontStyle:'bold',textColor:[40,40,40]}:{}));
+          var st=x.grand?{fontStyle:'bold',fillColor:BAND,textColor:PDF_INK,lineWidth:{top:.2,bottom:.2},lineColor:LINE}
+                :(x.total?{fontStyle:'bold',lineWidth:{top:.16},lineColor:LINE}
+                :(x.group?{fontStyle:'bold',fillColor:GROUP,textColor:PDF_INK}:{}));
           return [
             {content:safe('   '.repeat(x.lvl)+x.label),styles:st},
             {content:x.group?'':safe(fmtDep(x.amount)),styles:Object.assign({halign:'right'},st)},
@@ -3765,18 +3862,23 @@ window.exportOfficialPDF=function(){
           ];
         }),
         theme:'striped',
-        styles:{font:'helvetica',fontSize:7.3,cellPadding:1.35,textColor:[20,20,20],lineWidth:0},
-        bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:[246,248,250]},
-        columnStyles:{0:{cellWidth:126},1:{cellWidth:28,halign:'right'},2:{cellWidth:28,halign:'right'}},
-        margin:{left:14,right:14,bottom:16}
+        styles:{font:'times',fontSize:8.1,cellPadding:1.5,textColor:PDF_INK,lineColor:LINE,lineWidth:{bottom:.07},overflow:'linebreak',valign:'middle'},
+        bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:STRIPE},
+        columnStyles:{0:{cellWidth:120},1:{cellWidth:31,halign:'right'},2:{cellWidth:31,halign:'right'}},
+        margin:{left:14,right:14,top:18,bottom:16},rowPageBreak:'avoid',showHead:'everyPage'
       });
       return doc.lastAutoTable.finalY;
     }
 
-    var y=table('Stato patrimoniale — Attivo',d.attivo,doc.lastAutoTable.finalY+5);
-    table('Stato patrimoniale — Passivo',d.passivo,y+4);
     doc.addPage();
-    table('Conto economico',d.ce,18);
+    doc.setFont('times','bold');doc.setFontSize(13);doc.setTextColor.apply(doc,PDF_INK);doc.text(safe('Stato patrimoniale'),14,14);
+    var y=table('Attivo',d.attivo,19);
+    var passivoStart=y+5;
+    if(passivoStart>255){doc.addPage();passivoStart=18;}
+    table('Passivo e patrimonio netto',d.passivo,passivoStart);
+    doc.addPage();
+    doc.setFont('times','bold');doc.setFontSize(13);doc.setTextColor.apply(doc,PDF_INK);doc.text(safe('Conto economico'),14,14);
+    table('Conto economico',d.ce,19);
 
     var pages=doc.getNumberOfPages();
     for(var i=1;i<=pages;i++){

@@ -34,19 +34,23 @@ for(const relative of [
 }
 
 const fa=read('tools/financial-analysis/index.html');
-assert.match(fa,/\['cg_inventory_products','Variazione prodotti e lavori in corso'\]/);
-assert.match(fa,/\['cg_internal_work','Incrementi per lavori interni'\]/);
-assert.match(fa,/\['cg_prod_da','D&A industriale allocata al costo del venduto'\]/);
-assert.match(fa,/return \(g\.cg_prod_direct\|\|0\)\+\(g\.cg_prod_indirect\|\|0\)\+\(g\.cg_inventory_products\|\|0\)\+\(g\.cg_internal_work\|\|0\)\+\(g\.cg_prod_da\|\|0\)/);
-assert.match(fa,/Benchmark incompleto/);
-assert.match(fa,/Diagnostica crisi e continuità/);
+const faClient=read('tools/financial-analysis/authoritative-app.js');
+assert.match(faClient,/cg_inventory_products:'Variazione prodotti e lavori in corso'/);
+assert.match(faClient,/cg_internal_work:'Incrementi per lavori interni'/);
+assert.match(faClient,/cg_prod_da:'D&A industriale'/);
+assert.doesNotMatch(fa+faClient,/return \(g\.cg_prod_direct\|\|0\)\+\(g\.cg_prod_indirect\|\|0\)\+\(g\.cg_inventory_products\|\|0\)\+\(g\.cg_internal_work\|\|0\)\+\(g\.cg_prod_da\|\|0\)/,
+  'il subtotale proprietario COGS non deve tornare nel frontend pubblico');
+assert.match(faClient,/righe incomplete\/non ordinate/);
+assert.match(faClient,/Adeguati assetti/);
 assert.match(fa,/aria-controls/);
 assert.match(fa,/id="fa-kpi-menu-clarity-style"/);
-assert.match(fa,/className='sb-close-mobile'/);
+assert.match(fa,/class="sb-close-mobile"/);
 assert.match(fa,/Legenda affidabilità/);
 assert.match(fa,/Con assunzioni/);
 assert.match(fa,/Da integrare/);
 assert.doesNotMatch(fa,/class="kpi-legend"/);
+assert.match(fa,/authoritative-app\.js/);
+assert.doesNotMatch(fa,/shadow-bridge\.js|FA_SHADOW/);
 
 const lipe=read('tools/lipe/index.html');
 /* Il numero non si scrive qui. Il 24 agosto 2026 questo controllo ha bocciato un

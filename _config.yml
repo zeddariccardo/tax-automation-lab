@@ -1,0 +1,15 @@
+# GitHub Pages elabora questo branch con Jekyll. I file di lavoro restano nel
+# repository, ma non fanno parte del sito pubblicato.
+include:
+  - .well-known
+
+exclude:
+  - AGENTS.md
+  - AUDIT-2026-08-23.md
+  - CONTESTO.md
+  - HANDOFF_CODEX_TO_CLAUDE_2026-08-21.md
+  - package.json
+  - package-lock.json
+  - node_modules
+  - output
+  - tests

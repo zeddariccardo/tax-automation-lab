@@ -1,15 +1,14 @@
-/* I tool non caricano niente da fuori, e quattro su sei non chiedono niente a
- * nessuno.
+/* I tool non caricano risorse da domini esterni. Due tool sono interamente
+ * locali; quattro usano esclusivamente il servizio di calcolo TAL.
  *
  * «I file restano nel browser» è scritto nel piede di ogni pagina, nella privacy
  * e nei cataloghi: è la promessa su cui poggia tutto il resto. Il 24 agosto
  * 2026, misurata aprendo i sei tool e leggendo le risorse caricate: **sette
  * risorse ciascuno, zero fuori origine**.
  *
- * Due tool — Confronto regimi e Generatore LIPE — dal 27 agosto 2026 fanno il
- * calcolo su un servizio nostro, allo stesso indirizzo del sito. Non mandano
- * file né dati identificativi: solo i valori del calcolo. Hanno controlli loro,
- * in fondo a questo file.
+ * Bilancio, Analisi di bilancio, Confronto regimi e LIPE fanno il calcolo su un
+ * servizio TAL, allo stesso indirizzo del sito. File e dati account-level non
+ * devono entrare nel payload. F24 e Fascicolo restano locali.
  *
  * Questo controllo la tiene senza dover aprire un browser: nessun tool può
  * caricare uno script, un foglio di stile, un carattere o un'immagine da un
@@ -26,15 +25,16 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TOOLS = ['financial-statement', 'financial-analysis', 'lipe', 'tfa-client-file', 'f24', 'confronto-regimi'];
 
-/* Dal 27 agosto 2026 il Confronto regimi fa il calcolo su un servizio nostro, e
-   il Generatore LIPE ha il ponte per farlo — spento, ma c'è. Tutti e due
-   continuerebbero a passare il controllo qui sotto, perché l'indirizzo che
-   chiamano è relativo — ma passerebbero per un dettaglio di forma, e un test
-   che dice sì per il motivo sbagliato è peggio di un test che non c'è. Gli
-   altri quattro restano senza rete; per questi due ci sono controlli loro, in
-   fondo al file. */
-const CON_SERVIZIO = ['confronto-regimi', 'lipe'];
+const CON_SERVIZIO = ['financial-statement', 'financial-analysis', 'lipe', 'confronto-regimi'];
 const SENZA_RETE = TOOLS.filter((t) => CON_SERVIZIO.indexOf(t) === -1);
+const API_ATTESE = {
+  'financial-statement': ['/api/financial-statement/calcola'],
+  'financial-analysis': ['/api/financial-analysis/calcola'],
+  lipe: ['/api/lipe/calcola', '/api/stato'],
+  'tfa-client-file': [],
+  f24: [],
+  'confronto-regimi': ['/api/confronto-regimi/calcola', '/api/stato'],
+};
 
 /* Solo gli attributi che fanno partire una richiesta. */
 const CARICANO = [
@@ -49,6 +49,42 @@ const CARICANO = [
 ];
 
 const fuoriOrigine = (u) => /^(https?:)?\/\//i.test(String(u).trim());
+
+function sorgentiRuntime(dir) {
+  const toolRoot = path.join(root, 'tools', dir);
+  const htmlPath = path.join(toolRoot, 'index.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const sources = [{ file: `tools/${dir}/index.html`, code: html }];
+  const seen = new Set();
+
+  for (const match of html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
+    const raw = match[1].trim();
+    if (!raw || fuoriOrigine(raw) || /^(?:data:|blob:|javascript:)/i.test(raw)) continue;
+    const clean = raw.split(/[?#]/, 1)[0];
+    const absolute = clean.startsWith('/')
+      ? path.resolve(root, `.${clean}`)
+      : path.resolve(toolRoot, clean);
+    const relative = path.relative(root, absolute).replace(/\\/g, '/');
+    assert.ok(relative && !relative.startsWith('..') && !path.isAbsolute(relative),
+      `${dir}: script locale fuori repository: ${raw}`);
+    assert.ok(fs.existsSync(absolute), `${dir}: script locale non trovato: ${relative}`);
+    if (seen.has(relative)) continue;
+    seen.add(relative);
+    sources.push({ file: relative, code: fs.readFileSync(absolute, 'utf8') });
+  }
+  return sources;
+}
+
+function percorsiApi(sources) {
+  return [...new Set(sources.flatMap(({ code }) =>
+    [...code.matchAll(/["'`]((?:\/api\/)[A-Za-z0-9/_-]+)["'`]/g)].map((match) => match[1])
+  ))].sort();
+}
+
+function patternCampoPayload(campo) {
+  const escaped = campo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp('\\b' + escaped + '\\b\\s*:');
+}
 
 for (const dir of TOOLS) {
   test(`${dir}: non carica niente da fuori`, () => {
@@ -66,22 +102,41 @@ for (const dir of TOOLS) {
 
     assert.equal(male.length, 0,
       `${dir}: ${male.length} risorse caricate da un altro dominio:\n${[...new Set(male)].join('\n')}\n` +
-      `  «L'elaborazione avviene localmente nel browser» è scritto nel piede di ogni pagina.`);
+      '  I tool devono caricare solo risorse appartenenti al sito.');
   });
 }
 
+test('la classificazione locale/servizio copre esattamente i sei tool', () => {
+  assert.deepStrictEqual([...CON_SERVIZIO].sort(),
+    ['confronto-regimi', 'financial-analysis', 'financial-statement', 'lipe']);
+  assert.deepStrictEqual([...SENZA_RETE].sort(), ['f24', 'tfa-client-file']);
+  assert.deepStrictEqual([...new Set([...CON_SERVIZIO, ...SENZA_RETE])].sort(), [...TOOLS].sort());
+});
+
+test('gli endpoint dichiarati includono anche gli script runtime caricati', () => {
+  for (const dir of TOOLS) {
+    assert.deepStrictEqual(percorsiApi(sorgentiRuntime(dir)), [...API_ATTESE[dir]].sort(),
+      `${dir}: endpoint inattesi o non coperti`);
+  }
+  assert.ok(
+    sorgentiRuntime('financial-analysis').some(({ file }) => file === 'tools/financial-analysis/authoritative-app.js'),
+    'authoritative-app.js deve essere incluso nell’analisi di rete/privacy',
+  );
+});
+
 test('nessun tool fa richieste di rete a runtime verso l’esterno', () => {
   const male = [];
-  for (const dir of SENZA_RETE) {
-    const html = fs.readFileSync(path.join(root, 'tools', dir, 'index.html'), 'utf8');
+  for (const dir of TOOLS) {
+    for (const { file, code } of sorgentiRuntime(dir)) {
     /* `fetch`, `XMLHttpRequest`, `sendBeacon`, `EventSource`, `WebSocket` verso
        un indirizzo assoluto. Le chiamate a indirizzi relativi non escono dal
        sito e non violano la promessa. */
-    for (const m of html.matchAll(/\b(fetch|open|sendBeacon)\s*\(\s*['"`]((?:https?:)?\/\/[^'"`]+)/g)) {
-      male.push(`  ${dir}: ${m[1]}("${m[2].slice(0, 70)}")`);
+    for (const m of code.matchAll(/\b(fetch|open|sendBeacon)\s*\(\s*['"`]((?:https?:)?\/\/[^'"`]+)/g)) {
+      male.push(`  ${file}: ${m[1]}("${m[2].slice(0, 70)}")`);
     }
-    for (const m of html.matchAll(/new\s+(WebSocket|EventSource)\s*\(\s*['"`]([^'"`]+)/g)) {
-      male.push(`  ${dir}: new ${m[1]}("${m[2].slice(0, 70)}")`);
+    for (const m of code.matchAll(/new\s+(WebSocket|EventSource)\s*\(\s*['"`]([^'"`]+)/g)) {
+      male.push(`  ${file}: new ${m[1]}("${m[2].slice(0, 70)}")`);
+    }
     }
   }
   assert.equal(male.length, 0, `${male.length} chiamate di rete verso l’esterno:\n${male.join('\n')}`);
@@ -211,7 +266,7 @@ test('nessun dato identificativo è fra i campi che LIPE spedirebbe', () => {
   assert.ok(costruttore, 'non trovo il costruttore del payload');
   ['denom', 'piva', 'cf', 'repCf', 'interCf', 'notes', 'sourceFile', 'code', 'description', 'note']
     .forEach((campo) => {
-      assert.equal(new RegExp('\b' + campo + ':').test(costruttore[1]), false,
+      assert.equal(patternCampoPayload(campo).test(costruttore[1]), false,
         campo + ' non deve comparire fra i campi che partono');
     });
 
@@ -221,4 +276,14 @@ test('nessun dato identificativo è fra i campi che LIPE spedirebbe', () => {
   /* «eventi» viaggia come sì/no: al calcolo serve sapere se c'è, non che cosa. */
   assert.match(codice, /eventi: !!m\.eventi/,
     'il codice degli eventi eccezionali non deve partire come testo');
+});
+
+test('la guardia anti-PII LIPE rileva davvero una chiave vietata nel payload', () => {
+  const sentinella = 'return { anno: 2026, denom: stato.denom, mesi: [] };';
+  assert.equal(patternCampoPayload('denom').test(sentinella), true,
+    'la prova positiva deve intercettare denom: se entra nel costruttore');
+  assert.equal(patternCampoPayload('denom').test('return { anno: 2026, mesi: [] };'), false,
+    'la guardia non deve produrre un falso positivo senza la chiave vietata');
+  assert.equal(patternCampoPayload('denom').test('return { notdenom: 1 };'), false,
+    'il word-boundary deve distinguere denom da una chiave più lunga');
 });

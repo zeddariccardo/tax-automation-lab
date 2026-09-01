@@ -3087,6 +3087,19 @@ function apriChiudiSidebar() {
   if (t) t.setAttribute('aria-expanded', String(aperta));
 }
 
+/* Stesso controller del menu globale usato negli altri tool: il CSS condiviso
+   mostra la navigazione quando l'intestazione riceve `tal-menu-open`. */
+function impostaMenuSito(aperto, restituisciFuoco) {
+  const siteHeader = q('.tal-global-header');
+  const siteToggle = q('[data-action="toggle-site-nav"]');
+  const siteNav = $('talGhNav');
+  if (!siteHeader || !siteToggle || !siteNav) return;
+  siteHeader.classList.toggle('tal-menu-open', aperto);
+  siteToggle.setAttribute('aria-expanded', String(aperto));
+  siteToggle.setAttribute('aria-label', aperto ? 'Chiudi il menu' : 'Apri il menu');
+  if (!aperto && restituisciFuoco) siteToggle.focus();
+}
+
 
 /* ------------------------------------------------------------ validazione */
 
@@ -3508,7 +3521,28 @@ function collega() {
   /* Comando del menu e sfondo */
   qa('[data-action="toggle-sidebar"]').forEach((b) => b.addEventListener('click', apriChiudiSidebar));
   qa('[data-action="close-sidebar"]').forEach((b) => b.addEventListener('click', chiudiSidebar));
+  const siteToggle = q('[data-action="toggle-site-nav"]');
+  const siteNav = $('talGhNav');
+  if (siteToggle && siteNav) {
+    impostaMenuSito(false, false);
+    siteToggle.addEventListener('click', () => {
+      const siteHeader = q('.tal-global-header');
+      impostaMenuSito(!siteHeader.classList.contains('tal-menu-open'), false);
+    });
+    siteNav.querySelectorAll('a,button').forEach((item) => item.addEventListener('click', () => {
+      if (window.matchMedia('(max-width:760px)').matches) impostaMenuSito(false, false);
+    }));
+    window.addEventListener('resize', () => {
+      if (!window.matchMedia('(max-width:760px)').matches) impostaMenuSito(false, false);
+    }, { passive: true });
+  }
   window.addEventListener('keydown', (e) => {
+    const siteHeader = q('.tal-global-header');
+    if (e.key === 'Escape' && siteHeader && siteHeader.classList.contains('tal-menu-open')) {
+      e.preventDefault();
+      impostaMenuSito(false, true);
+      return;
+    }
     if (e.key === 'Escape' && $('sidebar').classList.contains('open')) {
       chiudiSidebar();
       const t = q('.sb-toggle'); if (t) t.focus();

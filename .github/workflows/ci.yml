@@ -34,13 +34,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Classifica e copre tutte le suite statiche/browser
+        run: npm run test:groups
       - name: Sintassi degli script inline, regole critiche, versioni
-        run: node --test "tests/*.test.mjs"
+        run: npm run test:static
       - name: Il sitemap è allineato al contenuto
         run: node tests/build-sitemap.mjs --check
 
   e2e:
-    name: Comando del menu e responsive nei cinque tool
+    name: Test browser e responsive nei sei tool
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,5 +53,7 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
+      - name: Golden e characterization che richiedono Chromium
+        run: npm run test:browser
       - name: Verifica a 320, 360, 390, 430, 768, 980 e 981 px
         run: npm run test:e2e

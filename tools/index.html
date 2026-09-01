@@ -2,6 +2,11 @@
 
 <html lang="it"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/assets/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/assets/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/site.webmanifest" rel="manifest"/>
 <title>Strumenti | Tax Automation Lab</title>
 <meta content="index,follow,max-image-preview:large" name="robots"/>
 <style>
@@ -182,7 +187,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 }
 </style>
 <link href="/assets/site-shell.css?v=20260823" rel="stylesheet"/>
-<meta name="description" content="Sei strumenti locali per bilancio civilistico, analisi di bilancio, LIPE, fascicolo fiscale cliente, modelli F24 e confronto tra regimi. Tutti e sei sono disponibili esclusivamente online: i file restano nel browser, e due di essi calcolano su un nostro servizio senza ricevere documenti né dati identificativi.">
+<meta name="description" content="Sei strumenti online per bilancio, analisi, LIPE, fascicolo fiscale, F24 e regimi. File e identità restano nel browser; i tool ibridi inviano al servizio solo dati tecnici o numerici necessari al calcolo, senza persistenza.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -197,7 +202,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:site_name" content="Tax Automation Lab">
 <meta property="og:title" content="Strumenti | Tax Automation Lab">
-<meta property="og:description" content="Sei strumenti locali per bilancio civilistico, analisi di bilancio, LIPE, fascicolo fiscale cliente, modelli F24 e confronto tra regimi. Tutti e sei sono disponibili esclusivamente online: i file restano nel browser, e due di essi calcolano su un nostro servizio senza ricevere documenti né dati identificativi.">
+<meta property="og:description" content="Sei strumenti online. File e identità restano nel browser; i tool ibridi inviano al servizio solo dati tecnici o numerici necessari al calcolo, senza persistenza.">
 <meta property="og:url" content="https://taxautomationlab.com/tools/">
 <meta property="og:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
@@ -207,7 +212,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <meta property="og:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Strumenti | Tax Automation Lab">
-<meta name="twitter:description" content="Sei strumenti locali per bilancio civilistico, analisi di bilancio, LIPE, fascicolo fiscale cliente, modelli F24 e confronto tra regimi. Tutti e sei sono disponibili esclusivamente online: i file restano nel browser, e due di essi calcolano su un nostro servizio senza ricevere documenti né dati identificativi.">
+<meta name="twitter:description" content="Sei strumenti online. File e identità restano nel browser; i tool ibridi inviano al servizio solo dati tecnici o numerici necessari al calcolo, senza persistenza.">
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta name="twitter:image:alt" content="Tax Automation Lab — strumenti verificabili per fiscalità, contabilità e bilancio">
 
@@ -216,6 +221,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-design.css?v=20260814">
 <script defer src="/assets/tal-experience.js?v=20260823"></script>
+<script defer src="/assets/tool-catalog.js?v=20260901"></script>
 
 <style id="tal-tool-families">
 /* Le famiglie di strumenti.
@@ -279,7 +285,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section class="hero">
 <p class="tal-page-eyebrow">Strumenti</p>
 <h1>Strumenti professionali online</h1>
-<p class="lead">Applicazioni gratuite, utilizzabili online. I file, i nomi e i codici fiscali restano nel browser e non vengono caricati né conservati su server applicativi. Il Confronto regimi e il Generatore LIPE eseguono il calcolo su un nostro servizio: il primo gli trasmette i soli valori numerici della simulazione, il secondo i soli totali del quadro VP. Né file, né nomi, né codici fiscali, e nulla viene salvato. I dati salvati nel browser possono andare persi cambiando dispositivo o cancellando i dati del sito: esporta periodicamente una copia di sicurezza.</p>
+<p class="lead">Applicazioni gratuite, utilizzabili online. File, identità e dati account-level restano nel browser. Bilancio civilistico, Analisi di bilancio, LIPE e Confronto regimi inviano al servizio esclusivamente i dati tecnici o numerici necessari al rispettivo calcolo, senza persistenza. F24 e Fascicolo fiscale cliente elaborano localmente nel browser. I dati salvati nel browser possono andare persi cambiando dispositivo o cancellando i dati del sito: esporta periodicamente una copia di sicurezza.</p>
 
 </section>
 <section class="onboarding-banner">
@@ -292,25 +298,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Riclassificare, analizzare, depositare.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="financial-statement">
 <span class="label">Bilancio civilistico · v1.4.2</span><h2>Bilancio civilistico ITA GAAP</h2><span class="tool-tag tool-tag--contabilita">Bilancio civilistico</span>
 <p>Riclassificazione IV Direttiva da bilancio di verifica IAS/IFRS, con schemi ordinari o abbreviati, mappatura, scadenze per categoria, rettifiche, quadrature e archivio annuale.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Bilancio di verifica Excel</div>
 <div><strong>Output</strong><br/>Stato patrimoniale, conto economico, Excel e PDF</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/financial-statement/">Apri Bilancio civilistico →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="financial-analysis">
 <span class="label">Analisi gestionale · v2.1.3</span><h2>Analisi di bilancio</h2><span class="tool-tag tool-tag--contabilita">Analisi e KPI</span>
 <p>Riclassificazioni gestionali, KPI, rendiconto finanziario, budget, forecast, centri di costo, benchmark e controlli di qualità.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Bilancio di verifica e moduli facoltativi</div>
 <div><strong>Output</strong><br/>KPI, schemi gestionali, rendiconto e report</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/financial-analysis/">Apri Analisi di bilancio →</a></div>
 </article>
@@ -322,25 +328,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Preparare e controllare quello che va trasmesso o versato.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="lipe">
 <span class="label">LIPE · v3.6.7</span><h2>Generatore LIPE</h2><span class="tool-tag tool-tag--adempimenti">IVA periodica</span>
 <p>Codici IVA, quadro VP e XML IVP18 per le comunicazioni delle liquidazioni periodiche IVA, con riporti controllati, PDF e working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Codiciario e importi Excel</div>
 <div><strong>Output</strong><br/>Quadro VP, PDF, Excel e XML</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/lipe/">Apri Generatore LIPE →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="f24">
 <span class="label">F24 · v1.0.1</span><h2>Generatore F24</h2><span class="tool-tag tool-tag--adempimenti">Versamenti</span>
 <p>Modelli F24 ministeriali per uno o più contribuenti, con raggruppamento per flusso di pagamento, controlli su saldi, capienza e codici tributo, archivio crediti e tracciato telematico.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel o CSV dei versamenti, o compilazione guidata</div>
 <div><strong>Output</strong><br/>PDF ministeriale, ZIP per società, Excel</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/f24/">Apri Generatore F24 →</a></div>
 </article>
@@ -352,25 +358,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Tenere in ordine il cliente e scegliere come impostarlo.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="tfa-client-file">
 <span class="label">Fascicolo cliente · v2.3.3</span><h2>Fascicolo fiscale cliente</h2><span class="tool-tag tool-tag--utilita">Fascicolo cliente</span>
 <p>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Anagrafica e documentazione fiscale</div>
 <div><strong>Output</strong><br/>Fascicolo analitico e discorsivo</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/tfa-client-file/">Apri Fascicolo fiscale →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="confronto-regimi">
 <span class="label">Confronto regimi · v1.4.2</span><h2>Confronto regimi</h2><span class="tool-tag tool-tag--utilita">Scelta del regime</span>
 <p>Confronta il netto personale disponibile di un avvocato o di un dottore commercialista fra regime forfettario, partita IVA ordinaria e STP/STA S.r.l., con la soglia di convenienza oltre 85.000 euro, la contribuzione di Cassa sull'utile attribuibile e il mix fra compenso amministratore e dividendo.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel del profilo, dei compensi e dei costi, o compilazione guidata</div>
 <div><strong>Output</strong><br/>Confronto, quattro grafici, working paper Excel</div>
 <div>Interfaccia operativa in italiano</div>
-<div>Aggiornato il 23 agosto 2026 · elaborazione locale · solo online</div>
+<div data-tool-meta>Metadati dal catalogo · solo online</div>
 </div>
 <div class="actions"><a class="button" href="/tools/confronto-regimi/">Apri Confronto regimi →</a></div>
 </article>

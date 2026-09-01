@@ -49,7 +49,15 @@ function walk(dir, out = []) {
 
 function gitDate(file) {
   try {
-    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', file],
+    const rel = path.relative(root, file);
+    const dirty = execFileSync('git', ['status', '--porcelain', '--', rel],
+      {cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']}).trim();
+    /* Una pagina modificata ma non ancora committata non può ereditare la data
+       del commit precedente: sarebbe già falsa nel momento in cui si prepara
+       la release. In quel solo caso usiamo la mtime reale del file. Dopo il
+       commit la fonte torna automaticamente a essere la data Git. */
+    if (dirty) return fs.statSync(file).mtime.toISOString().slice(0, 10);
+    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', rel],
       {cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']}).trim();
     if (/^\d{4}-\d{2}-\d{2}$/.test(out)) return out;
   } catch { /* git assente o file non tracciato */ }

@@ -17,7 +17,7 @@
       "type": "image/png"
     }
   ],
-  "description": "Strumenti online per fiscalità, contabilità e analisi di bilancio con elaborazione locale nel browser.",
+  "description": "Strumenti online per fiscalità, contabilità e analisi: file e identità restano nel browser; i tool dichiarati inviano al servizio solo dati tecnici o numerici necessari al calcolo, senza persistenza.",
   "scope": "/",
   "lang": "it"
 }

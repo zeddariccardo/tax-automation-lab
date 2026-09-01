@@ -2,6 +2,11 @@
 
 <html lang="en"><head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/assets/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/assets/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="/site.webmanifest" rel="manifest"/>
 <title>Tools | Tax Automation Lab</title>
 <meta content="index,follow,max-image-preview:large" name="robots"/>
 <style>
@@ -182,7 +187,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 }
 </style>
 <link href="/assets/site-shell.css?v=20260823" rel="stylesheet"/>
-<meta name="description" content="Six local tools for statutory statements, management analysis, VAT periodic communications, the client tax file, F24 forms and tax regime comparison. All six are available exclusively online, with local processing in the browser.">
+<meta name="description" content="Six online tools for statutory statements, analysis, VAT, the client tax file, F24 forms and tax regimes. Files and identity stay in the browser; hybrid tools send only technical or numerical calculation data to a no-persistence service.">
 <meta name="author" content="Riccardo Zedda">
 <meta name="theme-color" content="#0E1624">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -197,7 +202,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:site_name" content="Tax Automation Lab">
 <meta property="og:title" content="Tools | Tax Automation Lab">
-<meta property="og:description" content="Six local tools for statutory statements, management analysis, VAT periodic communications, the client tax file, F24 forms and tax regime comparison. All six are available exclusively online, with local processing in the browser.">
+<meta property="og:description" content="Six online tools. Files and identity stay in the browser; hybrid tools send only technical or numerical calculation data to a no-persistence service.">
 <meta property="og:url" content="https://taxautomationlab.com/en/tools/">
 <meta property="og:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta property="og:image:secure_url" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
@@ -207,7 +212,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <meta property="og:image:alt" content="Tax Automation Lab — verifiable tools for tax, accounting and financial statements">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tools | Tax Automation Lab">
-<meta name="twitter:description" content="Six local tools for statutory statements, management analysis, VAT periodic communications, the client tax file, F24 forms and tax regime comparison. All six are available exclusively online, with local processing in the browser.">
+<meta name="twitter:description" content="Six online tools. Files and identity stay in the browser; hybrid tools send only technical or numerical calculation data to a no-persistence service.">
 <meta name="twitter:image" content="https://taxautomationlab.com/assets/social-preview-v6142.png">
 <meta name="twitter:image:alt" content="Tax Automation Lab — verifiable tools for tax, accounting and financial statements">
 
@@ -216,6 +221,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-design.css?v=20260814">
 <script defer src="/assets/tal-experience.js?v=20260823"></script>
+<script defer src="/assets/tool-catalog.js?v=20260901"></script>
 
 <style id="tal-tool-families">
 /* Le famiglie di strumenti.
@@ -279,7 +285,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section class="hero">
 <p class="tal-page-eyebrow">Tools</p>
 <h1>Professional tools, available online</h1>
-<p class="lead">Free applications available online, with local processing in the browser. Files are not uploaded to or retained by an application server. Browser data may be lost when changing device or clearing site data: export a local backup regularly.</p>
+<p class="lead">Free applications available online. Files, identity and account-level data stay in the browser. Statutory Statements, Financial Analysis, LIPE and Confronto regimi send only the technical or numerical data required for their calculation to the service, without persistence. F24 and the Client tax file process locally in the browser. Browser data may be lost when changing device or clearing site data: export a local backup regularly.</p>
 
 </section>
 <section class="onboarding-banner">
@@ -292,25 +298,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Reclassify, analyse, file.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="financial-statement">
 <span class="label">Statutory statements · v1.4.2</span><h2>Italian statutory financial statements · ITA GAAP</h2><span class="tool-tag tool-tag--contabilita">Statutory statements</span>
 <p>Fourth Directive reclassification from an IAS/IFRS trial balance, with ordinary or abbreviated layouts, mapping, maturity breakdown by category, adjustments and reconciliations.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel trial balance</div>
 <div><strong>Output</strong><br/>Balance sheet, income statement, Excel and PDF</div>
 <div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/financial-statement/">Open statutory statements (IT) →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="financial-analysis">
 <span class="label">Management analysis · v2.1.3</span><h2>Financial analysis</h2><span class="tool-tag tool-tag--contabilita">Analysis and KPIs</span>
 <p>Management reclassifications, KPIs, cash flow, budget, forecast, cost centres, documented benchmarks and quality gates.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Trial balance and optional modules</div>
 <div><strong>Output</strong><br/>KPIs, management layouts, cash flow and reports</div>
 <div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/financial-analysis/">Open financial analysis (IT) →</a></div>
 </article>
@@ -322,25 +328,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Prepare and check what has to be filed or paid.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="lipe">
 <span class="label">LIPE · v3.6.7</span><h2>LIPE Generator</h2><span class="tool-tag tool-tag--adempimenti">Periodic VAT</span>
 <p>VAT codes, VP section and IVP18 XML for periodic VAT settlement communications, with controlled carry-forwards, PDF and working paper.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>VAT code mapping and Excel amounts</div>
 <div><strong>Output</strong><br/>VP section, PDF, Excel and XML</div>
 <div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/lipe/">Open LIPE Generator (IT) →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="f24">
 <span class="label">F24 · v1.0.1</span><h2>F24 Generator</h2><span class="tool-tag tool-tag--adempimenti">Tax payments</span>
 <p>Italian F24 payment forms for one or many taxpayers, grouped by payment stream, with checks on balances, form capacity and tax codes, a credit register and the telematic record layout.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel or CSV of payments, or guided entry</div>
 <div><strong>Output</strong><br/>Official PDF form, ZIP per company, Excel</div>
 <div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/f24/">Open F24 Generator (IT) →</a></div>
 </article>
@@ -352,25 +358,25 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <p>Keep the client in order and decide how to set them up.</p>
 </div>
 <div class="grid">
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="tfa-client-file">
 <span class="label">Fascicolo cliente · v2.3.3</span><h2>Client tax file</h2><span class="tool-tag tool-tag--utilita">Client file</span>
 <p>Client profile and annual tax working paper for Tax for Audit, M&amp;A due diligence and other tax review processes, with open items and full backup.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Client and tax documentation</div>
 <div><strong>Output</strong><br/>Analytical and narrative tax file</div>
 <div>Operational interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <p class="interface-note">Operational interface currently in Italian.</p><div class="actions"><a class="button" href="/tools/tfa-client-file/">Open client tax file (IT) →</a></div>
 </article>
-<article class="card tool-card-v614">
+<article class="card tool-card-v614" data-tool-slug="confronto-regimi">
 <span class="label">Confronto regimi · v1.4.2</span><h2>Confronto regimi</h2><span class="tool-tag tool-tag--utilita">Choosing the regime</span>
 <p>Compares the net personal cash of an Italian lawyer or chartered accountant across the flat-rate regime, ordinary self-employment and a professional limited company (STP/STA), including the break-even point above EUR 85,000, pension-fund contributions on attributable profit, and the director-fee versus dividend mix.</p>
 <div class="facts">
 <div><strong>Input</strong><br/>Excel workbook with profile, fees and costs, or guided entry</div>
 <div><strong>Output</strong><br/>Comparison, four charts, Excel working paper</div>
 <div>Working interface in Italian</div>
-<div>Updated 23 August 2026 · local processing · online only</div>
+<div data-tool-meta>Metadata from the catalogue · online only</div>
 </div>
 <div class="actions"><a class="button" href="/tools/confronto-regimi/">Open Confronto regimi →</a></div>
 </article>

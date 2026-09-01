@@ -1,12 +1,12 @@
 {
   "release": "v6.18.0",
-  "date": "2026-08-23",
+  "date": "2026-08-31",
   "privacy_model": {
-    "processing": "local_in_browser",
-    "server_upload": false,
-    "persistence": "device_browser_storage",
+    "processing": "mixed_by_tool",
+    "server_upload": "technical_or_numeric_calculation_inputs_for_declared_tools_only",
+    "persistence": "browser_storage_for_local_work; no_server_payload_persistence",
     "backup_recommended": true,
-    "note": "Vale per tutti i tool salvo dove il singolo tool dichiara altrimenti nel proprio blocco privacy_model."
+    "note": "Bilancio civilistico, Analisi di bilancio, LIPE e Confronto regimi usano un servizio di calcolo con il confine dichiarato nel proprio blocco privacy_model. F24 e Fascicolo fiscale cliente elaborano localmente nel browser."
   },
   "distribution_note": "All tools are available exclusively online. No standalone packages are published through GitHub Releases.",
   "tools": [
@@ -18,7 +18,19 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-30",
+      "privacy_model": {
+        "processing": "server_side_calculation",
+        "server_upload": "qualified_statement_aggregates_only",
+        "uploads_documents": false,
+        "uploads_identifiers": false,
+        "uploads_account_codes_or_descriptions": false,
+        "server_retention": "none",
+        "server_logging_of_inputs": "none",
+        "local_fallback": false,
+        "endpoint": "https://taxautomationlab.com/api/financial-statement/calcola",
+        "note": "File, identità, codici e descrizioni dei conti restano nel browser. Il servizio riceve esclusivamente aggregati tecnici necessari al calcolo, senza persistenza."
+      }
     },
     {
       "slug": "financial-analysis",
@@ -28,7 +40,19 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-31",
+      "privacy_model": {
+        "processing": "server_side_calculation",
+        "server_upload": "post_mapping_aggregated_numeric_inputs_only",
+        "uploads_documents": false,
+        "uploads_identifiers": false,
+        "uploads_account_codes_or_descriptions": false,
+        "server_retention": "none",
+        "server_logging_of_inputs": "none",
+        "local_fallback": false,
+        "endpoint": "https://taxautomationlab.com/api/financial-analysis/calcola",
+        "note": "File, identità, codici e descrizioni dei conti restano nel browser. Il servizio riceve esclusivamente enum tecnici e valori numerici già aggregati necessari al calcolo, senza persistenza."
+      }
     },
     {
       "slug": "tfa-client-file",
@@ -38,7 +62,12 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-25",
+      "privacy_model": {
+        "processing": "local_in_browser",
+        "server_upload": false,
+        "persistence": "device_browser_storage"
+      }
     },
     {
       "slug": "lipe",
@@ -48,7 +77,7 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23",
+      "updated": "2026-08-28",
       "privacy_model": {
         "processing": "server_side_calculation",
         "server_upload": "aggregated_vp_totals_only",
@@ -70,7 +99,12 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23"
+      "updated": "2026-08-25",
+      "privacy_model": {
+        "processing": "local_in_browser",
+        "server_upload": false,
+        "persistence": "device_browser_storage"
+      }
     },
     {
       "slug": "confronto-regimi",
@@ -80,7 +114,7 @@
       "release_filename": null,
       "distribution": "online_only",
       "license": "MIT",
-      "updated": "2026-08-23",
+      "updated": "2026-08-27",
       "privacy_model": {
         "processing": "server_side_calculation",
         "server_upload": "numeric_inputs_only",

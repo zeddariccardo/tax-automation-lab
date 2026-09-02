@@ -1,0 +1,132 @@
+TAX AUTOMATION LAB — PROPRIETARY NOTICE
+Versione del 2 settembre 2026
+
+===============================================================================
+ITALIANO — TESTO SORGENTE
+===============================================================================
+
+© 2026 Riccardo Zedda — Tax Automation Lab. Tutti i diritti riservati.
+
+1. Software originale Tax Automation Lab — proprietario
+
+Il software originale, il codice frontend e backend, i motori di calcolo, gli
+algoritmi e le logiche applicative, i test, la documentazione tecnica, i
+template e i prompt di Tax Automation Lab sono proprietari, salvo i componenti
+di terzi espressamente identificati nelle relative informative di licenza.
+
+2. Uso degli strumenti attraverso il sito
+
+È consentito utilizzare gli strumenti attraverso il sito per finalità lecite
+personali, interne o professionali. La disponibilità gratuita sul sito non
+concede diritti sul codice sorgente. Salvo preventiva autorizzazione scritta,
+non è consentito copiare, modificare, distribuire, sublicenziare, vendere,
+concedere in white-label, incorporare in un prodotto concorrente, offrire come
+servizio concorrente, estrarre o riutilizzare parti sostanziali del software,
+né aggirare limiti o misure tecniche.
+
+3. Dati e output dell’utente
+
+I dati e i documenti caricati restano dell’utente. Gli output generati possono
+essere utilizzati dall’utente per le proprie finalità lecite, ferme le verifiche
+e le responsabilità professionali previste dai Termini.
+
+4. Componenti e librerie di terzi
+
+Le librerie, i font e gli altri componenti di terzi restano soggetti alle
+rispettive licenze e informative. Il presente avviso non modifica né sostituisce
+tali licenze.
+
+5. Contenuti, marchio e materiali editoriali
+
+I testi e i contenuti editoriali originali, il design, il logo, il nome, il
+marchio, l’identità del progetto e gli altri elementi distintivi di Tax
+Automation Lab sono proprietari e tutti i diritti sono riservati.
+
+Restano salvi i diritti inderogabili previsti dalla legge.
+
+===============================================================================
+ENGLISH — FAITHFUL TRANSLATION
+===============================================================================
+
+© 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
+
+1. Original Tax Automation Lab software — proprietary
+
+The original software, frontend and backend code, calculation engines,
+algorithms and application logic, tests, technical documentation, templates
+and prompts of Tax Automation Lab are proprietary, except for third-party
+components expressly identified in the relevant licence notices.
+
+2. Use of the tools through the website
+
+The tools may be used through the website for lawful personal, internal or
+professional purposes. Free availability on the website does not grant rights
+in the source code. Without prior written authorisation, it is not permitted to
+copy, modify, distribute, sublicense, sell, provide on a white-label basis,
+incorporate into a competing product, offer as a competing service, extract or
+reuse substantial parts of the software, or circumvent limits or technical
+measures.
+
+3. User data and outputs
+
+Data and documents uploaded by the user remain the user’s. Generated outputs
+may be used by the user for their lawful purposes, subject to the professional
+checks and responsibilities set out in the Terms.
+
+4. Third-party components and libraries
+
+Third-party libraries, fonts and other components remain subject to their
+respective licences and notices. This notice does not modify or replace those
+licences.
+
+5. Content, trade mark and editorial materials
+
+Original editorial texts and content, the design, logo, name, trade mark,
+project identity and other distinctive elements of Tax Automation Lab are
+proprietary and all rights are reserved.
+
+Mandatory rights provided by law remain unaffected.
+
+===============================================================================
+ESPAÑOL — TRADUCCIÓN FIEL
+===============================================================================
+
+© 2026 Riccardo Zedda — Tax Automation Lab. Todos los derechos reservados.
+
+1. Software original de Tax Automation Lab — propietario
+
+El software original, el código frontend y backend, los motores de cálculo, los
+algoritmos y las lógicas de aplicación, las pruebas, la documentación técnica,
+las plantillas y los prompts de Tax Automation Lab son propietarios, salvo los
+componentes de terceros expresamente identificados en los avisos de licencia
+correspondientes.
+
+2. Uso de las herramientas a través del sitio
+
+Se permite utilizar las herramientas a través del sitio para fines lícitos
+personales, internos o profesionales. La disponibilidad gratuita en el sitio
+no concede derechos sobre el código fuente. Sin autorización previa por
+escrito, no se permite copiar, modificar, distribuir, sublicenciar, vender,
+ofrecer en modalidad de marca blanca, incorporar en un producto competidor,
+ofrecer como servicio competidor, extraer o reutilizar partes sustanciales del
+software ni eludir límites o medidas técnicas.
+
+3. Datos y resultados del usuario
+
+Los datos y documentos cargados siguen siendo del usuario. El usuario puede
+utilizar los resultados generados para sus fines lícitos, sin perjuicio de las
+verificaciones y responsabilidades profesionales previstas en los Términos.
+
+4. Componentes y librerías de terceros
+
+Las librerías, las fuentes y los demás componentes de terceros siguen sujetos
+a sus respectivas licencias y avisos. El presente aviso no modifica ni
+sustituye dichas licencias.
+
+5. Contenidos, marca y materiales editoriales
+
+Los textos y contenidos editoriales originales, el diseño, el logo, el nombre,
+la marca, la identidad del proyecto y los demás elementos distintivos de Tax
+Automation Lab son propietarios y todos los derechos están reservados.
+
+Quedan a salvo los derechos inderogables previstos por la ley.

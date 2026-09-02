@@ -1,5 +1,5 @@
 /* Tax Automation Lab — contratto fra prompt, template e tool
-   Copyright (c) 2026 Riccardo Zedda — MIT
+   Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
 
    Perché esiste. L'audit del 21 agosto 2026 ha trovato due difetti che vivevano
    nei file distribuiti, non nel codice:

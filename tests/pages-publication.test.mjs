@@ -13,6 +13,8 @@ const INTERNAL_ROOT_FILES = [
   'AGENTS.md',
   'AUDIT-2026-08-23.md',
   'CONTESTO.md',
+  'REPOSITORY-PRIVACY-OPTIONS.md',
+  'assets/tal-design.README.md',
   'HANDOFF_CODEX_TO_CLAUDE_2026-08-21.md',
   'package.json',
 ];
@@ -27,6 +29,12 @@ const REQUIRED_PUBLIC_FILES = [
   'robots.txt',
   'sitemap.xml',
   'site.webmanifest',
+  'legal-docs/PROPRIETARY-NOTICE.txt',
+  'legal-docs/APACHE-2.0.txt',
+  'legal-docs/OFL-1.1.txt',
+  'legal-docs/MIT.txt',
+  'legal-docs/THIRD-PARTY-NOTICES.txt',
+  'legal-docs/SITE-CONTENT-NOTICE.txt',
   'assets/tal-app.css',
   'assets/tal-app.js',
   'assets/tal-design.css',
@@ -61,6 +69,13 @@ function trackedFiles() {
   const files = output.split('\0').filter(Boolean).map((file) => file.replace(/\\/g, '/'));
   // Prima del commit anche la configurazione deve partecipare alla simulazione.
   if (!files.includes('_config.yml')) files.push('_config.yml');
+  // Include i nuovi avvisi del commit candidato senza modificare l'indice Git.
+  // Il documento interno entra nella simulazione per provare l'esclusione
+  // anche nel caso di una futura aggiunta accidentale al repository.
+  for (const file of ['legal-docs/PROPRIETARY-NOTICE.txt', 'legal-docs/APACHE-2.0.txt',
+    'legal-docs/OFL-1.1.txt', 'REPOSITORY-PRIVACY-OPTIONS.md']) {
+    if (!files.includes(file)) files.push(file);
+  }
   return files;
 }
 

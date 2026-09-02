@@ -1,17 +1,35 @@
+THIRD-PARTY MIT LICENCE REFERENCE
+
+This file applies only to the third-party components identified below and in
+THIRD-PARTY-NOTICES.txt. It does not grant any rights in the original software,
+code, calculation engines, documentation, prompts, templates, content, design
+or distinctive materials of Tax Automation Lab, which are proprietary and
+subject to PROPRIETARY-NOTICE.txt.
+
+The following copyright notices and the licence grant below apply separately
+to the corresponding third-party component:
+
+- jsPDF 4.2.1: Copyright (c) 2010-2025 James Hall and the other contributors
+  identified in the preserved @license banner inside the vendored file.
+- jsPDF AutoTable 5.0.8: Copyright (c) 2026 Simon Bengtsson.
+- JSZip 3.10.1: Copyright (c) 2009-2016 Stuart Knightley. Tax Automation Lab
+  uses the MIT option offered by its dual licence.
+- pako: Copyright (c) 2014-2017 Vitaly Puzrin and Andrey Tupitsin, for the
+  files offered under MIT; zlib-derived files remain subject to the zlib terms.
+- Three.js r180 in the remotely loaded decorative module: Copyright
+  2010-2025 Three.js Authors.
+
 MIT License
 
-Copyright (c) 2026 Riccardo Zedda
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of the TaxTool software made available by Tax Automation Lab,
-including TaxTool Financial Statement, TaxTool Financial Analysis, TaxTool TFA Client File and TaxTool LIPE, and associated documentation files, to deal in the Software without
-restriction, including without limitation the rights to use, copy, modify,
-merge, publish, distribute, sublicense, and/or sell copies of the Software,
-and to permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

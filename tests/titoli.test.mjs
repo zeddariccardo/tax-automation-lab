@@ -1,5 +1,5 @@
 /* Tax Automation Lab — un titolo per pagina
-   Copyright (c) 2026 Riccardo Zedda — MIT
+   Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
 
    Perché esiste. L'audit del 23 agosto 2026 ha trovato che su quattordici
    pagine editoriali il titolo mostrato dal browser era diverso da quello del
@@ -21,18 +21,13 @@ import test from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 
-function pagine(dir = root, out = []) {
-  for (const voce of fs.readdirSync(dir, {withFileTypes: true})) {
-    if (voce.name === '.git' || voce.name === 'node_modules' || voce.name === 'tests') continue;
-    const p = path.join(dir, voce.name);
-    if (voce.isDirectory()) pagine(p, out);
-    else if (voce.name.endsWith('.html')) out.push(path.relative(root, p).split(path.sep).join('/'));
-  }
-  return out;
+function pagine(dir = root) {
+  return trackedFiles(dir, { exclude: ['tests'], pattern: /\.html$/, absolute: false });
 }
 
 function decodifica(s) {

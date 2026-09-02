@@ -20,6 +20,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -44,16 +45,7 @@ function senzaCommenti(html) {
 }
 
 function pagine() {
-  const out = [];
-  (function cammina(d) {
-    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      if (['.git', 'node_modules', 'tests', 'resources'].includes(e.name)) continue;
-      const p = path.join(d, e.name);
-      if (e.isDirectory()) cammina(p);
-      else if (e.name.endsWith('.html')) out.push(p);
-    }
-  })(root);
-  return out;
+  return trackedFiles(root, { exclude: ['tests', 'resources'], pattern: /\.html$/ });
 }
 
 const rel = (p) => p.slice(root.length + 1).split(path.sep).join('/');

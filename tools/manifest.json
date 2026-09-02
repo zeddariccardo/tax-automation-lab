@@ -17,7 +17,7 @@
       "site_url": "https://taxautomationlab.com/tools/financial-statement/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-30",
       "privacy_model": {
         "processing": "server_side_calculation",
@@ -39,7 +39,7 @@
       "site_url": "https://taxautomationlab.com/tools/financial-analysis/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-31",
       "privacy_model": {
         "processing": "server_side_calculation",
@@ -61,7 +61,7 @@
       "site_url": "https://taxautomationlab.com/tools/tfa-client-file/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-25",
       "privacy_model": {
         "processing": "local_in_browser",
@@ -76,7 +76,7 @@
       "site_url": "https://taxautomationlab.com/tools/lipe/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-28",
       "privacy_model": {
         "processing": "server_side_calculation",
@@ -98,7 +98,7 @@
       "site_url": "https://taxautomationlab.com/tools/f24/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-25",
       "privacy_model": {
         "processing": "local_in_browser",
@@ -113,7 +113,7 @@
       "site_url": "https://taxautomationlab.com/tools/confronto-regimi/",
       "release_filename": null,
       "distribution": "online_only",
-      "license": "MIT",
+      "license": "https://taxautomationlab.com/legal-docs/PROPRIETARY-NOTICE.txt",
       "updated": "2026-08-27",
       "privacy_model": {
         "processing": "server_side_calculation",

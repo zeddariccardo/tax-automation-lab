@@ -20,6 +20,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TOOLS = ['financial-statement', 'financial-analysis', 'lipe', 'tfa-client-file', 'f24', 'confronto-regimi'];
@@ -61,15 +62,7 @@ for (const dir of TOOLS) {
 }
 
 test('le pagine editoriali non parlano come un assistente', () => {
-  const pagine = [];
-  (function cammina(d) {
-    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      if (['.git', 'node_modules', 'tests', 'tools', 'resources'].includes(e.name)) continue;
-      const p = path.join(d, e.name);
-      if (e.isDirectory()) cammina(p);
-      else if (e.name.endsWith('.html')) pagine.push(p);
-    }
-  })(root);
+  const pagine = trackedFiles(root, { exclude: ['tests', 'tools', 'resources'], pattern: /\.html$/ });
 
   const male = [];
   for (const p of pagine) {

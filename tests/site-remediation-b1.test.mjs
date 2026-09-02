@@ -6,6 +6,7 @@ import test from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
@@ -90,14 +91,11 @@ test('mailto: i subject statici EN ed ES sono localizzati', () => {
   assert.doesNotMatch(es, /subject=[^"\s]*(?:Contatto|Confronto)/);
 });
 
-function walk(dir, out = []) {
-  for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
-    if (entry.isDirectory()) {
-      if (['.git', 'node_modules', 'assets', 'tests', 'output', 'resources'].includes(entry.name)) continue;
-      walk(path.join(dir, entry.name), out);
-    } else if (entry.name === 'index.html') out.push(path.join(dir, entry.name));
-  }
-  return out;
+function walk(dir) {
+  return trackedFiles(dir, {
+    exclude: ['assets', 'tests', 'resources'],
+    pattern: /(^|\/)index\.html$/
+  });
 }
 
 test('favicon: ogni pagina indicizzabile usa tutti gli asset esistenti e il manifest', () => {

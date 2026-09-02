@@ -1,5 +1,5 @@
 /* Tax Automation Lab — generatore del sitemap
-   Copyright (c) 2026 Riccardo Zedda — MIT
+   Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
 
    Perché esiste. Il sitemap era scritto a mano e le date `lastmod` erano
    rimaste indietro: al 21 agosto 2026 trentasei URL su quarantaquattro
@@ -23,6 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -33,18 +34,11 @@ const CHECK = process.argv.includes('--check');
    sono strumenti di verifica, non contenuto pubblico da indicizzare. */
 const SKIP_DIRS = new Set(['.git', '.github', 'node_modules', 'assets', 'legal-docs',
                            'resources', 'tests', '.well-known', '.codex-tools',
-                           '.playwright-mcp']);
+                           '.playwright-mcp', '.21st', '.claude',
+                           '.codex-tmp-xlsx-verify']);
 
-function walk(dir, out = []) {
-  for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
-    if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue;
-      walk(path.join(dir, entry.name), out);
-    } else if (entry.name === 'index.html') {
-      out.push(path.join(dir, entry.name));
-    }
-  }
-  return out;
+function walk(dir) {
+  return trackedFiles(dir, { exclude: [...SKIP_DIRS], pattern: /(^|\/)index\.html$/ });
 }
 
 function gitDate(file) {

@@ -1,5 +1,5 @@
 /* Tax Automation Lab — E2E: comando del menu e scorrimento orizzontale
-   Copyright (c) 2026 Riccardo Zedda — MIT
+   Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
 
    Perché esiste. L'audit del 21 agosto 2026 ha bocciato la release perché il
    comando del menu non era lo stesso nei cinque tool e in due di essi

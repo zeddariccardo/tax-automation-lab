@@ -17,7 +17,8 @@
  *  Fascicolo il fuoco lo restituisce da solo, e li' questo file non tocca
  *  niente.
  *
- *  Copyright (c) 2026 Riccardo Zedda — MIT, vedi /legal-docs/MIT.txt
+ *  Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
+ *  Original TAL software is proprietary. See /legal-docs/PROPRIETARY-NOTICE.txt.
  */
 (function () {
   'use strict';

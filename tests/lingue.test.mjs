@@ -12,19 +12,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITO = 'https://taxautomationlab.com';
 
-const pagine = [];
-(function cammina(d) {
-  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-    if (e.name === '.git' || e.name === 'node_modules' || e.name === 'tests') continue;
-    const p = path.join(d, e.name);
-    if (e.isDirectory()) cammina(p);
-    else if (e.name.endsWith('.html')) pagine.push(p);
-  }
-})(root);
+const pagine = trackedFiles(root, { exclude: ['tests'], pattern: /\.html$/ });
 
 const rel = (p) => p.slice(root.length + 1).split(path.sep).join('/');
 const urlDi = (f) => SITO + '/' + f.replace(/index\.html$/, '');

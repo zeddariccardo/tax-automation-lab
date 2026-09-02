@@ -24,6 +24,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -93,18 +94,12 @@ for (const [it, en, es] of TERZINE) {
 
 test('nessuna pagina costruisce schede con uno script invece che nel markup', () => {
   const male = [];
-  (function cammina(d) {
-    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      if (['.git', 'node_modules', 'tests', 'resources'].includes(e.name)) continue;
-      const p = path.join(d, e.name);
-      if (e.isDirectory()) { cammina(p); continue; }
-      if (!e.name.endsWith('.html')) continue;
-      const html = fs.readFileSync(p, 'utf8');
-      for (const m of html.matchAll(/insertAdjacentHTML\([^)]{0,40}<article/g)) {
-        male.push(`  ${p.slice(root.length + 1).split(path.sep).join('/')}: ${m[0].slice(0, 70)}…`);
-      }
+  for (const p of trackedFiles(root, { exclude: ['tests', 'resources'], pattern: /\.html$/ })) {
+    const html = fs.readFileSync(p, 'utf8');
+    for (const m of html.matchAll(/insertAdjacentHTML\([^)]{0,40}<article/g)) {
+      male.push(`  ${p.slice(root.length + 1).split(path.sep).join('/')}: ${m[0].slice(0, 70)}…`);
     }
-  })(root);
+  }
   assert.equal(male.length, 0,
     `${male.length} pagine costruiscono schede a runtime:\n${male.join('\n')}\n` +
     `  Quello che si vede deve stare nel markup: altrimenti non si confronta fra lingue, ` +

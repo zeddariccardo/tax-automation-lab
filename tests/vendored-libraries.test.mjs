@@ -1,5 +1,5 @@
 /* Tax Automation Lab — integrità delle librerie incorporate
-   Copyright (c) 2026 Riccardo Zedda — MIT
+   Copyright (c) 2026 Riccardo Zedda — Tax Automation Lab. All rights reserved.
 
    Perché esiste. L'audit del 23 agosto 2026 ha misurato la copia di SheetJS
    incorporata nei sei tool e ha trovato quattro sequenze di byte diverse, a

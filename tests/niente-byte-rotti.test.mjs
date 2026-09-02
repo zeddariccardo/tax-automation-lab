@@ -22,20 +22,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { trackedFiles } from './tracked-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function testuali(cartella, trovati = []) {
-  for (const voce of fs.readdirSync(cartella, { withFileTypes: true })) {
-    const p = path.join(cartella, voce.name);
-    if (voce.isDirectory()) {
-      if (['node_modules', '.git', 'legal-docs'].includes(voce.name)) continue;
-      testuali(p, trovati);
-    } else if (/\.(html|css|js|mjs|json|txt|md|svg|xml)$/i.test(voce.name)) {
-      trovati.push(p);
-    }
-  }
-  return trovati;
+function testuali(cartella) {
+  return trackedFiles(cartella, {
+    exclude: ['legal-docs'],
+    pattern: /\.(html|css|js|mjs|json|txt|md|svg|xml)$/i
+  });
 }
 
 const file = testuali(root);

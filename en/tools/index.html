@@ -76,12 +76,6 @@ footer a:hover{color:#F7F7F5!important}
 .tool-choice-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin-top:18px}
 .tool-choice-card{padding:18px;border:1px solid rgba(247,247,245,.13);border-radius:12px;background:rgba(255,255,255,.035)}
 .tool-choice-arrow{font-size:30px;color:#8bd7b4}
-.compare-wrap{margin-top:24px;overflow-x:auto;border:1px solid rgba(247,247,245,.13);border-radius:12px}
-.compare-table{width:100%;border-collapse:collapse;min-width:760px;background:rgba(14,22,36,.62)}
-.compare-table th,.compare-table td{padding:13px 14px;border-bottom:1px solid rgba(247,247,245,.1);text-align:left;vertical-align:top}
-.compare-table th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#fff;background:rgba(20,83,104,.32)}
-.compare-table td{font-size:13px;color:#d9dde1}
-.compare-table tr:last-child td{border-bottom:0}
 @media(max-width:760px){
   .grid,.tool-grid{grid-template-columns:1fr!important}
   .tool-choice-grid{grid-template-columns:1fr}
@@ -239,7 +233,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
   padding:0 0 12px;margin:0 0 18px;border-bottom:1px solid var(--tal-line,#e7e4dc)
 }
 .tool-family-head h2{
-  margin:0;font-size:clamp(17px,2.2vw,21px);line-height:1.2;
+  margin:0;font-size:clamp(21px,2.5vw,26px);line-height:1.16;
   display:flex;align-items:center;gap:9px
 }
 /* Il quadratino colorato accanto al titolo lega la famiglia ai tag delle card. */
@@ -247,7 +241,15 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
   content:"";width:11px;height:11px;border-radius:3px;flex:0 0 auto;
   background:var(--fam)
 }
-.tool-family-head p{margin:0;font-size:13px;color:var(--tal-ink-3,#6e6b65)}
+html:not(.tal-tool-page) .onboarding-banner .label{
+  display:inline-flex;padding:5px 10px;border:1px solid rgba(148,225,207,.4);
+  border-radius:999px;background:rgba(6,45,55,.62)!important;color:#B7E9DC!important
+}
+html:not(.tal-tool-page) .onboarding-banner{
+  border-color:rgba(95,181,154,.44)!important;border-left-color:#5FB59A!important;
+  background:linear-gradient(145deg,rgba(9,54,62,.94),rgba(16,82,89,.8))!important;
+  box-shadow:0 16px 38px rgba(4,40,48,.26)!important
+}
 
 .tool-family--contabilita{--fam:#145368}
 .tool-family--adempimenti{--fam:#8B6A16}
@@ -284,8 +286,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <main>
 <section class="hero">
 <p class="tal-page-eyebrow">Tools</p>
-<h1>Professional tools, available online</h1>
-<p class="lead">Free applications available online. Files, identity and account-level data stay in the browser. Statutory Statements, Financial Analysis, LIPE and Confronto regimi send only the technical or numerical data required for their calculation to the service, without persistence. F24 and the Client tax file process locally in the browser. Browser data may be lost when changing device or clearing site data: export a local backup regularly.</p>
+<h1>Professional tools available - online and free</h1>
 
 </section>
 <section class="onboarding-banner">
@@ -295,7 +296,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-contabilita" class="tool-family tool-family--contabilita">
 <div class="tool-family-head">
 <h2 id="fam-contabilita">Accounting and financial statements</h2>
-<p>Reclassify, analyse, file.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="financial-statement">
@@ -325,7 +325,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-adempimenti" class="tool-family tool-family--adempimenti">
 <div class="tool-family-head">
 <h2 id="fam-adempimenti">Tax and compliance</h2>
-<p>Prepare and check what has to be filed or paid.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="lipe">
@@ -355,7 +354,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-utilita" class="tool-family tool-family--utilita">
 <div class="tool-family-head">
 <h2 id="fam-utilita">Organisation and decisions</h2>
-<p>Keep the client in order and decide how to set them up.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="tfa-client-file">
@@ -383,12 +381,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 </section>
 
-<section aria-label="Which financial-statement tool should you use?" class="compare-wrap">
-<table class="compare-table">
-<thead><tr><th>Tool</th><th>Purpose</th><th>Input</th><th>Output</th><th>Access</th><th>Storage</th></tr></thead>
-<tbody><tr><td><strong>Italian statutory financial statements</strong></td><td>Fourth Directive reclassification from an IAS/IFRS trial balance, with ordinary or abbreviated layouts, mapping, maturity breakdown by category, adjustments and reconciliations.</td><td>Excel trial balance</td><td>Balance sheet, income statement, Excel and PDF</td><td>Online</td><td>Local browser</td></tr><tr><td><strong>Financial analysis</strong></td><td>Management reclassifications, KPIs, cash flow, budget, forecast, cost centres, documented benchmarks and quality gates.</td><td>Trial balance and optional modules</td><td>KPIs, management layouts, cash flow and reports</td><td>Online</td><td>Local browser</td></tr><tr><td><strong>Client tax file</strong></td><td>Client profile and annual tax working paper for Tax for Audit, M&amp;A due diligence and other tax review processes, with open items and full backup.</td><td>Client and tax documentation</td><td>Analytical and narrative tax file</td><td>Online</td><td>Local browser</td></tr><tr><td><strong>LIPE Generator</strong></td><td>VAT codes, VP section and IVP18 XML for periodic VAT settlement communications, with controlled carry-forwards, PDF and working paper.</td><td>VAT code mapping and Excel amounts</td><td>VP section, PDF, Excel and XML</td><td>Online</td><td>Local browser</td></tr></tbody>
-</table>
-</section>
 <section class="safety-note"><strong>Professional notice:</strong> always verify data, rules and outputs before professional use, submission or filing with third parties.</section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/en/insights/">Cases &amp; method</a><a href="/en/privacy/">Privacy</a><a href="/en/security/">Security</a><a href="/en/terms/">Terms &amp; disclaimer</a><a href="/en/licenses/">Licences</a></nav><p>A personal and independent project. Content does not constitute professional advice, and the project is not approved, sponsored or affiliated with employers or third parties.</p></div></footer></div>
 <script id="tal-language-routes">

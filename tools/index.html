@@ -76,12 +76,6 @@ footer a:hover{color:#F7F7F5!important}
 .tool-choice-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin-top:18px}
 .tool-choice-card{padding:18px;border:1px solid rgba(247,247,245,.13);border-radius:12px;background:rgba(255,255,255,.035)}
 .tool-choice-arrow{font-size:30px;color:#8bd7b4}
-.compare-wrap{margin-top:24px;overflow-x:auto;border:1px solid rgba(247,247,245,.13);border-radius:12px}
-.compare-table{width:100%;border-collapse:collapse;min-width:760px;background:rgba(14,22,36,.62)}
-.compare-table th,.compare-table td{padding:13px 14px;border-bottom:1px solid rgba(247,247,245,.1);text-align:left;vertical-align:top}
-.compare-table th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#fff;background:rgba(20,83,104,.32)}
-.compare-table td{font-size:13px;color:#d9dde1}
-.compare-table tr:last-child td{border-bottom:0}
 @media(max-width:760px){
   .grid,.tool-grid{grid-template-columns:1fr!important}
   .tool-choice-grid{grid-template-columns:1fr}
@@ -239,7 +233,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
   padding:0 0 12px;margin:0 0 18px;border-bottom:1px solid var(--tal-line,#e7e4dc)
 }
 .tool-family-head h2{
-  margin:0;font-size:clamp(17px,2.2vw,21px);line-height:1.2;
+  margin:0;font-size:clamp(21px,2.5vw,26px);line-height:1.16;
   display:flex;align-items:center;gap:9px
 }
 /* Il quadratino colorato accanto al titolo lega la famiglia ai tag delle card. */
@@ -247,7 +241,15 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
   content:"";width:11px;height:11px;border-radius:3px;flex:0 0 auto;
   background:var(--fam)
 }
-.tool-family-head p{margin:0;font-size:13px;color:var(--tal-ink-3,#6e6b65)}
+html:not(.tal-tool-page) .onboarding-banner .label{
+  display:inline-flex;padding:5px 10px;border:1px solid rgba(148,225,207,.4);
+  border-radius:999px;background:rgba(6,45,55,.62)!important;color:#B7E9DC!important
+}
+html:not(.tal-tool-page) .onboarding-banner{
+  border-color:rgba(95,181,154,.44)!important;border-left-color:#5FB59A!important;
+  background:linear-gradient(145deg,rgba(9,54,62,.94),rgba(16,82,89,.8))!important;
+  box-shadow:0 16px 38px rgba(4,40,48,.26)!important
+}
 
 .tool-family--contabilita{--fam:#145368}
 .tool-family--adempimenti{--fam:#8B6A16}
@@ -284,8 +286,7 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <main>
 <section class="hero">
 <p class="tal-page-eyebrow">Strumenti</p>
-<h1>Strumenti professionali online</h1>
-<p class="lead">Applicazioni gratuite, utilizzabili online. File, identità e dati account-level restano nel browser. Bilancio civilistico, Analisi di bilancio, LIPE e Confronto regimi inviano al servizio esclusivamente i dati tecnici o numerici necessari al rispettivo calcolo, senza persistenza. F24 e Fascicolo fiscale cliente elaborano localmente nel browser. I dati salvati nel browser possono andare persi cambiando dispositivo o cancellando i dati del sito: esporta periodicamente una copia di sicurezza.</p>
+<h1>Strumenti professionali disponibili - online e gratuiti</h1>
 
 </section>
 <section class="onboarding-banner">
@@ -295,7 +296,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-contabilita" class="tool-family tool-family--contabilita">
 <div class="tool-family-head">
 <h2 id="fam-contabilita">Contabilità e bilancio</h2>
-<p>Riclassificare, analizzare, depositare.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="financial-statement">
@@ -325,7 +325,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-adempimenti" class="tool-family tool-family--adempimenti">
 <div class="tool-family-head">
 <h2 id="fam-adempimenti">Fiscale e adempimenti</h2>
-<p>Preparare e controllare quello che va trasmesso o versato.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="lipe">
@@ -355,7 +354,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 <section aria-labelledby="fam-utilita" class="tool-family tool-family--utilita">
 <div class="tool-family-head">
 <h2 id="fam-utilita">Organizzazione e decisioni</h2>
-<p>Tenere in ordine il cliente e scegliere come impostarlo.</p>
 </div>
 <div class="grid">
 <article class="card tool-card-v614" data-tool-slug="tfa-client-file">
@@ -383,12 +381,6 @@ h1,h2,.card h2,.onboarding-banner h2,.tool-choice h2,.tool-choice-card h2{font-f
 </div>
 </section>
 
-<section aria-label="Quale strumento scegliere per il bilancio?" class="compare-wrap">
-<table class="compare-table">
-<thead><tr><th>Strumento</th><th>Obiettivo</th><th>Input</th><th>Output</th><th>Accesso</th><th>Memoria</th></tr></thead>
-<tbody><tr><td><strong>Bilancio civilistico ITA GAAP</strong></td><td>Riclassificazione IV Direttiva da bilancio di verifica IAS/IFRS, con schemi ordinari o abbreviati, mappatura, scadenze per categoria, rettifiche, quadrature e archivio annuale.</td><td>Bilancio di verifica Excel</td><td>Stato patrimoniale, conto economico, Excel e PDF</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Analisi di bilancio</strong></td><td>Riclassificazioni gestionali, KPI, rendiconto finanziario, budget, forecast, centri di costo, benchmark e controlli di qualità.</td><td>Bilancio di verifica e moduli facoltativi</td><td>KPI, schemi gestionali, rendiconto e report</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Fascicolo fiscale cliente</strong></td><td>Scheda cliente e working paper annuale per Tax for Audit, M&amp;A due diligence e altri processi di revisione fiscale, con punti aperti e backup completo.</td><td>Anagrafica e documentazione fiscale</td><td>Fascicolo analitico e discorsivo</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Generatore LIPE</strong></td><td>Codici IVA, quadro VP e XML IVP18 per le comunicazioni delle liquidazioni periodiche IVA, con riporti controllati, PDF e working paper.</td><td>Codiciario e importi Excel</td><td>Quadro VP, PDF, Excel e XML</td><td>Online</td><td>Browser locale</td></tr><tr><td><strong>Generatore F24</strong></td><td>Preparazione, raggruppamento per flusso, controllo e generazione di modelli F24 ministeriali singoli e massivi, con archivio contribuenti, archivio crediti e tracciato telematico.</td><td>Excel o CSV dei versamenti</td><td>PDF ministeriale, ZIP per società, Excel</td><td>Online</td><td>Browser locale</td></tr></tbody>
-<tr><td><b>Confronto regimi</b></td><td>Confronto del netto personale disponibile fra forfettario, partita IVA ordinaria e STP/STA, con la soglia di convenienza oltre 85.000 euro e l’ottimizzazione automatica del mix fra compenso amministratore e dividendo</td><td>Excel di profilo, compensi e costi, o compilazione guidata</td><td>Confronto, quattro grafici, working paper Excel</td><td>Online</td><td>Archivio locale delle simulazioni</td></tr></table>
-</section>
 <section class="safety-note"><strong>Avvertenza professionale:</strong> verifica sempre dati, regole e risultati prima dell’uso professionale, dell’invio o del deposito presso terzi.</section>
 </main><footer class="tal-standard-footer"><div class="tal-footer-inner"><div>© 2026 Riccardo Zedda · Tax Automation Lab</div><nav aria-label="Legal"><a href="/approfondimenti/">Casi e metodo</a><a href="/privacy/">Privacy</a><a href="/security/">Sicurezza</a><a href="/terms/">Termini e disclaimer</a><a href="/licenses/">Licenze</a></nav><p>Progetto personale e indipendente. I contenuti non costituiscono consulenza professionale e il progetto non è approvato, sponsorizzato o affiliato a datori di lavoro o terze parti.</p></div></footer></div>
 <script id="tal-language-routes">

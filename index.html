@@ -450,6 +450,13 @@ html.tal-show-intro .intro{display:grid!important}
 .collaborations-head{display:grid;grid-template-columns:1fr .8fr;gap:22px;align-items:end;margin-bottom:16px}
 .collaborations-head h2{font-family:var(--serif);font-size:clamp(34px,4vw,52px);font-weight:300;margin:6px 0}
 .collaborations-head p{margin:0;color:#dce0e4}
+.collab-preview{position:relative;overflow:hidden;padding:20px;min-height:210px}
+.collab-blur{display:grid;gap:12px;filter:blur(6px);opacity:.55;user-select:none;pointer-events:none}
+.collab-profile{display:grid;grid-template-columns:76px 1fr;gap:16px;align-items:center;padding:15px;border:1px solid rgba(247,247,245,.14);border-radius:12px;background:rgba(255,255,255,.035)}
+.collab-avatar{width:76px;height:76px;border-radius:14px;background:linear-gradient(135deg,#145368,#725D6A)}
+.collab-lines b{display:block;font-family:var(--serif);font-size:24px}.collab-lines span{display:block;color:#cdd3d8}
+.collab-overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(14,22,36,.2),rgba(14,22,36,.68))}
+.collab-overlay strong{padding:12px 22px;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:rgba(14,22,36,.78);font-size:14px;letter-spacing:.22em}
 .collab-apply{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-top:14px;padding:20px;border-left:4px solid #734C34}
 .collab-apply h3{font-family:var(--serif);font-size:30px;font-weight:300;margin:0 0 4px}.collab-apply p{margin:0;color:#dce0e4}
 .footer{font-size:13px!important;line-height:1.5}
@@ -460,8 +467,11 @@ html.tal-show-intro .intro{display:grid!important}
 .tal-site-footer a,.site-footer a,footer a{font-size:13px!important}
 .tal-gh-menu-toggle{display:none;appearance:none;border:1px solid rgba(247,247,245,.22);background:rgba(8,15,26,.42);color:#F7F7F5;border-radius:999px;min-width:44px;min-height:44px;padding:0 12px;font:800 11px/1 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer}
 .button,.btn,a.button,button.btn{min-height:44px;font-size:max(12px,inherit)}
-.intro-lang-switch{display:grid!important;grid-template-columns:repeat(3,42px)!important;gap:2px!important;width:auto!important;min-width:134px!important;padding:4px!important;align-items:center!important}
-.intro-lang-switch .lang-option{width:42px!important;min-width:42px!important;height:40px!important;display:grid!important;place-items:center!important;padding:0!important}
+html:not(.tal-tool-page) .home-hero .button.ai-config-cta{background:linear-gradient(135deg,var(--petrol),#176b72)!important;border-color:rgba(117,225,211,.5)!important;color:#fff!important;box-shadow:0 0 0 1px rgba(51,177,167,.16),0 14px 34px rgba(4,59,65,.38),0 0 26px rgba(46,174,162,.16)!important;transition:transform .15s ease,filter .15s ease,box-shadow .15s ease,border-color .15s ease}
+html:not(.tal-tool-page) .home-hero .button.ai-config-cta:hover{border-color:rgba(145,239,226,.72)!important;box-shadow:0 0 0 1px rgba(70,199,187,.22),0 16px 38px rgba(4,59,65,.46),0 0 32px rgba(57,198,184,.25)!important}
+html:not(.tal-tool-page) .home-hero .button.ai-config-cta:focus-visible{outline:3px solid rgba(151,241,228,.88);outline-offset:4px}
+.intro-lang-switch{display:grid!important;grid-template-columns:repeat(3,36px)!important;gap:1px!important;width:auto!important;min-width:116px!important;padding:3px!important;align-items:center!important}
+.intro-lang-switch .lang-option{width:36px!important;min-width:36px!important;height:34px!important;min-height:34px!important;display:grid!important;place-items:center!important;padding:0!important;font-size:11px!important}
 @media(max-width:760px){
  .tal-global-header{padding:8px 8px 0!important}
  .tal-gh-frame{min-height:58px!important;padding:7px 8px!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"brand lang menu"!important;gap:7px!important;border-radius:13px!important}
@@ -481,8 +491,8 @@ html.tal-show-intro .intro{display:grid!important}
  .tal-gh-lang{grid-template-columns:repeat(3,31px)!important}
  .tal-gh-lang a{width:31px!important;min-width:31px!important}
  .tal-gh-menu-toggle{min-width:40px;padding:0 9px;font-size:10px}
- .intro-lang-switch{grid-template-columns:repeat(3,39px)!important;min-width:125px!important}
- .intro-lang-switch .lang-option{width:39px!important;min-width:39px!important}
+ .intro-lang-switch{grid-template-columns:repeat(3,34px)!important;min-width:109px!important}
+ .intro-lang-switch .lang-option{width:34px!important;min-width:34px!important}
 }
 </style>
 <style id="tal-v614-intro-state">html.tal-skip-intro #intro{display:none!important}html.tal-show-intro #intro{display:grid!important;place-items:center!important}</style>
@@ -549,7 +559,7 @@ html.tal-show-intro #intro{
 <!-- Tax Automation Lab — livello estetico condiviso (v7.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/newsreader-var-latin.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/tal-design.css?v=20260814">
+<link rel="stylesheet" href="/assets/tal-design.css?v=2026090201">
 <script defer src="/assets/tal-experience.js?v=20260823"></script>
 </head>
 <body class="intro-open">
@@ -561,9 +571,7 @@ html.tal-show-intro #intro{
 <a class="lang-option" data-lang="es" href="/es/" hreflang="es">ESP</a>
 </div>
 <div class="intro-inner">
-<p class="intro-kicker">Dott. Riccardo Zedda</p>
 <p class="intro-title" id="intro-title">Tax &amp; Accounting <em>Automation Lab</em></p>
-<p class="intro-copy">Automatizza i processi fiscali e contabili ricorrenti.</p>
 <button class="start-btn" id="start-button" type="button">Entra</button>
 </div>
 </section>
@@ -592,8 +600,8 @@ html.tal-show-intro #intro{
 <div class="shell">
 <div class="home-hero">
 <h1 class="display" id="home-title" tabindex="-1">Processi fiscali e contabili, trasformati in <em>strumenti tecnologici</em></h1>
-<p class="lead">Non devi essere uno sviluppatore per automatizzare un processo fiscale. Conosci il processo. Definisci le regole. Automatizza l’esecuzione. Controlla il risultato.</p>
-<div class="hero-actions"><a class="button" href="/tools/">Esplora gli strumenti</a><a class="button secondary" href="/approfondimenti/">Casi e metodo</a></div>
+<p class="lead">Risparmia ore di lavoro: conosci il processo, definisci le regole, automatizza l'esecuzione e controlla il risultato.</p>
+<div class="hero-actions"><a class="button" href="/tools/">Esplora gli strumenti</a><a class="button secondary ai-config-cta" href="/configura-con-ai/">Configura con AI</a></div>
 </div>
 <div class="lab-goals-wrap">
 <article class="lab-goals surface">
@@ -617,12 +625,19 @@ html.tal-show-intro #intro{
 <div class="timeline"><div class="timeline-row"><time>2025 — oggi</time><div><strong>Tax Manager</strong><p>Gestisco la fiscalità italiana del gruppo e coordino progetti di automazione dei processi fiscali e contabili.</p></div></div><div class="timeline-row"><time>2023 — 2025</time><div><strong>PwC Italy · Tax</strong><p>Ho lavorato in PwC occupandomi di imposte dirette, IVA, ritenute, operazioni straordinarie e supporto agli audit.</p></div></div><div class="timeline-row"><time>2023</time><div><strong>KPMG Italy · M&amp;A Tax</strong><p>Ho svolto un’esperienza in M&amp;A Tax dedicata all’analisi fiscale delle operazioni straordinarie.</p></div></div></div>
 <div class="qualification"><strong>Qualifica.</strong> Ho conseguito l’abilitazione all’esercizio della professione di dottore commercialista. Attualmente non esercito la libera professione e non sono iscritto all’Albo, in quanto lavoro come dipendente.</div>
 </article>
-<aside class="surface"><span class="label" data-romeo-background-label>Background</span><div class="credentials"><div class="credential"><strong>Bocconi University</strong><span>MSc in Economics and Legislation for Business</span></div><div class="credential"><strong>Università di Cagliari</strong><span>Economia e gestione aziendale · 110/110 e lode</span></div><div class="credential"><strong>Ambiti</strong><span>Tax compliance, M&amp;A, reporting, AI tax automation, NetSuite</span></div><div class="credential"><strong>Lingue</strong><span>Italiano, inglese e spagnolo</span></div><div class="credential romeo-family-card"><strong data-romeo-family-title>Famiglia</strong><span><span data-romeo-family-prefix>Marito e </span><button aria-label="Apri Il primo bilancio di Romeo" class="romeo-trigger" title="Apri Il primo bilancio di Romeo" type="button">papà</button></span></div></div></aside>
+<aside class="surface"><span class="label" data-romeo-background-label>Background</span><div class="credentials"><div class="credential"><strong>Bocconi University</strong><span>MSc in Economics and Legislation for Business</span></div><div class="credential"><strong>Università di Cagliari</strong><span>Economia e gestione aziendale · 110/110 e lode</span></div><div class="credential"><strong>Ambiti</strong><span>Tax compliance, M&amp;A, reporting, AI tax automation, ERP e gestionali (Profis, NetSuite)</span></div><div class="credential"><strong>Lingue</strong><span>Italiano, inglese e spagnolo</span></div><div class="credential romeo-family-card"><strong data-romeo-family-title>Famiglia</strong><span><span data-romeo-family-prefix>Marito e </span><button aria-label="Apri Il primo bilancio di Romeo" class="romeo-trigger" title="Apri Il primo bilancio di Romeo" type="button">papà</button></span></div></div></aside>
 </div>
 <section aria-labelledby="collaborations-title" class="collaborations">
 <header class="collaborations-head"><div><span class="label">Collaborazioni</span><h2 id="collaborations-title">Collaborazioni</h2></div><p>Una sezione dedicata ai professionisti che contribuiscono con competenze, test e idee ai progetti del Lab.</p></header>
-<div class="collab-apply surface"><div><h3>Hai un’idea o vuoi contribuire?</h3><p>Proponi un caso d’uso, una revisione professionale o una collaborazione su uno dei tool.</p></div><a class="button" href="mailto:contact@taxautomationlab.com?subject=Tax%20Automation%20Lab%20%E2%80%94%20Proposta%20di%20collaborazione">Proponi una collaborazione ↗</a></div>
-</section><div class="contact surface"><div><span class="label">Contatti</span><h3>Feedback e casi d’uso concreti</h3><p>Hai un’idea, un processo da semplificare o vuoi confrontarti su uno dei tool? Scrivimi: sarò felice di ascoltarti e approfondire insieme il caso.</p></div><a class="button" href="mailto:contact@taxautomationlab.com?subject=Tax%20Automation%20Lab%20%E2%80%94%20Contatto%20dal%20sito">Scrivi a Riccardo ↗</a></div>
+<div class="collab-preview surface">
+<div aria-hidden="true" class="collab-blur">
+<div class="collab-profile"><div class="collab-avatar"></div><div class="collab-lines"><b>Nome collaboratore</b><span>Profilo professionale e competenze</span><span>Contributo a uno strumento del Lab</span></div></div>
+<div class="collab-profile"><div class="collab-avatar"></div><div class="collab-lines"><b>Nome collaboratore</b><span>Profilo professionale e competenze</span><span>Contributo a uno strumento del Lab</span></div></div>
+</div>
+<div class="collab-overlay"><strong>SOON</strong></div>
+</div>
+<div class="collab-apply surface"><div><h3>Hai un’idea o vuoi contribuire?</h3><p>Condividi un feedback, proponi un caso d’uso, una revisione professionale o una collaborazione su uno dei tool.</p></div><a class="button" href="mailto:contact@taxautomationlab.com?subject=Tax%20Automation%20Lab%20%E2%80%94%20Proposta%20di%20collaborazione">Proponi una collaborazione ↗</a></div>
+</section>
 </div>
 </section>
 </main>

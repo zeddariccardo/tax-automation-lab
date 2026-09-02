@@ -901,11 +901,12 @@ html:not(.tal-tool-page) p a:not(.button):hover{color:#fff;background-size:100% 
 /* Focus: un solo anello, sempre lo stesso. */
 html:not(.tal-tool-page) a:focus-visible,
 html:not(.tal-tool-page) button:focus-visible,
-html:not(.tal-tool-page) [tabindex]:focus-visible{
+html:not(.tal-tool-page) [tabindex]:not(.page):focus-visible{
   outline:2px solid #7FD4EC !important;
   outline-offset:3px !important;
   border-radius:var(--tal-r-xs);
 }
+html:not(.tal-tool-page) .page[tabindex]:focus-visible{outline:none !important}
 
 /* Pannello contatti flottante */
 html:not(.tal-tool-page) .ask-trigger{

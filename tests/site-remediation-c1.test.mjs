@@ -8,6 +8,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const homes = [
   {
     file: 'index.html',
+    collaborator: 'Nome collaboratore',
+    areas: 'ERP e gestionali (Profis, NetSuite)',
+    applyPrefix: 'Condividi un feedback, proponi un caso d’uso',
     required: [
       'File e dati identificativi restano nel browser.',
       'dati tecnici o numerici necessari al calcolo',
@@ -16,6 +19,9 @@ const homes = [
   },
   {
     file: 'en/index.html',
+    collaborator: 'Collaborator name',
+    areas: 'ERP systems (Profis, NetSuite)',
+    applyPrefix: 'Share feedback, propose a use case',
     required: [
       'Files and identifying data remain in the browser.',
       'technical or numerical data required for calculation',
@@ -24,6 +30,9 @@ const homes = [
   },
   {
     file: 'es/index.html',
+    collaborator: 'Nombre del colaborador',
+    areas: 'ERP y sistemas de gestión (Profis, NetSuite)',
+    applyPrefix: 'Comparte tus comentarios, propón un caso de uso',
     required: [
       'Los archivos y los datos identificativos permanecen en el navegador.',
       'datos técnicos o numéricos necesarios para el cálculo',
@@ -49,20 +58,22 @@ test('le tre home non contengono più claim di elaborazione interamente locale',
   }
 });
 
-test('i placeholder collaboratori e i loro badge sono rimossi senza sostituzioni', () => {
-  const forbidden = [
-    /Nome collaboratore/i,
-    /Collaborator name/i,
-    /Nombre del colaborador/i,
-    /class="collab-preview/i,
-    /class="collab-profile/i,
-    /class="collab-overlay/i,
-    /<strong>\s*(?:PRESTO|SOON|PRÓXIMAMENTE)\s*<\/strong>/i,
-  ];
+test('le tre home ripristinano la card collaborazioni future e rimuovono la card contatti', () => {
   for (const home of homes) {
     const html = fs.readFileSync(path.join(root, home.file), 'utf8');
-    for (const pattern of forbidden) {
-      assert.doesNotMatch(html, pattern, `${home.file}: placeholder collaboratore residuo`);
-    }
+    assert.ok(html.includes('class="collab-preview surface"'), `${home.file}: card collaborazioni future assente`);
+    assert.ok(html.includes('class="collab-blur"'), `${home.file}: effetto blur assente`);
+    assert.equal((html.match(/class="collab-profile"/g) || []).length, 2, `${home.file}: profili futuri inattesi`);
+    assert.ok(html.includes(home.collaborator), `${home.file}: testo collaboratore localizzato assente`);
+    assert.match(html, /<div class="collab-overlay"><strong>SOON<\/strong><\/div>/, `${home.file}: badge SOON assente`);
+    assert.ok(html.includes(home.areas), `${home.file}: ambiti ERP non aggiornati`);
+    assert.ok(html.includes(home.applyPrefix), `${home.file}: invito al feedback non aggiornato`);
+    assert.doesNotMatch(html, /<div class="contact surface">/, `${home.file}: card contatti ancora presente`);
   }
+});
+
+test('le sezioni pagina raggiunte via hash non ricevono il contorno dei controlli interattivi', () => {
+  const css = fs.readFileSync(path.join(root, 'assets/tal-design.css'), 'utf8');
+  assert.match(css, /\[tabindex\]:not\(\.page\):focus-visible/);
+  assert.match(css, /\.page\[tabindex\]:focus-visible\s*\{\s*outline:none\s*!important\s*\}/);
 });

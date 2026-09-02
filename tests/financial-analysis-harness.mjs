@@ -46,6 +46,9 @@ export async function startFinancialAnalysisHarness({ apiHandler, viewport = { w
     const page = await context.newPage();
     page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
     page.on('pageerror', error => consoleErrors.push(error.message));
+    await page.route('**/api/stato', route => route.fulfill({
+      status: 200, contentType: 'application/json', body: '{"ok":true}'
+    }));
     await page.route(API_PATTERN, async route => {
       const raw = route.request().postData() || '';
       requests.push(raw);

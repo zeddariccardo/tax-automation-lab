@@ -43,7 +43,6 @@ Official source: https://taxautomationlab.com/tools/confronto-regimi/
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/inter-var-latin.woff2">
 <link rel="stylesheet" href="/assets/site-shell.css?v=20260823">
 <link rel="stylesheet" href="/assets/tal-app.css?v=20260824d">
-<script src="/assets/tal-api-connection.js?v=20260902"></script>
 <script defer src="/assets/tal-app.js?v=20260822a"></script>
 <script type="application/ld+json">
 {
@@ -3494,12 +3493,7 @@ function aggiornaContesto() {
 window.cfAggiornaContesto = aggiornaContesto;
 
 function salvaSimulazione() {
-  const esito = window.cfRisultatoCorrente();
-  if (!esito) {
-    toast('Attendi un calcolo valido prima di salvare la simulazione.');
-    vaiA('confronto');
-    return;
-  }
+  const esito = calcola();
   const a = leggiArchivio();
   const voce = {
     id: 'sim-' + Date.now(),
@@ -3714,8 +3708,10 @@ else avvia();
    stessa origine del sito (`/api/...`): una Route di Cloudflare la
    intercetta prima che la richiesta arrivi a GitHub Pages. Cosi' non serve
    CORS, non serve un sottodominio e non serve un record DNS nuovo. Per le
-   prove locali il trasporto condiviso ammette solo indirizzi loopback.
-   In produzione preferenze storiche e parametri del link non cambiano origine.
+   prove si puo' puntare a un indirizzo *.workers.dev, ma solo mettendolo a
+   mano in `localStorage` e solo se ha quella forma: un indirizzo che si
+   potesse passare nel link sarebbe un modo per far spedire i numeri di
+   qualcuno a un server scelto da qualcun altro.
 
    Che cosa parte davvero, senza formule consolatorie. Partono i VALORI del
    calcolo — compensi, costi, percentuali, aliquote — e nient'altro. Non
@@ -3749,6 +3745,12 @@ const SONDA = '/api/stato';
 const ATTESA_MS = 8000;
 const MAX_TENTATIVI = 2;
 
+/* Un sottodominio workers.dev e nient'altro. */
+const FORMA_PROVA = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{0,40}\.workers\.dev$/;
+
+const preferenza = (chiave) => {
+  try { return localStorage.getItem(chiave); } catch (_) { return null; }
+};
 
 /* Il motore non e' piu' in pagina. Chi avesse messo 'locale' o
    'api-con-riserva' nelle preferenze del browser se lo ritrova scritto, e va
@@ -3756,7 +3758,11 @@ const MAX_TENTATIVI = 2;
 const motoreInPagina = () => false;
 const modo = () => 'api';
 
-const indirizzo = () => window.TAL_API.url(PERCORSO);
+const radice = () => {
+  const b = (preferenza('tal-api-base') || '').trim();
+  return b && FORMA_PROVA.test(b) ? b : '';
+};
+const indirizzo = () => radice() + PERCORSO;
 
 /* ------------------------------------------------------------------ errori */
 
@@ -3817,11 +3823,33 @@ function guasto(genere, extra) {
  * ricaricamento. Sull'esito negativo si ribussa, e costa una GET che non porta
  * niente. */
 let servizioPronto = null;       /* null = non ancora chiesto */
+let sondaInCorso = null;
 
 async function ilServizioCe() {
-  /* Finché la sonda condivisa non riconosce il servizio, nessun payload viene inviato. */
-  servizioPronto = await window.TAL_API.ready();
-  return servizioPronto;
+  if (servizioPronto === true) return true;
+  if (sondaInCorso) return sondaInCorso;
+  sondaInCorso = (async () => {
+    try {
+      const ctrl = new AbortController();
+      const scadenza = setTimeout(() => ctrl.abort(), ATTESA_MS);
+      const r = await fetch(radice() + SONDA, {
+        method: 'GET', signal: ctrl.signal, credentials: 'omit',
+        cache: 'no-store', referrerPolicy: 'no-referrer'
+      });
+      clearTimeout(scadenza);
+      const d = r.ok ? await r.json().catch(() => null) : null;
+      servizioPronto = !!(d && d.ok === true);
+    } catch (_) {
+      servizioPronto = false;
+    }
+    if (!servizioPronto) {
+      console.warn('cf-api: a ' + (radice() || location.origin) + SONDA +
+        ' non risponde il servizio di calcolo. Il calcolo non parte e nessun payload viene inviato.');
+    }
+    sondaInCorso = null;
+    return servizioPronto;
+  })();
+  return sondaInCorso;
 }
 
 /* --------------------------------------------------------------- richiesta */
@@ -3833,7 +3861,7 @@ async function chiama(corpo, tentativo) {
   const scadenza = setTimeout(() => ctrl.abort(), ATTESA_MS);
   let r;
   try {
-    r = await window.TAL_API.request(PERCORSO, {
+    r = await fetch(indirizzo(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(corpo),
@@ -3982,57 +4010,43 @@ window.cfInputDaMandare = inputDaMandare;
  * perche' non c'e' niente da invalidare a mano. */
 let ULTIMA_CHIESTA = null;
 
-function corpoCorrente() {
-  return { input: inputDaMandare(), parti: ['risultato', 'soglie', 'curva', 'varianti'],
-    varianti: variantiNecessarie(window.cfStato()) };
-}
-let IN_CORSO = null;
-window.cfRisultatoCorrente = () =>
-  CACHE && ULTIMA_CHIESTA === JSON.stringify(corpoCorrente()) ? CACHE.base : null;
-
 async function precarica() {
-  const corpo = corpoCorrente(), impronta = JSON.stringify(corpo);
-  if (window.cfRisultatoCorrente()) return true;
-  if (IN_CORSO) {
-    if (IN_CORSO.impronta === impronta) return IN_CORSO.promessa;
-    await IN_CORSO.promessa.catch(() => {});
-    return impronta === JSON.stringify(corpoCorrente()) ? precarica() : false;
-  }
-  CACHE = null;
-  svuotaRisultato();
-  const promessa = (async () => {
-    try {
-      const risposta = await chiama(corpo);
-      if (impronta !== JSON.stringify(corpoCorrente())) return false;
-      if (!risposta.esito || !Array.isArray(risposta.esito.scenari) ||
-          !Array.isArray(risposta.varianti) || risposta.varianti.length !== corpo.varianti.length ||
-          !risposta.soglie || !Array.isArray(risposta.curva?.punti)) throw guasto('servizio');
-      const perChiave = {};
-      corpo.varianti.forEach((e, i) => { perChiave[chiave(e)] = risposta.varianti[i]; });
-      CACHE = { base: risposta.esito, assunzioni: risposta.assunzioni, varianti: perChiave,
-        conv: Object.assign({}, risposta.soglie, { punti: risposta.curva.punti }) };
-      PARAMETRI_PER_ANNO[corpo.input.year] = risposta.esito.params;
-      ULTIMA_CHIESTA = impronta;
-      usaRiserva = false;
-      return true;
-    } catch (error) {
-      if (impronta !== JSON.stringify(corpoCorrente())) return false;
-      CACHE = null; ULTIMA_CHIESTA = null; window.TAL_API.invalidate();
-      throw error;
-    } finally { IN_CORSO = null; }
-  })();
-  IN_CORSO = { impronta, promessa };
-  return promessa;
+  const stato = window.cfStato();
+  const varianti = variantiNecessarie(stato);
+  const corpo = {
+    input: inputDaMandare(),
+    parti: ['risultato', 'soglie', 'curva', 'varianti'],
+    varianti: varianti
+  };
+
+  const impronta = JSON.stringify(corpo);
+  if (CACHE && impronta === ULTIMA_CHIESTA) return;
+
+  const risposta = await chiama(corpo);
+
+  const perChiave = {};
+  varianti.forEach((e, i) => { perChiave[chiave(e)] = risposta.varianti[i]; });
+
+  CACHE = {
+    base: risposta.esito,
+    assunzioni: risposta.assunzioni,
+    varianti: perChiave,
+    conv: Object.assign({}, risposta.soglie, { punti: risposta.curva.punti })
+  };
+  PARAMETRI_PER_ANNO[stato.year] = risposta.esito.params;
+  /* Segnata solo adesso: se la richiesta fosse fallita, la prossima volta si
+     deve riprovare, non credere di avere gia' il risultato. */
+  ULTIMA_CHIESTA = impronta;
+  usaRiserva = false;
 }
 
 /* Gli archivi sono simulazioni diverse fra loro, non varianti di quella
    aperta: si mandano come input completi, uno per riga. */
 let CACHE_ARCHIVIO = {};
 let ULTIMO_ARCHIVIO = null;
-let ARCHIVIO_RICHIESTO = null, ARCHIVIO_IN_CORSO = null;
 
 async function precaricaArchivio(elenco) {
-  if (!elenco.length) { CACHE_ARCHIVIO = {}; ULTIMO_ARCHIVIO = null; ARCHIVIO_RICHIESTO = null; return true; }
+  if (!elenco.length) { CACHE_ARCHIVIO = {}; ULTIMO_ARCHIVIO = null; return; }
   const corpo = {
     input: soloCampiDelMotore(elenco[0].input),
     parti: ['varianti'],
@@ -4041,33 +4055,14 @@ async function precaricaArchivio(elenco) {
 
   /* Stessa regola del confronto: riaprire l'archivio senza averlo toccato non
      e' una domanda nuova. */
-  const impronta = JSON.stringify([elenco.map(x => x.id), corpo]);
-  ARCHIVIO_RICHIESTO = impronta;
-  if (impronta === ULTIMO_ARCHIVIO) return true;
-  if (ARCHIVIO_IN_CORSO) {
-    if (ARCHIVIO_IN_CORSO.impronta === impronta) return ARCHIVIO_IN_CORSO.promessa;
-    await ARCHIVIO_IN_CORSO.promessa.catch(() => {});
-    return ARCHIVIO_RICHIESTO === impronta ? precaricaArchivio(elenco) : false;
-  }
-  CACHE_ARCHIVIO = {}; ULTIMO_ARCHIVIO = null;
-  const promessa = (async () => {
-    try {
-      const risposta = await chiama(corpo);
-      if (ARCHIVIO_RICHIESTO !== impronta) return false;
-      if (!Array.isArray(risposta.varianti) || risposta.varianti.length !== elenco.length ||
-          risposta.varianti.some(r => !r || !Array.isArray(r.scenari))) throw guasto('servizio');
-      const m = {};
-      elenco.forEach((x, i) => { m[x.id] = risposta.varianti[i]; });
-      CACHE_ARCHIVIO = m; ULTIMO_ARCHIVIO = impronta;
-      return true;
-    } catch (error) {
-      if (ARCHIVIO_RICHIESTO !== impronta) return false;
-      window.TAL_API.invalidate();
-      throw error;
-    } finally { ARCHIVIO_IN_CORSO = null; }
-  })();
-  ARCHIVIO_IN_CORSO = { impronta, promessa };
-  return promessa;
+  const impronta = JSON.stringify(corpo);
+  if (impronta === ULTIMO_ARCHIVIO) return;
+
+  const risposta = await chiama(corpo);
+  const m = {};
+  elenco.forEach((x, i) => { m[x.id] = risposta.varianti[i]; });
+  CACHE_ARCHIVIO = m;
+  ULTIMO_ARCHIVIO = impronta;
 }
 
 /* ------------------------------------------------------------ l'interfaccia */
@@ -4149,17 +4144,8 @@ function mostraGuasto(g, riprova) {
 /* Svuota il risultato invece di lasciarlo com'era. Numeri vecchi accanto a un
    messaggio d'errore si leggono come numeri nuovi. */
 function svuotaRisultato() {
-  window.cfSetUltimoEsito(null);
-  document.querySelectorAll('[data-action="export-excel"]').forEach((b) => { b.disabled = true; });
-  ['cfVerdict', 'cfCards', 'cfThresholdReadout', 'cfChartReadout', 'cfDrivers',
-    'cfChartMain', 'cfChartBridge', 'cfChartYears', 'cfResultContext', 'cfThresholdLead',
-    'cfLegendMain', 'cfPerche', 'cfCostoSalto', 'cfMixSocieta', 'cfChecks']
+  ['cfVerdict', 'cfCards', 'cfThresholdReadout', 'cfChartReadout', 'cfDrivers']
     .forEach((id) => { const e = document.getElementById(id); if (e) e.innerHTML = ''; });
-  const grafico = document.getElementById('cfChartMain');
-  if (grafico) grafico.onkeydown = null;
-  ['cfPerche', 'cfCostoSalto', 'cfMixSocietaBox'].forEach((id) => {
-    const e = document.getElementById(id); if (e) e.hidden = true;
-  });
 }
 
 /* ---------------------------------------------------- sostituzione dei ponti */
@@ -4208,8 +4194,7 @@ window.cfAssunzioniCorrenti = function () {
 
 window.cfRenderConfronto = function () {
   mostraAttesa();
-  return precarica().then((corrente) => {
-    if (!corrente) return;
+  return precarica().then(() => {
     chiudiAttesa();
     /* Il disegno sta in un `try` suo. Se fallisce non e' il servizio ad avere
        un problema — i numeri sono arrivati — ed e' un difetto della pagina, che
@@ -4219,7 +4204,6 @@ window.cfRenderConfronto = function () {
        mandava a cercare dalla parte sbagliata. */
     try {
       renderConfrontoLocale();
-      document.querySelectorAll('[data-action="export-excel"]').forEach((b) => { b.disabled = false; });
     } catch (e) {
       console.error('cf-api: i numeri sono arrivati ma il disegno è fallito', e);
       svuotaRisultato();
@@ -4242,7 +4226,7 @@ window.cfRenderArchivio = function () {
       }).concat((s.costi || []).filter((c) => c.custom))
     })
   }));
-  return precaricaArchivio(elenco).then(corrente => { if (corrente) renderArchivioLocale(); }).catch(() => {
+  return precaricaArchivio(elenco).then(renderArchivioLocale).catch(() => {
     /* L'archivio ha gia' la sua rete: se il ricalcolo non riesce mostra la
        sintesi memorizzata e lo dichiara. Qui basta lasciarlo fare. */
     CACHE_ARCHIVIO = {};
@@ -4306,7 +4290,7 @@ window.cfAnniPrevisti = function () {
 window.cfApiDiagnostica = () => ({
   modo: modo(),
   indirizzo: indirizzo(),
-  sonda: window.TAL_API.url(SONDA),
+  sonda: radice() + SONDA,
   servizioTrovato: servizioPronto,      /* null = non ancora chiesto */
   motoreInPagina: motoreInPagina(),
   inRiserva: usaRiserva,
@@ -4960,7 +4944,6 @@ function formattaColonna(ws, colonna) {
 }
 
 function esportaExcel() {
-  if (!window.cfRisultatoCorrente()) { window.cfToast('Attendi un calcolo valido prima di esportare.', true); return; }
   const stato = window.cfStato();
   const ultimo = window.cfUltimoEsito();
   if (!ultimo) { window.cfToast('Apri prima il confronto.', true); return; }

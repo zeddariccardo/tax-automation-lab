@@ -707,7 +707,6 @@ footer a:hover{color:#F7F7F5!important}
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-app.css?v=20260824d">
-<script src="/assets/tal-api-connection.js?v=20260902"></script>
 <script defer src="/assets/tal-app.js?v=20260822a"></script>
 </head>
 <body class="tal-tool-page">
@@ -2817,7 +2816,7 @@ renderSavedList();
   function archSave(a){try{localStorage.setItem(ARCH_KEY,JSON.stringify(a));}catch(_){}}
 
   function capture(){var an={};AN_IDS.forEach(function(id){var el=$id(id);an[id]=el?el.value:'';});return {an:an,schema:(window.schemaMode?window.schemaMode():an.an_schema),accounts:clone(STATE.accounts||[]),leafOverrides:clone(STATE.leafOverrides||{}),storni:clone(STATE.storni||[]),adjustments:clone(STATE.adjustments||[]),aiFindings:clone(STATE.aiFindings||[]),technicalAix:clone(STATE.technicalAix||null)};}
-  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);STATE.aiFindings=clone(st.aiFindings||[]);STATE.technicalAix=clone(st.technicalAix||null);if(window.fsPostLoadReconcile)window.fsPostLoadReconcile('archive');if(window.fsUpdateContext)window.fsUpdateContext();if(window.refreshAll)window.refreshAll(true);if(STATE.accounts.length){if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
+  function restore(st,reveal){if(!st)return;AN_IDS.forEach(function(id){var el=$id(id);if(el&&st.an&&st.an[id]!==undefined)el.value=st.an[id];});if(st.schema&&$id('an_schema'))$id('an_schema').value=st.schema;STATE.accounts=clone(st.accounts||[]);STATE.leafOverrides=clone(st.leafOverrides||{});STATE.storni=clone(st.storni||[]);STATE.adjustments=clone(st.adjustments||[]);STATE.aiFindings=clone(st.aiFindings||[]);STATE.technicalAix=clone(st.technicalAix||null);if(window.fsPostLoadReconcile)window.fsPostLoadReconcile('archive');if(window.fsUpdateContext)window.fsUpdateContext();if(STATE.accounts.length){if(window.refreshAll)window.refreshAll(true);if(reveal&&window.showResultsUI)window.showResultsUI();}else{var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';}}
 
   function saveDraft(){if(!fsReady)return;try{localStorage.setItem(DRAFT_KEY,JSON.stringify(capture()));}catch(_){}}
   /* Il ripristino silenzioso della bozza faceva trovare all'apertura
@@ -2897,7 +2896,6 @@ renderSavedList();
         carryPending:{from:(years.length?years[0]:''),storni:clone(base.storni||[]),adjustments:clone(base.adjustments||[])}};
       try{localStorage.setItem(LEGACY_KEY,JSON.stringify(leg));}catch(_){}
     }
-    if(window.refreshAll)window.refreshAll();
     var ec=$id('empty_results'),rc=$id('results_content');if(ec)ec.style.display='block';if(rc)rc.style.display='none';
     if(window.fsUpdateContext)window.fsUpdateContext();
     if(window.fsShowView)window.fsShowView('import');
@@ -2911,8 +2909,8 @@ renderSavedList();
   document.addEventListener('click',function(e){
     var cli=e.target.closest('[data-fscli]');if(cli){selectedClient=cli.getAttribute('data-fscli');renderUI();return;}
     var lo=e.target.closest('[data-fsload]');if(lo){loadYear(lo.getAttribute('data-fsload'),true);T('Anno caricato');return;}
-    var pd=e.target.closest('[data-fspdf]');if(pd){loadYear(pd.getAttribute('data-fspdf'),true);window.fsFinancialStatementApi.runNow().then(function(run){if(run&&window.openPdfModes)window.openPdfModes();}).catch(function(){});return;}
-    var xl=e.target.closest('[data-fsxls]');if(xl){loadYear(xl.getAttribute('data-fsxls'),false);window.fsFinancialStatementApi.runNow().then(function(run){if(run&&window.exportExcel)window.exportExcel();}).catch(function(){});return;}
+    var pd=e.target.closest('[data-fspdf]');if(pd){loadYear(pd.getAttribute('data-fspdf'),true);setTimeout(function(){if(window.openPdfModes)window.openPdfModes();},60);return;}
+    var xl=e.target.closest('[data-fsxls]');if(xl){loadYear(xl.getAttribute('data-fsxls'),false);setTimeout(function(){if(window.exportExcel)window.exportExcel();},60);return;}
     var dyr=e.target.closest('[data-fsdelyr]');if(dyr){delYear(dyr.getAttribute('data-fsdelyr'));return;}
     var nyr=e.target.closest('[data-fsnewyear]');if(nyr){newYear();return;}
     var dcl=e.target.closest('[data-fsdelcli]');if(dcl){delClient();return;}
@@ -5195,7 +5193,7 @@ function commit(item,backend,cached){
 function pump(){
   if(state.active||!state.queued)return;
   var item=state.queued;state.queued=null;state.active=item;state.requests+=1;state.bytes.push(item.payloadBytes);
-  window.TAL_API.request(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:item.serialized,cache:'no-store'})
+  fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:item.serialized,cache:'no-store'})
     .then(function(response){if(!response.ok)throw new Error('Il servizio Bilancio ha risposto con stato '+response.status+'.');return response.json();})
     .then(validateResponse)
     .then(function(backend){
@@ -5203,7 +5201,6 @@ function pump(){
       var out=commit(item,backend,false);item.resolve(out);return out;
     })
     .catch(function(error){
-      window.TAL_API.invalidate();state.lastKey='';state.lastResponse=null;
       state.failures+=1;state.lastRun={error:String(error&&error.message||error)};
       if(item.key===state.desiredKey)invalidate('error',(error&&error.message)||'Riprova tra poco.');
       item.reject(error);
@@ -5216,7 +5213,7 @@ function enqueue(item,force){
   }
   if(state.active&&state.active.key===item.key)return state.active.promise;
   if(state.queued&&state.queued.key===item.key)return state.queued.promise;
-  if(state.queued&&state.queued.resolve)state.queued.resolve(null);
+  if(state.queued&&state.queued.reject)state.queued.reject(new Error('Stato superato da una modifica successiva.'));
   var resolve,reject,promise=new Promise(function(ok,no){resolve=ok;reject=no;});
   item.resolve=resolve;item.reject=reject;item.promise=promise;state.queued=item;pump();return promise;
 }
@@ -5228,7 +5225,7 @@ function requestNow(force){
     return Promise.resolve(null);
   }
   var item;
-  try{item=context();}catch(error){state.desiredKey='';invalidate('error',error.message);return Promise.reject(error);}
+  try{item=context();}catch(error){invalidate('error',error.message);return Promise.reject(error);}
   state.generation+=1;state.desiredKey=item.key;invalidate('loading','Il servizio sta elaborando esclusivamente gli aggregati tecnici.');
   return enqueue(item,!!force);
 }
@@ -5236,7 +5233,7 @@ function schedule(){
   if(state.timer)clearTimeout(state.timer);
   if(!(STATE.accounts||[]).length||!mode())return requestNow(false);
   var item;
-  try{item=context();}catch(error){state.desiredKey='';invalidate('error',error.message);return Promise.resolve(null);}
+  try{item=context();}catch(error){invalidate('error',error.message);return Promise.reject(error);}
   state.generation+=1;state.desiredKey=item.key;invalidate('loading','Il servizio sta elaborando esclusivamente gli aggregati tecnici.');
   state.timer=setTimeout(function(){state.timer=0;enqueue(item,false).catch(function(){});},90);
   return Promise.resolve(null);

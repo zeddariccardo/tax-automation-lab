@@ -22,11 +22,6 @@ function startStaticServer(apiHandler) {
   const server = createServer(async (request, response) => {
     try {
       const url = new URL(request.url || '/', 'http://127.0.0.1');
-      if (url.pathname === '/api/stato' && apiHandler) {
-        response.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
-        response.end('{"ok":true}');
-        return;
-      }
       if (url.pathname === '/api/financial-statement/calcola' && apiHandler) {
         const chunks = [];
         for await (const chunk of request) chunks.push(chunk);

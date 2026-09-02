@@ -28,8 +28,8 @@ const TOOLS = ['financial-statement', 'financial-analysis', 'lipe', 'tfa-client-
 const CON_SERVIZIO = ['financial-statement', 'financial-analysis', 'lipe', 'confronto-regimi'];
 const SENZA_RETE = TOOLS.filter((t) => CON_SERVIZIO.indexOf(t) === -1);
 const API_ATTESE = {
-  'financial-statement': ['/api/financial-statement/calcola', '/api/stato'],
-  'financial-analysis': ['/api/financial-analysis/calcola', '/api/stato'],
+  'financial-statement': ['/api/financial-statement/calcola'],
+  'financial-analysis': ['/api/financial-analysis/calcola'],
   lipe: ['/api/lipe/calcola', '/api/stato'],
   'tfa-client-file': [],
   f24: [],
@@ -157,9 +157,11 @@ test('Confronto regimi chiama solo il proprio servizio di calcolo, e bussa prima
   percorsi.forEach((u) => assert.ok(u.startsWith('/'),
     u + ' non è relativo: uscirebbe dal sito'));
 
-  /* No production override: the shared transport constrains development to loopback. */
-  assert.match(codice, /window\.TAL_API\.request\(PERCORSO,/);
-  assert.doesNotMatch(codice, /localStorage\.getItem|sessionStorage\.getItem|FORMA_PROVA/);
+  /* L'indirizzo alternativo per le prove si può mettere solo a mano, e solo se
+     è un sottodominio workers.dev: un indirizzo passabile in un link sarebbe un
+     modo per far spedire i numeri di qualcuno a un server scelto da altri. */
+  assert.match(codice, /const FORMA_PROVA = \/\^https:.*workers\\\.dev\$\//,
+    'manca il vincolo di forma sull’indirizzo di prova');
   assert.doesNotMatch(codice, /location\.search|URLSearchParams|getAttribute\('data-api/,
     'l’indirizzo del servizio non deve poter arrivare dal link o dal markup');
 
@@ -240,8 +242,8 @@ test('LIPE chiama solo il proprio servizio di calcolo, e bussa prima', () => {
     'gli indirizzi chiamati non sono quelli attesi');
   percorsi.forEach((u) => assert.ok(u.startsWith('/'), u + ' non è relativo: uscirebbe dal sito'));
 
-  assert.ok(codice.includes('window.TAL_API.request(PERCORSO_LIPE,'));
-  assert.doesNotMatch(codice, /localStorage\.getItem|sessionStorage\.getItem|FORMA_PROVA_LIPE/);
+  assert.match(codice, /const FORMA_PROVA_LIPE = \/\^https:.*workers\\.dev\$\//,
+    'manca il vincolo di forma sull’indirizzo di prova');
 
   /* Prima di spedire si controlla che dall'altra parte ci sia il servizio:
      senza, con la Route non attiva, un POST finirebbe a GitHub Pages. */

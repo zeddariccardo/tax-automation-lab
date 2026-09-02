@@ -356,7 +356,6 @@ footer a:hover{color:#F7F7F5!important}
 <!-- Tax Automation Lab — layer applicativo condiviso (v1.0) -->
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-var-latin.woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tal-app.css?v=20260824d">
-<script src="/assets/tal-api-connection.js?v=20260902"></script>
 <script defer src="/assets/tal-app.js?v=20260822a"></script>
 <style id="lipe-ia-v400">
 /* Fase 1 — barra di contesto e schede delle impostazioni.
@@ -2649,6 +2648,12 @@ const SONDA_LIPE = '/api/stato';
 const ATTESA_LIPE_MS = 8000;
 const MAX_TENTATIVI_LIPE = 2;
 
+/* Solo un sottodominio workers.dev, e solo scritto a mano nelle preferenze del
+   browser. Un indirizzo che si potesse passare nel link sarebbe un modo per
+   far spedire i numeri di qualcuno a un server scelto da qualcun altro. */
+const FORMA_PROVA_LIPE = /^https:\/\/[a-z0-9][a-z0-9-]{0,40}\.[a-z0-9][a-z0-9-]{0,40}\.workers\.dev$/;
+
+const preferenzaLipe = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
 
 /* Il calcolo lo fa il servizio. Non c'e' alternativa, ed e' la conclusione di
    un percorso in tre tempi: prima la pagina sapeva parlare col servizio ma
@@ -2658,6 +2663,10 @@ const MAX_TENTATIVI_LIPE = 2;
    numeri e non ne mostra di vecchi. */
 const acceso = () => true;
 const motoreInPagina = () => false;
+const radiceLipe = () => {
+  const b = String(preferenzaLipe('tal-api-base') || '').trim();
+  return b && FORMA_PROVA_LIPE.test(b) ? b : '';
+};
 
 const TESTI_LIPE = {
   assente: ['Il servizio di calcolo non risponde',
@@ -2699,8 +2708,26 @@ let servizioLipePronto = null;
 let sondaLipeInCorso = null;
 
 async function ilServizioLipeCe() {
-  servizioLipePronto = await window.TAL_API.ready();
-  return servizioLipePronto;
+  if (servizioLipePronto === true) return true;
+  if (sondaLipeInCorso) return sondaLipeInCorso;
+  sondaLipeInCorso = (async () => {
+    try {
+      const ctrl = new AbortController();
+      const scadenza = setTimeout(() => ctrl.abort(), ATTESA_LIPE_MS);
+      const r = await fetch(radiceLipe() + SONDA_LIPE, {
+        method: 'GET', signal: ctrl.signal, credentials: 'omit',
+        cache: 'no-store', referrerPolicy: 'no-referrer'
+      });
+      clearTimeout(scadenza);
+      const d = r.ok ? await r.json().catch(() => null) : null;
+      servizioLipePronto = !!(d && d.ok === true);
+    } catch (_) {
+      servizioLipePronto = false;
+    }
+    sondaLipeInCorso = null;
+    return servizioLipePronto;
+  })();
+  return sondaLipeInCorso;
 }
 
 async function chiamaLipe(corpo, tentativo) {
@@ -2710,7 +2737,7 @@ async function chiamaLipe(corpo, tentativo) {
   const scadenza = setTimeout(() => ctrl.abort(), ATTESA_LIPE_MS);
   let r;
   try {
-    r = await window.TAL_API.request(PERCORSO_LIPE, {
+    r = await fetch(radiceLipe() + PERCORSO_LIPE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(corpo),
@@ -2736,11 +2763,7 @@ async function chiamaLipe(corpo, tentativo) {
     }
     throw guastoLipe('servizio', { riferimento: e.riferimento || null });
   }
-  if (!dati || !Array.isArray(dati.periodi) || !Array.isArray(dati.controlli) ||
-      !Array.isArray(dati.bloccanti) || typeof dati.blocca !== 'boolean' || !dati.totali) {
-    window.TAL_API.invalidate();
-    throw guastoLipe('servizio');
-  }
+  if (!dati) throw guastoLipe('servizio');
   return dati;
 }
 
@@ -2962,9 +2985,6 @@ function mostraGuastoLipe(g, riprova) {
 
 /* Numeri vecchi accanto a un messaggio d'errore si leggono come numeri nuovi. */
 function svuotaRisultatoLipe() {
-  ['export-pdf', 'export-excel', 'export-xml', 'save-history'].forEach((id) => {
-    const button = document.getElementById(id); if (button) button.disabled = true;
-  });
   ['results-summary', 'period-tabs', 'period-panels', 'checks-grid']
     .forEach((id) => { const e = document.getElementById(id); if (e) e.innerHTML = ''; });
   const t = document.getElementById('detail-table');
@@ -2993,22 +3013,17 @@ function riprovaTutto() {
 function assicura(poi) {
   const ora = payloadOra();
   if (RISULTATO && RISULTATO.impronta === ora.impronta) { poi(); return; }
-  RISULTATO = null;
-  svuotaRisultatoLipe();
   mostraAttesaLipe();
   ponteLipe.chiedi(ora.payload).then((esito) => {
     /* `null` vuol dire «superata»: mentre questa aspettava il turno, l'utente
        ha cambiato ancora qualcosa e ne e' partita una piu' recente. Non e' un
        guasto e non c'e' niente da disegnare: fra un istante arriva l'altra. */
-    if (!esito || payloadOra().impronta !== ora.impronta) return;
+    if (!esito) return;
     RISULTATO = { impronta: ora.impronta, esito, dettagli: ora.dettagli };
     daRifare = [];
     chiudiAttesaLipe();
     poi();
   }, (g) => {
-    if (payloadOra().impronta !== ora.impronta) return;
-    ponteLipe.dimentica();
-    window.TAL_API.invalidate();
     /* Niente ripiego di nascosto: il guasto si vede. */
     RISULTATO = null;
     if (daRifare.indexOf(poi) === -1) daRifare.push(poi);

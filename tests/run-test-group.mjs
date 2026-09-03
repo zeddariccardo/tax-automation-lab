@@ -9,6 +9,7 @@ const ROOT = path.resolve(TESTS_DIR, '..');
 // Elenco intenzionale: la guardia sotto fallisce se una nuova suite dipende
 // (anche transitivamente) da Playwright ma non viene assegnata al job browser.
 const BROWSER_TESTS = new Set([
+  'confronto-regimi-import.test.mjs',
   'f24-import-pdf.test.mjs',
   'financial-statement-characterization.test.mjs',
   'financial-statement-golden.test.mjs',

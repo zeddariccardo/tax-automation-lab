@@ -3359,8 +3359,8 @@ window.cfApriScelta = apriScelta;
 
    La versione del ruleset viaggia col salvataggio: al ritorno, se e' cambiata,
    l'utente lo sa. */
-function costiDaSalvare() {
-  return (costi || []).map((c) => {
+function costiDaSalvare(elenco = costi) {
+  return (elenco || []).map((c) => {
     const base = CF_COSTI_DEFAULT.find((d) => d.id === c.id);
     const ridotto = { id: c.id, amount: c.amount, gross: !!c.gross };
     if (!base || c.custom) {
@@ -3380,10 +3380,12 @@ function costiDaSalvare() {
   });
 }
 
-function salvaLavoro(silenzioso) {
+function salvaLavoro(silenzioso, candidato) {
   try {
     localStorage.setItem(KEY_STATE, JSON.stringify({
-      stato, costi: costiDaSalvare(), esiti: esitiAI,
+      stato: candidato ? candidato.statoLetto : stato,
+      costi: costiDaSalvare(candidato ? candidato.costiLetti : costi),
+      esiti: candidato ? candidato.esitiLetti : esitiAI,
       ruleset: CF_RULESET.versione, v: 2
     }));
     if (!silenzioso) toast('Lavoro salvato in questo browser.');
@@ -4559,214 +4561,311 @@ function fogliUtili(wb) {
   return wb.SheetNames.filter((n) => !RE_ESEMPI.test(n));
 }
 
-/* Legge un foglio a due colonne come mappa etichetta -> valore. */
-function leggiCoppie(wb, nome) {
-  const foglio = fogliUtili(wb).find((n) => norm(n) === norm(nome));
+/* Il contratto usa alias finiti: niente rimozione indiscriminata di punteggiatura. */
+function aliasCampo(etichetta) {
+  return etichetta.includes('dell’anno')
+    ? [etichetta, etichetta.replace('dell’anno', "dell'anno"), etichetta.replace('dell’anno', 'dell anno')]
+    : [etichetta];
+}
+const COLONNE_ESITI = ['Tipo', 'Codice / campo', 'Elemento da verificare', 'Stato',
+  'Osservazione / assunzione', 'Fonte utilizzata'];
+const vuotoImport = (v) => v == null || (typeof v === 'string' && !v.trim());
+function erroreImport(src, campo, causa) {
+  throw new Error(src.foglio + ', riga ' + (src.r + 1) + ', colonna ' +
+    XLSX.utils.encode_col(src.c) + ' (' + src.indirizzo + '), ' + campo + ': ' + causa);
+}
+function cellaImport(wb, foglio, r, c, campo) {
+  const indirizzo = XLSX.utils.encode_cell({ r, c });
+  const cella = wb.Sheets[foglio][indirizzo];
+  const src = { foglio, r, c, indirizzo, valore: cella ? cella.v : undefined };
+  const errori = { 0: '#NULL!', 7: '#DIV/0!', 15: '#VALUE!', 23: '#REF!',
+    29: '#NAME?', 36: '#NUM!', 42: '#N/A', 43: '#GETTING_DATA' };
+  if (cella && cella.f && (cella.v == null || cella.t === 'z'))
+    erroreImport(src, campo, 'formula senza risultato salvato; ricalcolare e salvare il file in Excel');
+  if (cella && cella.f && vuotoImport(cella.v))
+    erroreImport(src, campo, 'formula con risultato vuoto: non è un valore importabile');
+  if (cella && cella.t === 'e') erroreImport(src, campo, 'errore Excel ' + (errori[cella.v] || cella.w || cella.v));
+  if (cella && cella.t === 'd') erroreImport(src, campo, 'data Excel non prevista per questo campo');
+  if (typeof src.valore === 'string' && /^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A|GETTING_DATA|SPILL!|CALC!|ERROR!)/i.test(src.valore.trim()))
+    erroreImport(src, campo, 'errore Excel ' + src.valore);
+  return src;
+}
+function numeroImport(src, campo) {
+  const v = src.valore;
+  let n;
+  if (typeof v === 'number') n = v;
+  else if (typeof v === 'string') {
+    const s = v.trim();
+    if (/^[+-]?\d{1,3}[.,]\d{3}$/.test(s))
+      erroreImport(src, campo, 'numero testuale ambiguo «' + s + '»: usare una cella numerica o decimali espliciti');
+    if (/^[+-]?\d+$/.test(s) || /^[+-]?\d+\.\d+$/.test(s)) n = Number(s);
+    else if (/^[+-]?\d+,\d+$/.test(s)) n = Number(s.replace(',', '.'));
+    else if (/^[+-]?\d{1,3}(?:\.\d{3})+,\d+$/.test(s)) n = Number(s.replace(/\./g, '').replace(',', '.'));
+    else if (/^[+-]?\d{1,3}(?:,\d{3})+\.\d+$/.test(s)) n = Number(s.replace(/,/g, ''));
+  }
+  if (!Number.isFinite(n)) erroreImport(src, campo, 'numero non valido «' + String(v) + '»');
+  return n;
+}
+function percentualeImport(src, campo, min = 0) {
+  const n = numeroImport(src, campo);
+  if (n < min || n > 100) erroreImport(src, campo, 'percentuale fuori dominio: atteso ' + min + '–100');
+  return n;
+}
+function booleanoImport(src, campo) {
+  if (!SINO_AMMESSI.test(String(src.valore).trim())) erroreImport(src, campo, 'attesi SI oppure NO');
+  return sino(src.valore);
+}
+function unisciImport(mappa, chiave, src, valore, campo) {
+  const prima = mappa.get(chiave);
+  if (prima && prima.valore !== valore)
+    erroreImport(src, campo, 'valori discordanti tra ' + prima.src.foglio + '!' +
+      prima.src.indirizzo + ' e ' + src.foglio + '!' + src.indirizzo);
+  if (!prima) mappa.set(chiave, { src, valore });
+}
+function foglioImport(wb, nome) {
+  const nomi = fogliUtili(wb).filter(n => norm(n) === norm(nome));
+  if (nomi.length > 1) throw new Error('Fogli duplicati per ' + nome + ': ' + nomi.join(', '));
+  return nomi[0];
+}
+function righeImport(wb, foglio) {
+  const ref = wb.Sheets[foglio]['!ref'];
+  return ref ? XLSX.utils.decode_range(ref) : { s: { r: 0, c: 0 }, e: { r: -1, c: -1 } };
+}
+function valoreCampo(src, etichetta, chiave, tipo) {
+  if (tipo === 'numero') {
+    const pct = ['ownership', 'distribution', 'irapRate', 'regionalRate', 'municipalRate', 'pensionRate'];
+    const n = pct.includes(chiave)
+      ? percentualeImport(src, etichetta, chiave === 'pensionRate' ? 12 : 0)
+      : numeroImport(src, etichetta);
+    if (n < 0) erroreImport(src, etichetta, 'valore negativo non ammesso');
+    if (chiave === 'year' && !window.cfAnniPrevisti().includes(n))
+      erroreImport(src, etichetta, 'anno non previsto: ' + window.cfAnniPrevisti().join(', '));
+    if (chiave === 'inpsRate' && ![24, 33.72].includes(n))
+      erroreImport(src, etichetta, 'aliquota non prevista: 24 oppure 33,72');
+    return n;
+  }
+  if (tipo === 'sino') return booleanoImport(src, etichetta);
+  if (chiave === 'subjectName') {
+    const s = String(src.valore).trim();
+    if (s.length > 80) erroreImport(src, etichetta, 'massimo 80 caratteri');
+    return s;
+  }
+  const parsed = leggiEnum(chiave, src.valore);
+  if (!parsed.ok) erroreImport(src, etichetta, 'valore non ammesso; attesi ' + parsed.ammessi.join(', '));
+  return parsed.valore;
+}
+/* Le colonne annotative restano fuori dal modello. Si conservano nel rapporto
+   solo intestazione, conteggio e indirizzi, mai i valori delle celle extra. */
+function extraValorizzata(wb, foglio, r, c) {
+  const cella = wb.Sheets[foglio][XLSX.utils.encode_cell({ r, c })];
+  return !!(cella && (cella.f || cella.t === 'e' || !vuotoImport(cella.v)));
+}
+function diagnosticaExtra(wb, foglio, testa, colonne, avvisi) {
+  const range = righeImport(wb, foglio);
+  for (const [c, intestazione] of colonne) {
+    let numero = 0;
+    const celle = [];
+    for (let r = testa + 1; r <= range.e.r; r++) {
+      if (!extraValorizzata(wb, foglio, r, c)) continue;
+      numero++;
+      if (celle.length < 5) celle.push(XLSX.utils.encode_cell({ r, c }));
+    }
+    if (numero) avvisi.push({ foglio, intestazione, numero, celle });
+  }
+}
+function nomeExtra(src) {
+  return vuotoImport(src.valore) ? '(senza intestazione, colonna ' + XLSX.utils.encode_col(src.c) + ')' : String(src.valore).trim();
+}
+function leggiCoppie(wb, nome, campi, avvisi) {
+  const foglio = foglioImport(wb, nome);
   if (!foglio) return null;
-  const righe = XLSX.utils.sheet_to_json(wb.Sheets[foglio], { header: 1, raw: true, defval: '' });
-  const mappa = {};
-  righe.forEach((r) => {
-    const k = norm(r[0]);
-    if (k) mappa[k] = r[1];
-  });
+  const range = righeImport(wb, foglio), mappa = new Map(), alias = new Map();
+  campi.forEach(campo => aliasCampo(campo[0]).forEach(a => alias.set(norm(a), campo)));
+  // Campo e Valore restano strutturali; nessuna colonna extra li sostituisce.
+  let testa = -1, colCampo, valori;
+  const extra = new Map();
+  for (let r = range.s.r; r <= Math.min(range.e.r, range.s.r + 14); r++) {
+    const celle = [];
+    for (let c = range.s.c; c <= range.e.c; c++) celle.push(cellaImport(wb, foglio, r, c, 'Intestazione'));
+    const campiHeader = celle.filter(s => norm(s.valore) === 'campo');
+    const valoriHeader = celle.filter(s => norm(s.valore) === 'valore');
+    if (!campiHeader.length || !valoriHeader.length) continue;
+    if (campiHeader.length !== 1) erroreImport(campiHeader[1], 'Campo', 'colonna Campo duplicata');
+    testa = r; colCampo = campiHeader[0].c; valori = valoriHeader.map(s => s.c);
+    for (const src of celle) {
+      if (src.c !== colCampo && !valori.includes(src.c) && norm(src.valore) !== 'come si compila')
+        extra.set(src.c, nomeExtra(src));
+    }
+    break;
+  }
+  if (testa < 0) erroreImport({ foglio, r: range.s.r, c: range.s.c, indirizzo: XLSX.utils.encode_cell(range.s) },
+    'Intestazione', 'sono richieste le colonne "Campo" e "Valore"; una colonna extra non può sostituirle');
+  diagnosticaExtra(wb, foglio, testa, extra, avvisi);
+  for (let r = range.s.r; r <= range.e.r; r++) {
+    if (r === testa) continue;
+    const label = cellaImport(wb, foglio, r, colCampo, 'Campo');
+    const campo = alias.get(norm(label.valore));
+    let valorePresente = false;
+    for (const c of valori) {
+      const src = cellaImport(wb, foglio, r, c, String(label.valore || 'Valore'));
+      if (vuotoImport(src.valore)) continue;
+      valorePresente = true;
+      if (!campo) erroreImport(label, 'Campo', 'intestazione non riconosciuta «' + String(label.valore || '') + '»; valore in ' + src.indirizzo);
+      unisciImport(mappa, campo[1], src, valoreCampo(src, ...campo), campo[0]);
+    }
+    const annotazione = [...extra].find(([c]) => extraValorizzata(wb, foglio, r, c));
+    if (campo && !valorePresente && annotazione) {
+      const [c, nome] = annotazione;
+      erroreImport({ foglio, r, c, indirizzo: XLSX.utils.encode_cell({ r, c }) }, campo[0],
+        'Il campo "' + campo[0] + '" non contiene un valore nella colonna "Valore", ma è presente un dato nella colonna "' +
+        nome + '". Verifica che il valore sia nella colonna corretta.');
+    }
+    if (!campo && !vuotoImport(label.valore) && annotazione)
+      erroreImport(label, 'Campo', 'intestazione non riconosciuta «' + String(label.valore) + '»');
+  }
   return mappa;
+}
+/* Colonne ripetute vengono lette tutte e riconciliate prima di applicare i dati. */
+function tabellaImport(wb, nome, colonne, principale, avvisi) {
+  const foglio = foglioImport(wb, nome);
+  if (!foglio) return null;
+  const range = righeImport(wb, foglio), headers = new Map(), extra = new Map();
+  let testa = -1;
+  for (let r = range.s.r; r <= Math.min(range.e.r, range.s.r + 14); r++) {
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const src = cellaImport(wb, foglio, r, c, 'Intestazione');
+      if (norm(src.valore) === norm(principale)) { testa = r; break; }
+    }
+    if (testa >= 0) break;
+  }
+  if (testa < 0) erroreImport({ foglio, r: range.s.r, c: range.s.c, indirizzo: XLSX.utils.encode_cell(range.s) },
+    principale, 'intestazione non trovata');
+  for (let c = range.s.c; c <= range.e.c; c++) {
+    const src = cellaImport(wb, foglio, testa, c, 'Intestazione');
+    const key = colonne.findIndex(label => norm(label) === norm(src.valore));
+    headers.set(c, key);
+    if (key < 0) extra.set(c, nomeExtra(src));
+  }
+  diagnosticaExtra(wb, foglio, testa, extra, avvisi);
+  const righe = [];
+  for (let r = testa + 1; r <= range.e.r; r++) {
+    const celle = [];
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const key = headers.get(c);
+      if (key < 0) continue; // Nessun valore extra passa alla validazione o al modello.
+      const src = cellaImport(wb, foglio, r, c, colonne[key]);
+      if (vuotoImport(src.valore)) continue;
+      celle.push({ key, src });
+    }
+    if (celle.length) righe.push({ r, celle });
+  }
+  return { foglio, righe, headers, testa };
 }
 
 function importaWorkbook(wb, opzioni) {
   const unisci = !!(opzioni && opzioni.unisciAllaCorrente);
   const utili = fogliUtili(wb);
-  if (!utili.length) {
-    throw new Error('il file contiene solo fogli di esempio. Compila PROFILO, COMPENSI e COSTI.');
+  if (!utili.length) throw new Error('il file contiene solo fogli di esempio. Compila PROFILO, COMPENSI e COSTI.');
+  for (const nome of utili) {
+    if (!['profilo', 'compensi', 'costi', 'esiti ai', 'istruzioni'].includes(norm(nome)))
+      throw new Error('Foglio non importabile «' + nome + '»: usare PROFILO, COMPENSI, COSTI oppure Esiti AI.');
   }
-
-  /* Da uno stato PULITO, non dalla simulazione in corso.
-
-     Prima era `Object.assign(cfStatoDefault(), clone(cfStato()))`: un file che
-     non conteneva un campo lasciava dentro il valore della simulazione
-     precedente. Provato — dopo la demo, un file con solo «Compensi = 50.000»
-     conservava compenso amministratore 40.000, altri redditi 15.000 e
-     distribuzione al 70%: il risultato sembrava completo e mescolava due
-     clienti. Il merge con la simulazione corrente esiste ancora, ma solo se lo
-     si chiede espressamente. */
+  // Nessun riferimento mutabile alla lavorazione corrente entra nel candidato.
   const stato = unisci
     ? Object.assign(window.cfStatoDefault(), JSON.parse(JSON.stringify(window.cfStato())))
     : window.cfStatoDefault();
-
+  const costi = unisci ? JSON.parse(JSON.stringify(window.cfCosti())) : window.cfNuoviCosti();
   const rapporto = { profilo: 0, compensi: 0, costi: 0, nuove: 0, esempiEsclusi: 0,
-    esiti: 0, bloccanti: 0, letti: [], chiavi: [], mancanti: [], errori: [], unito: unisci };
-
-  /* --- PROFILO e COMPENSI ------------------------------------------- */
-  const applica = (mappa, campi, contatore, foglio) => {
-    if (!mappa) {
-      /* Un foglio assente non e' un errore: il file puo' essere parziale, e i
-         criteri di accettazione chiedono che un file parziale funzioni. Finisce
-         fra i mancanti, che l'interfaccia elenca. Bloccano solo i valori non
-         validi, non le assenze. */
-      rapporto.mancanti.push('tutto il foglio ' + foglio);
-      return;
-    }
-    campi.forEach(([etichetta, chiave, tipo]) => {
-      if (!(norm(etichetta) in mappa)) { rapporto.mancanti.push(etichetta); return; }
-      const grezzo = mappa[norm(etichetta)];
-      if (grezzo === '' || grezzo == null) { rapporto.mancanti.push(etichetta); return; }
-      if (tipo === 'numero') {
-        const n = window.cfLeggiNumero(grezzo);
-        /* Un negativo non diventa zero in silenzio: qui non esistono importi
-           negativi, quindi e' un errore del file, non un valore da correggere. */
-        if (n < 0) { rapporto.errori.push(etichetta + ': valore negativo (' + grezzo + ').'); return; }
-        stato[chiave] = n;
-      } else if (tipo === 'sino') {
-        if (!SINO_AMMESSI.test(String(grezzo).trim())) {
-          rapporto.errori.push(etichetta + ': attesi SI oppure NO, trovato ' + grezzo + '.'); return;
-        }
-        stato[chiave] = sino(grezzo);
-      } else if (chiave === 'subjectName') {
-        stato[chiave] = String(grezzo).trim().slice(0, 80);
-      } else {
-        const r = leggiEnum(chiave, grezzo);
-        if (!r.ok) {
-          rapporto.errori.push(etichetta + ': ' + grezzo + ' non e un valore ammesso. Ammessi: ' +
-            r.ammessi.join(', ') + '.');
-          return;
-        }
-        stato[chiave] = r.valore;
-      }
+    esiti: 0, bloccanti: 0, letti: [], chiavi: [], mancanti: [], errori: [], avvisi: [], unito: unisci };
+  const origini = new Map();
+  for (const [nome, campi, contatore] of [['PROFILO', CAMPI_PROFILO, 'profilo'], ['COMPENSI', CAMPI_COMPENSI, 'compensi']]) {
+    const mappa = leggiCoppie(wb, nome, campi, rapporto.avvisi);
+    if (!mappa) { rapporto.mancanti.push('tutto il foglio ' + nome); continue; }
+    for (const [etichetta, chiave] of campi) {
+      const dato = mappa.get(chiave);
+      if (!dato) { rapporto.mancanti.push(etichetta); continue; }
+      stato[chiave] = dato.valore;
+      origini.set(chiave, dato.src);
       rapporto[contatore]++;
       rapporto.letti.push(etichetta);
-      /* Le chiavi servono all'anteprima: «cosa verrebbe sovrascritto» riguarda i
-         soli campi presenti nel file, non tutti quelli che differiscono da uno
-         stato pulito. Confrontando anche gli assenti il conteggio diceva dodici
-         dove i campi nel file erano otto. */
       rapporto.chiavi.push(chiave);
-    });
-  };
-  applica(leggiCoppie(wb, 'PROFILO'), CAMPI_PROFILO, 'profilo', 'PROFILO');
-  applica(leggiCoppie(wb, 'COMPENSI'), CAMPI_COMPENSI, 'compensi', 'COMPENSI');
-
-  /* --- l'anno si valida prima di tutto il resto --------------------- */
-  if (window.cfAnniPrevisti().indexOf(Number(stato.year)) === -1) {
-    throw new Error('anno ' + stato.year + ' non previsto: i parametri esistono per ' +
-      window.cfAnniPrevisti().join(' e ') + '.');
+    }
   }
-
-  /* --- COSTI --------------------------------------------------------- */
-  /* In unione i costi di adesso restano, ed e' quello che la finestra
-     promette: «i campi assenti dal file restano quelli di adesso». Le voci
-     presenti nel file sovrascrivono le omonime. In simulazione nuova si
-     parte dalle voci predefinite a zero. */
-  const costi = unisci
-    ? JSON.parse(JSON.stringify(window.cfCosti() || window.cfNuoviCosti()))
-    : window.cfNuoviCosti();
-  const fogliCosti = utili.find((n) => norm(n) === 'costi');
-  if (!fogliCosti) rapporto.mancanti.push('tutto il foglio COSTI');
+  if (stato.employeeIncomeCurr > stato.otherIncome + 0.005 &&
+      (!(opzioni && opzioni.soloAnteprima) || opzioni.validaRelazioni ||
+       (origini.has('employeeIncomeCurr') && origini.has('otherIncome')))) {
+    const src = origini.get('employeeIncomeCurr') || origini.get('otherIncome');
+    if (src) erroreImport(src, 'di cui lavoro dipendente anno corrente', 'non può superare gli altri redditi personali');
+  }
+  const tabella = tabellaImport(wb, 'COSTI', INTESTAZIONI_COSTI, 'Voce di costo', rapporto.avvisi);
+  if (!tabella) rapporto.mancanti.push('tutto il foglio COSTI');
   else {
-    const righe = XLSX.utils.sheet_to_json(wb.Sheets[fogliCosti], { header: 1, raw: true, defval: '' });
-    let testa = -1;
-    for (let k = 0; k < Math.min(righe.length, 12); k++) {
-      if ((righe[k] || []).some((c) => norm(c) === 'voce di costo')) { testa = k; break; }
+    const voci = new Map();
+    for (const { celle } of tabella.righe) {
+      const nomi = new Map();
+      for (const { key, src } of celle.filter(c => c.key === 0))
+        unisciImport(nomi, 'nome', src, String(src.valore).trim(), 'Voce di costo');
+      const nome = nomi.get('nome');
+      if (!nome) erroreImport(celle[0].src, 'Voce di costo', 'riga valorizzata senza voce di costo');
+      if (nome.valore.length > 60) erroreImport(nome.src, 'Voce di costo', 'massimo 60 caratteri');
+      const id = norm(nome.valore);
+      if (!voci.has(id)) voci.set(id, { nome: nome.valore, campi: new Map() });
+      const voce = voci.get(id);
+      for (const { key, src } of celle.filter(c => c.key !== 0)) {
+        const campo = INTESTAZIONI_COSTI[key];
+        const valore = key === 2 ? booleanoImport(src, campo)
+          : key >= 3 ? percentualeImport(src, campo) / 100 : numeroImport(src, campo);
+        if (key === 1 && valore < 0) erroreImport(src, campo, 'importo negativo non ammesso');
+        unisciImport(voce.campi, key, src, valore, campo + ' / ' + voce.nome);
+      }
     }
-    if (testa < 0) throw new Error('nel foglio COSTI non trovo l intestazione Voce di costo.');
-    const H = (righe[testa] || []).map(norm);
-    const col = (etichetta) => H.indexOf(norm(etichetta));
-    const iNome = col('Voce di costo'), iImp = col('Importo annuale'),
-      iLordo = col('Importo IVA compresa'), iIva = col('Aliquota IVA %'),
-      iUso = col('Uso professionale %'), iIvaO = col('IVA detraibile % ordinario'),
-      iIvaS = col('IVA detraibile % società'), iDedO = col('Deducibile % IRPEF'),
-      iDedS = col('Deducibile % IRES'), iIrap = col('Deducibile % IRAP'),
-      iTetto = col('Tetto % dei compensi');
-
-    for (let k = testa + 1; k < righe.length; k++) {
-      const r = righe[k] || [];
-      const nome = String(r[iNome] == null ? '' : r[iNome]).trim();
-      if (!nome) continue;
-      const importo = window.cfLeggiNumero(r[iImp]);
-      if (importo < 0) {
-        rapporto.errori.push('COSTI riga ' + (k + 1) + ' ' + nome + ': importo negativo.');
-        continue;
+    const chiavi = ['nome', 'amount', 'gross', 'iva', 'uso', 'ivaOrd', 'ivaSoc', 'dedOrd', 'dedSoc', 'irap', 'tetto'];
+    for (const voce of voci.values()) {
+      let costo = costi.find(c => norm(c.nome) === norm(voce.nome));
+      let nuovo = false;
+      if (!costo) {
+        let indice = costi.length + 1;
+        while (costi.some(c => c.id === 'import-' + indice)) indice++;
+        costo = { id: 'import-' + indice, nome: voce.nome, iva: 0.22, ivaOrd: 1, ivaSoc: 1,
+          dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null, amount: 0, gross: false,
+          custom: true, nota: 'Voce arrivata dal file importato.' };
+        costi.push(costo); rapporto.nuove++; nuovo = true;
       }
-      /* Nessun confronto col contenuto degli esempi: una riga vera che
-         coincide con un esempio va importata. Il presidio e il nome del
-         foglio, che non ha falsi positivi. */
-      let voce = costi.find((c) => norm(c.nome) === norm(nome));
-      if (!voce) {
-        voce = { id: 'import-' + k, nome: nome.slice(0, 60),
-          nota: 'Voce arrivata dal file importato.', iva: .22, ivaOrd: 1, ivaSoc: 1,
-          dedOrd: 1, dedSoc: 1, irap: 1, uso: 1, tetto: null, amount: 0,
-          gross: false, custom: true };
-        costi.push(voce);
-        rapporto.nuove++;
-      }
-      voce.amount = importo;
-      if (iLordo >= 0 && String(r[iLordo]).trim() !== '') {
-        if (!SINO_AMMESSI.test(String(r[iLordo]).trim())) {
-          rapporto.errori.push('COSTI riga ' + (k + 1) + ': Importo IVA compresa attende SI oppure NO.');
-        } else voce.gross = sino(r[iLordo]);
-      }
-      const perc = (idx, chiave, etichetta) => {
-        if (idx < 0) return;
-        const v = r[idx];
-        if (v === '' || v == null) return;
-        const n = window.cfLeggiNumero(v);
-        if (n < 0 || n > 100) {
-          rapporto.errori.push('COSTI riga ' + (k + 1) + ' ' + nome + ': ' + etichetta +
-            ' fuori intervallo 0-100 (' + v + ').');
-          return;
-        }
-        voce[chiave] = n / 100;
-      };
-      perc(iIva, 'iva', 'aliquota IVA'); perc(iUso, 'uso', 'uso professionale');
-      perc(iIvaO, 'ivaOrd', 'IVA detraibile ordinario');
-      perc(iIvaS, 'ivaSoc', 'IVA detraibile societa');
-      perc(iDedO, 'dedOrd', 'deducibile IRPEF'); perc(iDedS, 'dedSoc', 'deducibile IRES');
-      perc(iIrap, 'irap', 'deducibile IRAP');
-      if (iTetto >= 0) {
-        const v = String(r[iTetto] == null ? '' : r[iTetto]).trim();
-        if (v === '') voce.tetto = null;
-        else {
-          const n = window.cfLeggiNumero(v);
-          if (n < 0 || n > 100) rapporto.errori.push('COSTI riga ' + (k + 1) + ': tetto fuori intervallo.');
-          else voce.tetto = n / 100;
-        }
-      }
-      if (importo > 0) rapporto.costi++;
+      const prima = JSON.stringify(costo);
+      for (const [key, dato] of voce.campi) costo[chiavi[key]] = dato.valore;
+      // Il template intatto contiene solo regole standard. Gli zeri espliciti,
+      // le regole personalizzate e le nuove voci sono invece dati importati.
+      if (nuovo || voce.campi.has(1) || JSON.stringify(costo) !== prima) rapporto.costi++;
     }
   }
-
-  /* --- Esiti AI ------------------------------------------------------ */
-  const esiti = window.TAL_AI ? window.TAL_AI.read(wb, XLSX) : [];
-  const sintesi = window.TAL_AI ? window.TAL_AI.summarize(esiti) : { open: 0, blocking: 0 };
-  rapporto.esiti = sintesi.open;
-  rapporto.bloccanti = sintesi.blocking;
-
-  /* Un errore di validazione blocca l import: il file va corretto, non
-     interpretato. Prima un valore fuori elenco diventava un default
-     plausibile e il calcolo finiva senza dire niente. */
-  if (rapporto.errori.length) {
-    const e = new Error('il file contiene ' + rapporto.errori.length +
-      (rapporto.errori.length === 1 ? ' problema da correggere.' : ' problemi da correggere.'));
-    e.dettagli = rapporto.errori;
-    throw e;
+  // Preflight delle sei colonne, poi il lettore condiviso conserva la semantica
+  // di stati/esempi AI. La copia normalizzata riconcilia anche colonne duplicate.
+  const ai = tabellaImport(wb, 'Esiti AI', COLONNE_ESITI, 'Elemento da verificare', rapporto.avvisi);
+  let esiti = [];
+  if (ai) {
+    const righe = [COLONNE_ESITI];
+    for (const { r, celle } of ai.righe) {
+      const dati = new Map();
+      for (const { key, src } of celle)
+        unisciImport(dati, key, src, String(src.valore).trim(), COLONNE_ESITI[key]);
+      if (!dati.has(2)) erroreImport(celle[0].src, 'Elemento da verificare', 'riga AI valorizzata senza elemento');
+      // Mantiene sourceRow identico anche con titoli o righe vuote.
+      while (righe.length < r) righe.push([]);
+      righe.push(COLONNE_ESITI.map((_, k) => dati.get(k)?.valore || ''));
+    }
+    const copia = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(copia, XLSX.utils.aoa_to_sheet(righe), 'Esiti AI');
+    esiti = window.TAL_AI.read(copia, XLSX);
   }
-
-  const letti = rapporto.profilo + rapporto.compensi + rapporto.costi;
-  if (!letti && !esiti.length) {
+  const sintesi = window.TAL_AI.summarize(esiti);
+  rapporto.esiti = sintesi.open; rapporto.bloccanti = sintesi.blocking;
+  if (!rapporto.profilo && !rapporto.compensi && !rapporto.costi && !esiti.length)
     throw new Error('nessun dato da importare: i fogli PROFILO, COMPENSI e COSTI sono vuoti. Compilali con i dati del cliente.');
+  rapporto.statoLetto = stato; rapporto.costiLetti = costi; rapporto.esitiLetti = esiti;
+  if (!(opzioni && opzioni.soloAnteprima)) {
+    window.cfSetStato(stato); window.cfSetCosti(costi); window.cfSetEsitiAI(esiti);
+    window.cfSetUltimoEsito(null);
   }
-
-  /* RE-002. In anteprima non si scrive niente: si restituisce quello che il
-     file contiene, così la finestra può mostrarlo prima che l'utente scelga.
-     Lo stato calcolato viaggia col rapporto, così la scelta non costringe a
-     rileggere e rianalizzare il file una seconda volta. */
-  if (opzioni && opzioni.soloAnteprima) {
-    rapporto.statoLetto = stato;
-    rapporto.costiLetti = costi;
-    rapporto.esitiLetti = esiti;
-    return rapporto;
-  }
-
-  window.cfSetStato(stato);
-  window.cfSetCosti(costi);
-  window.cfSetEsitiAI(esiti);
   return rapporto;
 }
 
@@ -4775,9 +4874,32 @@ function importaWorkbook(wb, opzioni) {
    quali voci sono nuove e cosa verrebbe sovrascritto. L'audit chiedeva
    esattamente questo, e serve soprattutto in aggiornamento: «aggiorna la
    corrente» senza sapere cosa cambia e' una scommessa. */
+function avvisiColonneImport(avvisi) {
+  const X = window.cfEsc;
+  if (!avvisi.length) return '';
+  return '<p><b>Colonne aggiuntive escluse dall’import</b></p><ul>' + avvisi.map(a =>
+    '<li>' + X(a.foglio) + ': La colonna &quot;' + X(a.intestazione) +
+    '&quot; non fa parte del template TAL e non verrà importata. ' + a.numero +
+    (a.numero === 1 ? ' cella valorizzata' : ' celle valorizzate') + ' (' + a.celle.map(X).join(', ') +
+    (a.numero > a.celle.length ? ', …' : '') + ').</li>').join('') + '</ul>';
+}
+function mostraAvvisiImport(avvisi) {
+  let box = document.getElementById('cfImportWarnings');
+  if (!box && !avvisi.length) return;
+  if (!box) {
+    box = document.createElement('aside'); box.id = 'cfImportWarnings';
+    box.className = 'cf-section'; box.setAttribute('role', 'status');
+    box.style.overflowWrap = 'anywhere';
+    const main = document.getElementById('cfMain');
+    main.insertBefore(box, main.querySelector('.cf-stage'));
+  }
+  // Riepilogo persistente nella pagina, esterno a stato, archivio ed export.
+  box.hidden = !avvisi.length;
+  box.innerHTML = avvisiColonneImport(avvisi);
+}
 function riepilogoImport(r, inCorso, corrente) {
   const X = window.cfEsc;
-  const p = [];
+  const p = [avvisiColonneImport(r.avvisi)];
   const letti = r.profilo + r.compensi + r.costi;
   p.push('<p>Il file porta <b>' + letti + '</b> ' + (letti === 1 ? 'dato' : 'dati') + ': ' +
     r.profilo + ' di profilo, ' + r.compensi + ' economici, ' + r.costi +
@@ -4842,7 +4964,7 @@ async function importaFile(file) {
 
   let wb;
   try {
-    wb = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
+    wb = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true, sheetStubs: true });
   } catch (e) {
     window.cfToast('Il file non si apre: ' + e.message, true);
     return;
@@ -4871,9 +4993,12 @@ async function importaFile(file) {
   const unisci = scelta === 'aggiorna';
 
   try {
-    const r = importaWorkbook(wb, { unisciAllaCorrente: unisci });
+    const r = importaWorkbook(wb, { unisciAllaCorrente: unisci, soloAnteprima: true, validaRelazioni: true });
+    // Il salvataggio può fallire: nessuno stato o input cambia prima del successo.
+    if (!window.cfSalvaLavoro(true, r)) throw new Error('salvataggio non riuscito; la simulazione precedente è invariata.');
+    window.cfSetStato(r.statoLetto); window.cfSetCosti(r.costiLetti); window.cfSetEsitiAI(r.esitiLetti);
+    window.cfSetUltimoEsito(null);
     window.cfScriviStato(); window.cfRenderCosti(); window.cfAggiornaContesto();
-    window.cfSalvaLavoro(true);
 
     /* La riconciliazione e' dichiarata: chi importa deve poter confrontare i
        numeri del tool con quelli dei documenti di partenza. */
@@ -4900,6 +5025,7 @@ async function importaFile(file) {
         (r.bloccanti ? ', di cui ' + r.bloccanti + (r.bloccanti === 1 ? ' bloccante' : ' bloccanti') : '') +
         '. Li trovi nel confronto.', true);
     }
+    mostraAvvisiImport(r.avvisi);
     window.cfVaiA('confronto');
   } catch (e) {
     /* Gli errori di validazione si elencano uno per uno: «il file non va bene»

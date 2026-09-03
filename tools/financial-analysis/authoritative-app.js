@@ -85,14 +85,276 @@ function normalizeIv(value,type){const raw=String(value||'').trim(),t=token(raw)
 function sectionFor(account){const info=infoFor(account.iv);if(info)return info.sec;if(account.type==='CE')return'ce';return finite(account.current)>=0?'sp_attivo':'sp_passivo';}
 function accountKey(account){return`${account.type}|${account.code}`;}
 function attrsFor(account){const key=accountKey(account);if(!STATE.attrs[key])STATE.attrs[key]={...(account.attrs||{})};return STATE.attrs[key];}
-function readWorkbook(file,callback){const reader=new FileReader();reader.onload=event=>{try{callback(XLSX.read(event.target.result,{type:'array'}));}catch(error){toast('File non leggibile: '+error.message,true);}};reader.readAsArrayBuffer(file);}
-function rowsOf(wb,name){const sheet=wb.Sheets[name];return sheet?XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true}):[];}
-function headerIndex(headers,aliases){return headers.findIndex(value=>aliases.some(alias=>value.includes(alias)));}
-function parseCompany(wb){const map={};rowsOf(wb,'Anagrafica').forEach(row=>{if(row[0]!==''&&row[1]!==undefined)map[String(row[0]).trim().toLowerCase()]=row[1];});const pick=(...keys)=>{for(const key of Object.keys(map))if(keys.some(test=>key.includes(test)))return map[key];return'';};const from=pick('periodo — dal','periodo - dal','periodo dal'),to=pick('periodo — al','periodo - al','periodo al'),year=to?new Date(to).getFullYear():parseNumber(pick('esercizio corrente')),schemaText=String(pick('schema di bilancio')||'').toLowerCase();return{name:String(pick('denominazione','ragione sociale')||''),vat:String(pick('partita iva')||''),cf:String(pick('codice fiscale')||''),currency:String(pick('valuta')||'EUR').toUpperCase(),schema:schemaText.includes('ordinar')?'ordinary':schemaText.includes('abbreviat')?'abbrev':'',periodFrom:from||'',periodTo:to||'',yearCurrent:year||STATE.company.yearCurrent,yearPrevious:year?year-1:STATE.company.yearPrevious};}
-function parseAccounts(wb,{requireSP=true,requireCE=true}={}){const accounts=[],diagnostics=[];for(const [sheet,type] of [['Stato Patrimoniale','SP'],['Conto Economico','CE']]){const rows=rowsOf(wb,sheet);if(!rows.length){if((type==='SP'&&requireSP)||(type==='CE'&&requireCE))diagnostics.push({level:'error',text:`Foglio “${sheet}” assente o vuoto.`});continue;}const headers=rows[0].map(x=>String(x).trim().toLowerCase()),ix={code:headerIndex(headers,['codice conto','codice']),desc:headerIndex(headers,['descrizione conto','descrizione']),cur:headerIndex(headers,['importo esercizio corrente','corrente']),prev:headerIndex(headers,['importo esercizio precedente','precedente']),iv:headerIndex(headers,['voce iv direttiva','voce civilistica','iv direttiva'])};if(Object.values(ix).some(x=>x<0)){diagnostics.push({level:'error',text:`Colonne obbligatorie mancanti nel foglio “${sheet}”.`});continue;}rows.slice(1).forEach((row,index)=>{if(!row.some(value=>String(value).trim()))return;const code=String(row[ix.code]||'').trim(),normalized=normalizeIv(row[ix.iv],type);if(!code){diagnostics.push({level:'error',text:`${sheet}, riga ${index+2}: codice conto mancante.`});return;}const account={type,code,desc:String(row[ix.desc]||'').trim(),current:parseNumber(row[ix.cur]),previous:parseNumber(row[ix.prev]),iv:normalized.code,ivRaw:normalized.raw,row:index+2};if(!normalized.code||normalized.unsupported)diagnostics.push({level:'error',text:`${sheet}, conto ${code}: voce civilistica non riconosciuta.`});accounts.push(account);});}
-  if(requireSP&&!accounts.some(a=>a.type==='SP'))diagnostics.push({level:'error',text:'Il file non contiene uno Stato Patrimoniale utilizzabile.'});if(requireCE&&!accounts.some(a=>a.type==='CE'))diagnostics.push({level:'error',text:'Il file non contiene un Conto Economico utilizzabile.'});
-  const current=accounts.some(a=>a.current!==0),previous=accounts.some(a=>a.previous!==0);const spRows=accounts.filter(a=>a.type==='SP');for(const field of ['current','previous']){const difference=spRows.reduce((sum,a)=>sum+finite(a[field]),0);if(Math.abs(difference)>.01)diagnostics.push({level:'error',text:`Stato Patrimoniale ${field==='current'?'corrente':'precedente'} non quadrato nel file: differenza ${fmt(difference,2)}.`});}
-  return{accounts,diagnostics,periods:{current:{available:current},previous:{available:previous}}};
+// Import Excel: lettura delle celle originali, prima di qualunque modifica a STATE.
+const IMPORT_ACCOUNT_COLUMNS={
+  code:['codice conto','codice'],desc:['descrizione conto','descrizione'],
+  cur:['importo esercizio corrente','importo corrente','corrente'],
+  prev:['importo esercizio precedente','importo precedente','precedente'],
+  iv:['voce iv direttiva','voce civilistica','iv direttiva']
+};
+const importEmpty=value=>value==null||(typeof value==='string'&&!value.trim());
+const importName=value=>String(value??'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');
+function importError(src,field,message){
+  const cell=XLSX.utils.encode_cell({r:src.r,c:src.c});
+  throw new Error(src.sheet+', riga '+(src.r+1)+', cella '+cell+', '+field+': '+message);
+}
+function importCell(wb,sheet,r,c,field){
+  const cell=wb.Sheets[sheet]?.[XLSX.utils.encode_cell({r,c})],src={sheet,r,c,cell,value:cell?.v};
+  const errors={0:'#NULL!',7:'#DIV/0!',15:'#VALUE!',23:'#REF!',29:'#NAME?',36:'#NUM!',42:'#N/A',43:'#GETTING_DATA'};
+  if(cell?.f&&(importEmpty(cell.v)||cell.t==='z'))importError(src,field,'formula senza risultato salvato; ricalcolare e salvare il file in Excel.');
+  if(cell?.t==='e')importError(src,field,'errore Excel '+(errors[cell.v]||cell.w||cell.v||'non specificato'));
+  if(typeof src.value==='string'&&/^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A|GETTING_DATA|SPILL!|CALC!)/i.test(src.value.trim()))importError(src,field,'errore Excel '+src.value);
+  return src;
+}
+function importNumber(src,field,empty=0){
+  if(importEmpty(src.value))return empty;
+  if(src.cell?.t==='d'||(src.cell?.z&&XLSX.SSF.is_date(src.cell.z)))importError(src,field,'data Excel non ammessa come importo.');
+  const v=src.value;let n;
+  if(typeof v==='number')n=v;
+  else if(typeof v==='string'){
+    const s=v.trim();
+    if(/^[+-]?\d{1,3}[.,]\d{3}$/.test(s))importError(src,field,'numero testuale ambiguo «'+s+'»: usare una cella numerica o decimali espliciti.');
+    if(/^[+-]?\d+$/.test(s)||/^[+-]?\d+\.\d+$/.test(s))n=Number(s);
+    else if(/^[+-]?\d+,\d+$/.test(s))n=Number(s.replace(',','.'));
+    else if(/^[+-]?\d{1,3}(?:\.\d{3})+,\d+$/.test(s))n=Number(s.replace(/\./g,'').replace(',','.'));
+    else if(/^[+-]?\d{1,3}(?:,\d{3})+\.\d+$/.test(s))n=Number(s.replace(/,/g,''));
+  }
+  if(!Number.isFinite(n))importError(src,field,'numero non valido «'+String(v)+'».');
+  return Object.is(n,-0)?0:n;
+}
+function importText(src,field,{identifier=false}={}){
+  if(importEmpty(src.value))return'';
+  if(src.cell?.t==='d')importError(src,field,'data non ammessa per questo campo.');
+  if(identifier&&typeof src.value==='number'){
+    if(!Number.isSafeInteger(src.value)||src.value<0)importError(src,field,'identificativo numerico non valido.');
+    const formatted=String(src.cell.w??XLSX.utils.format_cell(src.cell)).trim();
+    // Solo zeri realmente conservati dalla formattazione Excel; nessun padding inventato.
+    if(/^0\d+$/.test(formatted)&&Number(formatted)===src.value)return formatted;
+  }
+  return String(src.value).trim();
+}
+function importDate(wb,src,field){
+  if(importEmpty(src.value))return'';
+  let y,m,d;
+  if(typeof src.value==='number'){
+    if(!Number.isInteger(src.value)||src.value<0)importError(src,field,'data Excel non valida.');
+    const date=XLSX.SSF.parse_date_code(src.value,{date1904:!!wb.Workbook?.WBProps?.date1904});
+    if(date)({y,m,d}=date);
+  }else if(src.value instanceof Date){
+    y=src.value.getUTCFullYear();m=src.value.getUTCMonth()+1;d=src.value.getUTCDate();
+  }else{
+    const s=String(src.value).trim(),iso=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s),it=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+    if(iso)[y,m,d]=iso.slice(1).map(Number);else if(it)[d,m,y]=it.slice(1).map(Number);
+  }
+  const date=new Date(Date.UTC(y,m-1,d));
+  if(!(y>=1000&&y<=9999)||date.getUTCFullYear()!==y||date.getUTCMonth()+1!==m||date.getUTCDate()!==d)importError(src,field,'data impossibile o formato non valido; usare GG/MM/AAAA o AAAA-MM-GG.');
+  return String(y).padStart(4,'0')+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+}
+function importRange(wb,sheet){
+  return wb.Sheets[sheet]?.['!ref']?XLSX.utils.decode_range(wb.Sheets[sheet]['!ref']):{s:{r:0,c:0},e:{r:0,c:0}};
+}
+function importRowUsed(wb,sheet,r){
+  const range=importRange(wb,sheet);
+  for(let c=range.s.c;c<=range.e.c;c++){const cell=wb.Sheets[sheet]?.[XLSX.utils.encode_cell({r,c})];if(cell&&(cell.f||cell.t==='e'||!importEmpty(cell.v)))return true;}
+  return false;
+}
+function importTable(wb,sheet,columns,required=Object.keys(columns),warnings=[]){
+  if(!wb.Sheets[sheet])throw new Error('Foglio “'+sheet+'” assente.');
+  const range=importRange(wb,sheet);let header=-1,ix={};
+  // Una riga titolo è ammessa; l'header deve comunque corrispondere agli alias espliciti.
+  for(let r=range.s.r;r<=Math.min(range.e.r,range.s.r+10);r++){
+    const found={};
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const name=importName(importCell(wb,sheet,r,c,'Intestazione').value);
+      const key=Object.keys(columns).find(k=>columns[k].some(alias=>importName(alias)===name));
+      if(key){if(found[key]!=null)importError({sheet,r,c},columns[key][0],'intestazione duplicata.');found[key]=c;}
+    }
+    if(required.every(key=>found[key]!=null)){header=r;ix=found;break;}
+  }
+  if(header<0)importError({sheet,r:range.s.r,c:range.s.c},'Intestazioni','struttura non valida: richieste '+required.map(k=>columns[k][0]).join(', ')+'.');
+  for(let r=range.s.r;r<header;r++){
+    const cells=[];for(let c=range.s.c;c<=range.e.c;c++){const src=importCell(wb,sheet,r,c,'Riga titolo');if(!importEmpty(src.value))cells.push(src);}
+    if(cells.length>1||(cells.length===1&&typeof cells[0].value!=='string'))importError(cells[0],'Struttura','dati prima dell’intestazione: spostarli sotto le colonne corrette.');
+  }
+  const get=(r,key)=>ix[key]==null?{sheet,r,c:range.s.c,value:undefined}:importCell(wb,sheet,r,ix[key],columns[key][0]);
+  const rows=[];
+  for(let r=header+1;r<=range.e.r;r++)if(importRowUsed(wb,sheet,r))rows.push(r);
+  for(let c=range.s.c;c<=range.e.c;c++)if(!Object.values(ix).includes(c)&&rows.some(r=>{const cell=wb.Sheets[sheet][XLSX.utils.encode_cell({r,c})];return cell&&(cell.f||cell.t==='e'||!importEmpty(cell.v));})){
+    const label=importText(importCell(wb,sheet,header,c,'Intestazione'),'Intestazione')||XLSX.utils.encode_col(c);
+    rows.forEach(r=>importCell(wb,sheet,r,c,label));
+    warnings.push({level:'warning',text:sheet+': la colonna “'+label+'” non è importabile nel modello attuale; il suo contenuto non viene acquisito.'});
+  }
+  return{rows,get,header,ix};
+}
+function importUniqueAccounts(accounts){
+  const seen=new Map();
+  for(const a of accounts){const key=accountKey(a),previous=seen.get(key);if(previous){
+    // Guardrail temporaneo: il template ammette sottoconti, ma sezione|codice
+    // oggi li raggruppa. Il supporto per identità di riga indipendenti è un task separato.
+    importError(a.importSource,'Codice conto','Il codice conto '+a.code+' compare in più righe che l\'attuale mapping non può distinguere in modo sicuro. '+[previous,a].map(row=>row.importSource.sheet+'!'+XLSX.utils.encode_cell(row.importSource)+' (riga '+row.row+', '+row.desc+')').join('; ')+'. L\'import è stato annullato per evitare una riclassificazione dipendente dall\'ordine delle righe.');
+  }seen.set(key,a);}
+}
+function parseAccountSheet(wb,sheet,type,{scenario=false,warnings=[]}={}){
+  const columns=scenario?{...IMPORT_ACCOUNT_COLUMNS,cur:['importo scenario alla data'],section:['sezione']}:IMPORT_ACCOUNT_COLUMNS;
+  const required=scenario?['section','code','desc','cur','iv']:Object.keys(columns),table=importTable(wb,sheet,columns,required,warnings),accounts=[];
+  for(const r of table.rows){
+    const codeSrc=table.get(r,'code'),code=importText(codeSrc,'Codice conto',{identifier:true});
+    if(!code)importError(codeSrc,'Codice conto','riga valorizzata senza identificativo.');
+    if(scenario&&importName(importText(table.get(r,'section'),'Sezione'))!=='ce')importError(table.get(r,'section'),'Sezione','Budget/Forecast supportano soltanto CE. Le righe SP non sono importabili nel confronto attuale.');
+    const normalized=normalizeIv(importText(table.get(r,'iv'),'Voce IV Direttiva'),type),info=infoFor(normalized.code);
+    if(!info||(type==='CE')!==(info.sec==='ce'))importError(table.get(r,'iv'),'Voce IV Direttiva','voce non riconosciuta nella sezione '+type+'.');
+    accounts.push({type,code,desc:importText(table.get(r,'desc'),'Descrizione conto'),current:importNumber(table.get(r,'cur'),'Importo corrente'),previous:scenario?0:importNumber(table.get(r,'prev'),'Importo precedente'),iv:normalized.code,ivRaw:normalized.raw,row:r+1,importSource:{sheet,r,c:codeSrc.c}});
+  }
+  importUniqueAccounts(accounts);
+  return accounts;
+}
+function parseAccounts(wb,{requireSP=true,requireCE=true}={}){
+  const accounts=[],diagnostics=[];
+  for(const [sheet,type,required] of [['Stato Patrimoniale','SP',requireSP],['Conto Economico','CE',requireCE]]){
+    if(!wb.Sheets[sheet]&&!required)continue;
+    const rows=parseAccountSheet(wb,sheet,type,{warnings:diagnostics});
+    if(required&&!rows.length)importError({sheet,r:0,c:0},'Conti','nessuna riga conto utilizzabile.');
+    accounts.push(...rows);
+  }
+  for(const field of ['current','previous']){
+    const difference=accounts.filter(a=>a.type==='SP').reduce((sum,a)=>sum+a[field],0);
+    if(Math.abs(difference)>.01)throw new Error('Stato Patrimoniale '+(field==='current'?'corrente':'precedente')+': import annullato, differenza di quadratura '+fmt(difference,2)+'.');
+  }
+  return{accounts,diagnostics,periods:{current:{available:accounts.some(a=>a.current!==0)},previous:{available:accounts.some(a=>a.previous!==0)}}};
+}
+function parseCompany(wb,warnings=[]){
+  const sheet='Anagrafica',company={name:'',vat:'',cf:'',currency:'EUR',schema:'',periodFrom:'',periodTo:''};if(!wb.Sheets[sheet])return company;
+  const aliases={name:['denominazione','ragione sociale'],vat:['partita iva'],cf:['codice fiscale'],currency:['valuta'],schema:['schema di bilancio'],periodFrom:['periodo — dal','periodo - dal','periodo dal'],periodTo:['periodo — al','periodo - al','periodo al'],yearCurrent:['esercizio corrente']};
+  const sources={},range=importRange(wb,sheet);
+  for(let r=range.s.r;r<=range.e.r;r++){
+    const label=importText(importCell(wb,sheet,r,0,'Campo'),'Campo'),src=importCell(wb,sheet,r,1,label||'Valore');
+    if(r===range.s.r&&importName(label)==='campo'&&importName(src.value)==='valore')continue;
+    if(importEmpty(src.value))continue;
+    if(!label)importError(src,'Anagrafica','valore privo del nome del campo.');
+    const key=Object.keys(aliases).find(k=>aliases[k].some(a=>importName(a)===importName(label)));
+    if(!key){warnings.push({level:'warning',text:'Anagrafica: il campo “'+label+'” non è importabile nel modello attuale; il suo contenuto non viene acquisito.'});continue;}
+    let value;
+    if(key.startsWith('period'))value=importDate(wb,src,label);
+    else if(key==='yearCurrent'){value=importNumber(src,label);if(!Number.isInteger(value)||value<1000||value>9999)importError(src,label,'anno non valido.');}
+    else if(key==='schema'){const s=importName(importText(src,label));value=['ordinario','ordinaria','ordinary'].includes(s)?'ordinary':['abbreviato','abbreviata','abbrev'].includes(s)?'abbrev':'';if(!value)importError(src,label,'schema non riconosciuto.');}
+    else value=importText(src,label,{identifier:['vat','cf'].includes(key)});
+    if(key==='currency'){
+      value=value.toUpperCase();
+      try{new Intl.NumberFormat('it-IT',{style:'currency',currency:value}).format(0);}
+      catch(_){importError(src,label,'valuta non valida: usare un codice di tre lettere, per esempio EUR.');}
+    }
+    if(sources[key]&&company[key]!==value)importError(src,label,'valore discordante con '+sources[key]+'.');
+    company[key]=value;sources[key]=sheet+'!'+XLSX.utils.encode_cell(src);
+  }
+  if(company.periodFrom&&company.periodTo&&company.periodFrom>company.periodTo)throw new Error('Anagrafica: periodo dal successivo al periodo al.');
+  if(company.periodTo){const year=Number(company.periodTo.slice(0,4));if(company.yearCurrent&&company.yearCurrent!==year)throw new Error('Anagrafica: esercizio corrente e data finale discordanti.');company.yearCurrent=year;}
+  if(company.yearCurrent)company.yearPrevious=company.yearCurrent-1;
+  if(company.currency)company.currency=company.currency.toUpperCase();
+  return company;
+}
+function importUnsupportedSheets(wb,consumed,warnings){
+  const emptyHeaders={
+    'Esiti AI':['Tipo','Codice conto / campo','Elemento da verificare','Stato','Osservazione / assunzione','Fonte utilizzata'],
+    Budget:['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva'],
+    Forecast:['Sezione','Codice conto','Descrizione conto','Importo scenario alla data','Voce IV Direttiva'],
+    'Catalogo centri':['Codice centro','Descrizione centro'],
+    'Allocazioni centri':['Codice conto','Centro di costo','Importo esercizio corrente','Importo esercizio precedente'],
+    Benchmark:['Codice KPI','Unità','Q1','Mediana','Q3','Fonte','Anno']
+  };
+  for(const sheet of wb.SheetNames){
+    if(consumed.has(sheet)||['Istruzioni','Voci IV Direttiva'].includes(sheet))continue;
+    const range=importRange(wb,sheet);
+    let firstRow=range.s.r;
+    if(emptyHeaders[sheet]){
+      const columns=Object.fromEntries(emptyHeaders[sheet].map((label,i)=>['c'+i,[label]]));
+      firstRow=importTable(wb,sheet,columns,Object.keys(columns),warnings).header+1;
+    }
+    for(let r=firstRow;r<=range.e.r;r++)if(importRowUsed(wb,sheet,r)){
+      if(sheet==='Esiti AI')importError({sheet,r,c:0},'Esiti AI','foglio valorizzato non ancora reimportabile: manca il percorso di revisione e chiusura dei rilievi. Nessun esito è stato ignorato; import annullato.');
+      importError({sheet,r,c:0},'Foglio','foglio non importabile da questo comando; nessun dato è stato acquisito.');
+    }
+  }
+}
+function parseBenchmark(wb,sheet,warnings){
+  const columns={code:['codice kpi','codice'],unit:['unità','unita'],q1:['q1','primo quartile'],median:['mediana'],q3:['q3','terzo quartile'],source:['fonte'],year:['anno']},table=importTable(wb,sheet,columns,Object.keys(columns),warnings),seen=new Set();
+  return table.rows.map(r=>{
+    const code=importText(table.get(r,'code'),'Codice KPI',{identifier:true});
+    if(!KPI_CODES.includes(code))importError(table.get(r,'code'),'Codice KPI','identificativo assente o non riconosciuto.');
+    if(seen.has(code))importError(table.get(r,'code'),'Codice KPI','codice duplicato '+code+'.');seen.add(code);
+    const row={code,unit:importText(table.get(r,'unit'),'Unità'),q1:importNumber(table.get(r,'q1'),'Q1',null),median:importNumber(table.get(r,'median'),'Mediana',null),q3:importNumber(table.get(r,'q3'),'Q3',null),source:importText(table.get(r,'source'),'Fonte'),year:importText(table.get(r,'year'),'Anno')};
+    if(row.unit!==KPI_META[code][2])importError(table.get(r,'unit'),'Unità','unità attesa: '+KPI_META[code][2]+'.');
+    return row;
+  });
+}
+function parseCenters(wb,sheet,accounts,warnings){
+  const columns={code:['codice conto','codice'],desc:['descrizione conto','descrizione'],center:['centro','centro di costo'],cur:['importo corrente','importo esercizio corrente','corrente'],prev:['importo precedente','importo esercizio precedente','precedente']};
+  const table=importTable(wb,sheet,columns,['code','center','cur','prev'],warnings);
+  return table.rows.map(r=>{
+    const code=importText(table.get(r,'code'),'Codice conto',{identifier:true}),center=importText(table.get(r,'center'),'Centro',{identifier:true});
+    if(!code)importError(table.get(r,'code'),'Codice conto','riga valorizzata senza identificativo.');
+    if(!center)importError(table.get(r,'center'),'Centro','riga valorizzata senza identificativo.');
+    if(!accounts.some(a=>a.type==='CE'&&a.code===code))importError(table.get(r,'code'),'Codice conto','conto CE non presente nel bilancio: '+code+'.');
+    return{code,center,...(table.ix.desc!=null?{desc:importText(table.get(r,'desc'),'Descrizione conto')}:{}),current:importNumber(table.get(r,'cur'),'Importo corrente'),previous:importNumber(table.get(r,'prev'),'Importo precedente')};
+  });
+}
+function parseCenterCatalog(wb,warnings){
+  const sheet='Catalogo centri',table=importTable(wb,sheet,{code:['codice centro'],desc:['descrizione centro']},['code','desc'],warnings),seen=new Set();
+  return table.rows.map(r=>{const code=importText(table.get(r,'code'),'Codice centro',{identifier:true});if(!code||seen.has(code))importError(table.get(r,'code'),'Codice centro','codice assente o duplicato.');seen.add(code);return{code,desc:importText(table.get(r,'desc'),'Descrizione centro')};});
+}
+function prepareImportAccounts(candidate,accounts){
+  // Stessa identità e precedenza attributi di prepareAccounts; solo sul candidato.
+  for(const account of accounts){
+    delete account.importSource;
+    if(!account.id)account.id=account.type+'|'+account.code+'|'+(account.row||0);
+    const key=accountKey(account);
+    candidate.attrs[key]={...inferAttributes(account),...(account.attrs||{}),...(candidate.attrs[key]||{})};
+  }
+}
+function importCandidate(wb,kind,file){
+  const candidate={...clone(STATE),selected:new Set(STATE.selected)},warnings=[],consumed=new Set();
+  const take=(name)=>{consumed.add(name);return !!wb.Sheets[name];};
+  if(kind==='main'||kind==='history'){
+    const parsed=parseAccounts(wb),company={...candidate.company,...parseCompany(wb,warnings)};
+    ['Stato Patrimoniale','Conto Economico','Anagrafica'].forEach(take);warnings.push(...parsed.diagnostics);
+    if(kind==='main'){Object.assign(candidate,{accounts:parsed.accounts,company,periods:parsed.periods,attrs:{},reclassMap:{},loaded:true,diagnostics:[]});candidate.files.main=file;prepareImportAccounts(candidate,candidate.accounts);}
+    else{if(!wb.Sheets.Anagrafica||!parseCompany(wb).yearCurrent)throw new Error('Anagrafica: indicare il periodo o l’esercizio del bilancio storico.');prepareImportAccounts(candidate,parsed.accounts);candidate.history=[...candidate.history,{year:company.yearCurrent,accounts:parsed.accounts,field:'current',periods:parsed.periods}].slice(-12);}
+  }
+  for(const scenario of ['budget','forecast'])if(kind==='main'||kind===scenario){
+    const sheet=scenario==='budget'?'Budget':'Forecast';let rows;
+    if(take(sheet))rows=parseAccountSheet(wb,sheet,'CE',{scenario:true,warnings});
+    else if(kind===scenario){const name=wb.Sheets['Conto Economico']?'Conto Economico':'Dati';take(name);rows=parseAccountSheet(wb,name,'CE',{warnings});}
+    if(rows){if(kind===scenario&&!rows.length)throw new Error(sheet+': nessun conto CE utilizzabile.');prepareImportAccounts(candidate,rows);candidate.scenarios[scenario]=rows;candidate.files[scenario]=file;}
+  }
+  if(kind==='main'||kind==='centers'){
+    const catalog=take('Catalogo centri');if(catalog)candidate.centerCatalog=parseCenterCatalog(wb,warnings);
+    const name=['Allocazioni centri','Allocazioni',...(kind==='centers'?['Dati']:[])].find(n=>wb.Sheets[n]);
+    if(name){take(name);candidate.centers=parseCenters(wb,name,candidate.accounts,warnings);candidate.files.centers=file;}
+    else if(kind==='centers')throw new Error('Foglio Allocazioni centri/Allocazioni assente.');
+    if(name&&catalog&&candidate.centerCatalog.length)for(const row of candidate.centers)if(!candidate.centerCatalog.some(c=>c.code===row.center))throw new Error(name+': centro '+row.center+' assente dal Catalogo centri.');
+  }
+  if(kind==='main'||kind==='benchmark'){
+    const name=wb.Sheets.Benchmark?'Benchmark':kind==='benchmark'?'Dati':null;
+    if(name){take(name);candidate.benchmark=parseBenchmark(wb,name,warnings);candidate.files.benchmark=file;}
+  }
+  importUnsupportedSheets(wb,consumed,warnings);
+  candidate.diagnostics.push(...warnings);
+  return candidate;
+}
+function readWorkbook(file,callback,onSuccess){
+  const reader=new FileReader();
+  reader.onerror=()=>toast('Import annullato: impossibile leggere il file.',true);
+  reader.onload=event=>{
+    let candidate;
+    try{candidate=callback(XLSX.read(event.target.result,{type:'array',cellNF:true,sheetStubs:true}));}
+    catch(error){toast('Import annullato: '+error.message,true);return;}
+    // Unica applicazione, dopo la validazione dell'intero file. Nessuna persistenza
+    // o invalidazione del risultato durante parsing, controlli e preparazione.
+    Object.assign(STATE,candidate);
+    updateAll();
+    if(onSuccess)onSuccess();
+    toast(STATE.accounts.length+' conti disponibili. Import completato'+(STATE.diagnostics.some(d=>d.level==='warning')?' con avvisi: consulta Importa Excel.':'.'));
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function inferAttributes(account){const c=token(account.iv),sec=sectionFor(account),d=String(account.desc||'').toLowerCase(),out={};if(account.type==='SP'){
@@ -189,11 +451,17 @@ function updateAll(){renderAll();schedule(false);}
 
 function syncInputs(){const map={an_name:STATE.company.name,an_schema:STATE.company.schema,an_vat:STATE.company.vat,an_cf:STATE.company.cf,an_currency:STATE.company.currency,an_from:STATE.company.periodFrom,an_to:STATE.company.periodTo,an_days:STATE.company.days,'kpi-ebitda-base':STATE.extra.useAdjustedEbitda?'adjusted':'reported','extra-emp-current':STATE.extra.employeesCurrent,'extra-emp-previous':STATE.extra.employeesPrevious,'extra-purchases':STATE.extra.purchasesCurrent,'extra-vat-sales':STATE.extra.vatSalesPct,'extra-vat-purchases':STATE.extra.vatPurchasesPct,'extra-cashflow':STATE.extra.cashFlowDebtService,'extra-debtservice':STATE.extra.debtService,'cf-interest-paid':STATE.extra.cfInterestPaid,'cf-tax-paid':STATE.extra.cfTaxPaid,'cf-other-operating':STATE.extra.cfOtherOperating,'cf-capex':STATE.extra.cfCapex,'cf-disposals':STATE.extra.cfDisposals,'cf-other-investing':STATE.extra.cfOtherInvesting,'cf-new-debt':STATE.extra.cfNewDebt,'cf-debt-repayment':STATE.extra.cfDebtRepayment,'cf-capital':STATE.extra.cfCapital,'cf-dividends':STATE.extra.cfDividends,'cf-other-financing':STATE.extra.cfOtherFinancing,'cf-other-unreconstructed':STATE.extra.cfOtherUnreconstructed,'ad-overdue-tax':STATE.extra.adequacyOverdueTax,'ad-overdue-social':STATE.extra.adequacyOverdueSocial,'ad-overdue-suppliers':STATE.extra.adequacyOverdueSuppliers,'ad-overdue-employees':STATE.extra.adequacyOverdueEmployees,'ad-overdue-banks':STATE.extra.adequacyOverdueBanks};for(const [id,value] of Object.entries(map)){const el=q(id);if(el&&document.activeElement!==el)el.value=value??'';}}
 function saveCompany(){for(const [key,id] of [['name','an_name'],['schema','an_schema'],['vat','an_vat'],['cf','an_cf'],['currency','an_currency'],['periodFrom','an_from'],['periodTo','an_to']])STATE.company[key]=q(id)?.value||'';STATE.company.days=Math.max(1,finite(q('an_days')?.value,365));const year=STATE.company.periodTo?new Date(STATE.company.periodTo).getFullYear():STATE.company.yearCurrent;if(Number.isFinite(year)){STATE.company.yearCurrent=year;STATE.company.yearPrevious=year-1;}saveConfig(false);updateAll();toast('Configurazione salvata.');}
-function importMain(event){const file=event.target.files?.[0];if(!file)return;readWorkbook(file,wb=>{const parsed=parseAccounts(wb);STATE.accounts=parsed.accounts;STATE.diagnostics=parsed.diagnostics;STATE.periods=parsed.periods;STATE.company={...STATE.company,...parseCompany(wb)};STATE.loaded=STATE.accounts.length>0;STATE.files.main=file.name;STATE.attrs={};STATE.reclassMap={};prepareAccounts(STATE.accounts);updateAll();setView('schemes');toast(`${STATE.accounts.length} conti caricati.`);event.target.value='';});}
-function importScenario(event,kind){const file=event.target.files?.[0];if(!file||!STATE.loaded)return;readWorkbook(file,wb=>{const parsed=parseAccounts(wb,{requireSP:false});STATE.scenarios[kind]=parsed.accounts.filter(a=>a.type==='CE');prepareAccounts(STATE.scenarios[kind]);STATE.files[kind]=file.name;updateAll();event.target.value='';});}
-function importCenters(event){const file=event.target.files?.[0];if(!file)return;readWorkbook(file,wb=>{const rows=rowsOf(wb,wb.SheetNames.includes('Allocazioni')?'Allocazioni':wb.SheetNames[0]),headers=(rows[0]||[]).map(x=>String(x).toLowerCase()),ix={code:headerIndex(headers,['codice conto','codice']),center:headerIndex(headers,['centro']),cur:headerIndex(headers,['corrente']),prev:headerIndex(headers,['precedente'])};if(Object.values(ix).some(v=>v<0)){toast('Template centri non riconosciuto.',true);return;}STATE.centers=rows.slice(1).filter(row=>String(row[ix.code]).trim()&&String(row[ix.center]).trim()).map(row=>({code:String(row[ix.code]).trim(),center:String(row[ix.center]).trim(),current:parseNumber(row[ix.cur]),previous:parseNumber(row[ix.prev])}));updateAll();event.target.value='';});}
-function importBenchmark(event){const file=event.target.files?.[0];if(!file)return;readWorkbook(file,wb=>{const rows=rowsOf(wb,wb.SheetNames.includes('Benchmark')?'Benchmark':wb.SheetNames[0]),headers=(rows[0]||[]).map(x=>String(x).toLowerCase()),ix={code:headerIndex(headers,['codice kpi','codice']),unit:headerIndex(headers,['unità','unita']),q1:headerIndex(headers,['q1','primo quartile']),med:headerIndex(headers,['mediana']),q3:headerIndex(headers,['q3','terzo quartile']),source:headerIndex(headers,['fonte']),year:headerIndex(headers,['anno'])};STATE.benchmark=rows.slice(1).filter(row=>String(row[ix.code]).trim()).map(row=>({code:String(row[ix.code]).trim(),unit:String(row[ix.unit]||''),q1:optional(row[ix.q1]),median:optional(row[ix.med]),q3:optional(row[ix.q3]),source:String(row[ix.source]||''),year:String(row[ix.year]||'')}));updateAll();event.target.value='';});}
-function importHistory(event){const file=event.target.files?.[0];if(!file)return;readWorkbook(file,wb=>{const parsed=parseAccounts(wb),company=parseCompany(wb);prepareAccounts(parsed.accounts);STATE.history.push({year:company.yearCurrent,accounts:parsed.accounts,field:'current'});STATE.history=STATE.history.slice(-12);updateAll();event.target.value='';});}
+function importExcel(event,kind){
+  const file=event.target.files?.[0];if(!file)return;
+  if(['budget','forecast','centers'].includes(kind)&&!STATE.loaded){toast('Import annullato: caricare prima il bilancio.',true);return;}
+  readWorkbook(file,wb=>importCandidate(wb,kind,file.name),()=>{if(kind==='main')setView('schemes');});
+  event.target.value='';
+}
+function importMain(event){importExcel(event,'main');}
+function importScenario(event,kind){if(['budget','forecast'].includes(kind))importExcel(event,kind);}
+function importCenters(event){importExcel(event,'centers');}
+function importBenchmark(event){importExcel(event,'benchmark');}
+function importHistory(event){importExcel(event,'history');}
 function clearHistory(){STATE.history=[];updateAll();}
 function resetSession(){Object.assign(STATE,{accounts:[],attrs:{},reclassMap:{},diagnostics:[],loaded:false,periods:{current:{available:true},previous:{available:false}},scenarios:{budget:[],forecast:[]},centers:[],benchmark:[],history:[],adjustments:[],extra:{aiFindings:[]}});ANALYSIS.result=null;ANALYSIS.resultHash='';ANALYSIS.resultKey='';ANALYSIS.status='idle';renderAll();setView('archive');}
 function applySchemes(){STATE.selected=new Set(Array.from(document.querySelectorAll('#scheme-grid input:checked')).map(el=>el.value));updateAll();setView('exceptions');}
@@ -255,8 +523,27 @@ function printAdvancedReport(){if(!exportGate())return;openPdf('Analisi di bilan
 function printReport(){return printAdvancedReport();}
 
 function sheetDownload(name,rows){const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Dati');XLSX.writeFile(wb,name);}
-function downloadMainTemplate(){sheetDownload('Template_Financial_Statement.xlsx',[['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva']]);}
-function downloadScenarioTemplate(){downloadMainTemplate();}
+function downloadMainTemplate(){
+  const wb=XLSX.utils.book_new(),add=(name,rows)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),name);
+  add('Istruzioni',[
+    ['Import Analisi di Bilancio'],
+    ['Compilare Anagrafica, Stato Patrimoniale e Conto Economico. Conti e segni restano quelli del bilancio di verifica.'],
+    ['Sono letti anche Budget e Forecast (solo CE), Catalogo centri, Allocazioni centri e Benchmark nel formato del template AI.'],
+    ['Esiti AI valorizzato non è ancora reimportabile: manca il percorso di revisione e chiusura dei rilievi. L’import viene annullato.'],
+    ['I codici duplicati nella stessa sezione sono temporaneamente bloccati: il mapping attuale non distingue le righe. Non sono concettualmente invalidi.'],
+    ['Il supporto dei duplicati richiede un intervento separato sull’identità delle righe. Non sostituire o inventare codici conto.'],
+    ['Campi e colonne non gestiti sono dichiarati nel riepilogo di import. Gli export analitici sono report e non sono template reimportabili.']
+  ]);
+  add('Anagrafica',[['Campo','Valore'],['Denominazione',''],['Partita IVA',''],['Codice fiscale',''],['Valuta','EUR'],['Schema di bilancio',''],['Periodo — dal',''],['Periodo — al','']]);
+  const headers=['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva'];
+  add('Stato Patrimoniale',[headers]);add('Conto Economico',[headers]);
+  XLSX.writeFile(wb,'Template_Financial_Statement.xlsx');
+}
+function downloadScenarioTemplate(){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Codice conto','Descrizione conto','Importo esercizio corrente','Importo esercizio precedente','Voce IV Direttiva']]),'Conto Economico');
+  XLSX.writeFile(wb,'Template_Scenario_Analisi.xlsx');
+}
 function downloadCentersTemplate(){sheetDownload('Template_Centri.xlsx',[['Codice conto','Centro','Importo corrente','Importo precedente']]);}
 function downloadBenchmarkTemplate(){sheetDownload('Template_Benchmark.xlsx',[['Codice KPI','Unità','Q1','Mediana','Q3','Fonte','Anno']]);}
 function setKpiDisplayMode(){}

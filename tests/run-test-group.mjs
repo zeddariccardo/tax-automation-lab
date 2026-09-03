@@ -11,6 +11,7 @@ const ROOT = path.resolve(TESTS_DIR, '..');
 const BROWSER_TESTS = new Set([
   'confronto-regimi-import.test.mjs',
   'f24-import-pdf.test.mjs',
+  'financial-analysis-import.test.mjs',
   'financial-statement-characterization.test.mjs',
   'financial-statement-golden.test.mjs',
   'financial-statement-import.test.mjs',

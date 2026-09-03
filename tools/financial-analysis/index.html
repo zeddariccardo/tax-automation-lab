@@ -253,8 +253,8 @@ h2.page-title{font-weight:650;letter-spacing:-.025em;font-size:clamp(26px,3vw,34
 <div class="panel"><h2>Percorso guidato</h2><p>Il flusso principale è lineare. Budget, centri di costo e benchmark sono moduli facoltativi e non bloccano l’analisi del bilancio.</p><div class="checks-grid" id="dash-metrics" style="margin-top:15px"></div><div id="dash-next" style="margin-top:14px"></div><div class="optional-note" id="dash-optional" style="margin-top:14px"></div></div>
 </section>
 <section class="fs-view" id="view-import">
-<span class="step-label">Importa</span><h2 class="page-title">Carica il bilancio civilistico</h2><p class="page-lead">Il caricamento è identico a quello del Bilancio civilistico Tool: stessi fogli, stesse colonne, stessi codici e stessa convenzione dei segni.</p><div class="rule"></div>
-<div class="panel"><h2>1. Template comune</h2><p>Il file può essere utilizzato indifferentemente nei due tool. Non esiste un secondo template per la riclassificazione gestionale.</p><div class="btn-row"><button class="btn" onclick="downloadMainTemplate()">Scarica template Financial Statement</button></div></div>
+<span class="step-label">Importa</span><h2 class="page-title">Carica il bilancio civilistico</h2><p class="page-lead">Il file usa i fogli, le colonne, i codici e la convenzione dei segni del bilancio civilistico. I limiti di import di Analisi sono indicati di seguito.</p><div class="rule"></div>
+<div class="panel"><h2>1. Template di import</h2><p>Compila Anagrafica, Stato Patrimoniale e Conto Economico. Sono letti anche Budget e Forecast (solo CE), Catalogo centri, Allocazioni centri e Benchmark nei formati previsti. Le colonne non gestite sono dichiarate nel riepilogo.</p><p>Esiti AI valorizzato non è ancora reimportabile: manca il percorso di revisione e chiusura dei rilievi. I codici duplicati nella stessa sezione sono temporaneamente bloccati per evitare collisioni del mapping; il loro supporto richiede un intervento separato sull’identità delle righe.</p><div class="btn-row"><button class="btn" onclick="downloadMainTemplate()">Scarica template Financial Statement</button></div></div>
 <div class="panel"><h2>2. Carica il file compilato</h2><label class="upload-zone"><span class="upload-icon">↑</span><span><b>Seleziona il bilancio Excel</b><span>Fogli obbligatori: Stato Patrimoniale e Conto Economico</span><small>.xlsx o .xls · il file resta nel browser</small></span><input accept=".xlsx,.xls" onchange="importMain(event)" type="file"/></label><div class="btn-row"><button class="btn ghost" onclick="loadDemo()">Carica esempio dimostrativo</button><button class="btn danger" onclick="resetSession()">Nuova elaborazione</button></div></div>
 <div id="import-status"></div>
 <div class="panel"><h2>Controlli sul file</h2><p>Errori e avvisi sono distinti. Gli errori di mapping rendono incompleta l’analisi; gli avvisi richiedono una verifica professionale.</p><div id="diagnostics-list" style="margin-top:14px"></div></div>
@@ -441,7 +441,7 @@ html{scroll-padding-top:calc(var(--tal-global-header-height,60px) + 12px)}
   .appbar#sidebar.open .sb-close-mobile:focus-visible{outline:3px solid #fff;outline-offset:2px}
 }
 </style>
-<script src="/tools/financial-analysis/authoritative-app.js?v=20260902"></script>
+<script src="/tools/financial-analysis/authoritative-app.js?v=20260903-import"></script>
 <script src="/assets/tal-xlsx-guard.js?v=20260824b"></script>
 <script src="/assets/tal-focus-guard.js?v=20260824"></script>
 </body></html>

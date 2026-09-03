@@ -14,6 +14,7 @@ const BROWSER_TESTS = new Set([
   'financial-statement-golden.test.mjs',
   'financial-statement-import.test.mjs',
   'financial-statement-ui-polish.test.mjs',
+  'lipe-import-safety.test.mjs',
 ]);
 
 const IMPORT_PATTERNS = [

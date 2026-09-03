@@ -1550,6 +1550,127 @@ function sheetRows(ws){return XLSX.utils.sheet_to_json(ws,{header:1,defval:'',ra
 function findHeaderRow(data){const aliases=['codice iva','codice','tax code','codice imposta'];for(let i=0;i<Math.min(data.length,25);i++)if(data[i].some(v=>aliases.includes(norm(v))))return i;return -1}
 function objectRowsFromSheet(ws){const data=sheetRows(ws),hr=findHeaderRow(data);if(hr<0)return [];const headers=data[hr].map(norm);return data.slice(hr+1).map((r,idx)=>{const o={__row:hr+idx+2};headers.forEach((h,i)=>o[h]=r[i]);return o})}
 function findVal(o,...names){for(const n of names){const key=Object.keys(o).find(k=>k===norm(n));if(key!==undefined)return o[key]}return ''}
+/* Import: lettura delle celle originali e preparazione senza effetti su STATE/storage.
+   num(), pct(), calcoli VP e serializzatori fiscali conservano le loro regole. */
+function lipeImportNumber(value,label='Importo'){
+  const fail=reason=>{throw new Error(label+': '+reason+' (“'+String(value).slice(0,40)+'”).');};
+  if(typeof value==='number'){if(!Number.isFinite(value))fail('numero non finito');return value;}
+  if(value instanceof Date||typeof value==='boolean')fail('valore non numerico');
+  let s=String(value??'').trim();if(!s)return 0;
+  let sign=1;
+  if(/^\(.*\)$/.test(s)){sign=-1;s=s.slice(1,-1).trim();}
+  s=s.replace(/^[€$£]\s*|\s*[€$£]$/g,'');
+  if(/^[+-]/.test(s)){if(sign<0)fail('segno ambiguo');if(s[0]==='-')sign=-1;s=s.slice(1);}
+  if(/^\d{1,3}(?:[ '\u00a0]\d{3})+(?:[.,]\d+)?$/.test(s))s=s.replace(/[ '\u00a0]/g,'');
+  let normalized;
+  if(/^\d+$/.test(s))normalized=s;
+  else if(/^\d{1,3}(?:\.\d{3})+,\d+$/.test(s))normalized=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(?:,\d{3})+\.\d+$/.test(s))normalized=s.replace(/,/g,'');
+  else if(/^\d{1,3}(?:\.\d{3}){2,}$/.test(s))normalized=s.replace(/\./g,'');
+  else if(/^\d{1,3}(?:,\d{3}){2,}$/.test(s))normalized=s.replace(/,/g,'');
+  else if(/^\d+[.,]\d+$/.test(s)){
+    if(/^\d{1,3}[.,]\d{3}$/.test(s))fail('formato ambiguo: usare una cella numerica o un separatore decimale non ambiguo');
+    normalized=s.replace(',','.');
+  }else fail('valore non numerico o formato non valido');
+  const result=sign*Number(normalized);if(!Number.isFinite(result))fail('numero non finito');return result;
+}
+function lipeImportPercent(value,label){
+  if(value===undefined||value===null||String(value).trim()==='')return 100;
+  const n=lipeImportNumber(typeof value==='string'?value.trim().replace(/%$/,''):value,label);
+  if(n<0||n>100)throw new Error(label+': percentuale fuori intervallo, deve essere compresa tra 0 e 100.');return n;
+}
+function lipeImportLocation(name,r,c,field){return 'Foglio «'+name+'», riga '+(r+1)+', colonna '+XLSX.utils.encode_col(c)+' ('+XLSX.utils.encode_cell({r,c})+') · '+field;}
+function lipeImportCell(wb,name,r,c,field,kind='value'){
+  const empty=kind==='number'?0:kind==='percent'?100:'';
+  if(c===undefined||c<0)return empty;
+  const cell=wb.Sheets[name][XLSX.utils.encode_cell({r,c})],label=lipeImportLocation(name,r,c,field);
+  if(!cell)return empty;
+  if(cell.f&&(cell.v===undefined||cell.v===null||cell.t==='z'))throw new Error(label+': formula senza risultato salvato.');
+  const errors={0:'#NULL!',7:'#DIV/0!',15:'#VALUE!',23:'#REF!',29:'#NAME?',36:'#NUM!',42:'#N/A',43:'#GETTING_DATA'};
+  if(cell.t==='e'||/^#(?:DIV\/0!|N\/A|VALUE!|REF!|NUM!|NAME\?|NULL!|GETTING_DATA)$/.test(String(cell.v)))throw new Error(label+': errore Excel '+(errors[cell.v]||cell.w||cell.v)+'.');
+  const v=cell.v??'';
+  if(kind==='date')return lipeImportDate(v,label,!!wb.Workbook?.WBProps?.date1904);
+  if(kind==='identifier'&&typeof v==='number'){
+    if(!Number.isSafeInteger(v)||v<0)throw new Error(label+': identificativo numerico non valido.');
+    const displayed=String(cell.w??XLSX.utils.format_cell(cell)).trim();
+    return /^0\d+$/.test(displayed)&&Number(displayed)===v?displayed:String(v);
+  }
+  if(kind==='number'||kind==='percent'){
+    if(cell.t==='d'||(cell.z&&XLSX.SSF.is_date(cell.z)))throw new Error(label+': data al posto di un numero.');
+    const value=kind==='percent'&&typeof v==='number'&&/(^|[^\\])%/.test((cell.z||'').replace(/"[^"]*"/g,''))?v*100:v;
+    return kind==='percent'?lipeImportPercent(value,label):lipeImportNumber(value,label);
+  }
+  if(typeof v==='number'&&!Number.isFinite(v))throw new Error(label+': numero non finito.');
+  return v;
+}
+function lipeImportDate(value,label,date1904=false){
+  if(value===''||value===undefined||value===null)return '';
+  let year,month,day;
+  if(typeof value==='number'){
+    const d=XLSX.SSF.parse_date_code(value,{date1904});if(d)({y:year,m:month,d:day}=d);
+  }else if(value instanceof Date){year=value.getUTCFullYear();month=value.getUTCMonth()+1;day=value.getUTCDate();}
+  else{
+    const s=String(value).trim(),iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/),local=s.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/);
+    if(iso)[year,month,day]=iso.slice(1).map(Number);else if(local)[day,month,year]=local.slice(1).map(Number);
+  }
+  const d=new Date(Date.UTC(year,month-1,day));
+  if(!year||d.getUTCFullYear()!==year||d.getUTCMonth()+1!==month||d.getUTCDate()!==day)throw new Error(label+': data impossibile o non valida.');
+  return String(year).padStart(4,'0')+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+}
+function lipeImportGrid(wb,name){
+  const sheet=wb.Sheets[name],range=XLSX.utils.decode_range(sheet['!ref']||'A1'),rows=[];
+  for(let r=0;r<=range.e.r;r++){
+    const row=[];for(let c=0;c<=range.e.c;c++)row.push(sheet[XLSX.utils.encode_cell({r,c})]?.v??'');rows.push(row);
+  }
+  return rows;
+}
+function lipePrepareMappings(items){
+  const seen=new Map(),mapping=clone(state.configMapping);let added=0,updated=0;
+  for(const incoming of items){
+    const code=String(incoming.code??'').trim().toUpperCase(),source=incoming.__source||'riga '+(seen.size+1);
+    if(!code)throw new Error(source+': Codice IVA mancante.');
+    if(seen.has(code))throw new Error('Codice IVA duplicato '+code+': '+seen.get(code)+' e '+source+'.');seen.set(code,source);
+    const {__source,...data}=incoming;
+    const clean={...data,code,basePct:lipeImportPercent(data.basePct,source+' · % imponibile'),duePct:lipeImportPercent(data.duePct,source+' · % IVA esigibile'),dedPct:lipeImportPercent(data.dedPct,source+' · % IVA detraibile')};
+    const old=mapping.find(m=>String(m.code).trim().toUpperCase()===code);
+    if(old){Object.assign(old,clean,{id:old.id});updated++;}else{mapping.push({...defaultMapping(code),...clean,id:uid()});added++;}
+  }
+  return {mapping,added,updated};
+}
+function lipeImportStorage(entries){
+  const planned=entries.map(([key,value])=>({key,next:JSON.stringify(value),before:localStorage.getItem(key)})),written=[];
+  try{for(const item of planned){localStorage.setItem(item.key,item.next);written.push(item);}}
+  catch(error){
+    for(const item of written.reverse()){if(item.before===null)localStorage.removeItem(item.key);else localStorage.setItem(item.key,item.before);}
+    throw new Error('Salvataggio locale non riuscito: import annullato. '+error.message);
+  }
+}
+function lipeImportWork(s){return {version:APP_VERSION,piva:s.activeClientKey,year:s.year,quarter:s.quarter,periodType:s.activeRecord?.client?.periodType||'',rows:clone(s.rows),manual:clone(s.manual),sourceFile:s.sourceFile,unknownDraft:clone(s.unknownDraft),importContext:clone(s.importContext||{piva:s.activeClientKey,year:Number(s.year),quarter:Number(s.quarter),periodType:s.activeRecord?.client?.periodType||''}),savedAt:new Date().toISOString()};}
+function lipeApplyMappingImport(client,mapping){
+  const p=client.piva,oldKey=state.loadedConfigKey,clients=getClients(),before=Object.keys(clients).length;
+  if(p&&!/^\d{11}$/.test(p))throw new Error('Partita IVA: occorrono 11 cifre; gli zeri assenti nel file non vengono ricostruiti.');
+  if(!client.denom.trim()||!p){Object.assign(state,{configClient:client,configMapping:mapping});syncConfigToFields();renderConfigMapping();toast('Codiciario importato. Completa denominazione e Partita IVA prima di salvare il cliente.');return;}
+  if(!xmlValidPiva(p)&&!confirm('La Partita IVA non supera il controllo formale. Vuoi salvarla comunque?'))return;
+  if(oldKey!==p&&clients[p]&&!confirm('Esiste già un cliente con questa Partita IVA. Vuoi sovrascriverlo?'))return;
+  if(!mapping.length&&!confirm('Il codiciario è vuoto. Vuoi salvare comunque il cliente?'))return;
+  const retainsWork=state.activeClientKey===oldKey||state.activeClientKey===p;
+  if(retainsWork&&state.rows.length&&state.activeRecord?.client.periodType!==client.periodType&&!confirm('La periodicità è cambiata. Vuoi mantenere i movimenti già caricati?'))return;
+  const rec={version:APP_VERSION,client:clone(client),mapping:clone(mapping),savedAt:new Date().toISOString()},next={...state,configClient:client,configMapping:mapping,loadedConfigKey:p,activeClientKey:p,activeRecord:clone(rec)};
+  clients[p]=rec;if(oldKey&&oldKey!==p)delete clients[oldKey];
+  const work=readStore(KEYS.work,{});let writeWork=false;
+  if(retainsWork){work[workKey(p)]=lipeImportWork(next);writeWork=true;}
+  else{
+    if(state.activeClientKey){work[workKey()]=lipeImportWork(state);writeWork=true;}
+    Object.assign(next,{rows:[],manual:{},sourceFile:'',importIssues:[],unknownDraft:{},periodMapping:{}});
+    const saved=work[workKey(p)];
+    if(saved)Object.assign(next,{rows:clone(saved.rows||[]),manual:clone(saved.manual||{}),sourceFile:saved.sourceFile||'',unknownDraft:clone(saved.unknownDraft||{}),importContext:clone(saved.importContext||{piva:saved.piva,year:saved.year,quarter:saved.quarter,periodType:saved.periodType})});
+  }
+  const entries=[[KEYS.clients,clients]];if(writeWork)entries.push([KEYS.work,work]);entries.push([KEYS.session,{piva:p,year:state.year,quarter:state.quarter}]);
+  lipeImportStorage(entries);
+  Object.assign(state,next);deriveImportIssues();syncConfigToFields();renderConfigMapping();renderSavedClients();renderProcessing();
+  if(window.lipeUpdateContext)lipeUpdateContext();
+  toast((Object.keys(clients).length>before?'Cliente creato dal file: ':'Cliente aggiornato dal file: ')+client.denom+' · '+mapping.length+' codici IVA. Ora puoi caricare gli importi del periodo.');
+}
 /* Il foglio degli esempi, e l'espressione con cui l'importatore lo salta.
    Vale per il template degli importi e per quello del codiciario: i due
    importatori cercano il foglio giusto per nome e, se non lo trovano,
@@ -1568,17 +1689,72 @@ function downloadMappingTemplate(){syncConfigFromFields();const wb=XLSX.utils.bo
   const codExamples=[{...defaultMapping('V22'),description:'Vendite IVA 22%',baseRow:'VP2',dueRow:'VP4'},{...defaultMapping('A22'),description:'Acquisti IVA 22%',baseRow:'VP3',dedRow:'VP5'},{...defaultMapping('RC22'),description:'Reverse charge 22%',baseRow:'VP3',dueRow:'VP4',dedRow:'VP5'},{...defaultMapping('FC'),description:'Fuori campo escluso'}];
   const asRow=m=>[m.code,m.description,m.baseRow,m.dueRow,m.dedRow,m.basePct,m.duePct,m.dedPct,m.note];
   const cod=[COD_HEAD,...state.configMapping.map(asRow)];const guide=[['Campo','Valori ammessi / significato'],['Imponibile →','vuoto, VP2 o VP3'],['IVA esigibile →','vuoto o VP4'],['IVA detraibile →','vuoto o VP5'],['Percentuali','0–100; se vuote il tool applica 100%'],['Codice escluso','lascia vuote tutte e tre le destinazioni'],['Foglio Codiciario','Esce con i codici già configurati per questo cliente. Se il cliente non ne ha, esce vuoto: le destinazioni VP le devi confermare tu, il tool non le indovina.'],['Foglio '+LIPE_EXAMPLE_SHEET,'Quattro mappature di esempio (V22, A22, RC22, FC). Il tool non le legge: se le vuoi, copiale nel foglio Codiciario e verificale una per una.']];const ws1=XLSX.utils.aoa_to_sheet(ana),ws2=XLSX.utils.aoa_to_sheet(cod),ws3=XLSX.utils.aoa_to_sheet(guide);const ws4=XLSX.utils.aoa_to_sheet([['ESEMPI — NON IMPORTATI. Mappature plausibili ma non confermate per questo cliente. Il tool legge il foglio Codiciario.'],COD_HEAD,...codExamples.map(asRow)]);ws1['!cols']=[{wch:28},{wch:42}];ws2['!cols']=[{wch:15},{wch:32},{wch:16},{wch:18},{wch:19},{wch:15},{wch:18},{wch:19},{wch:28}];ws3['!cols']=[{wch:24},{wch:58}];ws4['!cols']=ws2['!cols'];ws1['!freeze']={xSplit:0,ySplit:1};ws2['!freeze']={xSplit:0,ySplit:1};ws2['!autofilter']={ref:'A1:I1'};ws3['!freeze']={xSplit:0,ySplit:1};ws4['!freeze']={xSplit:0,ySplit:2};XLSX.utils.book_append_sheet(wb,ws1,'Anagrafica');XLSX.utils.book_append_sheet(wb,ws2,'Codiciario');XLSX.utils.book_append_sheet(wb,ws3,'Istruzioni');XLSX.utils.book_append_sheet(wb,ws4,LIPE_EXAMPLE_SHEET);XLSX.writeFile(wb,`LIPE_Codiciario_${clientKey()||'nuovo_cliente'}.xlsx`)}
-async function importMappingExcel(file){if(!file)return;if(!/\.xlsx?$/i.test(file.name)){toast('Carica un file XLSX o XLS.',true);return}try{const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});const anaName=wb.SheetNames.find(n=>norm(n).includes('anagrafica'));if(anaName){const data=sheetRows(wb.Sheets[anaName]);const obj={};data.slice(1).forEach(r=>{if(r[0])obj[norm(r[0])]=r[1]});state.configClient={...state.configClient,denom:String(obj['denominazione']||state.configClient.denom),piva:String(obj['partita iva']||state.configClient.piva).replace(/\D/g,''),cf:String(obj['codice fiscale']||state.configClient.cf),periodType:norm(obj['periodicita']).startsWith('trimestr')?'T':(obj['periodicita']? 'M':state.configClient.periodType),repCf:String(obj['cf dichiarante']||state.configClient.repCf),repRole:String(obj['codice carica']||state.configClient.repRole),interCf:String(obj['cf intermediario']||state.configClient.interCf),groupVat:String(obj['p iva controllante']||state.configClient.groupVat).replace(/\D/g,''),declCompanyCf:String(obj['cf societa dichiarante']||state.configClient.declCompanyCf).toUpperCase(),lastMonth:String(obj['ultimo mese gruppo']||state.configClient.lastMonth),groupLiquidation:/^(1|si|sì|true)$/i.test(String(obj['liquidazione del gruppo']||''))?'1':state.configClient.groupLiquidation,commitment:String(obj['impegno presentazione']||state.configClient.commitment),commitmentDate:String(obj['data impegno']||state.configClient.commitmentDate),softwareId:String(obj['identificativo produttore software']||state.configClient.softwareId).toUpperCase(),notes:String(obj['note']||state.configClient.notes)};syncConfigToFields()}const usableSheets=wb.SheetNames.filter(n=>!LIPE_EXAMPLE_RE.test(n));const codName=usableSheets.find(n=>norm(n).includes('codiciario'))||usableSheets.find(n=>findHeaderRow(sheetRows(wb.Sheets[n]))>=0);if(!codName)throw new Error('Foglio Codiciario non trovato');const rows=objectRowsFromSheet(wb.Sheets[codName]).map(o=>({...defaultMapping(),code:String(findVal(o,'Codice IVA','Codice')||'').trim().toUpperCase(),description:String(findVal(o,'Descrizione')||''),baseRow:routeValue(findVal(o,'Imponibile'),['VP2','VP3']),dueRow:routeValue(findVal(o,'IVA esigibile'),['VP4']),dedRow:routeValue(findVal(o,'IVA detraibile'),['VP5']),basePct:pct(findVal(o,'% imponibile')),duePct:pct(findVal(o,'% IVA esigibile','% esigibile')),dedPct:pct(findVal(o,'% IVA detraibile','% detraibile')),note:String(findVal(o,'Note')||'')})).filter(x=>x.code);mergeMappings(rows);
-  /* Foglio «Esiti AI»: dubbi, assunzioni e fonti scritti dall'AI. Questo tool
-     non conteneva nemmeno la stringa «Esiti AI» nel percorso d'importazione,
-     quindi i dati passavano e l'avviso si perdeva (TAL-P1-02). Ora resta sul
-     record del cliente, che è già persistito, e le eccezioni bloccanti
-     fermano la generazione dell'XML in buildXml. */
-  const ai=window.TAL_AI?window.TAL_AI.read(wb,XLSX):[];
-  state.configClient.aiFindings=ai;
-  const sum=window.TAL_AI?window.TAL_AI.summarize(ai):{open:0,blocking:0};
-  if(sum.open)toast(sum.open+(sum.open===1?' eccezione segnalata dall’AI':' eccezioni segnalate dall’AI')+' nel foglio «Esiti AI»'+(sum.blocking?', di cui '+sum.blocking+(sum.blocking===1?' bloccante: l’XML resta chiuso finché non è risolta.':' bloccanti: l’XML resta chiuso finché non sono risolte.'):'. Verificale prima di elaborare.'),true)
-  }catch(e){console.error(e);toast('Importazione codiciario non riuscita: '+e.message,true)}}
+function lipeReadMappingWorkbook(wb){
+  const client=clone(state.configClient),anaName=wb.SheetNames.find(n=>norm(n).includes('anagrafica'));
+  if(anaName){
+    const fields={'denominazione':'denom','partita iva':'piva','codice fiscale':'cf','periodicita':'periodType','cf dichiarante':'repCf','codice carica':'repRole','cf intermediario':'interCf','p iva controllante':'groupVat','cf societa dichiarante':'declCompanyCf','ultimo mese gruppo':'lastMonth','liquidazione del gruppo':'groupLiquidation','impegno presentazione':'commitment','data impegno':'commitmentDate','identificativo produttore software':'softwareId','note':'notes'};
+    const seen=new Map();
+    lipeImportGrid(wb,anaName).forEach((row,r)=>{
+      const key=norm(row[0]),field=fields[key];if(!field)return;
+      const label=lipeImportLocation(anaName,r,1,String(row[0]));
+      let value=lipeImportCell(wb,anaName,r,1,String(row[0]),field==='commitmentDate'?'date':['piva','cf','repCf','repRole','interCf','groupVat','declCompanyCf','lastMonth','commitment','softwareId'].includes(field)?'identifier':'value');
+      if(value===''||value===undefined||value===null)return;
+      value=String(value).trim();
+      if(['piva','groupVat'].includes(field)&&!/^\d{11}$/.test(value))throw new Error(label+': occorrono 11 cifre; gli zeri assenti nel file non vengono ricostruiti.');
+      if(field==='periodType'){
+        const periodicity=norm(value);if(!['m','mensile','t','trimestrale'].includes(periodicity))throw new Error(label+': periodicità non riconosciuta.');
+        value=['t','trimestrale'].includes(periodicity)?'T':'M';
+      }
+      if(field==='groupLiquidation'){
+        if(!/^(1|0|si|sì|no|true|false)$/i.test(value))throw new Error(label+': valore non riconosciuto.');
+        value=/^(1|si|sì|true)$/i.test(value)?'1':'';
+      }
+      if(['cf','repCf','interCf','declCompanyCf','softwareId'].includes(field))value=value.toUpperCase();
+      if(seen.has(field)&&seen.get(field).value!==value)throw new Error(label+': campo duplicato discordante con '+seen.get(field).source+'.');
+      seen.set(field,{value,source:label});client[field]=value;
+    });
+  }
+  const usable=wb.SheetNames.filter(n=>!LIPE_EXAMPLE_RE.test(n));
+  const name=usable.find(n=>norm(n).includes('codiciario'))||usable.find(n=>findHeaderRow(lipeImportGrid(wb,n))>=0);
+  if(!name)throw new Error('Foglio Codiciario non trovato.');
+  const rows=lipeImportGrid(wb,name),h=findHeaderRow(rows);if(h<0)throw new Error('Foglio «'+name+'»: intestazione Codice IVA non trovata.');
+  const columns={},labels={code:'Codice IVA',description:'Descrizione',baseRow:'Imponibile →',dueRow:'IVA esigibile →',dedRow:'IVA detraibile →',basePct:'% imponibile',duePct:'% IVA esigibile',dedPct:'% IVA detraibile',note:'Note'};
+  rows[h].forEach((raw,c)=>{
+    const s=String(lipeImportCell(wb,name,h,c,'Intestazione')),n=norm(s),isPct=/^\s*%/.test(s);
+    const key=['codice iva','codice','tax code','codice imposta'].includes(n)?'code':/descriz/.test(n)?'description':/imponibile/.test(n)?(isPct?'basePct':'baseRow'):/esigibile/.test(n)?(isPct?'duePct':'dueRow'):/detraibile/.test(n)?(isPct?'dedPct':'dedRow'):/^note$/.test(n)?'note':null;
+    if(!key)return;
+    if(columns[key]!==undefined)throw new Error(lipeImportLocation(name,h,c,labels[key])+': intestazione duplicata con '+XLSX.utils.encode_cell({r:h,c:columns[key]})+'.');
+    columns[key]=c;
+  });
+  const items=[];
+  for(let r=h+1;r<rows.length;r++){
+    // Controlla anche errori/formule in celle che sheet_to_json scarterebbe.
+    const values=rows[r].map((v,c)=>lipeImportCell(wb,name,r,c,labels[Object.keys(columns).find(k=>columns[k]===c)]||'Cella'));
+    if(!values.some(v=>String(v??'').trim()!==''))continue;
+    const get=(key,kind)=>lipeImportCell(wb,name,r,columns[key],labels[key],kind);
+    const code=String(get('code','identifier')).trim().toUpperCase(),source=lipeImportLocation(name,r,columns.code,'Codice IVA');
+    if(!code)throw new Error(source+': manca il codice in una riga valorizzata.');
+    const route=(key,allowed)=>{
+      const raw=String(get(key)||'').trim();if(!raw)return '';
+      const matches=raw.toUpperCase().match(/\bVP\d+\b/g)||[];
+      if(matches.length!==1||!allowed.includes(matches[0]))throw new Error(lipeImportLocation(name,r,columns[key],labels[key])+': destinazione non riconosciuta o ambigua.');
+      return matches[0];
+    };
+    items.push({...defaultMapping(code),code,description:String(get('description')),baseRow:route('baseRow',['VP2','VP3']),dueRow:route('dueRow',['VP4']),dedRow:route('dedRow',['VP5']),basePct:get('basePct','percent'),duePct:get('duePct','percent'),dedPct:get('dedPct','percent'),note:String(get('note')),__source:source});
+  }
+  const {mapping}=lipePrepareMappings(items);
+  // Esiti AI restano sul record e continuano ad alimentare il gate XML esistente.
+  client.aiFindings=window.TAL_AI?window.TAL_AI.read(wb,XLSX):[];
+  return {client,mapping,items};
+}
+async function importMappingExcel(file){
+  if(!file)return;if(!/\.xlsx?$/i.test(file.name)){toast('Carica un file XLSX o XLS.',true);return;}
+  if(file.size>25*1024*1024){toast('Il file supera 25 MB.',true);return;}
+  try{
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false,cellNF:true,cellText:true,sheetStubs:true});
+    const {client,mapping}=lipeReadMappingWorkbook(wb);lipeApplyMappingImport(client,mapping);
+  }catch(e){toast('Importazione codiciario non riuscita: '+e.message,true);}
+}
 
 function renderRunClientOptions(){const clients=getClients(),sel=$('run-client'),current=state.activeClientKey;sel.innerHTML='<option value="">Seleziona un cliente</option>'+Object.entries(clients).sort((a,b)=>(a[1].client?.denom||'').localeCompare(b[1].client?.denom||'')).map(([p,r])=>`<option value="${p}" ${p===current?'selected':''}>${esc(r.client?.denom||p)} · ${p}</option>`).join('')}
 function activateClient(p,clear=true){
@@ -2046,14 +2222,7 @@ const oldDefaultClient=defaultClient;
 defaultClient=function(){return {...oldDefaultClient(),quarterRegime:'ordinary'};};
 
 function strictNumber(v,label='Importo'){
-  if(typeof v==='number'){if(!Number.isFinite(v))throw new Error(label+' non numerico.');return v;}
-  if(v instanceof Date)throw new Error(label+' non numerico.');
-  let s=String(v??'').trim();if(!s)return 0;
-  if(/[A-Za-zÀ-ÿ]/.test(s))throw new Error(label+' contiene testo non ammesso: “'+s.slice(0,30)+'”.');
-  let neg=false;if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1).trim();}
-  s=s.replace(/[€$£\s']/g,'');
-  if(!/^[+-]?[0-9][0-9.,]*$/.test(s)||/[+-].*[+-]/.test(s)||/[+-]/.test(s.slice(1)))throw new Error(label+' non valido: “'+String(v).slice(0,30)+'”.');
-  const n=num((neg?'-':'')+s);if(!Number.isFinite(n))throw new Error(label+' non valido.');return n;
+  return lipeImportNumber(v,label);
 }
 function strictPercent(v,label){if(v===''||v===null||v===undefined)return 100;const n=strictNumber(v,label);if(n<0||n>100)throw new Error(label+' deve essere compresa tra 0 e 100.');return n;}
 pct=function(v){if(v===''||v===null||v===undefined)return 100;const n=num(v);return Number.isFinite(n)?n:0;};
@@ -2073,9 +2242,7 @@ function parsePeriod(v,row){
 monthNumber=function(v){try{return parsePeriod(v,'?');}catch{return 0;}};
 
 mergeMappings=function(items){
-  const seen=new Set(),dups=[];for(const i of items){const c=String(i.code||'').trim().toUpperCase();if(!c)continue;if(seen.has(c))dups.push(c);seen.add(c);}
-  if(dups.length){toast('Import annullato: codici IVA duplicati nel file ('+[...new Set(dups)].slice(0,8).join(', ')+').',true);return;}
-  let added=0,updated=0;for(const incoming of items){const code=String(incoming.code||'').trim().toUpperCase();if(!code)continue;const clean={...incoming,basePct:strictPercent(incoming.basePct,'% imponibile '+code),duePct:strictPercent(incoming.duePct,'% esigibile '+code),dedPct:strictPercent(incoming.dedPct,'% detraibile '+code)};const old=state.configMapping.find(m=>m.code===code);if(old){Object.assign(old,clean,{id:old.id,code});updated++;}else{state.configMapping.push({...defaultMapping(code),...clean,id:uid(),code});added++;}}
+  const {mapping,added,updated}=lipePrepareMappings(items);state.configMapping=mapping;
   renderConfigMapping();toast('Codiciario aggiornato: '+added+' nuovi, '+updated+' aggiornati.');
 };
 
@@ -2084,27 +2251,43 @@ parseGridText=function(text,type){
   const split=line=>line.includes('\t')?line.split('\t'):line.split(';'),cells=lines.map(split),first=cells[0].map(norm),codeAliases=['codice iva','codice','tax code','codice imposta'],hasHeader=first.some(x=>codeAliases.includes(x)),headers=hasHeader?first:[],rows=hasHeader?cells.slice(1):cells;
   const exactIndex=(aliases,label,required=false)=>{const matches=[];headers.forEach((h,i)=>{if(aliases.map(norm).includes(h))matches.push(i);});const unique=[...new Set(matches)];if(unique.length>1)throw new Error('Colonna '+label+' ambigua.');if(required&&!unique.length)throw new Error('Colonna '+label+' non riconosciuta.');return unique[0]??-1;};
   if(type==='mapping'){
-    const ix=(...names)=>exactIndex(names,names[0],false);
-    return rows.map((r,ri)=>{const val=(fallback,...names)=>{const i=ix(...names);return i>=0?r[i]:r[fallback];};const code=String(val(0,'Codice IVA','Codice')||'').trim().toUpperCase();return {...defaultMapping(),code,description:String(val(1,'Descrizione')||''),baseRow:routeValue(val(2,'Imponibile','Imponibile →'),['VP2','VP3']),dueRow:routeValue(val(3,'IVA esigibile','IVA esigibile →'),['VP4']),dedRow:routeValue(val(4,'IVA detraibile','IVA detraibile →'),['VP5']),basePct:strictPercent(val(5,'% imponibile'),'Riga '+(ri+(hasHeader?2:1))+' · % imponibile'),duePct:strictPercent(val(6,'% esigibile','% IVA esigibile'),'Riga '+(ri+(hasHeader?2:1))+' · % esigibile'),dedPct:strictPercent(val(7,'% detraibile','% IVA detraibile'),'Riga '+(ri+(hasHeader?2:1))+' · % detraibile'),note:String(val(8,'Note')||'')};}).filter(x=>x.code);
+    const wb=XLSX.utils.book_new(),head=['Codice IVA','Descrizione','Imponibile →','IVA esigibile →','IVA detraibile →','% imponibile','% IVA esigibile','% IVA detraibile','Note'];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(hasHeader?cells:[head,...cells]),'Dati incollati');
+    return lipeReadMappingWorkbook(wb).items;
   }
   const aliases={code:['Codice IVA','Codice','Tax code','Codice imposta'],taxable:['Imponibile','Base imponibile','Importo imponibile'],vat:['IVA','Imposta','Importo IVA','Importo imposta','IVA esigibile','IVA detraibile'],month:['Mese','Periodo','Data','Data periodo']};
   const idx=hasHeader?{code:exactIndex(aliases.code,'Codice IVA',true),taxable:exactIndex(aliases.taxable,'Imponibile',true),vat:exactIndex(aliases.vat,'IVA',true),month:exactIndex(aliases.month,'Mese/periodo',state.activeRecord?.client?.periodType==='M')}:{code:0,taxable:1,vat:2,month:3};
-  return rows.map((r,i)=>{const row=i+(hasHeader?2:1);return {id:uid(),code:String(r[idx.code]||'').trim().toUpperCase(),taxable:strictNumber(r[idx.taxable],'Riga '+row+' · imponibile'),vat:strictNumber(r[idx.vat],'Riga '+row+' · IVA'),month:idx.month>=0?parsePeriod(r[idx.month],row):0,sourceRow:row,source:'Dati incollati'};}).filter(x=>x.code);
+  return rows.map((r,i)=>{const row=i+(hasHeader?2:1);if(!String(r[idx.code]??'').trim())throw new Error('Dati incollati, riga '+row+', colonna '+(idx.code+1)+': Codice IVA mancante in una riga valorizzata.');return {id:uid(),code:String(r[idx.code]??'').trim().toUpperCase(),taxable:strictNumber(r[idx.taxable],'Riga '+row+' · imponibile'),vat:strictNumber(r[idx.vat],'Riga '+row+' · IVA'),month:idx.month>=0?parsePeriod(r[idx.month],row):0,sourceRow:row,source:'Dati incollati'};}).filter(x=>x.code);
 };
 
 importAmountsExcel=async function(file){
   if(!file)return;if(!state.activeRecord){toast('Seleziona prima un cliente configurato.',true);return;}if(!/\.xlsx?$/i.test(file.name)){toast('Carica un file XLSX o XLS.',true);return;}if(file.size>25*1024*1024){toast('Il file supera 25 MB.',true);return;}
-  try{const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+  try{const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false,cellNF:true,cellText:true,sheetStubs:true});
     /* I fogli di esempio sono fuori da entrambe le ricerche, non solo dalla
        prima: era il ripiego «primo foglio con un'intestazione valida» a
        raccogliere le righe dimostrative quando il foglio Importi mancava. */
     const usable=wb.SheetNames.filter(n=>!LIPE_EXAMPLE_RE.test(n));
     if(!usable.length)throw new Error('il file contiene solo fogli di esempio. Compila il foglio Importi con i movimenti del cliente.');
-    const name=usable.find(n=>norm(n).includes('import'))||usable.find(n=>findHeaderRow(sheetRows(wb.Sheets[n]))>=0);if(!name)throw new Error('Intestazione Codice IVA non trovata');const data=sheetRows(wb.Sheets[name]),hr=findHeaderRow(data);if(hr<0)throw new Error('Intestazione Codice IVA non trovata');
+    const name=usable.find(n=>norm(n).includes('import'))||usable.find(n=>findHeaderRow(lipeImportGrid(wb,n))>=0);if(!name)throw new Error('Intestazione Codice IVA non trovata');const data=lipeImportGrid(wb,name),hr=findHeaderRow(data);if(hr<0)throw new Error('Intestazione Codice IVA non trovata');
     const headers=data[hr].map(norm),aliases={code:['codice iva','codice','tax code','codice imposta'],taxable:['imponibile','base imponibile','importo imponibile'],vat:['iva','imposta','importo iva','importo imposta','iva esigibile','iva detraibile'],month:['mese','periodo','data','data periodo']};
     const idx=(field,label,required=true)=>{const matches=[];headers.forEach((h,i)=>{if(aliases[field].includes(h))matches.push(i);});const unique=[...new Set(matches)];if(unique.length>1)throw new Error('Colonna '+label+' ambigua.');if(required&&!unique.length)throw new Error('Colonna '+label+' non riconosciuta.');return unique[0]??-1;};
     const ci=idx('code','Codice IVA'),ti=idx('taxable','Imponibile'),vi=idx('vat','IVA'),mi=idx('month','Mese/periodo',state.activeRecord.client.periodType==='M');
-    const rows=data.slice(hr+1).map((r,i)=>{const row=hr+i+2;return {id:uid(),code:String(r[ci]||'').trim().toUpperCase(),taxable:strictNumber(r[ti],'Riga '+row+' · imponibile'),vat:strictNumber(r[vi],'Riga '+row+' · IVA'),month:mi>=0?parsePeriod(r[mi],row):0,sourceRow:row,source:file.name+' · riga '+row};}).filter(x=>x.code);
+    const rows=[];
+    for(let r=hr+1;r<data.length;r++){
+      const labels={[ci]:'Codice IVA',[ti]:'Imponibile',[vi]:'IVA',[mi]:'Mese/periodo'};
+      const values=data[r].map((v,c)=>lipeImportCell(wb,name,r,c,labels[c]||'Cella'));
+      if(!values.some(v=>String(v??'').trim()!==''))continue;
+      const code=String(lipeImportCell(wb,name,r,ci,'Codice IVA','identifier')).trim().toUpperCase();
+      if(!code)throw new Error(lipeImportLocation(name,r,ci,'Codice IVA')+': manca il codice in una riga valorizzata.');
+      const taxable=lipeImportCell(wb,name,r,ti,'Imponibile','number'),vat=lipeImportCell(wb,name,r,vi,'IVA','number');
+      let period=lipeImportCell(wb,name,r,mi,'Mese/periodo'),month=0;
+      if(mi>=0){
+        const cell=wb.Sheets[name][XLSX.utils.encode_cell({r,c:mi})];
+        if(cell?.z&&XLSX.SSF.is_date(cell.z))period=lipeImportCell(wb,name,r,mi,'Mese/periodo','date');
+        try{month=parsePeriod(period,r+1);}catch(e){throw new Error(lipeImportLocation(name,r,mi,'Mese/periodo')+': '+e.message);}
+      }
+      rows.push({id:uid(),code,taxable,vat,month,sourceRow:r+1,source:file.name+' · riga '+(r+1)});
+    }
     if(!rows.length)throw new Error('nessun movimento da importare: il foglio Importi è vuoto. Compilalo con i dati del cliente.');
     /* Le quattro righe dimostrative del template restano riconoscibili anche
        se qualcuno le ricopia a mano nel foglio Importi. Il confronto è su
@@ -2116,7 +2299,7 @@ importAmountsExcel=async function(file){
     if(dropped)toast(dropped===1?'Una riga di esempio del template è stata esclusa: non è un movimento del cliente.':dropped+' righe di esempio del template sono state escluse: non sono movimenti del cliente.',true);
     if(!clean.length)throw new Error('il foglio conteneva solo le righe di esempio del template. Sostituiscile con i movimenti del cliente.');
     setPeriodRows(clean,file.name);
-  }catch(e){console.error(e);toast('Importazione importi non riuscita: '+e.message,true);}
+  }catch(e){toast('Importazione importi non riuscita: '+e.message,true);}
 };
 
 function contextNow(){return {piva:state.activeClientKey,year:Number(state.year),quarter:Number(state.quarter),periodType:state.activeRecord?.client?.periodType||''};}
@@ -2126,7 +2309,9 @@ setPeriodRows=function(rows,source){const hadManual=Object.values(state.manual||
    aggiunge, e senza il numero di partenza non si vede che si stanno buttando
    via righe già caricate. */
 const before=(state.rows||[]).length;
-state.rows=rows;state.manual={};state.sourceFile=source;state.unknownDraft={};state.importContext=contextNow();deriveImportIssues();persistWork(false);renderProcessing();toast('Movimenti: '+(before?before+' → ':'')+rows.length+'. Letti da '+source+'. Confrontali con i registri IVA di partenza.'+(hadManual?' I valori manuali precedenti sono stati azzerati per evitare riporti non tracciati.':''));};
+const next={...state,rows,manual:{},sourceFile:source,unknownDraft:{},importContext:contextNow()};
+const key=workKey();if(key){const all=readStore(KEYS.work,{});all[key]=lipeImportWork(next);lipeImportStorage([[KEYS.work,all]]);}
+Object.assign(state,next);deriveImportIssues();renderProcessing();toast('Movimenti: '+(before?before+' → ':'')+rows.length+'. Letti da '+source+'. Confrontali con i registri IVA di partenza.'+(hadManual?' I valori manuali precedenti sono stati azzerati per evitare riporti non tracciati.':''));};
 persistWork=function(quiet=true){const key=workKey();if(!key)return false;const all=readStore(KEYS.work,{});all[key]={version:PATCH_VERSION,piva:state.activeClientKey,year:state.year,quarter:state.quarter,periodType:state.activeRecord?.client?.periodType||'',rows:clone(state.rows),manual:clone(state.manual),sourceFile:state.sourceFile,unknownDraft:clone(state.unknownDraft),importContext:clone(state.importContext||contextNow()),savedAt:new Date().toISOString()};return writeStore(KEYS.work,all,quiet);};
 restoreWorkForCurrent=function(){const rec=readStore(KEYS.work,{})[workKey()];if(!rec)return false;state.rows=clone(rec.rows||[]);state.manual=clone(rec.manual||{});state.sourceFile=rec.sourceFile||'';state.unknownDraft=clone(rec.unknownDraft||{});state.importContext=clone(rec.importContext||{piva:rec.piva,year:rec.year,quarter:rec.quarter,periodType:rec.periodType});deriveImportIssues();return true;};
 syncRunFields=function(){const nextYear=num($id('run-year').value)||new Date().getFullYear(),nextQuarter=num($id('run-quarter').value)||1,changed=nextYear!==state.year||nextQuarter!==state.quarter;if(!changed)return;persistWork(true);state.year=nextYear;state.quarter=nextQuarter;state.rows=[];state.manual={};state.sourceFile='';state.importIssues=[];state.unknownDraft={};state.importContext=null;restoreWorkForCurrent();deriveImportIssues();persistSession();renderProcessing();toast('Periodo cambiato: è stata aperta la lavorazione separata del '+state.year+' Q'+state.quarter+'.');};
@@ -3509,96 +3694,7 @@ if(navBtn2)navBtn2.addEventListener('click',goToImportAmounts);
        colonne percentuale prima di normalizzare, guardando se l'intestazione
        comincia per «%». Le intestazioni del template restano quelle: i file
        già prodotti dall'AI continuano a funzionare. */
-function normHead(v){
-  return String(v==null?'':v).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-}
-function codiciarioRows(sheet){
-  var rows=sheetRows(sheet), h=findHeaderRow(rows);
-  if(h<0)return null;
-  var head=rows[h]||[], col={};
-  head.forEach(function(raw,i){
-    var s=String(raw==null?'':raw);
-    var isPct=/^\s*%/.test(s);
-    var n=normHead(s);
-    var name=null;
-    if(/codice/.test(n))name='code';
-    else if(/descriz/.test(n))name='description';
-    else if(/imponibile/.test(n))name=isPct?'basePct':'baseRow';
-    else if(/esigibile/.test(n))name=isPct?'duePct':'dueRow';
-    else if(/detraibile/.test(n))name=isPct?'dedPct':'dedRow';
-    else if(/note/.test(n))name='note';
-    if(name&&col[name]===undefined)col[name]=i;
-  });
-  if(col.code===undefined)return null;
-  var out=[];
-  for(var r=h+1;r<rows.length;r++){
-    var row=rows[r]||[];
-    var code=String(row[col.code]==null?'':row[col.code]).trim().toUpperCase();
-    if(!code)continue;
-    var cell=function(k){return col[k]===undefined?'':row[col[k]];};
-    out.push(Object.assign(defaultMapping(),{
-      code:code,
-      description:String(cell('description')||''),
-      baseRow:routeValue(cell('baseRow'),['VP2','VP3']),
-      dueRow:routeValue(cell('dueRow'),['VP4']),
-      dedRow:routeValue(cell('dedRow'),['VP5']),
-      basePct:pct(cell('basePct')),
-      duePct:pct(cell('duePct')),
-      dedPct:pct(cell('dedPct')),
-      note:String(cell('note')||'')
-    }));
-  }
-  return out.length?out:null;
-}
-
-/* 2b. Un file, un cliente. `importMappingExcel` riempiva i campi e si fermava
-      lì: il cliente restava inesistente finché qualcuno non premeva Salva,
-      e senza cliente non si può caricare nessun importo. Ora, se il foglio
-      Anagrafica porta denominazione e P.IVA valida, la configurazione viene
-      salvata e resa attiva nello stesso gesto. */
-var baseImport=window.importMappingExcel;
-if(typeof baseImport==='function'){
-  window.importMappingExcel=async function(file){
-    var before=(window.getClients?Object.keys(getClients()).length:0);
-    await baseImport.apply(this,arguments);
-
-    /* Seconda passata sul codiciario, per indice di colonna. `mergeMappings`
-       aggiorna i codici che già ci sono, quindi le destinazioni corrette
-       prendono il posto di quelle perse dalla prima lettura. */
-    try{
-      if(file){
-        var wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
-        var name=wb.SheetNames.filter(function(n){return normHead(n).indexOf('codiciario')>=0;})[0];
-        if(!name)name=wb.SheetNames.filter(function(n){return findHeaderRow(sheetRows(wb.Sheets[n]))>=0;})[0];
-        var fixed=name&&codiciarioRows(wb.Sheets[name]);
-        if(fixed)mergeMappings(fixed);
-      }
-    }catch(e){ console.error('rilettura codiciario',e); }
-
-    var denom=(el('cfg-denom')||{}).value||'';
-    var piva=String((el('cfg-piva')||{}).value||'').replace(/\D/g,'');
-    if(!denom.trim()||piva.length!==11)return;      /* file parziale: resta da completare a mano */
-    if(typeof window.saveClient!=='function')return;
-    window.saveClient();
-    var clients=window.getClients?getClients():{};
-    if(!clients[piva])return;                        /* il salvataggio si è fermato: non fingere */
-    if(typeof window.activateClient==='function'){
-      var sel=el('run-client'); if(sel)sel.value=piva;
-      window.activateClient(piva);
-    }
-    /* La sidebar tiene il contesto e non si aggiorna da sola su questa
-       strada: senza, restava «Nessun cliente» con un cliente attivo. */
-    if(typeof window.lipeUpdateContext==='function')lipeUpdateContext();
-    var codes=(clients[piva].mapping||[]).length;
-    if(window.toast)toast(
-      (Object.keys(clients).length>before?'Cliente creato dal file: ':'Cliente aggiornato dal file: ')+
-      denom+' · '+codes+(codes===1?' codice IVA':' codici IVA')+'. Ora puoi caricare gli importi del periodo.');
-  };
-  /* Nessun ricablaggio del campo file: `initEvents` gira dopo questo blocco e
-     chiama l'identificatore globale, che ora è l'involucro. Riagganciarlo
-     qui produrrebbe solo due gestori per lo stesso clic. */
-}
+/* Lettura unica e applicazione atomica in importMappingExcel. */
 
 /* 3. Il template degli importi si rifiutava e basta. Serve davvero un
       cliente — mesi e periodicità vengono da lì — ma «Seleziona prima un

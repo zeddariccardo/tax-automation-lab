@@ -413,3 +413,145 @@ test('F24: download template, compilazione Beta fittizia, import, revisione e PD
   assert.equal(result.pdfFiles,1); assert.equal(result.zipPdfHeader,'%PDF-');
   assert.match(result.csv,/6840,25/);
 }));
+
+
+// Regressioni della compilazione manuale: nessuna modifica al parser Excel.
+async function seedF24Editor(page, section = 'Erario', extra = {}) {
+  await page.evaluate(({section,extra}) => {
+    state.demo=true;
+    state.clients=[{id:'manual-client',name:'CONTRIBUENTE FITTIZIO',cf:'20202020200',
+      address:'VIA DI PROVA 1',city:'MILANO',province:'MI',iban:'IT60X0542811101000000123456'}];
+    state.selectedClientId='manual-client';state.mode='single';state.workView='table';
+    state.rows=[upgradeRow({id:'manual-row',clientId:'manual-client',flow:'1',section,
+      paymentDate:'2026-09-16',year:'2026',taxCode:'1001',debit:100,credit:0,...extra})];
+    touchState();state.activeGroup=groupF24()[0]?.key || '';goStage('editor');renderAll();
+  },{section,extra});
+}
+
+const manualSections = [
+  {section:'Erario',taxCode:'1001',fields:{rdTaxOfficeCode:'ABC',rdActCode:'00000000001',rdCertificationNo:'CERT_TEST'},
+    expected:{taxOfficeCode:'ABC',actCode:'00000000001',certificationNo:'CERT_TEST'}},
+  {section:'INPS',taxCode:'DM10',fields:{rdOfficeCode:'1234',rdReference:'1234567890',rdPeriodFrom:'08/2026',rdPeriodTo:'08/2026'},
+    expected:{officeCode:'1234',reference:'1234567890',periodFrom:'08/2026',periodTo:'08/2026'}},
+  {section:'Regioni',taxCode:'3802',fields:{rdOfficeCode:'03'},expected:{officeCode:'03'},officeLabel:'Codice regione'},
+  {section:'IMU e altri tributi locali',taxCode:'3918',fields:{rdOfficeCode:'H501',rdNumImmobili:'2',rdDetrazione:'10,00',rdOperationId:'000001'},
+    expected:{officeCode:'H501',numImmobili:'2',detrazione:10,operationId:'000001'},officeLabel:'Codice ente / Comune'},
+  {section:'INAIL',taxCode:'P',fields:{rdOfficeCode:'12500',rdReference:'902026',rdInailCompanyCode:'76543210',rdInailCc:'04'},
+    expected:{officeCode:'12500',reference:'902026',inailCompanyCode:'76543210',inailCc:'04'}},
+  {section:'Altri enti previdenziali e assicurativi',taxCode:'CXX',fields:{rdOfficeCode:'00123',rdEntityCode:'0001',rdPositionCode:'000123456',rdPeriodFrom:'08/2026',rdPeriodTo:'08/2026'},
+    expected:{officeCode:'00123',entityCode:'0001',positionCode:'000123456',periodFrom:'08/2026',periodTo:'08/2026'}}
+];
+for(const scenario of manualSections) {
+  test('F24 modal: campi coerenti e gate validi per '+scenario.section,()=>withF24(async page=>{
+    await seedF24Editor(page,scenario.section,{taxCode:scenario.taxCode});
+    await page.locator('[data-action="open-row"][data-id="manual-row"]').click();
+    const expectedInputs=[...Object.keys(scenario.fields),'rdCoobligorCf','rdCoobligorCode','rdNote','rdNonCalendarYear'];
+    if(scenario.section.startsWith('IMU'))expectedInputs.push('rdRavv','rdImmVar','rdAcc','rdSaldo');
+    const inputs=await page.locator('#modalRowDetail input').evaluateAll(els=>els.filter(e=>e.type!=='hidden'&&e.getClientRects().length).map(e=>e.id));
+    assert.deepEqual(inputs.sort(),expectedInputs.sort(),'solo i campi pertinenti sono visibili');
+    const irrelevant=await page.locator('#modalRowDetail input').evaluateAll(els=>els.filter(e=>e.type!=='hidden'&&!e.getClientRects().length).map(e=>e.disabled));
+    assert.ok(irrelevant.every(Boolean),'campi non pertinenti disabilitati');
+    if(scenario.officeLabel)assert.equal(await page.locator('label[for="rdOfficeCode"]').textContent(),scenario.officeLabel);
+    for(const[id,value]of Object.entries(scenario.fields))await page.locator('#'+id).fill(value);
+    await page.locator('[data-action="save-row-detail"]').click();
+    const result=await page.evaluate(()=>({row:state.rows[0],issues:rowIssues(state.rows[0]),errors:blockingErrors(),
+      telematic:telematicGroupIssues(groupF24()[0],'personal',{})}));
+    for(const[key,value]of Object.entries(scenario.expected))assert.equal(result.row[key],value,key);
+    assert.deepEqual(result.issues,[]);assert.deepEqual(result.errors,[]);assert.deepEqual(result.telematic,[]);
+  }));
+}
+
+test('F24 modal: nessun fallback tra ufficio, regione/Comune ed ente previdenziale; campi nascosti preservati',()=>withF24(async page=>{
+  for(const[section,taxCode,office]of[['Regioni','3802','03'],['IMU e altri tributi locali','3918','H501']]){
+    await seedF24Editor(page,section,{taxCode,taxOfficeCode:'03',entityCode:'H501',reference:'NON MODIFICARE'});
+    assert.ok((await page.evaluate(()=>rowIssues(state.rows[0]))).some(x=>/Codice regione|Codice ente \/ Comune/.test(x)));
+    await page.evaluate(()=>openRowDetail('manual-row'));
+    await page.locator('#rdOfficeCode').fill(office);
+    // Un controllo fuori sezione non può cambiare il modello neppure se il DOM ha un valore residuo.
+    await page.evaluate(()=>{document.getElementById('rdTaxOfficeCode').value='DIVERSO';document.getElementById('rdEntityCode').value='DIVERSO';});
+    await page.locator('[data-action="save-row-detail"]').click();
+    assert.deepEqual(await page.evaluate(()=>[state.rows[0].officeCode,state.rows[0].taxOfficeCode,state.rows[0].entityCode,state.rows[0].reference,rowIssues(state.rows[0])]),
+      [office,'03','H501','NON MODIFICARE',[]]);
+  }
+  await page.evaluate(()=>{setRow('manual-row','section','INAIL');openRowDetail('manual-row');});
+  assert.equal(await page.locator('#rdReference').isEnabled(),true);
+  assert.equal(await page.locator('#rdInailCc').isVisible(),true);
+  assert.equal(await page.locator('#rdOperationId').isVisible(),false);
+}));
+
+for(const key of ['debit','credit']) {
+  test('F24 '+key+': negativo visibile, gate bloccati, correzione reale elimina il rilievo',()=>withF24(async page=>{
+    await seedF24Editor(page);
+    const input=page.locator('[data-action="row-money"][data-field="'+key+'"]').first();
+    await input.fill('-2.000,00');await input.press('Tab');
+    assert.equal(await input.inputValue(),'-2000','il segno non viene corretto silenziosamente');
+    const negative=await page.evaluate(key=>({value:state.rows[0][key],issues:rowIssues(state.rows[0]),
+      telematic:telematicGroupIssues(groupF24()[0],'personal',{}),importIssues:state.rows[0].importIssues}),key);
+    assert.equal(negative.value,-2000);assert.ok(negative.issues.some(x=>/negativo.*colonna corretta/.test(x)));
+    assert.ok(negative.telematic.some(x=>/negativo/.test(x)));
+    assert.deepEqual(negative.importIssues,[],'il segno corrente non è un errore di import storico');
+    await page.evaluate(()=>downloadF24Pdf(groupF24()[0].key));
+    assert.match(await page.locator('#toast').textContent(),/Correggi|errori/i,'PDF bloccato');
+    if(key==='debit'){
+      await input.fill('2.000,00');await input.press('Tab');
+    }else{
+      // Il credito deve passare nella colonna debito; non si indovina la direzione.
+      await input.fill('');await input.press('Tab');
+      const debit=page.locator('[data-action="row-money"][data-field="debit"]').first();
+      await debit.fill('2.000,00');await debit.press('Tab');
+    }
+    const corrected=await page.evaluate(()=>({debit:state.rows[0].debit,credit:state.rows[0].credit,
+      issues:rowIssues(state.rows[0]),errors:blockingErrors(),importIssues:state.rows[0].importIssues,
+      telematic:telematicGroupIssues(groupF24()[0],'personal',{})}));
+    assert.deepEqual(corrected,{debit:2000,credit:0,issues:[],errors:[],importIssues:[],telematic:[]});
+    const downloaded=page.waitForEvent('download');await page.evaluate(()=>downloadF24Pdf(groupF24()[0].key));
+    assert.match((await downloaded).suggestedFilename(),/\.pdf$/);
+  }));
+}
+
+test('F24: correggere il debito rimuove solo le sue issue pregresse anche con valore mostrato identico',()=>withF24(async page=>{
+  const other=['Importo a credito negativo nel file: indica un valore positivo nella colonna corretta',
+    'Detrazione non interpretabile nel file: «abc»','Sezione mancante o non riconosciuta'];
+  await seedF24Editor(page,'Erario',{debit:2000,importIssues:['Importo debito negativo',...other]});
+  const input=page.locator('[data-action="row-money"][data-field="debit"]').first();
+  await input.focus();await input.press('Tab');
+  assert.equal((await page.evaluate(()=>state.rows[0].importIssues)).length,4,'il solo focus non corregge il dato');
+  await input.fill('2000');await input.press('Tab');
+  assert.deepEqual(await page.evaluate(()=>state.rows[0].importIssues),other);
+}));
+
+test('F24 modello compilabile: segno e correzione hanno gli stessi effetti della tabella',()=>withF24(async page=>{
+  await seedF24Editor(page,'Regioni',{taxCode:'3802',officeCode:'03'});
+  await page.evaluate(()=>switchWorkView('model'));
+  const input=page.locator('#modelSheet [data-sezione="regioni"][data-riga="0"][data-field="debit"]');
+  await input.fill('-2.000,00');await input.press('Tab');
+  assert.equal(await input.inputValue(),'-2000');
+  assert.ok((await page.evaluate(()=>blockingErrors())).some(x=>/negativo/.test(x.msg)));
+  await input.fill('2000');await input.press('Tab');
+  assert.deepEqual(await page.evaluate(()=>[state.rows[0].importIssues,blockingErrors()]),[[],[]]);
+}));
+
+test('F24: una riga con solo un importo negativo non scompare come bozza',()=>withF24(async page=>{
+  await seedF24Editor(page,'Erario',{taxCode:''});
+  const input=page.locator('[data-action="row-money"][data-field="debit"]').first();
+  await input.fill('-2.000,00');await input.press('Tab');
+  const result=await page.evaluate(()=>({filled:groupF24()[0].filled.length,issues:blockingErrors()}));
+  assert.equal(result.filled,1);assert.ok(result.issues.some(x=>/negativo/.test(x.msg)));
+}));
+
+test('F24 detrazione: correzione nel modal elimina il rilievo del campo senza alterare gli altri importi',()=>withF24(async page=>{
+  await seedF24Editor(page,'IMU e altri tributi locali',{taxCode:'3918',officeCode:'H501',detrazione:5,
+    importIssues:['Detrazione non interpretabile nel file: «abc»']});
+  await page.evaluate(()=>openRowDetail('manual-row'));
+  await page.locator('#rdNote').fill('Nota fittizia');
+  await page.locator('[data-action="save-row-detail"]').click();
+  assert.deepEqual(await page.evaluate(()=>state.rows[0].importIssues),['Detrazione non interpretabile nel file: «abc»'],'una nota non corregge la detrazione');
+  await page.evaluate(()=>openRowDetail('manual-row'));
+  await page.locator('#rdDetrazione').fill('-10,00');
+  await page.locator('[data-action="save-row-detail"]').click();
+  assert.deepEqual(await page.evaluate(()=>[state.rows[0].detrazione,state.rows[0].importIssues]),[-10,[]]);
+  assert.ok((await page.evaluate(()=>rowIssues(state.rows[0]))).some(x=>/detrazione negativo/.test(x)));
+  await page.evaluate(()=>openRowDetail('manual-row'));
+  await page.locator('#rdDetrazione').fill('10,00');await page.locator('[data-action="save-row-detail"]').click();
+  assert.deepEqual(await page.evaluate(()=>[state.rows[0].debit,state.rows[0].credit,state.rows[0].detrazione,rowIssues(state.rows[0])]),[100,0,10,[]]);
+}));

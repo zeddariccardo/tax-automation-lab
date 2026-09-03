@@ -2839,7 +2839,7 @@ function blankRow(seed) {
 /* Una riga senza codice e senza importo è una bozza: resta visibile, ma fuori
    dai totali, dal conteggio degli F24 e da ogni output. */
 function meaningfulRow(r) {
-    return !!(String(r.taxCode || '').trim() || Number(r.debit) > 0 || Number(r.credit) > 0
+    return !!(String(r.taxCode || '').trim() || Math.abs(Number(r.debit)) > 0 || Math.abs(Number(r.credit)) > 0 || Number(r.detrazione) < 0
         || String(r.reference || '').trim() || String(r.officeCode || '').trim());
 }
 
@@ -2867,6 +2867,9 @@ const SECTION_REQUIRED = {
 
 function rowIssues(r) {
     const issues = [...(r.importIssues || [])];
+    ['debit', 'credit', 'detrazione'].forEach(key => {
+        if (r[key] < 0) issues.push(`Importo ${MONEY_LABELS[key]} negativo: indica un valore positivo nella colonna corretta`);
+    });
     if (!r.clientId) issues.push('Contribuente non associato');
     if (!r.paymentDate) issues.push('Data di pagamento mancante');
     else if (!isRealDate(r.paymentDate)) issues.push(`Data di pagamento inesistente nel calendario: ${dateIT(r.paymentDate)}`);
@@ -5276,18 +5279,26 @@ function setFlag(id, key, value) {
 
 const MONEY_LABELS = { debit: 'a debito', credit: 'a credito', detrazione: 'della detrazione' };
 
+function moneyIssueField(issue) {
+    if (typeof issue !== 'string') return issue?.field;
+    const match = issue.match(/^(?:Importo (?:a )?(debito|credito)|(?:Importo (?:della )?)?(detrazione))\b/i);
+    return match ? ({ debito: 'debit', credito: 'credit', detrazione: 'detrazione' })[(match[1] || match[2]).toLowerCase()] : '';
+}
+
+function updateRowMoney(r, key, value) {
+    const parsed = parseAmount(value);
+    r[key] = parsed.negative ? -parsed.value : parsed.value;
+    const word = MONEY_LABELS[key] || key;
+    // Rimuove solo i rilievi del campo realmente corretto, inclusi i messaggi
+    // dei progetti precedenti. Il segno resta nel dato e viene validato ora.
+    r.importIssues = (r.importIssues || []).filter(issue => moneyIssueField(issue) !== key);
+    if (parsed.invalid) r.importIssues.push(`Importo ${word} non interpretabile: «${parsed.raw}»`);
+}
+
 function setMoney(id, key, value) {
     const r = state.rows.find(x => x.id === id);
     if (!r) return;
-    const parsed = parseAmount(value);
-    r[key] = parsed.value;
-    const word = MONEY_LABELS[key] || key;
-    /* I rilievi si marcano con il campo, non con una parola del testo: prima
-       filtrare per «debito»/«credito» cancellava anche il rilievo dell'altro
-       campo quando i due messaggi si somigliavano. */
-    r.importIssues = (r.importIssues || []).filter(x => x.field !== key && !(typeof x === 'string' && x.toLowerCase().includes(word)));
-    if (parsed.invalid) r.importIssues.push(`Importo ${word} non interpretabile: «${parsed.raw}»`);
-    if (parsed.negative) r.importIssues.push(`Importo ${word} negativo: indica un valore positivo nel campo corretto`);
+    updateRowMoney(r, key, value);
     touchState();
     renderAll();
 }
@@ -5436,11 +5447,28 @@ function updateBulkBar() {
 
 const ROW_DETAIL_GUIDES = {
     erario: 'Codice ufficio e codice atto si compilano solo quando il tributo lo richiede: per i codici ordinari restano vuoti.',
-    inps: 'Indica i periodi da e a quando il contributo li prevede. Codice sede e matricola restano nei campi principali della riga.',
-    regioni: 'Il codice regione va nel campo «Codice ente / sede / regione / comune».',
-    imu: 'Compila i flag e il numero immobili soltanto quando il tributo locale li prevede.',
-    inail: 'Inserisci codice ditta e controcodice; il numero di riferimento resta nel campo principale.',
+    inps: 'Indica codice sede, matricola e periodi di riferimento quando il contributo li prevede.',
+    regioni: 'Inserisci il codice regione nel campo «Codice regione».',
+    imu: 'Inserisci il codice ente o Comune nel campo dedicato. Compila i flag e il numero immobili soltanto quando il tributo locale li prevede.',
+    inail: 'Indica codice sede, codice ditta, controcodice e numero di riferimento.',
     altri: 'Per gli altri enti indica il codice ente, il codice posizione e i periodi di riferimento.'
+};
+
+// Ogni controllo scrive un solo campo del modello. Nessuna sostituzione tra
+// codice ufficio erariale, regione/Comune, sede e codice ente previdenziale.
+const ROW_DETAIL_FIELDS = {
+    officeCode: ['rdOfficeCode', ['inps', 'regioni', 'imu', 'inail', 'altri']],
+    reference: ['rdReference', ['inps', 'inail']],
+    periodFrom: ['rdPeriodFrom', ['inps', 'altri']], periodTo: ['rdPeriodTo', ['inps', 'altri']],
+    taxOfficeCode: ['rdTaxOfficeCode', ['erario']], actCode: ['rdActCode', ['erario']],
+    certificationNo: ['rdCertificationNo', ['erario']], operationId: ['rdOperationId', ['imu']],
+    numImmobili: ['rdNumImmobili', ['imu']], detrazione: ['rdDetrazione', ['imu']],
+    ravvedimento: ['rdRavv', ['imu']], immobiliVariati: ['rdImmVar', ['imu']],
+    acconto: ['rdAcc', ['imu']], saldo: ['rdSaldo', ['imu']],
+    inailCompanyCode: ['rdInailCompanyCode', ['inail']], inailCc: ['rdInailCc', ['inail']],
+    entityCode: ['rdEntityCode', ['altri']], positionCode: ['rdPositionCode', ['altri']],
+    coobligorCf: ['rdCoobligorCf'], coobligorCode: ['rdCoobligorCode'],
+    nonCalendarYear: ['rdNonCalendarYear'], note: ['rdNote']
 };
 
 function openRowDetail(id) {
@@ -5454,38 +5482,38 @@ function openRowDetail(id) {
     ['rd-common', 'rd-imu', 'rd-inail', 'rd-altri'].forEach(x => $(x).classList.remove('active'));
     $('rd-common').classList.add('active');
     if ($('rd-' + k)) $('rd-' + k).classList.add('active');
-    const vals = {
-        rdOfficeCode: r.officeCode, rdReference: r.reference, rdNote: r.note,
-        rdPeriodFrom: r.periodFrom, rdPeriodTo: r.periodTo, rdTaxOfficeCode: r.taxOfficeCode,
-        rdActCode: r.actCode, rdCoobligorCf: r.coobligorCf, rdCoobligorCode: r.coobligorCode,
-        rdNumImmobili: r.numImmobili, rdDetrazione: r.detrazione || '',
-        rdInailCompanyCode: r.inailCompanyCode, rdInailCc: r.inailCc,
-        rdPositionCode: r.positionCode, rdEntityCode: r.entityCode,
-        rdCertificationNo: r.certificationNo, rdOperationId: r.operationId
-    };
-    Object.entries(vals).forEach(([k2, v]) => setVal(k2, v));
-    setChecked('rdRavv', r.ravvedimento);
-    setChecked('rdImmVar', r.immobiliVariati);
-    setChecked('rdAcc', r.acconto);
-    setChecked('rdSaldo', r.saldo);
-    setChecked('rdNonCalendarYear', r.nonCalendarYear);
+    Object.entries(ROW_DETAIL_FIELDS).forEach(([key, [inputId, sections]]) => {
+        const input = $(inputId), enabled = !sections || sections.includes(k);
+        const field = input.closest('.field, .flag-box');
+        input.disabled = !enabled;
+        field.hidden = !enabled;
+        field.style.display = enabled ? '' : 'none';
+        if (input.type === 'checkbox') setChecked(inputId, r[key]);
+        else setVal(inputId, key === 'detrazione' ? r[key] || '' : r[key]);
+        if (key === 'detrazione') {
+            input.dataset.initialValue = input.value;
+            delete input.dataset.moneyEdited;
+        }
+    });
+    document.querySelector('label[for="rdOfficeCode"]').textContent =
+        ({ regioni: 'Codice regione', imu: 'Codice ente / Comune' })[k] || 'Codice sede';
+    document.querySelector('label[for="rdReference"]').textContent =
+        k === 'inail' ? 'Numero di riferimento' : 'Matricola / codice posizione';
     openModal('modalRowDetail');
 }
 
 function saveRowDetail() {
     const r = state.rows.find(x => x.id === val('rdId'));
     if (!r) return;
-    r.officeCode = val('rdOfficeCode'); r.reference = val('rdReference'); r.note = val('rdNote');
-    r.periodFrom = val('rdPeriodFrom'); r.periodTo = val('rdPeriodTo');
-    r.taxOfficeCode = val('rdTaxOfficeCode'); r.actCode = val('rdActCode');
-    r.coobligorCf = normalizeId(val('rdCoobligorCf')); r.coobligorCode = val('rdCoobligorCode');
-    r.numImmobili = val('rdNumImmobili'); r.detrazione = parseAmount(val('rdDetrazione')).value;
-    r.inailCompanyCode = val('rdInailCompanyCode'); r.inailCc = val('rdInailCc');
-    r.positionCode = val('rdPositionCode'); r.entityCode = val('rdEntityCode');
-    r.certificationNo = val('rdCertificationNo'); r.operationId = val('rdOperationId');
-    r.ravvedimento = checked('rdRavv'); r.immobiliVariati = checked('rdImmVar');
-    r.acconto = checked('rdAcc'); r.saldo = checked('rdSaldo');
-    r.nonCalendarYear = checked('rdNonCalendarYear');
+    Object.entries(ROW_DETAIL_FIELDS).forEach(([key, [inputId, sections]]) => {
+        if (sections && !sections.includes(sectionKey(r.section))) return;
+        if (key === 'detrazione') {
+            const input = $(inputId);
+            if (input.dataset.moneyEdited || input.value !== input.dataset.initialValue) updateRowMoney(r, key, val(inputId));
+        }
+        else if ($(inputId).type === 'checkbox') r[key] = checked(inputId);
+        else r[key] = key === 'coobligorCf' ? normalizeId(val(inputId)) : val(inputId);
+    });
     touchState(); closeModal('modalRowDetail'); renderAll();
     toast('Dettagli della riga salvati');
 }
@@ -6703,8 +6731,14 @@ document.addEventListener('change', e => {
     if (el) {
         const a = el.dataset.action;
         if (a === 'row-set') return setRow(el.dataset.id, el.dataset.field, el.value);
-        if (a === 'row-money') return setMoney(el.dataset.id, el.dataset.field, el.value);
-        if (a === 'model-set') return modelSet(el);
+        if (a === 'row-money') {
+            delete el.dataset.moneyEdited;
+            return setMoney(el.dataset.id, el.dataset.field, el.value);
+        }
+        if (a === 'model-set') {
+            delete el.dataset.moneyEdited;
+            return modelSet(el);
+        }
         if (a === 'model-flag') return modelFlag(el);
         if (a === 'group-set') return setGroupField(el.dataset.key, el.dataset.field, el.value);
         if (a === 'row-select') {
@@ -6735,9 +6769,28 @@ document.addEventListener('change', e => {
 
 let searchTimer = null;
 document.addEventListener('input', e => {
+    const el = e.target;
+    if (el.dataset.action === 'row-money' || (el.dataset.action === 'model-set' && el.dataset.target === 'money') || el.id === 'rdDetrazione') {
+        el.dataset.moneyEdited = 'true';
+    }
     if (e.target.id === 'rowSearch') {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(renderEditor, 180);
+    }
+});
+
+// Riscrivere il numero mostrato può non emettere change (es. un vecchio
+// progetto con 2000 e l'issue del -2000). Rivalida solo dopo un input reale,
+// senza interrompere la digitazione e senza sanare il campo al semplice focus.
+document.addEventListener('focusout', e => {
+    const el = e.target;
+    if (!el.dataset.moneyEdited) return;
+    if (el.dataset.action === 'row-money') {
+        delete el.dataset.moneyEdited;
+        setMoney(el.dataset.id, el.dataset.field, el.value);
+    } else if (el.dataset.action === 'model-set' && el.dataset.target === 'money') {
+        delete el.dataset.moneyEdited;
+        modelSet(el);
     }
 });
 

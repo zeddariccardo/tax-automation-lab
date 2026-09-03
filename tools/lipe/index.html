@@ -786,6 +786,7 @@ html.tal-tool-page #lipe-benvenuto > #lipe-benvenuto-titolo{
 .lipe-benvenuto-passi li{padding-left:4px}
 .lipe-benvenuto-passi li::marker{font-weight:700;color:var(--g4)}
 .lipe-benvenuto-passi b{display:block;font-size:15px;font-weight:650;margin-bottom:2px}
+.lipe-benvenuto-passi span b{display:inline}
 .lipe-benvenuto-passi span{display:block;font-size:13.5px;line-height:1.55;color:var(--g5)}
 .lipe-benvenuto-nota{
   margin:18px 28px 0;padding:14px 16px;border-radius:9px;
@@ -1902,6 +1903,14 @@ function renderResults(){
   const details=raggruppaDettagliPerCodice(vals.flatMap(v=>v.details));
   $('detail-table').querySelector('tbody').innerHTML=details.length?details.map(d=>`<tr><td>${esc(d.period)}</td><td class="mono">${esc(d.code)}</td><td>${esc(d.description)}</td><td><div class="detail-destinations">${d.destinations.map(v=>`<span class="detail-destination"><b>${esc(v.row)} · ${esc(v.label)}</b><span>€ ${fmt(v.amount)}</span></span>`).join('')}</div></td><td>${d.sources.map(esc).join(' · ')||'—'}</td></tr>`).join(''):'<tr><td colspan="5">Nessun importo allocato. I codici potrebbero essere esclusi dalla LIPE.</td></tr>'
 }
+// Legge il modulo già restituito dal servizio: nessun calcolo o correzione
+// degli importi. Anche un profilo misto mantiene il vincolo sul modulo mensile.
+function monthlyVp12Problems(){
+  if(!state.activeRecord||!state.rows.length)return [];
+  return periodDescriptors()
+    .filter(d=>Number(d.month)>=1&&Number(d.month)<=12&&Math.abs(computePeriod(d).vp12)>.004)
+    .map(d=>d.label+': VP12 riguarda gli interessi delle liquidazioni trimestrali e non può essere valorizzato in un modulo mensile. Correggi VP12 per sbloccare PDF, XML ed Excel.');
+}
 function renderExportState(){
   const pronti=!!(state.activeRecord&&state.rows.length);
   ['export-pdf','export-excel','export-xml','save-history','clear-period'].forEach(id=>{
@@ -1909,6 +1918,14 @@ function renderExportState(){
   });
   if(!pronti){
     $('export-status').innerHTML='<div class="notice"><b>Output non ancora disponibili.</b> Seleziona o configura un cliente e completa un’elaborazione: i comandi si attiveranno automaticamente.</div>';
+    return;
+  }
+  const monthlyProblems=monthlyVp12Problems();
+  if(monthlyProblems.length){
+    ['export-pdf','export-excel','export-xml'].forEach(id=>{
+      const b=$(id);if(b){b.disabled=true;b.setAttribute('aria-disabled','true');}
+    });
+    $('export-status').innerHTML='<div class="notice warn"><b>Output bloccati.</b> '+monthlyProblems.map(esc).join('<br>')+'</div>';
     return;
   }
   const xmlProblems=(buildXml().problems||[]),warnings=checks().filter(c=>c.status==='warn');
@@ -4052,6 +4069,21 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
+<script id="lipe-vp12-output-guard">
+/* Il ponte riaggancia queste funzioni dopo DOMContentLoaded e assicura prima
+   la risposta corrente. Il controllo vale anche per una chiamata diretta:
+   disabilitare i pulsanti da solo non protegge gli export. Renderer invariati. */
+(function(){
+  ['exportPdf','exportWorkingPaper','exportXml'].forEach(function(name){
+    const original=window[name];
+    window[name]=function(){
+      const problems=monthlyVp12Problems();
+      if(problems.length){toast(problems.join(' '),true);return;}
+      return original.apply(this,arguments);
+    };
+  });
+})();
+</script>
 <script id="lipe-session-commands">/* I tre comandi della barra di sessione, gli stessi del Bilancio. La barra la
    disegna `tal-app.js`: qui si dice solo che cosa vogliono dire in LIPE. */
 window.TAL_SESSION={

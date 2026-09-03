@@ -2751,7 +2751,7 @@ function findClient(entity) {
 
 function clientById(id) { return state.clients.find(c => c.id === id) || null; }
 
-function createDraftClient(entity) {
+function draftClient(entity) {
     const c = {
         id: uid('cli'),
         name: String(entity.name || `Contribuente ${state.clients.length + 1}`).trim(),
@@ -2760,6 +2760,11 @@ function createDraftClient(entity) {
         rules: { codeFlow: [], defaultRef: '', defaultOffice: '', defaultIban: '' },
         draft: true, updatedAt: new Date().toISOString()
     };
+    return c;
+}
+
+function createDraftClient(entity) {
+    const c = draftClient(entity);
     state.clients.push(c);
     touchState(); persistClients();
     return c;
@@ -2867,6 +2872,9 @@ function rowIssues(r) {
     else if (!isRealDate(r.paymentDate)) issues.push(`Data di pagamento inesistente nel calendario: ${dateIT(r.paymentDate)}`);
 
     const sk = sectionKey(r.section);
+    if (sk === 'inail' && r.reference && !/^\d{1,6}$/.test(String(r.reference))) {
+        issues.push('Numero di riferimento INAIL: solo cifre, massimo 6 come nel tracciato telematico; il dato non viene troncato');
+    }
     (SECTION_REQUIRED[sk] || []).forEach(([campo, etichetta]) => {
         if (!String(r[campo] ?? '').trim()) {
             issues.push(`${etichetta}: obbligatorio nella sezione ${SECTION_UI[sk].label}`);
@@ -3322,7 +3330,7 @@ const HEADER_MAP = {
     'immobili variati': 'immobiliVariati', 'acconto': 'acconto', 'saldo': 'saldo',
     'numero immobili': 'numImmobili', 'detrazione': 'detrazione',
     'codice ditta inail': 'inailCompanyCode', 'codice ditta': 'inailCompanyCode',
-    'c c inail': 'inailCc', 'cc inail': 'inailCc',
+    'c.c. inail': 'inailCc', 'c c inail': 'inailCc', 'cc inail': 'inailCc',
     'codice posizione': 'positionCode',
     'cf coobbligato': 'coobligorCf', 'codice fiscale coobbligato': 'coobligorCf',
     'codice identificativo coobbligato': 'coobligorCode',
@@ -3343,16 +3351,74 @@ const TEMPLATE_HEADERS = [
     'Codice ente previdenziale', 'Anno imposta non coincidente'
 ];
 
-function canonicalRow(raw) {
+/* Importi: numeri Excel oppure notazione italiana/inglese, con raggruppamenti
+   di tre cifre. Mai estrarre cifre da testo arbitrario. La formattazione della
+   cella si usa solo per gli identificativi, non per i valori monetari. */
+function parseImportAmount(value) {
+    if (typeof value === 'number' || value == null || value === '') return parseAmount(value);
+    const raw = String(value).trim();
+    let text = raw.replace(/^€\s*|\s*€$/g, '').trim();
+    const negative = /^-/.test(text) || /^\(.*\)$/.test(text);
+    if (/^\(.*\)$/.test(text)) text = text.slice(1, -1);
+    text = text.replace(/^[+-]/, '');
+    const valid = /^(?:\d+(?:[.,]\d+)?|\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d+)?)$/.test(text);
+    if (!valid) return { value: 0, invalid: true, negative, raw };
+    // Un solo separatore seguito da tre cifre può indicare migliaia o decimali.
+    if (/^\d{1,3}[.,]\d{3}$/.test(text)) return { value: 0, invalid: true, ambiguous: true, negative, raw };
+    return parseAmount((negative ? '-' : '') + text.replace(/[ \u00a0\u202f]/g, ''));
+}
+
+function importLocation(source, column, header) {
+    return 'Foglio «' + (source.sourceSheet || 'PAGAMENTI') + '», riga ' + (source.sourceRow || '?')
+        + (column ? ', colonna ' + column : '') + (header ? ' (' + header + ')' : '');
+}
+
+function canonicalRow(raw, source = {}) {
     const obj = {};
-    Object.entries(raw).forEach(([k, v]) => {
-        const key = HEADER_MAP[normHeader(k)];
-        if (key) obj[key] = v;
+    const columns = {}, importNotes = [];
+    const entries = Array.isArray(raw) ? raw : Object.entries(raw).map(([header, value]) => ({ header, value }));
+    entries.forEach(({ header, value, column }) => {
+        const key = HEADER_MAP[normHeader(header)];
+        if (!key || value == null || String(value).trim() === '') return;
+        if (Object.hasOwn(obj, key)) {
+            // Primo valore non vuoto; confronti conservativi, senza "ultima colonna vince".
+            if (String(obj[key]).trim() !== String(value).trim()) {
+                throw new Error(importLocation(source, column, header) + ': colonne ambigue per ' + key
+                    + '; valori discordanti rispetto alla colonna ' + (columns[key].column || columns[key].header));
+            }
+            importNotes.push(importLocation(source, column, header) + ': duplicato identico; usata la prima colonna non vuota '
+                + (columns[key].column || columns[key].header));
+            return;
+        }
+        obj[key] = value;
+        columns[key] = { column, header };
     });
-    const debitParsed = parseAmount(obj.debit);
-    const creditParsed = parseAmount(obj.credit);
-    const detParsed = parseAmount(obj.detrazione);
+    const debitParsed = parseImportAmount(obj.debit);
+    const creditParsed = parseImportAmount(obj.credit);
+    const detParsed = parseImportAmount(obj.detrazione);
     const importIssues = [];
+    if (source.sourceSheet) {
+        ['debit', 'credit', 'detrazione'].forEach((key, i) => {
+            const parsed = [debitParsed, creditParsed, detParsed][i];
+            if (parsed.invalid || parsed.negative) {
+                const c = columns[key] || {};
+                if (parsed.ambiguous) throw new Error(importLocation(source, c.column, c.header || key)
+                    + ': importo ambiguo «' + String(obj[key]) + '». Esplicita i decimali (es. 1234,00) oppure usa una cella numerica Excel.');
+                throw new Error(importLocation(source, c.column, c.header || key)
+                    + ': importo non valido «' + String(obj[key]) + '». Usa un numero positivo italiano o inglese, senza testo.');
+            }
+        });
+        if (!obj.section || !/^(erario|inps|regioni|imu|imu e (?:altri )?tributi locali|inail|altri enti(?: previdenziali(?: e assicurativi)?)?)$/i.test(String(obj.section).trim())) {
+            importIssues.push('Sezione mancante o non riconosciuta: indicarla esplicitamente nel file');
+        }
+        if (!obj.flow) importNotes.push(importLocation(source) + ': Flusso vuoto; usato 1, come indicato nel template');
+        else if (sanitizeFlow(obj.flow) !== String(obj.flow).trim()) importIssues.push('Flusso non valido: usa al massimo 30 caratteri alfanumerici, spazi, punto, trattino o underscore');
+        ['ravvedimento', 'immobiliVariati', 'acconto', 'saldo', 'nonCalendarYear'].forEach(key => {
+            if (Object.hasOwn(obj, key) && !/^(s[iì]|no|true|false|vero|falso|1|0|x)$/i.test(String(obj[key]).trim())) {
+                importIssues.push('Casella ' + columns[key].header + ': valore non riconosciuto; usa Sì/No, 1/0 o X');
+            }
+        });
+    }
     if (debitParsed.invalid) importIssues.push(`Importo a debito non interpretabile nel file: «${debitParsed.raw}»`);
     if (creditParsed.invalid) importIssues.push(`Importo a credito non interpretabile nel file: «${creditParsed.raw}»`);
     if (detParsed.invalid) importIssues.push(`Detrazione non interpretabile nel file: «${detParsed.raw}»`);
@@ -3390,7 +3456,8 @@ function canonicalRow(raw) {
         coobligorCf: normalizeId(obj.coobligorCf),
         coobligorCode: String(obj.coobligorCode ?? '').trim(),
         note: String(obj.note ?? '').trim(),
-        sourceRow: 0, importIssues
+        sourceRow: source.sourceRow || 0, sourceSheet: source.sourceSheet || '',
+        sourceColumns: columns, importNotes, importIssues
     });
 }
 
@@ -3407,7 +3474,7 @@ function matchEntityForRow(entities, r) {
 function extractEntities(rows) {
     const entities = [];
     rows.forEach((r, i) => {
-        r.sourceRow = i + 2;
+        if (!r.sourceRow) r.sourceRow = i + 2;
         if (!r.entityName && !r.cf && !r.vat) return;
         let e = matchEntityForRow(entities, r);
         if (!e) {
@@ -3457,15 +3524,40 @@ function demoFingerprintSet() {
 
 async function readSpreadsheet(file) {
     const data = await file.arrayBuffer();
-    const wb = XLSX.read(data, { type: 'array', cellDates: true });
+    const wb = XLSX.read(data, { type: 'array', cellDates: true, cellNF: true, cellText: true });
     const usable = wb.SheetNames.filter(n => !EXAMPLE_SHEET_RE.test(n));
     if (!usable.length) {
         throw new Error('il file contiene solo fogli di esempio. Compila il foglio PAGAMENTI con i dati del tuo cliente.');
     }
     const preferred = usable.find(n => /pagament|f24|dati/i.test(n)) || usable[0];
-    const raw = XLSX.utils.sheet_to_json(wb.Sheets[preferred], { defval: '' });
-    const all = raw.map(canonicalRow)
-        .filter(r => r.taxCode || r.debit || r.credit || r.entityName || r.cf || r.vat);
+    const sheet = wb.Sheets[preferred], all = [];
+    if (!sheet['!ref']) return [];
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    const headers = [];
+    for (let c = range.s.c; c <= range.e.c; c++) {
+        const header = String(sheet[XLSX.utils.encode_cell({ r: range.s.r, c })]?.v ?? '').trim();
+        if (HEADER_MAP[normHeader(header)]) headers.push({ header, c, column: XLSX.utils.encode_col(c) });
+    }
+    if (!headers.length) throw new Error('Foglio «' + preferred + '»: nessuna intestazione F24 riconosciuta');
+    const identifiers = new Set(['cf', 'vat', 'flow', 'taxCode', 'period', 'year', 'officeCode', 'reference',
+        'periodFrom', 'periodTo', 'taxOfficeCode', 'actCode', 'inailCompanyCode', 'inailCc', 'positionCode',
+        'entityCode', 'certificationNo', 'operationId', 'coobligorCf', 'coobligorCode']);
+    const excelErrors = { 0: '#NULL!', 7: '#DIV/0!', 15: '#VALUE!', 23: '#REF!', 29: '#NAME?',
+        36: '#NUM!', 42: '#N/A', 43: '#GETTING_DATA' };
+    for (let r = range.s.r + 1; r <= range.e.r; r++) {
+        const source = { sourceSheet: preferred, sourceRow: r + 1 };
+        const entries = headers.map(({ header, c, column }) => {
+            const cell = sheet[XLSX.utils.encode_cell({ r, c })];
+            const where = importLocation(source, column, header);
+            if (cell?.f && cell.v == null) throw new Error(where + ': formula senza risultato memorizzato; ricalcola e salva il file in Excel');
+            if (cell?.t === 'e') throw new Error(where + ': errore Excel ' + (excelErrors[cell.v] || cell.w || 'non specificato'));
+            const value = cell && identifiers.has(HEADER_MAP[normHeader(header)]) && cell.t === 'n'
+                ? XLSX.utils.format_cell(cell) : (cell?.v ?? '');
+            return { header, column, value };
+        });
+        if (entries.every(x => x.value === '' || x.value == null)) continue;
+        all.push(canonicalRow(entries, source));
+    }
 
     const demo = demoFingerprintSet();
     const rows = all.filter(r => !demo.has(demoFingerprint(r)));
@@ -3487,11 +3579,75 @@ async function readSpreadsheet(file) {
     return rows;
 }
 
+/* Nessuna mutazione di state/localStorage durante lettura e validazione.
+   Anche un errore nell'ultima riga impedisce la creazione delle anagrafiche
+   incontrate prima. Le regole ricorrenti dell'editor non riempiono l'import. */
+function validateImportRows(rows, mass = false) {
+    const failures = [];
+    rows.forEach((r, i) => {
+        const where = importLocation({ ...r, sourceRow: r.sourceRow || i + 2 });
+        const issues = rowIssues({ ...r, clientId: r.clientId || 'da-associare' });
+        if (mass && (!r.entityName || (!r.cf && !r.vat))) issues.push('Contribuente non identificato: ogni riga deve indicare denominazione e codice fiscale o partita IVA');
+        if (r.cf && !isValidTaxCode(r.cf)) issues.push('Codice fiscale non valido: ' + r.cf);
+        if (r.vat && !isValidVatNumber(r.vat)) issues.push('Partita IVA non valida: ' + r.vat);
+        if (issues.length) failures.push({ row: r.sourceRow || i + 2, msg: where + ': ' + issues.join(' · ') });
+    });
+    if (failures.length) {
+        const error = new Error(failures[0].msg);
+        error.importFailures = failures;
+        throw error;
+    }
+}
+
+function validateImportGroups(rows) {
+    const groups = new Map();
+    rows.forEach(r => {
+        const key = [r.clientId, r.paymentDate, r.flow].join('|');
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(r);
+    });
+    groups.forEach(group => {
+        const prefix = importLocation(group[0]) + ', flusso ' + group[0].flow + ': ';
+        const balance = group.reduce((sum, r) => sum + cents(r.debit) - cents(r.credit), 0);
+        if (balance < 0) throw new Error(prefix + 'il totale dei crediti supera i debiti');
+        Object.entries(F24_CAPACITY).forEach(([section, capacity]) => {
+            if (group.filter(r => sectionKey(r.section) === section).length > capacity) {
+                throw new Error(prefix + SECTION_TITLES[section] + ': superata la capienza di ' + capacity + ' righe; indica un nuovo flusso nel file');
+            }
+        });
+    });
+}
+
+function commitPaymentImport(rows, clients, mode, selectedClientId) {
+    validateImportRows(rows, mode === 'mass');
+    validateImportGroups(rows);
+    // Un'unica scrittura persistente, solo dopo tutti i controlli.
+    if (clients.length !== state.clients.length && !writeStore(KEY_CLIENTS, clients)) {
+        throw new Error('Spazio locale non disponibile: importazione annullata, stato precedente invariato');
+    }
+    Object.assign(state, { rows, clients, mode, selectedClientId, pending: null });
+    touchState();
+    renderAll();
+    goStage(mode === 'mass' ? 'import' : 'editor');
+    toast(rows.length + ' righe importate' + (clients.some(c => c.draft) ? ' · Completa le nuove anagrafiche prima degli output' : ''));
+    const notes = rows.flatMap(r => (r.importNotes || []).map(msg => ({ row: r.sourceRow, msg })));
+    if (notes.length) showImportReport('Importazione completata. Convenzioni e colonne utilizzate:', notes);
+}
+
+function reportImportError(error) {
+    showImportReport('Importazione annullata. Nessuna riga o anagrafica è stata modificata.',
+        error.importFailures || [{ row: '—', msg: error.message }]);
+}
+
 function prepareImport(rows, fileName) {
     const entities = extractEntities(rows);
-    state.pending = { rows, entities, fileName };
+    validateImportRows(rows, state.mode === 'mass' || entities.length > 1);
+    validateImportGroups(rows.map(r => {
+        const entity = matchEntityForRow(entities, r);
+        return { ...r, clientId: entity ? (findClient(entity)?.id || entity.key) : state.selectedClientId };
+    }));
     if (state.mode === 'mass') return importMassRows(rows, entities);
-    if (entities.length > 1) { renderDetectedEntities(entities); openModal('modalMass'); return; }
+    if (entities.length > 1) { state.pending = { rows, entities, fileName }; renderDetectedEntities(entities); openModal('modalMass'); return; }
     importSingleRows(rows, entities[0] || null);
 }
 
@@ -3503,71 +3659,42 @@ function identitiesConflict(client, entity) {
     return false;
 }
 
-function importSingleRows(rows, entity) {
-    let selected = clientById(state.selectedClientId);
+function importSingleRows(rows, entity, switchClient = false) {
+    validateImportRows(rows);
+    let selected = switchClient ? null : clientById(state.selectedClientId);
+    const clients = [...state.clients];
     if (entity) {
         const matched = findClient(entity);
         if (selected && identitiesConflict(selected, entity)) {
             state.pending = { rows, entities: [entity], matchedClient: matched };
-            $('mismatchText').innerHTML = `Hai selezionato <b>${esc(selected.name)}</b>, ma il file sembra riferirsi a <b>${esc(entity.name || entity.cf || entity.vat)}</b>.`;
-            setText('switchClientBtn', matched ? `Passa a ${matched.name}` : 'Crea e usa il contribuente rilevato');
+            $('mismatchText').textContent = 'Il file riguarda ' + (entity.name || entity.cf || entity.vat)
+                + ', diverso dal contribuente selezionato ' + selected.name + '.';
+            setText('switchClientBtn', matched ? 'Passa a ' + matched.name : 'Crea e usa il contribuente rilevato');
             openModal('modalMismatch');
             return;
         }
-        if (!selected && matched) { selected = matched; state.selectedClientId = matched.id; }
-        if (!selected && !matched) {
-            selected = createDraftClient(entity);
-            state.selectedClientId = selected.id;
-            toast('Nuova anagrafica rilevata: completala prima di generare gli output');
-        }
+        if (!selected) selected = matched;
+        if (!selected) { selected = draftClient(entity); clients.push(selected); }
     }
-    if (!selected) {
-        toast('Seleziona o crea il contribuente prima di importare un file privo di anagrafica', true);
-        goStage('setup');
-        return;
-    }
-    rows.forEach(r => { r.clientId = selected.id; applyClientRules(r); });
-    state.rows = rows;
-    state.mode = 'single';
-    state.pending = null;
-    touchState();
-    renderAll();
-    goStage('editor');
-    toast(`${rows.length} ${rows.length === 1 ? 'riga importata' : 'righe importate'} per ${selected.name}`);
+    if (!selected) throw new Error('Seleziona o crea il contribuente prima di importare un file privo di anagrafica');
+    const prepared = rows.map(r => ({ ...r, clientId: selected.id }));
+    commitPaymentImport(prepared, clients, 'single', selected.id);
 }
 
 function importMassRows(rows, entities) {
-    const missing = rows.filter(r => !r.entityName || (!r.cf && !r.vat));
-    if (missing.length) {
-        state.pending = null;
-        showImportReport('Ogni riga deve indicare la denominazione e almeno uno tra codice fiscale e partita IVA. Nessuna riga è stata importata.',
-            missing.map(r => ({ row: r.sourceRow, msg: r.taxCode ? `codice ${r.taxCode}: contribuente non identificato` : 'contribuente non identificato' })));
-        return;
-    }
-    const invalid = rows.filter(r => (r.cf && !isValidTaxCode(r.cf)) || (r.vat && !isValidVatNumber(r.vat)));
-    if (invalid.length) {
-        state.pending = null;
-        showImportReport('Alcune righe contengono un codice fiscale o una partita IVA formalmente non validi. Non vengono corretti automaticamente: nessuna riga è stata importata.',
-            invalid.map(r => ({ row: r.sourceRow, msg: `${r.entityName || 'contribuente'}: ${r.cf && !isValidTaxCode(r.cf) ? 'CF ' + r.cf : 'P.IVA ' + r.vat} non valido` })));
-        return;
-    }
-    const map = new Map();
-    entities.forEach(e => { map.set(e.key, findClient(e) || createDraftClient(e)); });
-    rows.forEach(r => {
-        const e = matchEntityForRow(entities, r);
-        r.clientId = e ? map.get(e.key).id : '';
-        r.flow = sanitizeFlow(r.flow);
-        applyClientRules(r);
+    validateImportRows(rows, true);
+    const clients = [...state.clients], map = new Map();
+    entities.forEach(e => {
+        const client = findClient(e) || draftClient(e);
+        if (!clients.some(c => c.id === client.id)) clients.push(client);
+        map.set(e.key, client);
     });
-    state.rows = rows;
-    state.mode = 'mass';
-    state.selectedClientId = '';
-    state.pending = null;
-    touchState();
-    renderAll();
-    goStage('import');
-    const drafts = [...new Set(rows.map(r => r.clientId))].map(clientById).filter(c => c && c.draft).length;
-    toast(`${rows.length} righe importate per ${entities.length} contribuenti${drafts ? ` · ${drafts} anagrafiche da completare` : ''}`);
+    const prepared = rows.map(r => {
+        const entity = matchEntityForRow(entities, r);
+        if (!entity || !map.has(entity.key)) throw new Error(importLocation(r) + ': contribuente non associabile');
+        return { ...r, clientId: map.get(entity.key).id };
+    });
+    commitPaymentImport(prepared, clients, 'mass', '');
 }
 
 function showImportReport(subtitle, items) {
@@ -3649,7 +3776,9 @@ function downloadPaymentTemplate(forceMass) {
               : 'Denominazione, Codice fiscale e Partita IVA possono restare vuoti: viene usata la società selezionata nel tool.'],
         ['Flusso', 'Righe con stesso contribuente, stessa data e stesso flusso confluiscono nello stesso F24. Se il campo è vuoto viene assegnato il flusso 1.'],
         ['Periodo / rateazione', 'Quattro cifre: 0008 per il mese di agosto, 0101 quando le istruzioni del tributo prevedono il pagamento in unica soluzione.'],
-        ['Importi', 'Valori positivi. Non compilare debito e credito sulla stessa riga: il tool la segnala come errore invece di scegliere al posto tuo.'],
+        ['Importi', 'Numeri Excel oppure testo italiano (1.234,56) o inglese (1,234.56), con gruppi delle migliaia di tre cifre. Sono ammessi anche 1234,56, 1234.56 e spazi di raggruppamento. Testi ambigui come 1.234 e 1,234 bloccano l’import: esplicita i decimali (es. 1234,00) oppure usa una cella numerica Excel. Il simbolo € è facoltativo all’esterno. Le celle vuote valgono zero. Testi, errori Excel, formule senza risultato salvato e valori negativi bloccano l’intero import. Non compilare debito e credito sulla stessa riga.'],
+        ['Identificativi e alias', 'Gli identificativi conservano gli zeri del testo o del formato Excel (es. 0010 e 04); non si ricostruiscono zeri già persi. Per colonne equivalenti si usa la prima non vuota: duplicati identici vengono segnalati, valori diversi bloccano l’import.'],
+        ['Controlli prima dell’import', 'Sezione e campi obbligatori devono essere espliciti. Il riferimento INAIL ammette solo cifre, massimo sei, come il tracciato. Le regole ricorrenti del cliente non completano il file. Un errore annulla tutto l’import, senza cambiare righe o anagrafiche esistenti.'],
         ['Campi specifici', 'Le colonne da «Periodo da» a «Codice posizione» servono solo alle sezioni che le prevedono e possono restare vuote negli altri casi.'],
         ['Codice tributo', 'Il tool riconosce i codici più usati e segnala quelli che non conosce o che risultano in una sezione diversa da quella prevista. L’avviso non blocca la generazione.'],
         ['Compensazioni', 'Il tool calcola la quadratura ma non certifica spettanza, disponibilità, visto di conformità né canale di utilizzo del credito.'],
@@ -3813,11 +3942,11 @@ function pdfDocForGroup(g) {
     };
 
     /* Campi a caselle: una lettera per casella, centrata nella sua. */
-    const putCells = (box, valore) => {
+    const putCells = (box, valore, { bold = true } = {}) => {
         const v = normalizeId(valore).slice(0, box.n);
         if (!v) return;
         const size = box.size || 10;
-        doc.setFont('courier', 'bold');
+        doc.setFont('courier', bold ? 'bold' : 'normal');
         doc.setFontSize(size);
         doc.setTextColor(17, 17, 17);
         const y = baselineFor(box, size);
@@ -3877,13 +4006,13 @@ function pdfDocForGroup(g) {
         doc.addImage(F24_MINISTERIAL_TEMPLATES[pagina], 'PNG', 0, 0, 210, 297, 'f24-' + pagina, 'FAST');
 
         /* Contribuente */
-        putCells(M.contribuente.cf, c.cf || '');
+        putCells(M.contribuente.cf, c.cf || '', { bold: false });
         put(M.contribuente.name, c.name || '', { align: 'left' });
         put(M.contribuente.city, c.city || '', { align: 'left' });
         put(M.contribuente.province, c.province || '');
         put(M.contribuente.address, c.address || '', { align: 'left' });
         putFlag(M.contribuente.nonCalendarYear, first.nonCalendarYear);
-        putCells(M.contribuente.coobligorCf, first.coobligorCf || '');
+        putCells(M.contribuente.coobligorCf, first.coobligorCf || '', { bold: false });
         put(M.contribuente.coobligorCode, first.coobligorCode || '');
         if (c.surname || c.firstName) {
             put(M.contribuente.firstName, c.firstName || '', { align: 'left' });
@@ -3909,7 +4038,7 @@ function pdfDocForGroup(g) {
                     if (col.t === 'money') putMoney(box, r[campo]);
                     else if (col.t === 'flag') putFlag(box, r[campo]);
                     else if (campo === 'periodFrom' || campo === 'periodTo') put(box, r[campo] || (campo === 'periodFrom' ? r.period : ''));
-                    else put(box, r[campo], { bold: campo === 'taxCode' });
+                    else put(box, r[campo]);
                 });
             });
             if (sezione.extra) {
@@ -6496,19 +6625,19 @@ const CLICK_ACTIONS = {
     'exit-demo': () => exitDemo(),
     'open-carry': () => openCarryModal(),
     'confirm-carry': () => confirmCarry(),
-    'confirm-mass': () => { const p = state.pending; closeModal('modalMass'); if (p) { setMode('mass'); importMassRows(p.rows, p.entities); } },
+    'confirm-mass': () => {
+        const p = state.pending;
+        closeModal('modalMass');
+        if (p) { try { importMassRows(p.rows, p.entities); } catch (e) { reportImportError(e); } }
+    },
     'decline-mass': () => { closeModal('modalMass'); state.pending = null; openModal('modalMassDecline'); },
     'cancel-mass': () => { closeModal('modalMass'); state.pending = null; },
     'cancel-pending': () => { closeModal('modalMismatch'); state.pending = null; },
     'switch-client': () => {
         const p = state.pending;
         if (!p) return closeModal('modalMismatch');
-        const c = p.matchedClient || findClient(p.entities[0]) || createDraftClient(p.entities[0]);
-        state.selectedClientId = c.id;
         closeModal('modalMismatch');
-        const rows = p.rows, entity = p.entities[0];
-        state.pending = null;
-        importSingleRows(rows, entity);
+        try { importSingleRows(p.rows, p.entities[0], true); } catch (e) { reportImportError(e); }
     },
     'confirm-mass-review': () => confirmMassReview(),
     'select-group': el => { state.activeGroup = el.dataset.key; renderEditor(); },
@@ -6623,7 +6752,7 @@ async function handleFile(ev, labelId) {
         if (!rows.length) throw new Error('nessun pagamento da importare. Il foglio PAGAMENTI è vuoto: compilalo con i dati del tuo cliente.');
         prepareImport(rows, file.name);
     } catch (e) {
-        toast('Importazione non riuscita: ' + e.message, true);
+        reportImportError(e);
     } finally {
         ev.target.value = '';
     }
@@ -6640,7 +6769,7 @@ function setupDropzone(zoneId, labelId) {
         setText(labelId, f.name);
         readSpreadsheet(f)
             .then(rows => { if (!rows.length) throw new Error('nessun pagamento da importare. Il foglio PAGAMENTI è vuoto: compilalo con i dati del tuo cliente.'); prepareImport(rows, f.name); })
-            .catch(err => toast('Importazione non riuscita: ' + err.message, true));
+            .catch(reportImportError);
     });
 }
 

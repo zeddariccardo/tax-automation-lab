@@ -2548,7 +2548,7 @@ renderSavedList();
     var meta=document.getElementById('upload_meta');if(meta)meta.textContent=accts.length+' conti importati · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   };
   function fsIsExpectedImportError(err){
-    return /^(Fogli obbligatori mancanti:|Il foglio ".+" è vuoto\.|Intestazioni non valide nel foglio |Nessun conto trovato nei fogli di bilancio\.)/.test(String(err&&err.message||''));
+    return !!(err&&err.fsImportError)||/^(Fogli obbligatori mancanti:|Il foglio ".+" è vuoto\.|Intestazioni non valide nel foglio |Nessun conto trovato nei fogli di bilancio\.)/.test(String(err&&err.message||''));
   }
   handleUpload = function(evt){
     var file=evt.target.files&&evt.target.files[0];if(!file)return;
@@ -2560,7 +2560,7 @@ renderSavedList();
       var problema=window.TAL_LIMITS.check(file,'xlsx');
       if(problema){toast(problema,true);evt.target.value='';return;}
     }else if(!/\.(xlsx|xls)$/i.test(file.name)){toast('Formato non supportato: carica un file .xlsx o .xls',true);evt.target.value='';return;}
-    var reader=new FileReader();reader.onload=function(e){try{V13.sheetGuard();parseWorkbook(XLSX.read(e.target.result,{type:'array',cellDates:true}));toast('Bilancio caricato e verificato');}catch(err){if(!fsIsExpectedImportError(err))console.error(err);toast('Errore lettura file: '+err.message,true);} };reader.onerror=function(){toast('Impossibile leggere il file selezionato',true);};reader.readAsArrayBuffer(file);evt.target.value='';
+    var reader=new FileReader();reader.onload=function(e){try{V13.sheetGuard();parseWorkbook(XLSX.read(e.target.result,{type:'array',cellDates:true,cellNF:true,cellText:true,sheetStubs:true}));toast('Bilancio caricato e verificato');}catch(err){if(!fsIsExpectedImportError(err))console.error(err);fsImportDiagnostics('Import non applicato. '+err.message,true);toast('Errore lettura file: '+err.message,true);} };reader.onerror=function(){toast('Impossibile leggere il file selezionato',true);};reader.readAsArrayBuffer(file);evt.target.value='';
   };
 
   V13.tableWrap
@@ -2975,6 +2975,64 @@ function fsAddSchemaEntries(){
 }
 fsAddSchemaEntries();
 
+/* Validazione dell'import separata da STATE, DOM, mapping salvato e autosave.
+   Si leggono le celle originali: sheet_to_json perde errori e formati dei codici. */
+function fsImportError(sheet,row,col,message){
+  const e=new Error('Foglio «'+sheet+'», riga '+(row+1)+', colonna '+XLSX.utils.encode_col(col)+': '+message);
+  e.fsImportError=true;return e;
+}
+function fsImportBlank(value){return value==null||typeof value==='string'&&value.trim()==='';}
+function fsImportSheet(wb,name){
+  const ws=wb.Sheets[name],rows=[];
+  Object.keys(ws).filter(key=>/^[A-Z]+[1-9]\d*$/.test(key)).forEach(key=>{
+    const cell=ws[key],pos=XLSX.utils.decode_cell(key),value=cell.v;
+    if(cell.f&&(value==null||cell.t==='z'))throw fsImportError(name,pos.r,pos.c,'formula senza risultato memorizzato; ricalcola e salva il file in Excel.');
+    if(cell.t==='e'){
+      const labels={0:'#NULL!',7:'#DIV/0!',15:'#VALUE!',23:'#REF!',29:'#NAME?',36:'#NUM!',42:'#N/A',43:'#GETTING_DATA'};
+      throw fsImportError(name,pos.r,pos.c,'errore Excel '+(labels[value]||cell.w||String(value))+'; correggi la cella nel file origine.');
+    }
+    if(typeof value==='string'&&/^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A|GETTING_DATA|SPILL!|CALC!)/i.test(value.trim()))throw fsImportError(name,pos.r,pos.c,'errore Excel '+value.trim()+'.');
+    if(typeof value==='number'&&!Number.isFinite(value))throw fsImportError(name,pos.r,pos.c,'valore numerico non finito.');
+    (rows[pos.r]||(rows[pos.r]=[]))[pos.c]=value==null?'':value;
+  });
+  return {name,ws,rows};
+}
+function fsImportIdentifier(sheet,row,col){
+  const cell=sheet.ws[XLSX.utils.encode_cell({r:row,c:col})];
+  if(!cell||fsImportBlank(cell.v))return '';
+  if(cell.t==='n'){
+    if(!Number.isSafeInteger(cell.v))throw fsImportError(sheet.name,row,col,'identificativo numerico non intero o non rappresentabile esattamente; usa una cella di testo.');
+    const display=String(cell.w??XLSX.utils.format_cell(cell)).trim();
+    // Recupera soltanto zeri effettivamente presenti nella visualizzazione Excel.
+    if(/^0\d+$/.test(display)&&Number(display)===cell.v)return display;
+  }else if(cell.t!=='s'&&cell.t!=='str')throw fsImportError(sheet.name,row,col,'identificativo non valido; usa testo o un numero intero.');
+  return String(cell.v).trim();
+}
+function fsImportAmount(value,sheet,row,col){
+  if(fsImportBlank(value))return 0;
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  const fail=kind=>{throw fsImportError(sheet,row,col,'importo '+kind+' «'+String(value)+'». Usa un numero Excel o un formato esplicito, ad esempio 1234,56.');};
+  if(typeof value!=='string')return fail('non valido');
+  let text=value.trim().replace(/^€\s*|\s*€$/g,'').trim(),sign=1;
+  if(/^\(.*\)$/.test(text)){sign=-1;text=text.slice(1,-1);}
+  else if(/^[+-]/.test(text)){sign=text[0]==='-'?-1:1;text=text.slice(1);}
+  if(!/^(?:\d+(?:[.,]\d+)?|\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d+)?)$/.test(text))return fail('non valido');
+  if(/^\d{1,3}[.,]\d{3}$/.test(text))return fail('ambiguo');
+  text=text.replace(/[ \u00a0\u202f]/g,'');
+  if(text.includes(',')&&text.includes('.'))text=text.lastIndexOf(',')>text.lastIndexOf('.')?text.replace(/\./g,'').replace(',','.'):text.replace(/,/g,'');
+  else if((text.match(/[.,]/g)||[]).length>1)text=text.replace(/[.,]/g,'');
+  else text=text.replace(',','.');
+  const number=sign*Number(text);if(!Number.isFinite(number))return fail('non valido');return number;
+}
+function fsImportDiagnostics(message,error){
+  let host=document.getElementById('fs_import_diagnostics');
+  if(!host){host=document.createElement('div');host.id='fs_import_diagnostics';}
+  if(error)document.getElementById('upload_meta').after(host);else document.getElementById('results_content').prepend(host);
+  host.className='callout warn';host.setAttribute('role',error?'alert':'status');
+  host.style.whiteSpace='pre-line';host.style.overflowWrap='anywhere';host.hidden=!message;host.textContent=message||'';
+}
+window.fsImportDiagnostics=fsImportDiagnostics;
+window.fsBuildWorkbookImport=fsBuildWorkbookImport;
 function fsFindHeaderRow(data){
   for(let r=0;r<Math.min(data.length,15);r++){
     const row=(data[r]||[]).map(x=>String(x||'').trim());
@@ -2983,25 +3041,50 @@ function fsFindHeaderRow(data){
   }
   return null;
 }
-parseWorkbook=function(wb){
+function fsBuildWorkbookImport(wb){
   V13.sheetGuard();
-  const an=V13.findSheet(wb,'Anagrafica');if(an){const ar=XLSX.utils.sheet_to_json(wb.Sheets[an],{header:1,raw:true});const m={};ar.forEach(r=>{if(r&&r[0]&&r[1]!==undefined)m[String(r[0]).trim()]=r[1];});fillAnagrafica(m);}
+  const anagrafica=Object.create(null),warnings=[],an=V13.findSheet(wb,'Anagrafica');
+  if(an){const sheet=fsImportSheet(wb,an);sheet.rows.forEach((r,i)=>{
+    if(!r||fsImportBlank(r[1]))return;
+    const key=String(r[0]??'').trim();if(!key)throw fsImportError(an,i,0,'campo anagrafico vuoto con valore presente.');
+    const value=/^(Partita IVA|Codice fiscale|CAP|Numero REA)$/.test(key)?fsImportIdentifier(sheet,i,1):r[1];
+    if(Object.hasOwn(anagrafica,key)&&String(anagrafica[key])!==String(value))throw fsImportError(an,i,1,'campo anagrafico duplicato con valori discordanti: '+key+'.');
+    anagrafica[key]=value;
+  });}
   const required=[['Stato Patrimoniale','sp'],['Conto Economico','ce']],missing=[],accts=[];let allPrevColumns=true,anyPrevValue=false;
   required.forEach(pair=>{
     const sheet=V13.findSheet(wb,pair[0]),src=pair[1];if(!sheet){missing.push(pair[0]);return;}
-    const data=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,raw:true,defval:''});if(!data.length)throw new Error('Il foglio "'+pair[0]+'" è vuoto.');
+    const input=fsImportSheet(wb,sheet),data=input.rows;if(!data.length)throw new Error('Il foglio "'+pair[0]+'" è vuoto.');
     const h=fsFindHeaderRow(data);if(!h)throw new Error('Intestazioni non valide nel foglio "'+pair[0]+'". Sono obbligatorie: Codice conto, Descrizione conto, Importo esercizio corrente e Voce IV Direttiva.');
+    const columns=[h.ixCode,h.ixDesc,h.ixCur,h.ixPrev,h.ixVoce].filter(c=>c>=0),seen=new Map();
+    columns.forEach(c=>{const key=V13.norm(h.headers[c]),duplicates=h.headers.map((v,i)=>V13.norm(v)===key?i:-1).filter(i=>i>=0);if(duplicates.length>1)throw fsImportError(sheet,h.row,duplicates[1],'intestazione duplicata «'+h.headers[c]+'».');});
     if(h.ixPrev<0)allPrevColumns=false;
     for(let i=h.row+1;i<data.length;i++){
-      const r=data[i],code=String(r[h.ixCode]||'').trim();if(!code||V13.norm(code)==='codice conto')continue;
-      const prev=h.ixPrev>=0?V13.parseAmount(r[h.ixPrev]):0;if(Math.abs(prev)>=0.005)anyPrevValue=true;
-      accts.push({code:code,desc:String(r[h.ixDesc]||'').trim(),importo:V13.parseAmount(r[h.ixCur]),importo_prev:prev,voce:String(r[h.ixVoce]||'').trim()||null,source:src});
+      const r=data[i]||[];if(columns.every(c=>fsImportBlank(r[c])))continue;
+      if(columns.every(c=>V13.norm(r[c])===V13.norm(h.headers[c])))continue; // Solo un header completo ripetuto.
+      const code=fsImportIdentifier(input,i,h.ixCode);
+      if(!code||V13.norm(code)==='codice conto')throw fsImportError(sheet,i,h.ixCode,'codice conto mancante o non valido in una riga valorizzata.');
+      const current=fsImportAmount(r[h.ixCur],sheet,i,h.ixCur),prev=h.ixPrev>=0?fsImportAmount(r[h.ixPrev],sheet,i,h.ixPrev):0;
+      if(Math.abs(prev)>=0.005)anyPrevValue=true;
+      accts.push({code:code,desc:String(r[h.ixDesc]??'').trim(),importo:current,importo_prev:prev,voce:String(r[h.ixVoce]??'').trim()||null,source:src});
+      const key=V13.norm(code),address=XLSX.utils.encode_cell({r:i,c:h.ixCode});
+      if(!seen.has(key))seen.set(key,[]);seen.get(key).push(address);
     }
+    seen.forEach((cells,code)=>{if(cells.length>1)warnings.push('Codice conto duplicato «'+code+'» — '+sheet+': '+cells.join(', ')+'. Righe mantenute separate: verifica descrizioni e mapping, anche quelli salvati.');});
   });
   if(missing.length)throw new Error('Fogli obbligatori mancanti: '+missing.join(', ')+'.');if(!accts.length)throw new Error('Nessun conto trovato nei fogli di bilancio.');
-  STATE.accounts=accts;STATE.leafOverrides={};STATE.storni=[];STATE.adjustments=[];STATE.technicalAix=null;STATE.aiFindings=readAiFindings(wb);STATE.comparativeColumnPresent=allPrevColumns;STATE.comparativeHasValues=anyPrevValue;loadMemory();refreshAll();showResultsUI();
+  return {anagrafica,warnings,state:{accounts:accts,leafOverrides:{},storni:[],adjustments:[],technicalAix:null,
+    aiFindings:readAiFindings(wb),comparativeColumnPresent:allPrevColumns,comparativeHasValues:anyPrevValue}};
+}
+parseWorkbook=function(wb,prepared){
+  const imported=prepared||fsBuildWorkbookImport(wb),next=imported.state;
+  // Unico punto di applicazione: nessuna lettura/validazione Excel da qui in poi.
+  fillAnagrafica(imported.anagrafica);Object.assign(STATE,next);
+  loadMemory();refreshAll();showResultsUI();
+  const accts=next.accounts,allPrevColumns=next.comparativeColumnPresent,anyPrevValue=next.comparativeHasValues;
   const open=(STATE.aiFindings||[]).filter(f=>!f.closed).length;
   const meta=document.getElementById('upload_meta');if(meta)meta.textContent=accts.length+' conti importati · '+(allPrevColumns?(anyPrevValue?'comparativo rilevato':'comparativo presente ma non valorizzato'):'senza colonna comparativa')+(open?' · '+open+(open===1?' eccezione AI da chiudere':' eccezioni AI da chiudere'):'')+' · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  fsImportDiagnostics(imported.warnings.join('\n'),false);
   if(open)toast(open+(open===1?' eccezione segnalata dall’AI':' eccezioni segnalate dall’AI')+' nel foglio «Esiti AI»: le trovi nella scheda Verifiche.');
 };
 
@@ -3011,28 +3094,28 @@ parseWorkbook=function(wb){
    dalla sessione di lavoro. Ora entrano e vanno chiuse una per una. */
 function readAiFindings(wb){
   const sh=V13.findSheet(wb,'Esiti AI');if(!sh)return [];
-  const data=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:''});
+  const input=fsImportSheet(wb,sh),data=input.rows;
   let head=-1;
   for(let r=0;r<Math.min(data.length,15);r++){
     const row=(data[r]||[]).map(x=>String(x||'').trim());
     if(V13.findHeader(row,'Elemento da verificare')>=0){head=r;break;}
   }
-  if(head<0)return [];
+  if(head<0){if(data.some(r=>r&&r.some(v=>!fsImportBlank(v))))throw fsImportError(sh,0,0,'intestazione «Elemento da verificare» mancante.');return [];}
   const H=(data[head]||[]).map(x=>String(x||'').trim());
   /* Le intestazioni del template sono composte («Codice conto / campo»,
      «Osservazione / assunzione»): V13.findHeader vuole la corrispondenza
      esatta, qui serve il prefisso. */
-  const ix=n=>{const k=V13.norm(n);return H.findIndex(x=>V13.norm(x).indexOf(k)===0);};
+  const ix=n=>{const k=V13.norm(n),cols=H.map((x,i)=>V13.norm(x).indexOf(k)===0?i:-1).filter(i=>i>=0);if(cols.length>1)throw fsImportError(sh,head,cols[1],'intestazione duplicata «'+n+'».');return cols.length?cols[0]:-1;};
   const iTipo=ix('Tipo'),iRif=ix('Codice conto'),iEl=ix('Elemento da verificare'),iSt=ix('Stato'),iOss=ix('Osservazione'),iFonte=ix('Fonte');
   const out=[];
   for(let i=head+1;i<data.length;i++){
-    const r=data[i]||[];const g=j=>j>=0?String(r[j]||'').trim():'';
-    const el=g(iEl);if(!el)continue;
+    const r=data[i]||[];const g=j=>j>=0?String(r[j]??'').trim():'';
+    const el=g(iEl);if(!el){if([iTipo,iRif,iSt,iOss,iFonte].some(j=>g(j)))throw fsImportError(sh,i,iEl,'elemento da verificare vuoto in una riga valorizzata.');continue;}
     const tipo=g(iTipo);
     /* La riga di esempio del template non è un'eccezione vera. */
     if(V13.norm(tipo)==='esempio'||/non lasciare questa riga/i.test(el))continue;
     const stato=g(iSt);
-    out.push({tipo:tipo,rif:g(iRif),elemento:el,stato:stato,osservazione:g(iOss),fonte:g(iFonte),
+    out.push({tipo:tipo,rif:iRif>=0?fsImportIdentifier(input,i,iRif):'',elemento:el,stato:stato,osservazione:g(iOss),fonte:g(iFonte),
       closed:/risolt|chius|verificat[oa]$|ok/i.test(stato)});
   }
   return out;
@@ -3204,8 +3287,8 @@ window.refreshAll=function(){assignUids(STATE.accounts||[]);return baseRefresh.a
 try{refreshAll=window.refreshAll;}catch(_){ }
 
 const baseParse=window.parseWorkbook||parseWorkbook;
-window.parseWorkbook=function(wb){
-  const r=baseParse(wb);
+window.parseWorkbook=function(wb,prepared){
+  const r=baseParse(wb,prepared);
   assignUids(STATE.accounts||[]);normalizeTechnicalRows(STATE.accounts||[]);
   window.refreshAll(true);
   if(typeof showResultsUI==='function')showResultsUI();
@@ -3384,19 +3467,13 @@ function clearIdentity(){
   Object.keys(CHOICE_DEFAULTS).forEach(function(id){var e=document.getElementById(id);if(e)e.value=CHOICE_DEFAULTS[id];});
 }
 function identityKey(){return String(g('an_piva')||g('an_cf')||'').trim().toUpperCase();}
-function incomingKey(wb){
-  try{
-    var s=window.V13&&V13.findSheet?V13.findSheet(wb,'Anagrafica'):null;if(!s)return null;
-    var rows=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:true}),m={};
-    rows.forEach(function(r){if(r&&r[0]&&r[1]!==undefined&&r[1]!=='')m[String(r[0]).trim()]=r[1];});
-    return String(m['Partita IVA']||m['Codice fiscale']||'').trim().toUpperCase();
-  }catch(_){return null;}
-}
 var baseParse=window.parseWorkbook;
 window.parseWorkbook=function(wb){
-  var before=identityKey(), incoming=incomingKey(wb), switched=false;
+  // Anche il cambio società deve avvenire soltanto dopo la validazione completa.
+  var prepared=fsBuildWorkbookImport(wb),m=prepared.anagrafica;
+  var before=identityKey(), incoming=String(m['Partita IVA']||m['Codice fiscale']||'').trim().toUpperCase(), switched=false;
   if(incoming&&before&&incoming!==before){clearIdentity();switched=true;}
-  var out=baseParse.call(this,wb);
+  var out=baseParse.call(this,wb,prepared);
   var after=identityKey();
   if(!after){
     anagWarning(before

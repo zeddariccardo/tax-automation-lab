@@ -12,6 +12,7 @@ const BROWSER_TESTS = new Set([
   'f24-import-pdf.test.mjs',
   'financial-statement-characterization.test.mjs',
   'financial-statement-golden.test.mjs',
+  'financial-statement-import.test.mjs',
   'financial-statement-ui-polish.test.mjs',
 ]);
 

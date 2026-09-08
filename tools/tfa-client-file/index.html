@@ -1138,18 +1138,19 @@ function scheduleSave(){
   saveTimer=setTimeout(function(){persist()},450);
 }
 /* Salvataggio dopo una modifica al profilo permanente: registra anche la fotografia storica. */
-function commit(opts){
-  opts=opts||{};var d=state();if(!d)return {changed:false};
+function commit(opts,candidate){
+  opts=opts||{};var d=candidate||state();if(!d)return {changed:false};
+  function finish(result){if(!candidate){scheduleSave();updateShell()}return result}
   var ce=d.profile.corporate.graph.entities.filter(function(e){return e.isClient})[0];if(ce)ce.name=d.client.name;
-  if(opts.snapshot===false){scheduleSave();updateShell();return {changed:true,temporal:false}}
+  if(opts.snapshot===false)return finish({changed:true,temporal:false});
   var before=d._mirror||temporalPayload(d),after=temporalPayload(d),patch=diffTemporal(before,after,[],[]);
-  if(!patch.length){d.nextEffectiveDate='';scheduleSave();updateShell();return {changed:false}}
+  if(!patch.length){d.nextEffectiveDate='';return finish({changed:false})}
   var date=d.nextEffectiveDate||todayISO();d.history=d.history||createHistory(d,todayISO());d.history.seq=Number(d.history.seq||0)+1;
   d.history.changes.push({id:uid('chg'),date:date,seq:d.history.seq,patch:patch});d.history.changes.sort(function(a,b){return a.date===b.date?(a.seq||0)-(b.seq||0):(a.date<b.date?-1:1)});
   d.nextEffectiveDate='';
   var projected=projectAt(todayISO(),d);if(projected){d.client=projected.client;d.profile=projected.profile}
   d.client.currentFY=currentFYFor(d.client);if(!d.years[String(d.client.currentFY)])d.years[String(d.client.currentFY)]={events:[],engagement:null};
-  d._mirror=temporalPayload(d);scheduleSave();updateShell();return {changed:true,effectiveDate:date,scheduled:date>todayISO()};
+  d._mirror=temporalPayload(d);return finish({changed:true,effectiveDate:date,scheduled:date>todayISO()});
 }
 function recordSnapshot(){return commit({snapshot:true})}
 function snapshotAt(dateStr){return projectAt(dateStr,state())}
@@ -3547,6 +3548,73 @@ exportOrgPdf=function(mode){
 /* Backup versionato, validato e ripristinato in due fasi con allegati staged. */
 function buildBackupPayload(){var ids=attachmentIds();return Promise.all(ids.map(function(id){return getAttachment(id)})).then(function(recs){var attachments={};recs.forEach(function(rec,i){if(rec)attachments[ids[i]]=rec});return {format:BACKUP_FORMAT,schemaVersion:BACKUP_SCHEMA_VERSION,appVersion:VERSION,exported:new Date().toISOString(),vault:clone(vault),attachments:attachments}})}
 function exportBackup(){return buildBackupPayload().then(function(payload){downloadBytes(new TextEncoder().encode(JSON.stringify(payload,null,2)),'Fascicolo_fiscale_backup_'+todayISO()+'.json','application/json');toast('Backup JSON esportato · '+vault.clients.length+' '+plural(vault.clients.length,'cliente','clienti'));return payload}).catch(function(e){console.error(e);toast('Backup non riuscito',true);throw e})}
+/* Solo ingressi da file: i dati già salvati continuano a seguire la normale
+   migrazione. Il candidato viene validato senza toccare archivio o vista. */
+function validateImportedClient(d,where){
+  function dates(obj,path){
+    if(!obj||typeof obj!=='object')return;
+    Object.keys(obj).forEach(function(k){
+      var v=obj[k],p=path+'.'+k;
+      if(['date','updated','opened','closed','effective','createdDate','nextEffectiveDate','baselineDate','migratedAt','deadline'].indexOf(k)>=0&&v!=null&&v!==''&&typeof v!=='object')aiDate(v,p);
+      if(v&&typeof v==='object')dates(v,p);
+    });
+  }
+  function profile(p,path){
+    if(!p)return;dates(p,path);
+    var g=p.corporate&&p.corporate.graph;if(!g)return;
+    var seen=Object.create(null);
+    (g.entities||[]).forEach(function(e,i){
+      var at=path+'.corporate.graph.entities['+i+']';
+      if(!e||!aiNorm(e.id)||!aiNorm(e.name))throw new Error(at+': entità incompleta, ID e denominazione obbligatori.');
+      if(seen[e.id]!=null)throw new Error('ID entità duplicato «'+e.id+'»: '+path+'.corporate.graph.entities['+seen[e.id]+'] e ['+i+']. I collegamenti sarebbero ambigui; importazione annullata.');
+      seen[e.id]=i;
+    });
+    (g.relations||[]).forEach(function(r,i){
+      var at=path+'.corporate.graph.relations['+i+']';
+      if(!r||!r.fromId||!r.toId||seen[r.fromId]==null||seen[r.toId]==null)throw new Error(at+': relazione incompleta o riferimento a un ID entità assente.');
+      aiPct(r.ownership,at+'.ownership');aiPct(r.voting,at+'.voting');
+    });
+  }
+  function client(c,path){
+    if(!c)return;dates(c,path);
+    if(c.currentFY!=null&&c.currentFY!=='')aiFY(c.currentFY,path+'.currentFY');
+    if(c.fyEnd&&!validFyEnd(c.fyEnd))throw new Error(path+'.fyEnd: chiusura esercizio non valida.');
+  }
+  client(d.client,where+'.client');profile(d.profile,where+'.profile');
+  if(d.nextEffectiveDate)aiDate(d.nextEffectiveDate,where+'.nextEffectiveDate');
+  Object.keys(d.years||{}).forEach(function(y){aiFY(y,where+'.years');dates(d.years[y],where+'.years.'+y)});
+  if(d.history){
+    aiDate(d.history.baselineDate,where+'.history.baselineDate');
+    if(d.history.migratedAt)aiDate(d.history.migratedAt,where+'.history.migratedAt');
+    if(d.history.baseline){client(d.history.baseline.client,where+'.history.baseline.client');profile(d.history.baseline.profile,where+'.history.baseline.profile')}
+    var checked=Object.create(null);
+    (d.history.changes||[]).forEach(function(change,i){
+      aiDate(change.date,where+'.history.changes['+i+'].date');
+      if(!checked[change.date]&&d.history.baseline){checked[change.date]=true;var projected=projectAt(change.date,d);if(projected){client(projected.client,where+'.history@'+change.date+'.client');profile(projected.profile,where+'.history@'+change.date+'.profile')}}
+    });
+  }
+}
+function restoreImportStorage(key,previous){
+  if(localStorage.getItem(key)===previous)return;
+  try{if(previous===null)localStorage.removeItem(key);else localStorage.setItem(key,previous)}
+  catch(err){if(localStorage.getItem(key)!==previous)throw err}
+}
+function applyImportedVault(candidate){
+  var previous=localStorage.getItem(STORE),old={vault:vault,selectedFY:selectedFY,view:view,historic:historic,saveState:saveState},applied=false;
+  try{
+    // setItem è atomico: prima il salvataggio completo, poi lo stato visibile.
+    localStorage.setItem(STORE,JSON.stringify(candidate));
+    vault=candidate;applied=true;selectedFY=state().client.currentFY;
+    view={scope:'profile',section:'overview',taxArea:null,asOf:null};historic=null;
+    render();setSaveState('ok');
+    clearTimeout(saveTimer);saveTimer=null;
+  }catch(err){
+    vault=old.vault;selectedFY=old.selectedFY;view=old.view;historic=old.historic;
+    restoreImportStorage(STORE,previous);
+    if(applied)render();setSaveState(old.saveState);
+    throw new Error('Salvataggio non riuscito; importazione annullata e lavorazione precedente conservata. '+err.message);
+  }
+}
 function validateBackupPayload(parsed,fileSize){
   if(fileSize>MAX_BACKUP_BYTES)throw new Error('Il backup supera il limite di 25 MB');
   if(!parsed||typeof parsed!=='object')throw new Error('Struttura JSON non valida');
@@ -3554,14 +3622,22 @@ function validateBackupPayload(parsed,fileSize){
   if(parsed.format&&parsed.format!==BACKUP_FORMAT)throw new Error('Formato backup non riconosciuto');
   var v=parsed.vault||parsed;if(!v||!Array.isArray(v.clients)||!v.clients.length)throw new Error('Il backup non contiene clienti');
   if(v.clients.length>500)throw new Error('Numero di clienti non plausibile');
-  var restored=[];v.clients.forEach(function(c,i){if(!c||typeof c!=='object'||!c.data||typeof c.data!=='object')throw new Error('Cliente '+(i+1)+' non valido');var raw=clone(c.data);if(raw.profile&&raw.profile.businessTopics!=null&&!Array.isArray(raw.profile.businessTopics))throw new Error('businessTopics deve essere un array');if(raw.profile&&raw.profile.tax&&raw.profile.tax.areas&&typeof raw.profile.tax.areas!=='object')throw new Error('Aree fiscali non valide');if(!raw.client||!raw.profile)throw new Error('Cliente '+(i+1)+' non conforme allo schema corrente');var data=normalise(raw);restored.push({id:c.id||uid('cli'),data:data})});
+  var restored=[],clientIds=Object.create(null);v.clients.forEach(function(c,i){if(!c||typeof c!=='object'||!c.data||typeof c.data!=='object')throw new Error('Cliente '+(i+1)+' non valido');if(c.id&&clientIds[c.id]!=null)throw new Error('ID cliente duplicato «'+c.id+'»: clienti '+(clientIds[c.id]+1)+' e '+(i+1)+'.');if(c.id)clientIds[c.id]=i;var raw=clone(c.data);if(raw.profile&&raw.profile.businessTopics!=null&&!Array.isArray(raw.profile.businessTopics))throw new Error('businessTopics deve essere un array');if(raw.profile&&raw.profile.tax&&raw.profile.tax.areas&&typeof raw.profile.tax.areas!=='object')throw new Error('Aree fiscali non valide');if(!raw.client||!raw.profile)throw new Error('Cliente '+(i+1)+' non conforme allo schema corrente');validateImportedClient(raw,'Cliente '+(i+1));var data=normalise(raw);restored.push({id:c.id||uid('cli'),data:data})});
   var attachments=parsed.attachments||{};if(attachments&&typeof attachments!=='object')throw new Error('Allegati non validi');Object.keys(attachments).forEach(function(id){var rec=attachments[id];if(!rec||typeof rec!=='object'||typeof rec.data!=='string')throw new Error('Allegato '+id+' non valido');if(!/^data:image\/(png|jpeg|jpg|webp);base64,/i.test(rec.data))throw new Error('Formato allegato non supportato');var approx=Math.ceil((rec.data.split(',')[1]||'').length*0.75);if(approx>MAX_BACKUP_ATTACHMENT_BYTES)throw new Error('Un allegato supera 8 MB')});
   return {schema:schema,vault:v,restored:restored,attachments:attachments};
 }
 function replaceAttachmentIds(obj,map,seen){if(!obj||typeof obj!=='object')return;seen=seen||[];if(seen.indexOf(obj)>=0)return;seen.push(obj);if(obj.attachmentId&&map[obj.attachmentId])obj.attachmentId=map[obj.attachmentId];if(Array.isArray(obj))obj.forEach(function(v){replaceAttachmentIds(v,map,seen)});else Object.keys(obj).forEach(function(k){if(k!=='attachmentId')replaceAttachmentIds(obj[k],map,seen)})}
-function atomicRestore(valid){
-  var oldVault=clone(vault),oldIds=attachmentIds(),map={},staged=[];Object.keys(valid.attachments).forEach(function(old){map[old]=uid('att')});valid.restored.forEach(function(c){replaceAttachmentIds(c.data,map,[])});var puts=Object.keys(valid.attachments).map(function(old){var rec=valid.attachments[old],nid=map[old];staged.push(nid);return putAttachment(nid,rec.data,rec.meta||{})});
-  return Promise.all(puts).then(function(){var nv={version:VAULT_VERSION,currentId:valid.restored[0].id,clients:valid.restored};if(valid.vault.currentId&&valid.restored.some(function(x){return x.id===valid.vault.currentId}))nv.currentId=valid.vault.currentId;vault=nv;if(!persist()){vault=oldVault;return Promise.all(staged.map(deleteAttachment)).then(function(){throw new Error('Impossibile salvare il nuovo archivio')})}selectedFY=state().client.currentFY;view={scope:'profile',section:'overview',taxArea:null,asOf:null};render();return Promise.all(oldIds.filter(function(id){return attachmentIds().indexOf(id)<0}).map(deleteAttachment)).then(function(){return true})}).catch(function(err){vault=oldVault;return Promise.all(staged.map(deleteAttachment)).then(function(){throw err})})
+async function atomicRestore(valid){
+  var previousFallback=localStorage.getItem(ATTACH_FALLBACK),oldIds=attachmentIds(),map={},staged=[],restored=clone(valid.restored);
+  Object.keys(valid.attachments).forEach(function(old){map[old]=uid('att')});restored.forEach(function(c){replaceAttachmentIds(c.data,map,[])});
+  try{
+    // Attende anche le scritture ancora in corso prima di ripulire lo staging.
+    var writes=await Promise.allSettled(Object.keys(valid.attachments).map(function(old){var rec=valid.attachments[old],nid=map[old];staged.push(nid);return Promise.resolve().then(function(){return putAttachment(nid,rec.data,rec.meta||{})})}));
+    var failed=writes.find(function(r){return r.status==='rejected'});if(failed)throw failed.reason;
+    var nv={version:VAULT_VERSION,currentId:restored[0].id,clients:restored};if(valid.vault.currentId&&restored.some(function(x){return x.id===valid.vault.currentId}))nv.currentId=valid.vault.currentId;
+    applyImportedVault(nv);
+  }catch(err){await Promise.all(staged.map(deleteAttachment));restoreImportStorage(ATTACH_FALLBACK,previousFallback);throw err}
+  await Promise.all(oldIds.filter(function(id){return attachmentIds().indexOf(id)<0}).map(deleteAttachment));return true;
 }
 function installBackupImport220(){
   var old=$('#jsonInput');if(!old)return;var nu=old.cloneNode(true);old.parentNode.replaceChild(nu,old);nu.setAttribute('aria-label','Importa backup JSON del fascicolo');
@@ -3625,18 +3701,61 @@ function aiKey(v){return aiNorm(v).toLowerCase().normalize('NFD').replace(/[\u03
 function normalizeTaxId(v){var s=String(v==null?'':v).trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(/^IT\d{11}$/.test(s))s=s.slice(2);return s}
 function aiBool(v){var k=aiKey(v);return ['si','s','yes','y','true','1','x'].indexOf(k)>=0}
 function aiSplit(v){return aiNorm(v).split(/[;,\n]+/).map(function(x){return x.trim()}).filter(Boolean)}
-function aiDate(v){var s=aiNorm(v);if(!s)return '';var m=s.match(/^(\d{4})[-\/]([01]?\d)[-\/]([0-3]?\d)$/);if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');var d=s.match(/^([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](\d{4})$/);if(d)return d[3]+'-'+String(d[2]).padStart(2,'0')+'-'+String(d[1]).padStart(2,'0');return s}
-function aiPct(v){if(v===''||v==null)return '';var n=Number(String(v).replace('%','').replace(',','.').trim());return isFinite(n)?Math.max(0,Math.min(100,n)):''}
+function aiDate(v,where){
+  var s=aiNorm(v);if(!s)return '';
+  var m=/^(\d{4})[-\/]([01]?\d)[-\/]([0-3]?\d)$/.exec(s),d=/^([0-3]?\d)[\/\-.]([01]?\d)[\/\-.](\d{4})$/.exec(s);
+  var y=m?Number(m[1]):d?Number(d[3]):0,month=m?Number(m[2]):d?Number(d[2]):0,day=m?Number(m[3]):d?Number(d[1]):0;
+  var date=new Date(0);date.setUTCFullYear(y,month-1,day);
+  if(!y||!month||!day||date.getUTCFullYear()!==y||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)throw new Error((where||'Data')+': data non valida o inesistente «'+s+'».');
+  return String(y).padStart(4,'0')+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+}
+function aiPct(v,where){
+  var s=aiNorm(v);if(!s)return '';
+  var n=Number(s.replace(/\s*%$/,'').replace(',','.'));
+  if(!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)\s*%?$/.test(s)||!isFinite(n)||n<0||n>100)throw new Error((where||'Percentuale')+': percentuale non valida «'+s+'». Sono ammessi valori da 0 a 100%, senza correzioni automatiche.');
+  return n;
+}
+function aiFY(v,where){var s=aiNorm(v);if(!/^[1-9]\d{3}$/.test(s))throw new Error((where||'FY')+': esercizio non valido «'+s+'». Indica un anno di quattro cifre, ad esempio 2025.');return Number(s)}
 function aiTopicStatus(v){var k=aiKey(v);if(k.indexOf('monitor')>=0)return 'Da monitorare';if(k.indexOf('risolt')>=0||k.indexOf('chius')>=0)return 'Risolto';return 'Ricorrente'}
 function aiEventStatus(v){var k=aiKey(v);if(k.indexOf('conclus')>=0||k.indexOf('chius')>=0)return 'Conclusa';if(k.indexOf('corso')>=0)return 'In corso';return 'Aperta'}
 function aiSheet(wb,names){var map={};wb.SheetNames.forEach(function(n){map[aiKey(n)]=n});for(var i=0;i<names.length;i++){var hit=map[aiKey(names[i])];if(hit)return wb.Sheets[hit]}return null}
-function aiRows(wb,names){var sh=aiSheet(wb,names);if(!sh)return [];return XLSX.utils.sheet_to_json(sh,{defval:'',raw:false,blankrows:false}).map(function(r){var out={};Object.keys(r).forEach(function(k){out[aiKey(k)]=r[k]});return out})}
+function aiRows(wb,names){
+  var sh=aiSheet(wb,names);if(!sh||!sh['!ref'])return [];
+  var name=wb.SheetNames.find(function(n){return wb.Sheets[n]===sh}),range=XLSX.utils.decode_range(sh['!ref']),columns={};
+  for(var c=range.s.c;c<=range.e.c;c++){var head=sh[XLSX.utils.encode_cell({r:range.s.r,c:c})];if(head)columns[aiKey(XLSX.utils.format_cell(head))]=c}
+  // Verifica anche celle che sheet_to_json considera vuote (es. formule senza cache).
+  Object.keys(sh).forEach(function(address){
+    if(!/^[A-Z]+[1-9]\d*$/.test(address))return;var pos=XLSX.utils.decode_cell(address);if(pos.r<=range.s.r)return;
+    var cell=sh[address],where='Foglio «'+name+'», riga '+(pos.r+1)+', cella '+address;
+    if(cell.f&&(cell.v==null||cell.t==='z'))throw new Error(where+': formula senza risultato salvato.');
+    if(cell.t==='e')throw new Error(where+': errore Excel '+(cell.w||XLSX.utils.format_cell(cell)||'non disponibile')+'.');
+  });
+  return XLSX.utils.sheet_to_json(sh,{defval:'',raw:false,blankrows:false}).map(function(r){
+    var out={},meta={sheet:name,row:r.__rowNum__,columns:columns,cells:{},date1904:!!(wb.Workbook&&wb.Workbook.WBProps&&wb.Workbook.WBProps.date1904)};
+    Object.keys(r).forEach(function(k){var key=aiKey(k);out[key]=r[k];if(columns[key]!=null)meta.cells[key]=sh[XLSX.utils.encode_cell({r:meta.row,c:columns[key]})]});
+    Object.defineProperty(out,'_source',{value:meta});
+    return out;
+  });
+}
+function aiLocation(r,key){var s=r&&r._source;if(!s)return key;var col=s.columns[key];return 'Foglio «'+s.sheet+'», riga '+(s.row+1)+', '+(col==null?'colonna mancante':'cella '+XLSX.utils.encode_cell({r:s.row,c:col}))+' ('+key+')'}
+function aiDateField(r,key){
+  var value=aiField(r,key),s=r._source,cell=s&&s.cells[key];
+  if(cell&&cell.t==='n'&&cell.z&&XLSX.SSF.is_date(cell.z)){
+    var d=XLSX.SSF.parse_date_code(cell.v,{date1904:s.date1904});
+    if(!d)throw new Error(aiLocation(r,key)+': data Excel non valida.');
+    value=String(d.y).padStart(4,'0')+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');
+  }
+  return aiDate(value,aiLocation(r,key));
+}
+function aiRequire(r,keys){keys.forEach(function(key){if(!aiField(r,key))throw new Error(aiLocation(r,key)+': riga valorizzata ma incompleta; manca '+key+'.')});return r}
+function aiRecordRows(wb,names,keys){return aiRows(wb,names).filter(aiNonBlankRow).map(function(r){return aiRequire(r,keys)})}
+function aiSingleRow(wb,name){var rows=aiRows(wb,[name]).filter(aiNonBlankRow);if(rows.length>1)throw new Error(aiLocation(rows[1],Object.keys(rows[1])[0])+': il foglio ammette una sola riga; nessuna riga aggiuntiva può essere ignorata.');return rows[0]||{}}
 function aiAoa(wb,names){var sh=aiSheet(wb,names);return sh?XLSX.utils.sheet_to_json(sh,{header:1,defval:'',raw:false,blankrows:false}):[]}
 function aiNonBlankRow(r){return Object.keys(r||{}).some(function(k){return aiNorm(r[k])!==''})}
 function aiFindVersion(wb){var a=aiAoa(wb,['ISTRUZIONI','GUIDA','README']);for(var i=0;i<a.length;i++){if(aiKey(a[i][0])==='versione_template')return aiNorm(a[i][1])}return ''}
 function aiUnique(arr){var out=[],seen={};(arr||[]).forEach(function(v){var k=aiKey(v);if(k&&!seen[k]){seen[k]=1;out.push(aiNorm(v))}});return out}
 function aiField(row,key){return row&&row[key]!=null?aiNorm(row[key]):''}
-function aiMapTopic(r){return {id:uid('top'),title:aiField(r,'titolo'),status:aiTopicStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),source:aiField(r,'fonte'),updated:aiDate(aiField(r,'aggiornato_al'))}}
+function aiMapTopic(r){return {id:uid('top'),title:aiField(r,'titolo'),status:aiTopicStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),source:aiField(r,'fonte'),updated:aiDateField(r,'aggiornato_al')}}
 function aiDiag(p,level,msg){p.diagnostics.push({level:level,msg:msg})}
 
 function parseAiWorkbook(wb,fileName){
@@ -3647,29 +3766,38 @@ function parseAiWorkbook(wb,fileName){
   if(!p.version)aiDiag(p,'warn','Versione template non indicata: provo comunque a leggere i fogli riconosciuti.');
   else if(p.version!==CTP_AI_TEMPLATE_VERSION)aiDiag(p,'warn','Template versione '+p.version+': il tool usa la '+CTP_AI_TEMPLATE_VERSION+'. Importazione tentata in modalità compatibile.');
 
-  var a=aiRows(wb,['ANAGRAFICA']).filter(aiNonBlankRow)[0]||{};
+  var a=aiSingleRow(wb,'ANAGRAFICA');
   p.client={name:aiField(a,'ragione_sociale'),taxId:aiField(a,'codice_fiscale_piva'),country:aiField(a,'paese'),fyType:aiField(a,'esercizio_sociale'),fyEnd:aiField(a,'chiusura_esercizio_mm_gg'),businessType:aiSplit(aiField(a,'tipo_attivita')),markets:aiSplit(aiField(a,'mercati')),description:aiField(a,'descrizione_business')};
+  if(p.client.fyEnd&&!validFyEnd(p.client.fyEnd))throw new Error(aiLocation(a,'chiusura_esercizio_mm_gg')+': chiusura esercizio non valida; indica una data reale MM-GG.');
   if(!p.client.name)aiDiag(p,'warn','Ragione sociale non presente: potrai indicarla nella preview prima di creare un nuovo cliente.');
 
-  p.businessTopics=aiRows(wb,['TEMATICHE_BUSINESS']).filter(function(r){return aiField(r,'titolo')}).map(aiMapTopic);
-  var ac=aiRows(wb,['CONTABILITA']).filter(aiNonBlankRow)[0]||{};
+  p.businessTopics=aiRecordRows(wb,['TEMATICHE_BUSINESS'],['titolo']).map(aiMapTopic);
+  var ac=aiSingleRow(wb,'CONTABILITA');
   p.accounting={standards:aiField(ac,'principi_contabili'),reporting:aiField(ac,'tipo_bilancio'),groupReporting:aiField(ac,'reporting_di_gruppo'),fta:aiField(ac,'first_time_adoption')};
-  p.accountingTopics=aiRows(wb,['TEMATICHE_CONTABILI']).filter(function(r){return aiField(r,'titolo')}).map(aiMapTopic);
-  var cg=aiRows(wb,['SOCIETA_GRUPPO']).filter(aiNonBlankRow)[0]||{};
+  p.accountingTopics=aiRecordRows(wb,['TEMATICHE_CONTABILI'],['titolo']).map(aiMapTopic);
+  var cg=aiSingleRow(wb,'SOCIETA_GRUPPO');
   p.corporate={group:aiField(cg,'gruppo_di_appartenenza'),direction:aiField(cg,'direzione_e_coordinamento'),consolidated:aiField(cg,'consolidato_civilistico'),relatedParties:aiField(cg,'parti_correlate')};
-  p.corporateTopics=aiRows(wb,['TEMATICHE_GRUPPO']).filter(function(r){return aiField(r,'titolo')}).map(aiMapTopic);
-  p.taxSummary=aiRows(wb,['CARATTERISTICHE_FISCALI']).map(function(r){return aiField(r,'caratteristica')}).filter(Boolean);
+  p.corporateTopics=aiRecordRows(wb,['TEMATICHE_GRUPPO'],['titolo']).map(aiMapTopic);
+  p.taxSummary=aiRecordRows(wb,['CARATTERISTICHE_FISCALI'],['caratteristica']).map(function(r){return aiField(r,'caratteristica')});
 
-  var erows=aiRows(wb,['GRUPPO_ENTITA']).filter(function(r){return aiField(r,'id')||aiField(r,'denominazione')});
-  erows.forEach(function(r,i){var lid=aiField(r,'id')||('E'+(i+1)),name=aiField(r,'denominazione');if(!name){aiDiag(p,'warn','GRUPPO_ENTITA: riga '+(i+2)+' senza denominazione, ignorata.');return}p.entities.push({logicalId:lid,name:name,type:aiField(r,'tipo')||'Società',shape:aiField(r,'forma')||'rounded',color:aiField(r,'colore')||'teal',isClient:aiBool(aiField(r,'cliente')),notes:aiField(r,'note')})});
-  var logical={};p.entities.forEach(function(e){logical[aiKey(e.logicalId)]=e});
-  aiRows(wb,['GRUPPO_RELAZIONI']).filter(aiNonBlankRow).forEach(function(r,i){var f=aiField(r,'da_id'),t=aiField(r,'a_id');if(!f||!t){aiDiag(p,'warn','GRUPPO_RELAZIONI: riga '+(i+2)+' incompleta, ignorata.');return}if(!logical[aiKey(f)]||!logical[aiKey(t)]){aiDiag(p,'warn','GRUPPO_RELAZIONI: '+f+' → '+t+' usa un ID non presente in GRUPPO_ENTITA, relazione ignorata.');return}p.relations.push({fromLogical:f,toLogical:t,ownership:aiPct(aiField(r,'quota_percentuale')),voting:aiPct(aiField(r,'diritti_voto_percentuale')),type:aiField(r,'tipo_relazione')||'Partecipazione',label:aiField(r,'etichetta')})});
+  var erows=aiRecordRows(wb,['GRUPPO_ENTITA'],['id','denominazione']),logical=Object.create(null);
+  erows.forEach(function(r){
+    var lid=aiField(r,'id'),key=aiKey(lid),previous=logical[key];
+    if(!key)throw new Error(aiLocation(r,'id')+': ID entità non interpretabile.');
+    if(previous)throw new Error('ID entità duplicato «'+lid+'»: '+aiLocation(previous,'id')+' e '+aiLocation(r,'id')+' («'+aiField(previous,'denominazione')+'» / «'+aiField(r,'denominazione')+'»). I collegamenti sarebbero ambigui; importazione annullata.');
+    logical[key]=r;p.entities.push({logicalId:lid,name:aiField(r,'denominazione'),type:aiField(r,'tipo')||'Società',shape:aiField(r,'forma')||'rounded',color:aiField(r,'colore')||'teal',isClient:aiBool(aiField(r,'cliente')),notes:aiField(r,'note')});
+  });
+  aiRecordRows(wb,['GRUPPO_RELAZIONI'],['da_id','a_id']).forEach(function(r){
+    var f=aiField(r,'da_id'),t=aiField(r,'a_id');
+    ['da_id','a_id'].forEach(function(k){if(!logical[aiKey(aiField(r,k))])throw new Error(aiLocation(r,k)+': ID «'+aiField(r,k)+'» non presente in GRUPPO_ENTITA; collegamento ambiguo o incompleto.');});
+    p.relations.push({fromLogical:f,toLogical:t,ownership:aiPct(aiField(r,'quota_percentuale'),aiLocation(r,'quota_percentuale')),voting:aiPct(aiField(r,'diritti_voto_percentuale'),aiLocation(r,'diritti_voto_percentuale')),type:aiField(r,'tipo_relazione')||'Partecipazione',label:aiField(r,'etichetta')});
+  });
 
-  p.taxRows=aiRows(wb,['FISCALE']).filter(aiNonBlankRow).map(function(r){return {area:aiField(r,'area'),assessment:aiField(r,'esito_area'),title:aiField(r,'titolo'),status:aiTopicStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),source:aiField(r,'fonte'),updated:aiDate(aiField(r,'aggiornato_al'))}});
-  p.litigation=aiRows(wb,['CONTENZIOSO']).filter(function(r){return aiField(r,'titolo')}).map(function(r){return {id:uid('lit'),title:aiField(r,'titolo'),type:aiField(r,'tipo')||'Altro',authority:aiField(r,'autorita'),period:aiField(r,'periodo'),theme:aiField(r,'tema'),status:aiField(r,'stato')||'In corso',risk:aiField(r,'rischio')||'Non valutabile',description:aiField(r,'descrizione'),opened:aiDate(aiField(r,'data_apertura')),closed:aiDate(aiField(r,'data_chiusura'))}});
-  p.transactions=aiRows(wb,['OPERAZIONI']).filter(function(r){return aiField(r,'titolo')}).map(function(r){return {id:uid('trx'),title:aiField(r,'titolo'),type:aiField(r,'tipo')||'Altro',effective:aiDate(aiField(r,'data_efficacia')),description:aiField(r,'descrizione'),aspects:aiSplit(aiField(r,'aspetti_rilevanti')),updated:aiDate(aiField(r,'data_efficacia'))}});
-  p.other=aiRows(wb,['ALTRI_ASPETTI']).filter(function(r){return aiField(r,'titolo')}).map(aiMapTopic);
-  p.fy=aiRows(wb,['FY']).filter(function(r){return aiField(r,'titolo')||aiField(r,'descrizione')}).map(function(r,i){var fy=Number(String(aiField(r,'esercizio')).replace(/\D/g,''));if(!fy){aiDiag(p,'warn','FY: riga '+(i+2)+' senza esercizio valido, ignorata.');return null}return {fy:fy,event:{id:uid('evt'),date:aiDate(aiField(r,'data'))||String(fy)+'-01-01',section:aiField(r,'sezione')||'Altri aspetti rilevanti',area:aiField(r,'area'),title:aiField(r,'titolo')||'Aggiornamento importato',status:aiEventStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),promoted:false,linkedRecord:null},suggestPromote:aiBool(aiField(r,'riporta_nel_profilo'))}}).filter(Boolean);
+  p.taxRows=aiRecordRows(wb,['FISCALE'],['area']).map(function(r){if(!aiField(r,'titolo')&&!/(nessuna|verific)/.test(aiKey(aiField(r,'esito_area'))))throw new Error(aiLocation(r,'titolo')+': indica una tematica o un esito area riconosciuto.');return {area:aiField(r,'area'),assessment:aiField(r,'esito_area'),title:aiField(r,'titolo'),status:aiTopicStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),source:aiField(r,'fonte'),updated:aiDateField(r,'aggiornato_al')}});
+  p.litigation=aiRecordRows(wb,['CONTENZIOSO'],['titolo']).map(function(r){return {id:uid('lit'),title:aiField(r,'titolo'),type:aiField(r,'tipo')||'Altro',authority:aiField(r,'autorita'),period:aiField(r,'periodo'),theme:aiField(r,'tema'),status:aiField(r,'stato')||'In corso',risk:aiField(r,'rischio')||'Non valutabile',description:aiField(r,'descrizione'),opened:aiDateField(r,'data_apertura'),closed:aiDateField(r,'data_chiusura')}});
+  p.transactions=aiRecordRows(wb,['OPERAZIONI'],['titolo']).map(function(r){return {id:uid('trx'),title:aiField(r,'titolo'),type:aiField(r,'tipo')||'Altro',effective:aiDateField(r,'data_efficacia'),description:aiField(r,'descrizione'),aspects:aiSplit(aiField(r,'aspetti_rilevanti')),updated:aiDateField(r,'data_efficacia')}});
+  p.other=aiRecordRows(wb,['ALTRI_ASPETTI'],['titolo']).map(aiMapTopic);
+  p.fy=aiRecordRows(wb,['FY'],['esercizio']).map(function(r){if(!aiField(r,'titolo')&&!aiField(r,'descrizione'))throw new Error(aiLocation(r,'titolo')+': riga FY incompleta, manca titolo o descrizione.');var fy=aiFY(aiField(r,'esercizio'),aiLocation(r,'esercizio'));return {fy:fy,event:{id:uid('evt'),date:aiDateField(r,'data')||String(fy)+'-01-01',section:aiField(r,'sezione')||'Altri aspetti rilevanti',area:aiField(r,'area'),title:aiField(r,'titolo')||'Aggiornamento importato',status:aiEventStatus(aiField(r,'stato')),description:aiField(r,'descrizione'),promoted:false,linkedRecord:null},suggestPromote:aiBool(aiField(r,'riporta_nel_profilo'))}});
   if(p.fy.some(function(x){return x.suggestPromote}))aiDiag(p,'info','Alcune righe FY propongono il riporto nel profilo permanente: per sicurezza verranno importate come aggiornamenti FY da confermare nel tool.');
   return p;
 }
@@ -3678,7 +3806,7 @@ function importCounts(p){return {profile:p.businessTopics.length+p.accountingTop
 function normFyType(v){var k=aiKey(v);return k.indexOf('diverso')>=0||k.indexOf('custom')>=0?'custom':'calendar'}
 function importedClientData(p,nameOverride){
   var name=aiNorm(nameOverride||p.client.name)||'Cliente importato';var ft=normFyType(p.client.fyType),end=aiNorm(p.client.fyEnd);
-  if(ft==='custom'&&!validFyEnd(end)){ft='calendar';end='12-31';aiDiag(p,'warn','Chiusura esercizio non valida: non applicata. Verifica l’esercizio sociale dopo l’importazione.')}if(ft==='calendar')end='12-31';
+  if(ft==='custom'&&!validFyEnd(end))throw new Error('ANAGRAFICA: chiusura esercizio non valida; indica una data reale MM-GG.');if(ft==='calendar')end='12-31';
   var d=newClientData({name:name,taxId:p.client.taxId,country:p.client.country||'Italia',fiscalYearType:ft,fyEnd:end});
   d.client.businessType=aiUnique(p.client.businessType);d.client.markets=aiUnique(p.client.markets);d.client.description=p.client.description;
   d.profile.businessTopics=clone(p.businessTopics);
@@ -3711,6 +3839,18 @@ function mergeImported(target,incoming,useImportedScalars){
 function findImportMatch(p){var tid=normalizeTaxId(p.client.taxId),name=aiKey(p.client.name);var exact=null;vault.clients.some(function(c){if(tid&&normalizeTaxId(c.data.client.taxId)===tid){exact=c;return true}});if(exact)return exact;if(name)vault.clients.some(function(c){if(aiKey(c.data.client.name)===name){exact=c;return true}});return exact}
 function importStatsHtml(p){var c=importCounts(p);return '<div class="import-summary">'+[['Profilo',c.profile],['Gruppo',c.group],['Contenzioso / operazioni',c.lit],['Novità FY',c.fy]].map(function(x){return '<div class="import-stat"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'}).join('')+'</div>'}
 function importDiagnosticsHtml(p){if(!p.diagnostics.length)return '<div class="notice ok"><strong>Nessun problema bloccante.</strong> Il file è leggibile; le sezioni mancanti resteranno da verificare.</div>';return '<div class="import-diagnostics">'+p.diagnostics.map(function(d){return '<div class="import-diag '+esc(d.level)+'">'+esc(d.msg)+'</div>'}).join('')+'</div>'}
+function applyAiImport(p,name,targetId,useImportedScalars){
+  var incoming=importedClientData(p,name);validateImportedClient(incoming,'Excel importato');
+  var candidate=clone(vault),id=targetId||uid('cli');
+  if(targetId){
+    var target=candidate.clients.find(function(c){return c.id===targetId});
+    if(!target)throw new Error('Il cliente da integrare non è più disponibile.');
+    mergeImported(target.data,incoming,useImportedScalars);
+    commit({},target.data); // stesso storico, costruito sul candidato senza autosave
+    validateImportedClient(target.data,'Fascicolo integrato');
+  }else candidate.clients.push({id:id,data:incoming});
+  candidate.currentId=id;applyImportedVault(candidate);
+}
 function showImportPreview(p){
   lastImportPreview=p;var incoming=importedClientData(p,p.client.name||'Cliente importato'),match=findImportMatch(p),conflicts=match?importConflicts(match.data,incoming):[];
   var body='<span class="import-file-name">'+esc(p.fileName||'Workbook Excel')+'</span>'+importStatsHtml(p)+
@@ -3718,15 +3858,19 @@ function showImportPreview(p){
   if(!p.client.name)body+=fText('impName','Denominazione da usare','',{placeholder:'Indica la ragione sociale prima di creare il cliente'});
   if(match){body+='<div class="notice info" style="margin-top:14px"><strong>Cliente esistente trovato:</strong> '+esc(match.data.client.name)+'. Puoi integrare il fascicolo senza cancellare le informazioni già presenti.</div>';if(conflicts.length){body+='<table class="conflict-table"><thead><tr><th>Informazione</th><th>Attuale</th><th>Importata</th></tr></thead><tbody>'+conflicts.map(function(c){return '<tr><td>'+esc(c.label)+'</td><td>'+esc(c.current)+'</td><td>'+esc(c.incoming)+'</td></tr>'}).join('')+'</tbody></table>'+fSelect('impStrategy','In caso di differenza','keep',[{value:'keep',label:'Mantieni i dati già presenti (consigliato)'},{value:'import',label:'Usa i valori importati'}]);}}
   var foot='<button class="btn secondary" data-close type="button">Annulla</button>'+(match?'<button class="btn secondary" id="impMerge" type="button">Integra '+esc(match.data.client.name)+'</button>':'')+'<button class="btn accent" id="impCreate" type="button">Crea nuovo cliente</button>';
-  openModal({title:'Anteprima importazione',sub:'Nulla viene scritto nel fascicolo finché non confermi. Le sezioni mancanti non bloccano l’import.',body:body,foot:foot,wide:true,onMount:function(){var cm=$('#impCreate');cm.onclick=function(){var name=p.client.name||val('impName');if(!name){setError('impName','Indica la denominazione del cliente');return}var createNow=function(){var d=importedClientData(p,name);var id=uid('cli');vault.clients.push({id:id,data:d});vault.currentId=id;selectedFY=d.client.currentFY;view={scope:'profile',section:'overview',taxArea:null,asOf:null};closeModal();persist();render();toast('Cliente creato dal template Excel')};if(match){confirmDialog('Creare un duplicato?','Esiste già “'+match.data.client.name+'” con identificativo o denominazione equivalente. Per evitare duplicazioni involontarie è consigliato integrare il fascicolo esistente.','Crea comunque',false).then(function(ok){if(ok)createNow()})}else createNow()};var mm=$('#impMerge');if(mm)mm.onclick=function(){var target=byId(match.id);if(!target)return;var inc=importedClientData(p,p.client.name||target.data.client.name);mergeImported(target.data,inc,val('impStrategy')==='import');vault.currentId=target.id;selectedFY=target.data.client.currentFY;view={scope:'profile',section:'overview',taxArea:null,asOf:null};closeModal();commit();render();toast('Fascicolo integrato con i dati importati')}}});
+  openModal({title:'Anteprima importazione',sub:'Nulla viene scritto nel fascicolo finché non confermi. Le sezioni mancanti non bloccano l’import.',body:body,foot:foot,wide:true,onMount:function(){
+    function apply(name,targetId,useScalars){try{applyAiImport(p,name,targetId,useScalars);closeModal();toast(targetId?'Fascicolo integrato con i dati importati':'Cliente creato dal template Excel')}catch(err){toast('Importazione annullata: '+err.message,true)}}
+    var cm=$('#impCreate');cm.onclick=function(){var name=p.client.name||val('impName');if(!name){setError('impName','Indica la denominazione del cliente');return}var createNow=function(){apply(name,null,false)};if(match){confirmDialog('Creare un duplicato?','Esiste già “'+match.data.client.name+'” con identificativo o denominazione equivalente. Per evitare duplicazioni involontarie è consigliato integrare il fascicolo esistente.','Crea comunque',false).then(function(ok){if(ok)createNow()})}else createNow()};
+    var mm=$('#impMerge');if(mm)mm.onclick=function(){var target=byId(match.id);if(target)apply(p.client.name||target.data.client.name,target.id,val('impStrategy')==='import')};
+  }});
 }
-function readAiFile(file){if(!file)return;if(file.size>MAX_AI_XLSX_BYTES)return toast('File Excel troppo grande: massimo 12 MB',true);var rd=new FileReader();rd.onerror=function(){toast('Impossibile leggere il file Excel',true)};rd.onload=function(){try{var wb=XLSX.read(rd.result,{type:'array',cellDates:false});validateAiWorkbookLimits(wb);showImportPreview(parseAiWorkbook(wb,file.name))}catch(err){console.error(err);toast('Importazione non riuscita: '+err.message,true)}};rd.readAsArrayBuffer(file)}
+function readAiFile(file){if(!file)return;if(file.size>MAX_AI_XLSX_BYTES)return toast('File Excel troppo grande: massimo 12 MB',true);var rd=new FileReader();rd.onerror=function(){toast('Impossibile leggere il file Excel',true)};rd.onload=function(){try{var wb=XLSX.read(rd.result,{type:'array',cellDates:false,cellNF:true});validateAiWorkbookLimits(wb);showImportPreview(parseAiWorkbook(wb,file.name))}catch(err){toast('Importazione non riuscita: '+err.message,true)}};rd.readAsArrayBuffer(file)}
 function downloadAiTemplate(){var bin=atob(CTP_AI_TEMPLATE_B64),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);downloadBytes(u,CTP_AI_TEMPLATE_FILE,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
 function viewImportData(){return pageHead('Gestione','Importa dati','Il file non deve essere completo: vengono importate soltanto le informazioni presenti; ciò che manca resterà da verificare.')+
   '<div class="import-flow"><section class="import-step"><div class="n">1</div><h3>Scarica il template</h3><p>Un workbook per un solo cliente. Puoi lasciare interi fogli vuoti se non hai informazioni disponibili.</p><button class="btn secondary" data-imp="template" type="button">Scarica template Excel</button></section>'+ 
   '<section class="import-step"><div class="n">2</div><h3>Compilalo con Configura con AI</h3><p>Il prompt istruisce l’AI a non inventare dati e a conservare la struttura del workbook.</p><a class="btn ghost" href="/configura-con-ai/#tfa-client-file">Apri Configura con AI</a></section>'+ 
   '<section class="import-step"><div class="n">3</div><h3>Importa e verifica</h3><p>Prima di creare o integrare il cliente vedrai conteggi, warning e differenze rispetto al fascicolo esistente.</p><button class="btn add-action" data-imp="pick" type="button">Importa Excel</button></section></div>'+ 
-  '<div class="notice info"><strong>Importazione tollerante.</strong> Fogli assenti, campi vuoti, fonti mancanti o sezioni non pertinenti non bloccano l’import. Per sicurezza il file Excel non può superare 12 MB. Vengono scartate solo righe non interpretabili, con un warning visibile nella preview.</div>'+ 
+  '<div class="notice info"><strong>Importazione verificata.</strong> Fogli assenti, righe vuote, fonti mancanti o sezioni non pertinenti non bloccano l’import. Per sicurezza il file Excel non può superare 12 MB. Dati invalidi, collegamenti ambigui o righe valorizzate ma incomplete annullano l’importazione senza modificare il fascicolo.</div>'+
   '<section class="panel s-business"><h2 class="panel-title">Cosa può popolare il template</h2><dl class="kv-list">'+kv('Profilo permanente','Anagrafica, business, contabilità, gruppo, fiscalità e altri aspetti')+kv('Organigramma','Entità e relazioni con quote economiche e diritti di voto')+kv('Eventi','Contenzioso, operazioni straordinarie e novità FY')+kv('Aree non compilate','Restano “Da verificare”; non vengono trasformate in conclusioni positive')+'</dl></section>'+ 
   '<div class="page-actions"><button class="btn ghost" data-imp="demo" type="button">Prova con i dati dimostrativi</button></div>'}
 function viewClientManager(){var q=aiKey(clientManagerQuery||'');var rows=vault.clients.filter(function(c){return !q||aiKey(c.data.client.name+' '+c.data.client.taxId).indexOf(q)>=0});return pageHead('Gestione','Clienti','Apri, cerca o crea un fascicolo. Ogni cliente mantiene profilo permanente, esercizi e storico indipendenti.','<button class="btn add-action" data-cm="new" type="button">＋ Nuovo cliente</button><button class="btn secondary" data-cm="import" type="button">Importa Excel</button>')+

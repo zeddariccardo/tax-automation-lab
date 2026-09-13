@@ -12,6 +12,8 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 export async function startWorkerBrowser() {
   const allowed = new Set(execFileSync('git', ['ls-files', '-z'], { cwd: ROOT, encoding: 'utf8' }).split('\0'));
   allowed.add('assets/tal-api-connection.js'); // new client, before its first commit
+  allowed.add('tools/forfettario/index.html'); // new route, before its first commit
+  allowed.add('tools/forfettario/authoritative-client.js');
   const browser = await chromium.launch({ headless: true });
   return {
     async open(slug, { origin = 'https://taxautomationlab.com', storage = {}, session = {}, api } = {}) {

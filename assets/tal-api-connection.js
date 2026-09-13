@@ -1,8 +1,9 @@
-/* Same-origin transport for the four authoritative tools. No calculation,
+/* Same-origin transport for the authoritative tools. No calculation,
    payload transformation or access to client archives belongs in this module. */
 (function () {
   'use strict';
   const calculationPath = /^\/api\/(?:confronto-regimi|lipe|financial-statement|financial-analysis)\/calcola$/;
+  const forfettarioPath = /^\/api\/forfettario\/(?:config|calcola|ateco\/risolvi)$/;
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname.toLowerCase());
   const legacyKeys = ['tal-api-base', 'tal-api-modo', 'tal-lipe-api'];
   let base = '';
@@ -29,7 +30,7 @@
   let confirmed = false, pending = null;
   function invalidate() { confirmed = false; }
   function url(path) {
-    if (path !== '/api/stato' && !calculationPath.test(path)) throw new Error('Percorso del servizio non valido.');
+    if (path !== '/api/stato' && !calculationPath.test(path) && !forfettarioPath.test(path)) throw new Error('Percorso del servizio non valido.');
     return base + path;
   }
   async function ready() {

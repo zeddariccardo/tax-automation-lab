@@ -71,12 +71,14 @@ MIT.txt. The zlib notice for pako is reproduced below:
   3. This notice may not be removed or altered from any source distribution.
 
 Vendored SheetJS CE build verification:
-  File:    xlsx.full.min.js 0.20.3 (embedded in each operational tool HTML)
+  File:    xlsx.full.min.js 0.20.3 (embedded in six operational tool HTML files;
+           served as /assets/vendor/sheetjs-0.20.3.min.js for Forfettario)
   MD5:     6b3130af1ceadf07caa0ec08af7addff
   SHA-256: cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41
 
-The six embedded copies are byte-identical after line-ending normalisation.
-tests/vendored-libraries.test.mjs checks the SHA-256 signature on every run.
+The six embedded copies and the Forfettario asset are byte-identical after
+line-ending normalisation. tests/vendored-libraries.test.mjs checks the
+SHA-256 signature on every run.
 
 --------------------------------------------------------------------------------
 2. REMOTELY LOADED DECORATIVE MODULE

@@ -33,6 +33,8 @@ const root = path.resolve(here, '..');
 
 const TOOLS = ['financial-statement', 'financial-analysis', 'lipe',
                'tfa-client-file', 'f24', 'confronto-regimi'];
+const FORFETTARIO_ASSET = path.join(root, 'assets', 'vendor', 'sheetjs-0.20.3.min.js');
+const FORFETTARIO_PAGE = path.join(root, 'tools', 'forfettario', 'index.html');
 
 /* Il blocco vendorizzato è il <script> che contiene il banner di SheetJS.
    Si legge in binario e si normalizzano i fine riga, perché nel repository
@@ -54,6 +56,10 @@ function bloccoSheetJS(slug) {
 
 function firma(corpo) {
   return crypto.createHash('sha256').update(corpo + '\n', 'utf8').digest('hex');
+}
+
+function corpoSheetJSAsset() {
+  return fs.readFileSync(FORFETTARIO_ASSET, 'utf8').trim().replace(/\r\n/g, '\n');
 }
 
 test('SheetJS: i sei tool incorporano la stessa identica copia', () => {
@@ -79,6 +85,26 @@ test('SheetJS: la copia è quella dichiarata nei Third-party notices', () => {
     .map(([slug, f]) => `  ${slug}: ${f}`);
   assert.equal(sbagliati.length, 0,
     `i notices dichiarano ${dichiarata}\n${sbagliati.length} tool non corrispondono:\n${sbagliati.join('\n')}`);
+});
+
+test('SheetJS: l’asset del Forfettario coincide con la copia dichiarata', () => {
+  const notices = fs.readFileSync(path.join(root, 'legal-docs', 'THIRD-PARTY-NOTICES.txt'), 'utf8');
+  const dichiarata = (notices.match(/SHA-256:\s*([0-9a-f]{64})/) || [])[1];
+  const corpo = corpoSheetJSAsset();
+  assert.match(corpo, /^\/\*! xlsx\.js \(C\) 2013-present SheetJS/);
+  assert.equal(firma(corpo), dichiarata);
+});
+
+test('SheetJS: il Forfettario usa solo l’asset locale e lo prepara per il caricamento differito', () => {
+  const html = fs.readFileSync(FORFETTARIO_PAGE, 'utf8');
+  const notices = fs.readFileSync(path.join(root, 'legal-docs', 'THIRD-PARTY-NOTICES.txt'), 'utf8');
+  assert.doesNotMatch(html, /<script[^>]+src=["'][^"']*sheetjs/i,
+    'SheetJS non deve essere caricato insieme alla pagina');
+  assert.match(html, /src:'\/assets\/vendor\/sheetjs-0\.20\.3\.min\.js'/);
+  assert.match(html, /version:'0\.20\.3'/);
+  assert.match(html, /sha256:'cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41'/);
+  assert.match(notices, /SheetJS Community Edition 0\.20\.3 — Apache License 2\.0/);
+  assert.match(notices, /https:\/\/git\.sheetjs\.com\/sheetjs\/sheetjs/);
 });
 
 test('SheetJS: nel bundle non è finito codice del tool', () => {

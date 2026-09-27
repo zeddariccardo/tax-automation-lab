@@ -123,6 +123,12 @@ button.text-link { border: 0; background: transparent; padding: 0; min-height: 4
 #amount-form input, #amount-form select { width: 100%; min-height: 48px; font: inherit; }
 #amount-form select { border: 1px solid var(--line-strong); border-radius: 8px; padding: 10px; background: var(--surface); color: var(--ink); }
 #amount-form > .button { width: 100%; }
+#pension-form .field { margin-bottom: 18px; }
+#pension-form input { width: 100%; min-height: 48px; font: inherit; }
+#pension-form > .button { width: 100%; }
+.pension-records { margin-top: 32px; }
+.tax-detail dl { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
+.tax-detail dd { margin: 0; text-align: right; }
 .row-main h3 button { font: inherit; color: inherit; }
 .button:disabled { cursor: default; opacity: .55; }
 .profile strong, .rail-label, .client-bar strong, .client-link h2 { overflow-wrap: anywhere; }

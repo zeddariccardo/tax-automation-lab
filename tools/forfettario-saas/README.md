@@ -1,3 +1,48 @@
+# S09 — Oggi e Tasse reali
+
+Questo e lo stato corrente; le sezioni S08/S07/S06 sotto sono resoconti storici.
+Base frontend 3bca0cacc26b4e0e9e872c0bb1efb8ceb00bd3cc, branch feature/s07-saas-integration.
+Backend base 2011e2fcff01aa48ff2439d87d4e937a53985538 piu gli artefatti S09 approvati.
+
+- Oggi/Tasse ricevono incassato, reddito, imposta, previdenza, contributi dedotti,
+  riserva, saldo/acconti/calendario e forecast da cloud → Edge autenticata → Worker.
+  Browser invia soltanto workspace/anno, mai un payload fiscale arbitrario.
+- tal-data-service esteso con calculateFiscal e recordPension. Le view non fanno fetch.
+  Nessun nuovo motore o fallback fiscale nel browser, nessun risultato persistito.
+- Contributi pagati: non indicato resta mancante; nessun versamento e uno zero
+  dichiarato; i versamenti registrati sono condivisi con lo Studio autorizzato.
+  Form semplice: data/importo; gestione non inventata. Audit e idempotenza server.
+- Il calcolo precedente scompare prima di una scrittura/nuova lettura e in caso di
+  errore, revoca, cambio posizione, logout o risposta tardiva. 409/429/503 recuperabili.
+- Situazione e previsione restano separate; riserva e prossimo pagamento non sommati.
+  Importi non determinabili mostrati come Da definire. Limiti del calendario Worker
+  conservati. Nessun F24 o pagamento automatico.
+- Auth, contesti, strutture, Entrate e fiscalita sono reali. Attivita/Documenti e
+  lista Scadenze complessiva dello Studio sono ancora demo, esplicitamente indicate.
+- Profilo/requisiti/ATECO/forecast cloud sintetici predisposti dal test; nessun form
+  nuovo per modificarli. Supporto annualita 2025/2026. Nessun dato reale.
+
+Verifiche S09: frontend fiscale 14/14; Auth 20/20, lifecycle 20/20, Entrate 17/17,
+S06 9/9; statici 310/310; backend fiscale 29/29, S01 15/15 anche da PostgreSQL;
+E2E hosted 28/28, smoke finale 17/17, Auth hosted 18/18, strutture hosted 21/21.
+Atteso del test strutturale A aggiornato al seed S09 esplicito, B/dual incompleti.
+Revoca stesso JWT: nuova lettura/calcolo/scrittura Studio negati, owner disponibile;
+link ripristinato. Worker e RLS precedenti invariati. Nessuna chiave privilegiata in UI.
+Browser reale: Studio/owner, Oggi/Tasse, previsione, versamento 10,02 da mobile,
+reload (110,03 totale contributi, 4.606,07 incassato); 1440/1024/390/375 senza overflow.
+Focus e pannello nel viewport verificati; nessun errore console non gestito/404 finale.
+Suite generali browser preesistenti tentate ma bloccate da Chromium spawn EPERM;
+non sono dichiarate verdi. Nessuna prova su tastiera virtuale/hardware mobile.
+
+Esecuzione locale: node --test tools/forfettario-saas/fiscal.test.mjs insieme alle
+suite Auth/dati/Entrate/preview. Preview su 127.0.0.1:4174 con serve-dev.mjs.
+CSP limitata agli endpoint approvati, incluso il solo gateway fiscale e la RPC
+previdenziale; nessun accesso UI diretto a Worker, Document, Activity o Storage.
+config.local.js ignorato; nessun valore reale in config.example.js.
+Checkpoint solo feature, nessun merge main/deployment pubblico. Backend S09 documenta
+migration, bundle Edge development, seed, limiti e riproduzione test.
+
+---
 # S08 — Entrate cloud
 
 Base frontend: `77c0febac5599a9ef9f75e9547f153dfbb3db612`, branch

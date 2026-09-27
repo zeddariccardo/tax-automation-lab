@@ -3,8 +3,11 @@ import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
 import { cloud, service } from './tal-data-runtime.js';
 import { createIncomeController } from './income-controller.js';
+import { createFiscalController } from './fiscal-controller.js';
+import { fiscalView } from './fiscal-view.js';
 import { parseAmount, amountInput, formatCents } from './income-model.js';
 const incomes = createIncomeController({auth,service});
+const fiscals = createFiscalController({auth,service});
 let access = auth.getState();
 let structural = cloud.getState();
 const fiscalDemos = new Map();
@@ -76,7 +79,7 @@ const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<
 const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Entrate reali · dati fiscali ancora demo. Oggi, tasse, scadenze, documenti e attività restano esempi locali. Usa soltanto dati sintetici.</p>'; }
+function footer() { return '<p class="page-footer">Entrate e calcoli fiscali collegati ai dati cloud. Attività, documenti e la lista Scadenze dello Studio restano demo. Ambiente di sviluppo: usa soltanto dati sintetici.</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -94,6 +97,7 @@ function showRoute(focus) {
   if (route().role === 'studio' && route().page === 'clienti' && !route().client) clientQuery = saved?.query || '';
   render(true);
   void cloud.refresh();
+  if(['oggi','tasse'].includes(route().page))void fiscals.refresh();
   window.scrollTo(0, saved?.scroll || 0);
 }
 function navigate(url, { open, focus } = {}) {
@@ -117,7 +121,7 @@ function shell(r, content) {
   const studioName = structural.data?.studio?.name || access.selected.label;
   const activePage = r.page === 'documenti' ? 'attivita' : r.page;
   const clientHeader = r.client && p ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${icon('person')}</span><div class="row-main"><strong>${esc(p.label)}</strong>${p.studioReference ? '<small>Riferimento Studio · '+esc(p.studioReference)+'</small>' : ''}</div><button class="text-link" type="button" data-action="profile">Dati della posizione</button></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r,key)}" ${activePage===key?'aria-current="page"':''}>${label}</a>`).join('')}</nav>` : '';
-  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati fiscali demo</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
+  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
 }
 function cloudStatus() {
   if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Un momento…')+'<p role="status">Stiamo caricando la tua posizione.</p>';
@@ -126,12 +130,9 @@ function cloudStatus() {
 }
 function profileDetails(p) {
   const start = p.startDate ? new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(p.startDate)) : 'Non indicata';
-  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura. Gli importi della preview restano esempi.</p>`;
+  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura. Attività e documenti restano esempi separati.</p>`;
 }
 
-const reserveMeaning = 'La riserva stima imposte e contributi sugli incassi considerati, tenendo conto dei versamenti indicati. Non misura il denaro già messo da parte.';
-const paymentMeaning = 'Il pagamento previsto riguarda una scadenza specifica. In questa demo non è stabilito quanto del pagamento rientri nella riserva: non usarli per ricavare un totale.';
-function amountMeaning() { return `<details class="amount-meaning"><summary>Riserva e pagamento: la differenza</summary><p>${reserveMeaning}</p><p>${paymentMeaning}</p></details>`; }
 function receipt(p) { return p.documents.find(d => d.id === p.request.documentId); }
 function documentButton(d) { return d ? button('document', icon('file')+'Apri documento', `data-document="${d.id}"`) : ''; }
 function requestAction(r, p) {
@@ -144,23 +145,12 @@ function requestState(r, p) {
   if (p.request.state === 'submitted') return r.role === 'studio' ? 'Documento ricevuto. Da verificare.' : 'Ricevuta inviata. Ora la controlla Studio di esempio.';
   return `Ricevuta verificata da ${'Studio di esempio'}.`;
 }
-function deadlineStrip(r) {
-  return `<section class="deadline-strip" aria-label="Prossimo pagamento previsto"><div class="deadline-detail"><div class="date-tile"><strong>30</strong><span>nov</span></div><div><p class="eyebrow">Prossimo pagamento previsto</p><h3>Acconti di novembre</h3><p class="muted small">Imposte e contributi</p></div></div><div class="deadline-end"><strong class="money">${euro(214000)}</strong>${link(href(r, 'tasse'), 'Dettaglio pagamento', 'text-link', false, 'data-focus="payment-detail"')}</div></section>`;
+function fiscalPage(r) {
+ const year=positionFor(r.id)?.years[0]?.year || new Date().getFullYear();
+ fiscals.select(r.id,year);
+ return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading,button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-function today(r, p) {
-  const studio = r.role === 'studio';
-  const discrepancy = studio && p.issue === 'difference' && !p.differenceResolved;
-  const actionable = discrepancy || (studio ? p.request.state === 'submitted' : p.request.state === 'todo');
-  let task;
-  if (actionable) {
-    task = `<section class="task-card" id="current-task" tabindex="-1"><span class="task-label">${icon('todo')}${studio ? 'Da fare' : 'Da fare · Studio di esempio'}</span><h2>${discrepancy ? 'Un versamento da controllare' : 'Ricevuta contributi'}</h2>${discrepancy ? '<p>Il cliente ha indicato 320 € in più rispetto alla ricevuta.</p>'+button('difference', 'Controlla differenza') : requestAction(r, p)}</section>`;
-  } else {
-    const text = p.request.state === 'submitted' ? requestState(r,p) : p.request.state === 'todo' ? 'Ricevuta richiesta. In attesa del cliente.' : 'Nessuna attività da svolgere.';
-    task = `<div class="task-status"><p>${text}</p>${p.request.state !== 'completed' ? link(href(r,'attivita'),'Apri attività','text-link',false) : ''}</div>`;
-  }
-  return `${heading(studio ? 'Riepilogo' : 'Buongiorno',studio ? '' : esc(positionLabel(r.id)),studio ? '' : '<button class="text-link" type="button" data-action="profile">La mia posizione</button>')}<div class="today-grid"><section class="income-hero" aria-label="Incassi e riserva fiscale"><div class="income-line"><div><p class="eyebrow">Incassati nel 2026</p><strong class="hero-amount money">${euro(p.received)}</strong></div>${link(href(r, 'entrate'), 'Vedi entrate')}</div><div class="reserve"><div><p class="reserve-label">Riserva fiscale stimata</p><strong class="amount money">${p.tax ? euro(p.tax.current.reserve) : 'Da definire'}</strong><p>${p.tax ? 'Su '+euro(p.tax.current.income)+' incassati'+(p.received !== p.tax.current.income ? ' · stima iniziale della demo' : '') : 'Stima non disponibile nella demo'}</p></div>${link(href(r,'tasse'),'Dettaglio riserva','text-link',false,'data-focus="reserve-detail"')}</div>${p.tax ? amountMeaning() : ''}</section>${task}${p.tax ? deadlineStrip(r) : ''}</div>`;
-}
-
+const today=fiscalPage;
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.paid < i.total);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
@@ -171,15 +161,10 @@ function income(r) {
   const state=incomes.getState();
   if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Carichiamo fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
   const p=state.data;
-  return `${heading('Entrate', 'Entrate reali · dati fiscali ancora demo', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" disabled title="Disponibile in un prossimo aggiornamento">${icon('upload')}Importa fatture</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
+  return `${heading('Entrate', 'Fatture e incassi della tua posizione', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" disabled title="Disponibile in un prossimo aggiornamento">${icon('upload')}Importa fatture</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
 
-function taxes(r, p) {
-  if (!p.tax) return `${heading('Tasse e contributi')}<p class="empty">Per questo cliente non abbiamo aggiunto stime nella demo. La posizione di Mario include un esempio completo.</p>`;
-  const forecast = r.role === 'personal' && taxMode === 'forecast'; const t = p.tax[forecast ? 'forecast' : 'current'];
-  return `${heading('Tasse e contributi')}${r.role === 'personal' ? `<div class="segmented" aria-label="Periodo della stima"><button data-tax="current" aria-pressed="${!forecast}">Situazione attuale</button><button data-tax="forecast" aria-pressed="${forecast}">Previsione di fine anno</button></div>` : ''}<div class="tax-layout"><section><div class="tax-total" id="reserve-detail" tabindex="-1"><p class="eyebrow">Riserva fiscale stimata${forecast ? ' · a fine anno' : ''}</p><strong class="amount money">${euro(t.reserve)}</strong><p>${forecast ? `Se a fine anno avrai incassato ${euro(t.income)}. È un’ipotesi, non un importo già dovuto.` : `Su ${euro(t.income)} incassati. Considera già ${euro(t.paid)} di contributi versati.`}</p></div>${amountMeaning()}<div class="breakdown"><div><span>Imposta sostitutiva</span><strong class="money">${euro(t.tax)}</strong></div><div><span>Contributi</span><strong class="money">${euro(t.contributions)}</strong></div><div><span>Contributi già versati</span><strong class="money">− ${euro(t.paid)}</strong></div></div><details class="tax-detail"><summary>${icon('chevron')}Dettaglio della stima</summary><p>Esempio: consulente in Gestione Separata, senza altra copertura previdenziale, imposta al 15%. I contributi versati indicati nell’esempio riducono il reddito su cui stimare l’imposta e la riserva fiscale stimata.</p><dl><dt>Incassi considerati</dt><dd>${euro(t.income)}</dd><dt>Coefficiente di redditività</dt><dd>78%</dd><dt>Aliquota previdenziale dell’esempio</dt><dd>26,07%</dd></dl><p>Importi dimostrativi al 27 settembre 2026. Le azioni simulate sulle entrate non ricalcolano questa stima. Il pagamento di novembre è un esempio distinto.</p></details></section><section id="payment-detail" class="payment-detail" tabindex="-1"><h2>Prossimo pagamento previsto</h2><div class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h3>Acconti di novembre</h3><p>30 novembre 2026 · Imposte e contributi</p></div><strong class="money">${euro(214000)}</strong></div><p class="calendar-note">${r.role === 'studio' ? 'Importo previsto da controllare prima del versamento.' : 'Lo Studio confermerà l’importo prima del versamento.'}</p>${link(href(r,'attivita'),r.role === 'studio' ? 'Apri attività sul pagamento' : 'Chiedi allo Studio','text-link',true,'data-focus="payment-context"')}</section></div>`;
-}
-
+const taxes=fiscalPage;
 function documents(r, p) {
   return `${link(href(r,'attivita'),icon('back')+'Torna ad Attività','text-link archive-back',false)}${heading('Archivio documenti')}<div class="section-line"><span class="small muted">2026</span>${r.role === 'personal' ? '<button class="button secondary" type="button" data-action="upload-other">'+icon('plus')+'Aggiungi un altro documento</button>' : ''}</div><div class="list document-list">${p.documents.map(d => `<article class="row"><span class="doc-icon">${icon('file')}</span><div class="row-main"><h3>${d.name}</h3><p>${d.date} · PDF di esempio</p><span class="uploaded-label">${d.state === 'completed' ? icon('check')+'Verificato dallo Studio' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio' : 'Condiviso con lo Studio'}</span></div><button class="icon-button" type="button" data-action="document" data-document="${d.id}" aria-label="Apri ${d.name}">${icon('arrow')}</button></article>`).join('')}</div>`;
 }
@@ -213,6 +198,7 @@ function render(focus = false) {
   }
   const r = route();
   if(r.page!=='entrate')incomes.select(null);
+  if(!['oggi','tasse'].includes(r.page))fiscals.select(null,null);
   renderedHash = location.hash;
   document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
   if (r.role === 'entry') app.innerHTML = entry();
@@ -262,6 +248,35 @@ function moneyForm(command, initial='', invoice=null) {
   return `<form id="amount-form" data-command="${command}" novalidate>${creating?'<div class="field"><label for="invoice-number">Numero fattura</label><input id="invoice-number" name="number" maxlength="80" required autocomplete="off"></div><div class="field"><label for="invoice-customer">Cliente</label><input id="invoice-customer" name="customer" maxlength="180" required autocomplete="off"></div>':''}<div class="field"><label for="money-date">${creating?'Data fattura':'Data incasso'}</label><input id="money-date" name="date" type="date" value="${localDate()}" required></div><div class="field"><label for="amount">${creating?'Importo della fattura (€)':'Quanto hai ricevuto? (€)'}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off" required><p id="amount-help">${creating?'Registra una fattura già emessa. In questa prova usa soltanto dati fittizi.':'Restano '+euro(invoice.residual)+' da incassare.'}</p></div>${creating&&activities.length>1?'<div class="field"><label for="invoice-activity">Attività</label><select id="invoice-activity" name="activity" required><option value="">Scegli l’attività</option>'+activities.map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join('')+'</select></div>':''}<p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${creating?'Aggiungi fattura':'Registra incasso'}</button></form>`;
 }
 const moneyJobs=new WeakMap();
+const pensionJobs=new WeakMap();
+function pensionForm(d){
+ return '<p>Indica i contributi previdenziali obbligatori che hai pagato e che sono rimasti a tuo carico. Non inserire quelli ancora da pagare. Aggiungi tutti i versamenti effettuati.</p><form id="pension-form" data-year="'+d.year+'" data-revision="'+d.dataRevision+'"><div class="field"><label for="pension-date">Data del versamento</label><input id="pension-date" name="date" type="date" min="'+d.year+'-01-01" max="'+d.year+'-12-31" value="'+localDate()+'" required></div><div class="field"><label for="pension-amount">Importo versato (€)</label><input id="pension-amount" name="amount" inputmode="decimal" required autocomplete="off"></div><p id="pension-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Registra versamento</button>'+(d.pensionPayments.length?'':'<button class="text-link auth-exit" type="button" data-action="pension-none">Non ho effettuato versamenti nel '+d.year+'</button>')+'</form>';
+}
+async function savePension(form,action){
+ if(!form||form.dataset.busy==='true')return;
+ const r=route(),identity=access.user?.id+':'+access.selected?.context_id;
+ const current=()=>access.phase==='ready'&&identity===access.user.id+':'+access.selected.context_id&&route().id===r.id&&form.isConnected;
+ try{
+  if(!pensionJobs.has(form)){
+   const fields=new FormData(form);const input={year:Number(form.dataset.year),action,expectedDataRevision:Number(form.dataset.revision)};
+   if(action==='add'){input.paidDate=fields.get('date');input.amountCents=parseAmount(fields.get('amount'));}
+   pensionJobs.set(form,{key:crypto.randomUUID(),input});
+  }
+  const job=pensionJobs.get(form);form.dataset.busy='true';for(const el of form.querySelectorAll('input,button'))el.disabled=true;
+  form.querySelector('#pension-error').textContent='';fiscals.invalidate();
+  await service.recordPension(r.id,job.input,job.key);pensionJobs.delete(form);
+  if(!current())return;await fiscals.refresh();if(current())done(action==='none'?'Nessun versamento dichiarato.':'Versamento registrato.');
+ }catch(error){
+  if(!current())return;
+  const uncertain=error.code==='uncertain'||error.code==='stale';if(!uncertain)pensionJobs.delete(form);
+  await fiscals.refresh();if(!current())return;
+  const data=fiscals.getState().data;if(data)form.dataset.revision=data.dataRevision;
+  for(const el of form.querySelectorAll('input,button'))el.disabled=uncertain&&el.tagName==='INPUT'||['forbidden','expired'].includes(error.code);
+  form.querySelector('[type="submit"]').textContent='Riprova';
+  const message=form.querySelector('#pension-error');message.textContent=error.code==='conflict'?'La posizione è cambiata. Controlla i dati e riprova.':error.code==='amount'?'Inserisci un importo positivo, con al massimo due decimali.':uncertain?'Non abbiamo ricevuto conferma. Riprova: il versamento non verrà duplicato.':'Non è stato possibile registrare il versamento. Controlla data e importo.';message.focus();
+ }finally{form.dataset.busy='false';}
+}
+document.addEventListener('submit',event=>{if(event.target.id==='pension-form'){event.preventDefault();void savePension(event.target,'add');}});
 const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione: controlla e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Non abbiamo ricevuto conferma. Riprova: lo stesso tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
@@ -270,6 +285,12 @@ async function action(name, element) {
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
+    case 'fiscal-retry': await fiscals.refresh(); break;
+    case 'pension': {
+      const d=fiscals.getState().data;if(!d||d.workspaceId!==r.id)return;
+      openPanel('Contributi già versati',pensionForm(d));break;
+    }
+    case 'pension-none': await savePension(document.querySelector('#pension-form'),'none');break;
     case 'data-retry': await cloud.refresh(); break;
     case 'profile': if(positionFor(r.id)) openPanel('Dati della posizione',profileDetails(positionFor(r.id))); break;
     case 'account':
@@ -373,6 +394,7 @@ document.addEventListener('submit', async event => {
       const job=moneyJobs.get(form);form.dataset.busy='true';
       for(const el of form.querySelectorAll('input,select,button'))el.disabled=true;
       form.querySelector('[type="submit"]').textContent='Salvataggio…';form.querySelector('#form-error').textContent='';
+      fiscals.invalidate();
       await service[job.method](r.id,job.input,job.key);
       moneyJobs.delete(form);
       if(!stillCurrent())return;
@@ -430,6 +452,7 @@ function clearPosition() {
   clearTimeout(notificationTimer); notice.textContent = '';
   fiscalDemos.clear();
   incomes.select(null);
+  fiscals.select(null,null);
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 auth.subscribe(next => {
@@ -452,4 +475,9 @@ cloud.subscribe(next => {
   render(false);
 });
 incomes.subscribe(()=>{if(route().page==='entrate')render(false);});
+fiscals.subscribe(()=>{if(['oggi','tasse'].includes(route().page))render(false);});
+const refreshFiscal=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','tasse'].includes(route().page)&&!panel.open)void fiscals.refresh();};
+window.addEventListener('focus',refreshFiscal);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)fiscals.invalidate();else refreshFiscal();});
+window.setInterval(refreshFiscal,30000);
 void auth.restore();

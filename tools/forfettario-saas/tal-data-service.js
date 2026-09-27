@@ -125,7 +125,7 @@ export function createTalDataService({ auth, fetchImpl }) {
           if(response.status>=500)throw problem('uncertain');
           throw problem('invalid');
         }
-        if(!uuid.test(body?.invoiceId)||!Number.isSafeInteger(body?.dataRevision) || (name==='tal_record_payment'&&!uuid.test(body?.paymentId)))throw problem('uncertain');
+        if(!Number.isSafeInteger(body?.dataRevision) || (name!=='tal_record_pension_payment'&&!uuid.test(body?.invoiceId)) || (name==='tal_record_payment'&&!uuid.test(body?.paymentId)))throw problem('uncertain');
         return body;
       })();
       pending.set(identity,{body:frozen,promise});
@@ -133,6 +133,19 @@ export function createTalDataService({ auth, fetchImpl }) {
     });
   }
   return {
+    calculateFiscal: (id,year) => auth.withContextSession(async session=>{
+      if(!uuid.test(id)||![2025,2026].includes(year))throw problem('invalid');
+      let r;try{r=await fetchImpl(session.config.supabaseUrl+'/functions/v1/tal-calculate-fiscal',{
+        method:'POST',credentials:'omit',cache:'no-store',redirect:'error',signal:AbortSignal.timeout(30000),
+        headers:{apikey:session.config.publishableKey,Authorization:'Bearer '+session.token,'Content-Type':'application/json','x-tal-context':session.context.context_type+':'+session.context.context_id},
+        body:JSON.stringify({workspaceId:id,year}),
+      });}catch(e){throw problem('unavailable');}
+      if(!r.ok){await r.body?.cancel();throw problem(r.status===401?'expired':r.status===404||r.status===403?'forbidden':r.status===409?'conflict':r.status===429?'limited':'unavailable');}
+      let data;try{data=await r.json();}catch{throw problem('unavailable');}
+      if(data?.workspaceId!==id||data.year!==year||!Number.isSafeInteger(data.dataRevision)||!Array.isArray(data.missing)||!Array.isArray(data.pensionPayments))throw problem('unavailable');
+      return data;
+    }),
+    recordPension: (id,input,key) => command('tal_record_pension_payment',id,key,input),
     loadContext: () => auth.withContextSession(session => load(session)),
     readPosition: id => auth.withContextSession(async session => (await load(session, id)).positions.find(p => p.id === id)),
     listInvoices: (id,year=new Date().getFullYear()) => auth.withContextSession(session=>income(session,id,year)),

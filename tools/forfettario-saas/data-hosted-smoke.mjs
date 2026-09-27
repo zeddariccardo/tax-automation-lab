@@ -29,7 +29,12 @@ try {
    const d=await s.data.loadContext();
    const expected=context.context_type==='personal'?[context.context_id]:context.context_id===sa.context_id?[wa]:[];
    check(name+' / '+context.context_type,()=>{assert.deepEqual(d.positions.map(p=>p.id).sort(),expected.sort());assert.equal(d.source,'cloud');assert.ok(d.positions.every(p=>p.label.startsWith('SYNTHETIC')));});
-   if(context.context_type==='personal')check(name+' structural empty states',()=>{assert.ok(d.positions.every(p=>p.startDate===null&&p.studioReference===null&&!p.activities.length));assert.deepEqual(d.positions[0].years.map(y=>y.year),context.context_id===wa?[2026]:[]);});
+   if(context.context_type==='personal')check(name+' explicit S09 structural fixtures and missing states',()=>{
+    const p=d.positions[0];assert.equal(p.studioReference,null);
+    if(context.context_id===wa){assert.equal(p.startDate,'2020-01-01');assert.equal(p.activities.length,1);assert.equal(p.activities[0].atecoCode,'69.20.01');}
+    else{assert.equal(p.startDate,null);assert.deepEqual(p.activities,[]);}
+    assert.deepEqual(p.years.map(y=>y.year),context.context_id===wa?[2026]:[]);
+   });
   }
  }
  await assert.rejects(a.data.readPosition(wb),{code:'forbidden'});

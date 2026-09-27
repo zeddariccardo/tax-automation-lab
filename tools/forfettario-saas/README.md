@@ -89,3 +89,33 @@ Rieseguiti: suite S06 **9/9 PASS**, controlli statici frontend **310/310 PASS**,
 La suite backend non è stata rieseguita in questo checkpoint, come richiesto: l'ultima esecuzione riportata sopra aveva failure di avvio Chromium `EPERM`, non attribuite alle modifiche S06. Hash e diff confermano che il Forfettario pubblico e le superfici pubbliche preesistenti sono invariati.
 
 Checkpoint autorizzato sul branch separato `checkpoint/s06-ux-preview`. GitHub Pages pubblica da `main`: questo checkpoint lascia `main` e le impostazioni Pages invariati e non prevede deployment. Il commit comprende esclusivamente questa cartella; le modifiche preesistenti dell'utente restano escluse.
+
+## S06.1 — Rilevazione brand prima delle modifiche
+
+Fonti lette: `assets/site-shell.css`, `assets/tal-app.css`, `assets/tal-design.css`, font locali e header della homepage. Confronto renderizzato: homepage, Forfettario pubblico, F24 e Analisi di bilancio, senza operare sui loro dati.
+
+| Token TAL rilevato | Valore esistente | Uso nella preview |
+|---|---|---|
+| `--tal-accent / -2 / -deep / -soft` | `#145368 / #1D6A7F / #0C3341 / #EAF2F5` | CTA e hover, link, navigazione attiva, accenti e superfici discrete |
+| `--tal-session-1 / --tal-save-1` | `#5B3A8C / #6D3C99` | Viola già presente nelle barre/azioni TAL: focus e selezioni secondarie, senza gradienti |
+| `--tal-violet` editoriale | `#A867D8` | Riferimento della famiglia viola; per i controlli su carta si usa la variante scura già esistente |
+| `--tal-paper / -card / -sunken` | `#F6F5F1 / #FFFFFF / #F0EFEB` | Canvas, superfici di lavoro e dettagli neutri |
+| `--tal-fg / -ink / -ink-2 / -ink-3` | `#0B0B0B / #1D1B16 / #47443F / #6E6B65` | Testo, importi operativi, secondari e bordi dei campi |
+| `--tal-line / -line-2` | `#E7E4DC / #DCDAD4` | Separatori e bordi |
+| `--tal-warn / --tal-gold` | `#A53D28 / #8B6A16` | Messaggi espliciti già presenti; nessuna nuova semantica fiscale |
+
+Nel CSS condiviso, le variabili storiche `--tal-purple` sono alias petrolio: il viola effettivo dei tool viene dai token session/save definiti più avanti. Il focus attuale dei tool è petrolio; S06.1 usa il viola scuro TAL per il focus, come richiesto. Il sito editoriale usa testi chiari su fondo scuro: questi valori non vengono trasferiti sui fondi chiari dell'app.
+
+Identità: riutilizzare il monogramma RZ effettivamente incorporato nell'header TAL, mantenendone pixel e proporzioni, al posto della T inventata in S06. Tipografia: Inter per lavoro quotidiano, numeri e pannelli; Newsreader solo nel titolo d'ingresso, in continuità con la homepage. Nessuna modifica a IA, dati, copy operativo o journey.
+
+### Esito S06.1
+
+Allineati soltanto `app.css`, `mark.svg`, il theme-color di `index.html` e questo README. CTA/link/navigazione usano petrolio; nome TAL, focus e selezioni secondarie usano viola scuro. Le due opzioni attuale/previsione hanno lo stesso trattamento quando selezionate: viola indica selezione, non previsione o un significato fiscale. Importi dovuti e stati documentali restano leggibili attraverso testo, icone e gerarchia. Nessun gradiente aggiunto, nessun aumento di padding o altezza delle superfici.
+
+Il PNG del monogramma è copiato byte per byte dall'header homepage e incorporato in `mark.svg` su una piccola base petrolio, senza ridisegnarlo o alterarne le proporzioni. SHA-256 del PNG originale/riusato: `63d8ff503e0ee79daf8c0134b02572fcece4f386e7b9a9623f4b17050c1e0413`. Nessuna nuova risorsa esterna.
+
+Verifica nel browser: confronto TAL/F24 e SaaS alla stessa larghezza, entrambe le aree a 1440×900, 1024×768, 390×844 e 375×812; nessun overflow o target visibile inferiore a 44 px nelle 44 rilevazioni. Journey contribuente (fattura, incasso, richiesta, documento, previsione, Oggi) e Studio (verifica, ritorno alla coda, ricerca ID conservata e scadenza pertinente): PASS. Verificati focus viola, Tab, delimitazione del focus nella modale e Back; i mock sono stati ripristinati.
+
+Test S06 **9/9 PASS**, statici frontend **310/310 PASS**. Nessun errore/warning console o 404 osservato; sette risorse locali e CSP `connect-src 'none'`. Contrasto minimo dei testi visibili campionati nelle schermate mobili: **4,68:1**, senza failure; non costituisce certificazione completa di accessibilità. Il confronto visivo conferma la stessa identità TAL con layout S06 autonomo.
+
+`app.js`, `demo-service.js` e i test funzionali sono invariati; nessuna modifica fuori dalla preview rispetto allo snapshot iniziale. Lavoro locale su `checkpoint/s06-ux-preview`, senza commit, push, deployment o collegamenti a servizi reali.

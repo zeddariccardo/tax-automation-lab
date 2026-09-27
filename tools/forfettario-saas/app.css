@@ -138,3 +138,8 @@ button.text-link { border: 0; background: transparent; padding: 0; min-height: 4
   .cloud-profile dd { margin-bottom: 12px; }
   .client-bar > .text-link { flex-basis: 100%; }
 }
+
+/* S10: the same quiet activity surface, real files and scoped operations. */
+.today-activity{margin-top:2rem}.collaboration-item{padding:1.25rem 0}.collaboration-item .message{white-space:pre-wrap;overflow-wrap:anywhere}.collaboration-item .actions{margin-top:.75rem}.contextual-document{max-width:100%;text-align:left;overflow-wrap:anywhere}.contextual-document svg{flex-shrink:0}input[type=file]{max-width:100%;font-size:.875rem}input[type=file]::file-selector-button{border:1px solid var(--line,#ddd);background:transparent;border-radius:.4rem;padding:.75rem;margin-right:.5rem;cursor:pointer}.collaboration-item .state-line{margin:.5rem 0}.waiting-row .row-main p{overflow-wrap:anywhere}.document-list h2{overflow-wrap:anywhere}
+@media(max-width:600px){.collaboration-item{padding:1rem 0}.collaboration-item .actions .button{width:100%}.today-activity{margin-top:1.25rem}.waiting-row{gap:.75rem}.dialog-body .field input[type=file]{width:100%}.list .row h2{overflow-wrap:anywhere}}
+@media(max-width:600px){.document-list .row{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:start;gap:12px}.document-list .row>.button{grid-column:2;width:100%;justify-content:center}.document-list .row-main h2{font-size:17px;overflow-wrap:anywhere}}

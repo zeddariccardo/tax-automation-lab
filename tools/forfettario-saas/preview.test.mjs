@@ -9,7 +9,7 @@ const root = path.resolve(dir, '../..');
 const read = name => readFileSync(path.join(dir, name), 'utf8');
 const fresh = async () => (await import(`./demo-service.js?test=${crypto.randomUUID()}`)).demoService;
 
-test('demo fixtures isolated; network limited to Auth and approved structural, Entrate and S09 endpoints', () => {
+test('demo fixtures isolated; network limited to Auth and approved structural, Entrate S09 and S10 endpoints', () => {
   const html = read('index.html');
   assert.match(html, /name="robots" content="noindex,nofollow"/);
   assert.ok(html.includes('connect-src https://*.supabase.co/auth/v1/ https://*.supabase.co/rest/v1/rpc/tal_list_my_contexts'));
@@ -17,7 +17,9 @@ test('demo fixtures isolated; network limited to Auth and approved structural, E
   for(const endpoint of ['invoice','invoice_component','payment','allocation','rpc/tal_create_invoice','rpc/tal_record_payment'])assert.ok(html.includes('https://*.supabase.co/rest/v1/'+endpoint));
   assert.ok(html.includes('https://*.supabase.co/functions/v1/tal-calculate-fiscal'));
   assert.ok(html.includes('https://*.supabase.co/rest/v1/rpc/tal_record_pension_payment'));
-  assert.doesNotMatch(html, /rest\/v1\/(document|activity_feed_item)|storage\/v1|functions\/v1\/(?!tal-calculate-fiscal)/);
+  for(const name of ['document','activity_feed_item','rpc/tal_post_activity','rpc/tal_reserve_document','rpc/tal_finalize_document','rpc/tal_advance_request','rpc/tal_delete_document'])assert.ok(html.includes('/rest/v1/'+name));
+  for(const name of ['tal-verify-document-upload','tal-download-document'])assert.ok(html.includes('/functions/v1/'+name));
+  assert.doesNotMatch(html,/tal_attest_document_upload|object\/authenticated|storage\/v1\/object[ ;]/);
   assert.match(html, /form-action 'none'/);
   for (const name of ['app.js', 'demo-service.js']) {
     assert.doesNotMatch(read(name), /\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon|localStorage|sessionStorage|indexedDB)\s*[.(]/);

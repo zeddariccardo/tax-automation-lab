@@ -1,4 +1,6 @@
-import { createDemoService } from './demo-service.js';
+import { createCollaborationController } from './collaboration-controller.js';
+import { collaborationView } from './collaboration-view.js';
+import { createCollaborationUI } from './collaboration-ui.js';
 import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
 import { cloud, service } from './tal-data-runtime.js';
@@ -10,11 +12,7 @@ const incomes = createIncomeController({auth,service});
 const fiscals = createFiscalController({auth,service});
 let access = auth.getState();
 let structural = cloud.getState();
-const fiscalDemos = new Map();
-function demoFor(id) {
-  if (!fiscalDemos.has(id)) fiscalDemos.set(id, createDemoService());
-  return fiscalDemos.get(id);
-}
+const collaborations=createCollaborationController({auth,service});
 const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
 const positionFor = id => positions().find(p => p.id === id);
 const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
@@ -79,7 +77,7 @@ const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<
 const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Entrate e calcoli fiscali collegati ai dati cloud. Attività, documenti e la lista Scadenze dello Studio restano demo. Ambiente di sviluppo: usa soltanto dati sintetici.</p>'; }
+function footer() { return '<p class="page-footer">Entrate e calcoli fiscali collegati ai dati cloud. Attività e documenti sono condivisi con lo Studio. La lista Scadenze dello Studio resta demo. Ambiente di sviluppo: usa soltanto dati sintetici.</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -98,9 +96,10 @@ function showRoute(focus) {
   render(true);
   void cloud.refresh();
   if(['oggi','tasse'].includes(route().page))void fiscals.refresh();
+  if(['oggi','attivita','documenti','da-fare'].includes(route().page))void collaborations.refresh();
   window.scrollTo(0, saved?.scroll || 0);
 }
-function navigate(url, { open, focus } = {}) {
+function navigate(url, { open, focus, requestId } = {}) {
   const proceed = () => {
     rememberView();
     const r = route();
@@ -108,7 +107,8 @@ function navigate(url, { open, focus } = {}) {
     history.pushState({ origin: source, panel: null, context: focus === 'payment-context' ? focus : null }, '', url);
     showRoute(focus);
     if (focus) focusContext(focus);
-    if (open) action(open, document.querySelector('#main'));
+    if (open) void collaborations.refresh().then(()=>{if(location.hash!==url)return;focusContext(focus);return action(open,{dataset:{request:requestId}});}).catch(()=>notify('Attività non disponibile.'));
+    else if(focus?.startsWith('activity-'))void collaborations.refresh().then(()=>focusContext(focus));
   };
   if (panel.open) closePanel(proceed); else proceed();
 }
@@ -130,27 +130,20 @@ function cloudStatus() {
 }
 function profileDetails(p) {
   const start = p.startDate ? new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(p.startDate)) : 'Non indicata';
-  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura. Attività e documenti restano esempi separati.</p>`;
+  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura.</p>`;
 }
 
-function receipt(p) { return p.documents.find(d => d.id === p.request.documentId); }
-function documentButton(d) { return d ? button('document', icon('file')+'Apri documento', `data-document="${d.id}"`) : ''; }
-function requestAction(r, p) {
-  if (p.request.state === 'todo') return r.role === 'studio' ? '<p class="muted small">In attesa del cliente.</p>' : button('upload-request', icon('upload')+'Carica documento');
-  if (r.role === 'studio' && p.request.state === 'submitted') return button('review', 'Verifica documento');
-  return documentButton(receipt(p));
-}
-function requestState(r, p) {
-  if (p.request.state === 'todo') return '';
-  if (p.request.state === 'submitted') return r.role === 'studio' ? 'Documento ricevuto. Da verificare.' : 'Ricevuta inviata. Ora la controlla Studio di esempio.';
-  return `Ricevuta verificata da ${'Studio di esempio'}.`;
+function collaboration(r,mode='activity') {
+ const ids=mode==='queue'?positions().map(p=>p.id):r.id?[r.id]:[];
+ collaborations.select(ids);
+ return collaborationView({r,state:collaborations.getState(),access,positions:positions(),heading,link,href,button,esc,icon,mode});
 }
 function fiscalPage(r) {
  const year=positionFor(r.id)?.years[0]?.year || new Date().getFullYear();
  fiscals.select(r.id,year);
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading,button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=fiscalPage;
+const today=r=>fiscalPage(r)+collaboration(r,'today');
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.paid < i.total);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
@@ -165,21 +158,9 @@ function income(r) {
 }
 
 const taxes=fiscalPage;
-function documents(r, p) {
-  return `${link(href(r,'attivita'),icon('back')+'Torna ad Attività','text-link archive-back',false)}${heading('Archivio documenti')}<div class="section-line"><span class="small muted">2026</span>${r.role === 'personal' ? '<button class="button secondary" type="button" data-action="upload-other">'+icon('plus')+'Aggiungi un altro documento</button>' : ''}</div><div class="list document-list">${p.documents.map(d => `<article class="row"><span class="doc-icon">${icon('file')}</span><div class="row-main"><h3>${d.name}</h3><p>${d.date} · PDF di esempio</p><span class="uploaded-label">${d.state === 'completed' ? icon('check')+'Verificato dallo Studio' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio' : 'Condiviso con lo Studio'}</span></div><button class="icon-button" type="button" data-action="document" data-document="${d.id}" aria-label="Apri ${d.name}">${icon('arrow')}</button></article>`).join('')}</div>`;
-}
-
-function activity(r, p) {
-  const paymentContext = history.state?.context === 'payment-context';
-  return `${heading('Attività','',link(href(r,'documenti'),'Archivio documenti','text-link',false))}<div class="feed"><article class="feed-item"><span class="avatar">SR</span><div class="feed-meta"><strong>Studio di esempio</strong><time>${p.request.created}</time></div><p class="message">${p.request.text}</p><div class="feed-request">${p.request.state !== 'todo' ? '<p class="state-line">'+requestState(r,p)+'</p>' : ''}${requestAction(r,p)}</div></article>${p.messages.map(m => `<article class="feed-item"><span class="avatar ${m.from === 'you' ? 'warm' : ''}">${m.from === 'you' ? 'CL' : 'SR'}</span><div class="feed-meta"><strong>${m.from === 'you' ? (r.role === 'personal' ? 'Tu' : esc(positionLabel(r.id))) : 'Studio di esempio'}</strong><time>${m.date}</time></div><p class="message">${esc(m.text)}</p>${m.context === 'payment-context' ? '<p class="message-context">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</p>' : ''}${m.documentId && m.documentId !== p.request.documentId ? documentButton(p.documents.find(d=>d.id===m.documentId)) : ''}</article>`).join('')}</div><form class="composer" id="message-form">${paymentContext ? '<div class="message-context" id="payment-context" tabindex="-1">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</div>' : ''}<label for="message">${r.role === 'studio' ? 'Scrivi al cliente' : 'Scrivi allo Studio'}</label><textarea id="message" name="message" rows="3" maxlength="500" required placeholder="Aggiungi un messaggio…"></textarea><div class="actions">${button('send', 'Invia messaggio', 'id="send-message"')}</div></form>`;
-}
-
-function todo() {
-  const clients = positions();
-  if (!clients.length) return heading('Da fare')+'<p class="empty">Nessun cliente collegato.</p>';
-  const waiting = clients.filter(c=>demoFor(c.id).getPosition('mario').request.state !== 'completed');
-  return `${heading('Da fare','Le attività mostrate sono esempi, non richieste effettive.')}<section class="waiting-list"><h2>In attesa del cliente · esempio</h2>${waiting.length ? waiting.map(c=>'<div class="waiting-row"><div><strong>'+esc(c.label)+'</strong><p>Ricevuta contributi richiesta · esempio</p></div>'+link('#/studio/clienti/'+c.id+'/attivita','Apri attività','text-link',false)+'</div>').join('') : '<p>Nessuna attività nell’esempio.</p>'}</section>`;
-}
+const documents=r=>collaboration(r,'documents');
+const activity=r=>collaboration(r);
+const todo=()=>collaboration(route(),'queue');
 function clientRows(query = '') {
   const all = positions();
   if (!all.length) return '<p class="empty">Nessun cliente collegato.</p>';
@@ -192,6 +173,11 @@ function deadlines() {
 }
 
 function render(focus = false) {
+  const composer=document.querySelector('#message-form');
+  const draft=renderedHash===location.hash?composer?.elements.message.value:null;
+  const messageFocused=document.activeElement?.id==='message';
+  const selection=messageFocused?[document.activeElement.selectionStart,document.activeElement.selectionEnd]:null;
+  if(composer?.dataset.busy==='true'&&!focus)return;
   if (access.phase === 'ready') {
     const prefix = access.selected.context_type === 'personal' ? '#/io/' : '#/studio/';
     if (!location.hash.startsWith(prefix)) history.replaceState({ panel: null }, '', prefix + (access.selected.context_type === 'personal' ? 'oggi' : 'da-fare'));
@@ -207,11 +193,11 @@ function render(focus = false) {
     if (structural.phase !== 'ready') content = cloudStatus();
     else if (r.id && !positionFor(r.id)) content = heading('Posizione non disponibile')+'<p role="status">Questa posizione non è disponibile nel contesto scelto.</p>'+returnLink();
     else if (r.id) {
-      const p = demoFor(r.id).getPosition('mario');
-      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity })[r.page](r, p);
+      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity })[r.page](r);
     } else content = ({ 'da-fare': todo, clienti: clients, scadenze: deadlines })[r.page]();
     app.innerHTML = shell(r, content);
   }
+  if(draft!==null&&draft!==undefined&&document.querySelector('#message')){const input=document.querySelector('#message');input.value=draft;if(messageFocused){input.focus({preventScroll:true});input.setSelectionRange(...selection);}}
   if (focus) document.querySelector('#main').focus({ preventScroll: true });
 }
 
@@ -240,7 +226,6 @@ function done(message) {
   panels.delete(history.state?.panel);
   closePanel(() => { render(true); window.scrollTo(0, scroll); notify(message); });
 }
-function syntheticFile(name) { return `<div class="demo-file"><span class="example-stamp">SYNTHETIC TEST DATA</span><div class="doc-icon">${icon('file')}</div><h3>${name}</h3><p>Documento fittizio per esplorare la preview. Non è una ricevuta valida e non contiene dati personali reali.</p></div>`; }
 const localDate=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 function moneyForm(command, initial='', invoice=null) {
   const data=incomes.getState().data, creating=command==='invoice-save';
@@ -281,8 +266,9 @@ const moneyErrors={amount:'Inserisci un importo positivo con al massimo due deci
 let currentInvoice;
 async function action(name, element) {
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
-  const r = route(); const p = r.id && positionFor(r.id) ? demoFor(r.id).getPosition('mario') : null;
+  const r = route();
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
+  if(await collaborationUI.action(name,element))return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
     case 'fiscal-retry': await fiscals.refresh(); break;
@@ -300,23 +286,6 @@ async function action(name, element) {
     case 'auth-retry': await auth.restore(); break;
     case 'auth-logout': loginEmail = ''; await auth.logout(); break;
     case 'close': closePanel(); break;
-    case 'upload-request': case 'upload-other':
-      openPanel(name === 'upload-request' ? 'Carica la ricevuta' : 'Aggiungi un documento', `<p>Per questa prova abbiamo preparato un documento di esempio. Non selezionare file personali.</p>${syntheticFile(name === 'upload-request' ? 'Ricevuta contributi · esempio' : 'Documento di esempio')}${button(name === 'upload-request' ? 'upload-save-request' : 'upload-save-other', icon('upload')+'Usa documento di esempio')}`); break;
-    case 'upload-save-request': case 'upload-save-other': {
-      const token = history.state?.panel;
-      element.disabled = true; element.textContent = 'Aggiunta in corso…';
-      await new Promise(resolve => setTimeout(resolve, 280));
-      if (!panel.open || closingPanel || token !== history.state?.panel) return;
-      demoFor(r.id).uploadExample('mario', name === 'upload-save-request'); done(name === 'upload-save-request' ? 'Ricevuta inviata. Ora la controlla Studio di esempio.' : 'Documento aggiunto all’archivio. Le richieste aperte restano invariate.'); break;
-    }
-    case 'review':
-      openPanel('Verifica la ricevuta', `<p>${esc(positionLabel(r.id))} ha condiviso questo documento. Nella demo puoi simularne la verifica.</p>${syntheticFile('Ricevuta contributi')}${button('review-save', icon('check')+'Segna verificato')}`); break;
-    case 'review-save': demoFor(r.id).completeRequest('mario'); done('Ricevuta verificata. Il cliente vede l’aggiornamento.'); break;
-    case 'document': {
-      const d = p.documents.find(d => d.id === element.dataset.document);
-      if (!d) return;
-      openPanel(d.name, `<p>${r.role === 'studio' ? esc(positionLabel(r.id))+' · ' : ''}${d.state === 'completed' ? 'Verificato dallo Studio.' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio.' : 'Condiviso con lo Studio.'}</p>${syntheticFile(d.name)}<p>Anteprima simulata: nessun file viene scaricato.</p>${link(href(r,'documenti'),'Archivio documenti','text-link',false)}`); break;
-    }
     case 'add-invoice': if(incomes.getState().phase==='ready')openPanel('Una nuova fattura',moneyForm('invoice-save')); break;
     case 'payment': {
       currentInvoice = incomes.getState().data?.invoices.find(i=>i.id===element.dataset.invoice);
@@ -330,9 +299,7 @@ async function action(name, element) {
       if(route().id!==r.id||route().page!=='entrate')return;
       openPanel('Fattura '+esc(item.number),'<p>'+esc(item.customer)+'</p><dl class="cloud-profile"><dt>Importo</dt><dd>'+euro(item.total)+'</dd><dt>Residuo</dt><dd>'+euro(item.residual)+'</dd></dl><h3>Incassi registrati</h3>'+(item.payments.length?'<ul class="receipt-list">'+item.payments.map(x=>'<li><span>'+new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(x.date))+'</span><strong>'+ (x.cash===null?'Da verificare':euro(x.cash))+'</strong></li>').join('')+'</ul>':'<p>Nessun incasso registrato.</p>')+(!item.simple?'<p>Questa fattura richiede un controllo dei dettagli prima di registrare altri incassi.</p>':''));break;
     }
-    case 'send': document.querySelector('#message-form').requestSubmit(); break;
-    case 'difference': openPanel('Un versamento da chiarire', `<p>${esc(positionLabel(r.id))} ha indicato 320 € in più rispetto alla ricevuta. Nell’esempio si tratta del saldo dell’anno precedente.</p>${syntheticFile('Nota del cliente · esempio')}${button('difference-save', 'Segna controllato')}`); break;
-    case 'difference-save': demoFor(r.id).resolveDifference('mario'); done('Differenza controllata. La nota è in Attività.'); break;
+
   }
 }
 
@@ -341,7 +308,7 @@ document.addEventListener('click', event => {
   const anchor = event.target.closest('a[href^="#/"]');
   if (anchor && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && event.button === 0) {
     event.preventDefault();
-    navigate(anchor.getAttribute('href'), { open: anchor.dataset.open, focus: anchor.dataset.focus });
+    navigate(anchor.getAttribute('href'), { open: anchor.dataset.open, focus: anchor.dataset.focus, requestId:anchor.dataset.request });
     return;
   }
   const target = event.target.closest('[data-action],[data-filter],[data-tax]');
@@ -372,12 +339,7 @@ document.addEventListener('submit', async event => {
   if (access.phase !== 'ready' || structural.phase !== 'ready') return;
   const r = route();
   if(r.id && !positionFor(r.id)) return;
-  if (event.target.id === 'message-form') {
-    const input = document.querySelector('#message');
-    if (!input.value.trim()) { input.setCustomValidity('Scrivi un messaggio.'); input.reportValidity(); input.addEventListener('input', () => input.setCustomValidity(''), { once: true }); return; }
-    demoFor(r.id).sendMessage('mario', r.role === 'studio' ? 'studio' : 'you', input.value, history.state?.context);
-    render(); document.querySelector('#message').focus(); notify('Messaggio inviato nella demo.');
-  }
+  if(await collaborationUI.submit(event.target))return;
   if (event.target.id === 'amount-form') {
     const form=event.target;if(form.dataset.busy==='true')return;
     const actor=access.user.id,context=access.selected.context_type+':'+access.selected.context_id;
@@ -450,11 +412,14 @@ function clearPosition() {
   afterPanelClose = null; panelOpener = null; closingPanel = false;
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
   clearTimeout(notificationTimer); notice.textContent = '';
-  fiscalDemos.clear();
+  collaborationUI.clear();
+  collaborations.select([]);
   incomes.select(null);
   fiscals.select(null,null);
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
+const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
+
 auth.subscribe(next => {
   if (JSON.stringify(next) === JSON.stringify(access) && app.childElementCount) return;
   const previous = access;
@@ -480,4 +445,9 @@ const refreshFiscal=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','t
 window.addEventListener('focus',refreshFiscal);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)fiscals.invalidate();else refreshFiscal();});
 window.setInterval(refreshFiscal,30000);
+collaborations.subscribe(()=>{if(['oggi','attivita','documenti','da-fare'].includes(route().page))render(false);});
+const refreshCollaboration=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','attivita','documenti','da-fare'].includes(route().page)&&!panel.open)void collaborations.refresh();};
+window.addEventListener('focus',refreshCollaboration);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)collaborations.clear();else {render(false);refreshCollaboration();}});
+window.setInterval(refreshCollaboration,30000);
 void auth.restore();

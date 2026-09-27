@@ -1,6 +1,62 @@
-# S09 — Oggi e Tasse reali
+# S10 — Collaborazione reale
 
-Questo e lo stato corrente; le sezioni S08/S07/S06 sotto sono resoconti storici.
+Stato corrente. Base frontend `15d0e995bd3ce5dbce98c4e6179b4eb8d0301671`,
+branch `feature/s07-saas-integration`. Le sezioni S09–S06 sotto sono storiche.
+
+Attività, richieste in Oggi, eccezioni in Da fare e archivio secondario leggono
+Document/ActivityFeedItem reali. Auth, posizioni, Entrate e fiscalità S07–S09 restano
+reali. Solo la lista complessiva Scadenze dello Studio conserva esempi dichiarati.
+
+- Un flusso Attività: messaggi, richieste e documento contestuale; una CTA primaria.
+  Il contribuente sceglie un file e lo invia. Dopo l'invio tocca allo Studio.
+- Da fare mette prima le richieste azionabili, poi le attese. Apre direttamente il documento;
+  completion da qualsiasi membro attivo dello Studio richiedente. La richiesta completata
+  esce dalla coda e rimane nello storico condiviso. Ritorno alla coda conservato.
+- Archivio secondario, senza path/hash/revisioni visibili. Upload generico distinto dalla
+  risposta a una richiesta. Nessuna eliminazione nella UI S10; anche chiamando la RPC,
+  l'evidenza di una richiesta completed non può essere eliminata.
+- `tal-data-service` esteso con `collaboration-service`: letture paginate RLS e controllo
+  finale dell'accesso, coda in batch, RPC S05, retry/idempotenza. Nessun fetch nelle view.
+- Upload: reserve → POST Storage senza upsert → verifier hosted → finalize con JWT utente.
+  PDF/PNG/JPEG/XML, 10 MiB, pending 1 ora. Byte/SHA/MIME verificati server-side.
+  Dopo reload, la selezione dello stesso file riprende solo una reservation identica,
+  ancora valida e visibile via RLS allo stesso uploader/contesto. Nessuna proroga.
+- Esito incerto: file/payload/chiavi rimangono in memoria; retry senza duplicati. Nessun
+  file o dato operativo persistito nel browser. Configurazione reale locale ignorata.
+- Download solo via `tal-download-document`, JWT e contesto, size/MIME/SHA verificati,
+  Blob temporaneo poi revocato. Il gateway rivaluta RLS prima/dopo i byte. Niente signed URL.
+  Il primo documento pre-005 resta una fixture sintetica legacy, non il modello futuro.
+- Il controller elimina dati dopo diniego/logout/cambio contesto e scarta risposte tardive.
+  Refresh al ritorno/focus e ogni 30 secondi, senza Realtime. Bozza messaggio preservata durante
+  normali refresh. Nessuna lettura o esposizione di note private Studio in Attività.
+
+Preview: `node tools/forfettario-saas/serve-dev.mjs`, loopback 127.0.0.1:4174.
+CSP limitata ai percorsi approvati. Header PostgREST soltanto sulle letture REST, non sulle
+Edge: CORS esplicito, nessun ampliamento. Backend S10 contiene migration/verifier/test hosted.
+Nessuna dipendenza nuova, secret nel browser o collegamento diretto al Worker.
+
+Verifiche: 27 test collaborazione + 80 Auth/dati/Entrate/fiscalità/S06 = **107/107**;
+statici **310/310**. Verifier **34/34**, SQL locale/hosted PASS, E2E hosted **24/24** e
+smoke del servizio frontend con sei identità **18/18**. S04–S09 pertinenti PASS;
+parità S01 da PostgreSQL **15/15**. Revoca link/membership con stesso JWT: diniego immediato.
+Browser reale: richiesta Studio → file chooser/upload 390 px → resume/reload → documento
+contestuale → messaggio → completion da altro membro → uscita Da fare. Verificati
+1440/1024/390/375, focus/Back/pannelli, nessun overflow o errore console non gestito/404 finale.
+Non è una verifica di hardware iOS/Android o della tastiera virtuale.
+
+Suite generali tentate: Chromium esterno `spawn EPERM` (frontend 312 PASS/444 FAIL;
+backend 573 PASS/73 FAIL/260 SKIP; responsive.e2e bloccato). Non dichiarate verdi;
+la prova UI reale è stata completata separatamente nel browser desktop disponibile.
+
+Limiti: niente antivirus/OCR/AI; controllo conservativo del formato, non garanzia di innocuità.
+Hardening pre-pilot e cleanup schedulato successivi; nessun cron aggiunto. Un file già
+scaricato non è ritirabile: la revoca blocca le richieste successive.
+Nessun dato reale. Nessuna modifica a Forfettario pubblico, homepage, menu, sitemap o Worker.
+File utente esterni preservati. Checkpoint sul branch feature, niente merge/deployment pubblico.
+
+# S09 — Oggi e Tasse reali (storico)
+
+Resoconto storico S09; lo stato corrente è descritto in S10 sopra.
 Base frontend 3bca0cacc26b4e0e9e872c0bb1efb8ceb00bd3cc, branch feature/s07-saas-integration.
 Backend base 2011e2fcff01aa48ff2439d87d4e937a53985538 piu gli artefatti S09 approvati.
 

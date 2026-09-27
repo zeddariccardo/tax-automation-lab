@@ -1,5 +1,6 @@
 // Auth owns credentials/rotation. Reads use user RLS; financial writes only frozen RPCs.
 import { cents, isoDate, projectIncome, incomeProblem } from './income-model.js';
+import { createCollaborationService } from './collaboration-service.js';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const problem = code => Object.assign(new Error(code), { code });
 const text = value => typeof value === 'string' && value.trim().length <= 300 ? value.trim() || null : null;
@@ -133,6 +134,7 @@ export function createTalDataService({ auth, fetchImpl }) {
     });
   }
   return {
+    ...createCollaborationService({auth,fetchImpl}),
     calculateFiscal: (id,year) => auth.withContextSession(async session=>{
       if(!uuid.test(id)||![2025,2026].includes(year))throw problem('invalid');
       let r;try{r=await fetchImpl(session.config.supabaseUrl+'/functions/v1/tal-calculate-fiscal',{

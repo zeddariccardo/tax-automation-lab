@@ -9,12 +9,13 @@ const root = path.resolve(dir, '../..');
 const read = name => readFileSync(path.join(dir, name), 'utf8');
 const fresh = async () => (await import(`./demo-service.js?test=${crypto.randomUUID()}`)).demoService;
 
-test('preview fiscal data isolated; Auth and structural read-only adapters may connect', () => {
+test('preview fiscal data isolated; only Auth, structures and approved Entrate endpoints may connect', () => {
   const html = read('index.html');
   assert.match(html, /name="robots" content="noindex,nofollow"/);
   assert.ok(html.includes('connect-src https://*.supabase.co/auth/v1/ https://*.supabase.co/rest/v1/rpc/tal_list_my_contexts'));
   for (const table of ['tax_workspace','economic_activity','tax_year','studio','studio_client_link','studio_client_private']) assert.ok(html.includes('https://*.supabase.co/rest/v1/'+table));
-  assert.doesNotMatch(html, /rest\/v1\/(invoice|payment|allocation|document|activity_feed_item)|storage\/v1|functions\/v1/);
+  for(const endpoint of ['invoice','invoice_component','payment','allocation','rpc/tal_create_invoice','rpc/tal_record_payment'])assert.ok(html.includes('https://*.supabase.co/rest/v1/'+endpoint));
+  assert.doesNotMatch(html, /rest\/v1\/(document|activity_feed_item)|storage\/v1|functions\/v1/);
   assert.match(html, /form-action 'none'/);
   for (const name of ['app.js', 'demo-service.js']) {
     assert.doesNotMatch(read(name), /\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon|localStorage|sessionStorage|indexedDB)\s*[.(]/);

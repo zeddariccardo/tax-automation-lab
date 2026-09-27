@@ -1,3 +1,102 @@
+# S08 — Entrate cloud
+
+Base frontend: `77c0febac5599a9ef9f75e9547f153dfbb3db612`, branch
+`feature/s07-saas-integration`. Backend: base
+`7e7542eda74de8a7e326395fa24fe4253a4cdfca` più migration incrementale S08
+`202609270003_s08_rpc_conflict.sql`. Nessun deployment o merge frontend main.
+
+Questa sezione descrive lo stato corrente. I resoconti S07/S06 sotto sono storici:
+le loro indicazioni di dati demo, assenza di servizi o blocchi non sostituiscono S08.
+
+## Contratto operativo
+
+- Entrate legge Invoice, InvoiceComponent, Payment, Allocation ed EconomicActivity
+  tramite `tal-data-service`. Verifica scope e data_revision prima/dopo la lettura;
+  scarta risultati tardivi al cambio di identità/contesto o alla revoca.
+- Il contribuente registra una fattura già emessa e incassi totali/parziali.
+  Ogni incasso crea davvero Payment/Allocation via RPC, senza flag “Incassata”.
+  Studio A autorizzato lavora sugli stessi record con le stesse operazioni.
+- Parsing, somme e formattazione monetaria in centesimi interi, senza moltiplicare
+  floating point. Cash e settlement rimangono distinti; null non diventa zero.
+  Gli incassi annuali seguono cashDate; il residuo comprende tutte le fatture.
+- Le scritture passano soltanto da tal_create_invoice e tal_record_payment.
+  Chiave e payload sono congelati per il retry dopo risposta persa; doppio
+  submit in corso deduplicato. Nessun retry automatico cieco.
+- HTTP 409 aggiorna i dati e conserva i campi, richiedendo una nuova conferma:
+  “Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione:
+  controlla e riprova.” Un vero 40001 PostgreSQL non diventa un falso conflitto
+  applicativo. L'esito incerto mantiene la stessa chiave/payload nel form aperto.
+- Oggi, riserva fiscale, tasse, previdenza, forecast, scadenze, Documenti e Attività
+  restano demo separate. La UI mostra “Entrate reali · dati fiscali ancora demo”.
+  Nessun Worker, calcolo fiscale locale nuovo, Storage o gateway collegato.
+
+Il form semplice crea una componente compenso. Con più attività chiede quale
+utilizzare; senza attività usa null, ammesso dal contratto finanziario, senza
+inventare ATECO. I dati fiscali obbligatori saranno gestiti nel verticale fiscale.
+Le fatture con componenti/incassi complessi restano consultabili; la UI non inventa
+ripartizioni automatiche. Importazione disabilitata, nessun nuovo wizard.
+Il retry in questo step è in memoria: non esiste una coda offline persistente.
+
+## Verifiche del 27 settembre 2026
+
+| Verifica | Esito |
+|---|---|
+| Entrate locale: centesimi, null, cross-year, consistenza letture, retry, doppio submit, revoca, isolamento lifecycle | 17/17 PASS |
+| Auth locale / strutture e lifecycle / S06 | 20/20 + 20/20 + 9/9 PASS |
+| Statici frontend | 310/310 PASS |
+| Hosted Entrate con sei identità reali | 28/28 PASS |
+| Auth/context hosted, login e discovery | 18/18, 6/6 e 6/6 PASS |
+| Letture strutturali hosted senza nuove revoche | 21/21 PASS |
+| Conflitto hosted | HTTP 409 in 158 ms, singola richiesta, nessuna RPC lasciata bloccata |
+| Browser contribuente | Fattura, reload, parziale, saldo e dettaglio incassi persistiti; conflitto con input conservato e retry esplicito |
+| Browser Studio | Stesse fatture/incassi; cliente collegato e registrazione incasso sul dataset condiviso |
+| Mobile | 390/375 px: creazione, parziale, conflitto, loading, errore importo, pannelli nel viewport; controlli anche 1440/1024 |
+| Browser/accessibilità | Nessun overflow, errore/warning console o 404 osservato; focus delimitato con Tab/Shift+Tab, Escape e ritorno al portafoglio |
+| Ledger backend | S01 15/15 tramite adapter PostgreSQL; regressioni S04/S05/S07 e patch S08 PASS |
+
+Il test hosted ha perso intenzionalmente la risposta dopo il commit di un
+pagamento: il retry restituisce la ricevuta originale senza duplicare righe.
+B, Studio B, anon, contesti forzati e scritture dirette negati. La revoca del link
+con lo stesso JWT nega subito lettura e comando; link ripristinato active,
+revisione 17 → 18 → 19. Nessuna chiave privilegiata dimostra RLS.
+
+La verifica mobile è eseguita nel browser renderizzato, non su hardware
+iOS/Android o con tastiera virtuale. Durante una sessione lunga si è osservata
+indisponibilità transitoria della verifica Auth: schermata di recupero,
+nessun dato esposto e ripresa tramite Riprova. Non si certifica la suite generale
+preesistente bloccata dall'avvio Chromium EPERM; è separata dai test qui elencati.
+
+Le fixture finanziarie sono tutte marcate S08/SYNTHETIC. Le due fatture iniziali
+da 120.001 centesimi sono state riutilizzate e saldate, senza cancellarle.
+Stato finale: 5 fatture/5 componenti, 10 pagamenti/10 allocazioni, 15 ricevute
+idempotenti e 15 eventi audit finanziari. Totale fatture/incassato 360.604
+centesimi, residuo zero. Data revision 15, link Studio attivo revisione 19.
+La fattura mobile da 301 verifica anche il conflitto tra due utenti: dopo 102
+incassati, il contribuente registra 99 mentre il form Studio è già aperto.
+Il tentativo Studio obsoleto è respinto; il form conserva 199 ma mostra il
+nuovo residuo di 100. Solo la correzione/conferma esplicita registra gli ultimi 100.
+Nessun dato reale, utente Auth, documento o oggetto Storage aggiunto.
+I dati S04/S05 e le policy sono preservati; il solo cambio backend riguarda i
+RAISE applicativi delle sette RPC interessate, non i loro grant o il dominio.
+
+## Esecuzione dei test
+
+```powershell
+node --test tools/forfettario-saas/income.test.mjs tools/forfettario-saas/auth-context.test.mjs tools/forfettario-saas/tal-data.test.mjs tools/forfettario-saas/preview.test.mjs
+node tests/run-test-group.mjs static
+```
+
+`income-hosted-smoke.mjs --dynamic` è un test sintetico con scritture, non una
+suite da eseguire indiscriminatamente: richiede configurazione locale ignorata
+e password via stdin dal Credential Manager. Il processo applicativo usa solo
+publishable key + JWT. Un orchestratore separato autorizzato risponde al protocollo
+REVOKE/RESTORE per la sola revoca/ripristino amministrativa, con cleanup in finally.
+Nessuna password/token viene stampata o salvata dal runner.
+
+`config.local.js` resta ignorato. Nessun secret/configurazione reale, PDF,
+screenshot o log di sessione entra nel checkpoint. Forfettario pubblico,
+homepage/menu/sitemap, Worker e modifiche preesistenti dell'utente sono preservati.
+
 # S07 Step 3 — strutture cloud in sola lettura
 
 Base frontend: `7040e3c2a3d47e8ca6b57e18b010c7e22d3d57f7`, branch

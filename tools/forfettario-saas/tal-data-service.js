@@ -1,5 +1,5 @@
-// Structural cloud data only. All application requests are GET under user RLS.
-// Auth owns credentials/rotation. No fiscal facts, documents, notes or writes.
+// Auth owns credentials/rotation. Reads use user RLS; financial writes only frozen RPCs.
+import { cents, isoDate, projectIncome, incomeProblem } from './income-model.js';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const problem = code => Object.assign(new Error(code), { code });
 const text = value => typeof value === 'string' && value.trim().length <= 300 ? value.trim() || null : null;
@@ -11,13 +11,18 @@ const columns = {
   studio: 'id,name,status',
   studio_client_link: 'id,workspace_id,studio_id,status',
   studio_client_private: 'id,workspace_id,studio_id,link_id,reference:facts->alias->>clientCode',
+  invoice: 'id,workspace_id,revision,number:facts->>number,customer:facts->>customer,issue_date:facts->>issueDate,currency:facts->>currency',
+  invoice_component: 'id,workspace_id,invoice_id,activity_id,amount_cents,kind:facts->>kind',
+  payment: 'id,workspace_id,invoice_id,amount_cents,cash_received_cents,withholding_cents,cash_date:facts->>cashDate,currency:facts->>currency',
+  allocation: 'id,workspace_id,invoice_id,payment_id,component_id,amount_cents',
 };
 export function createTalDataService({ auth, fetchImpl }) {
-  async function rows(session, table, filters = {}) {
+  const pending = new Map();
+  async function rows(session, table, filters = {}, select = columns[table]) {
     if (!Object.hasOwn(columns, table)) throw problem('forbidden');
     const out = [];
     for (let offset = 0; ; ) {
-      const query = new URLSearchParams({ select: columns[table], ...filters, order: 'id.asc', limit: '200', offset: String(offset) });
+      const query = new URLSearchParams({ select, ...filters, order: 'id.asc', limit: '200', offset: String(offset) });
       let response;
       try {
         response = await fetchImpl(session.config.supabaseUrl + '/rest/v1/' + table + '?' + query, {
@@ -75,9 +80,80 @@ export function createTalDataService({ auth, fetchImpl }) {
     if (requestedId && !positions.some(p => p.id === requestedId)) throw problem('forbidden');
     return { source: 'cloud', context: { ...c }, studio: personal ? null : { id: studios[0].id, name: text(studios[0].name) || c.label }, positions };
   }
+  async function income(session, id, year) {
+    if (!uuid.test(id) || !Number.isInteger(year) || year<2000 || year>2200) throw problem('invalid');
+    if (session.context.context_type === 'personal' && session.context.context_id !== id) throw problem('forbidden');
+    async function workspace() {
+      const list=await rows(session,'tax_workspace',{id:'eq.'+id,status:'eq.active'},'id,data_revision');
+      if (list.length !== 1) throw problem('forbidden');
+      cents(list[0].data_revision); return list[0];
+    }
+    for (let attempt=0;attempt<3;attempt++) {
+      const before=await workspace(), scope={workspace_id:'eq.'+id};
+      const [invoices,components,payments,allocations,activities]=await Promise.all(
+        ['invoice','invoice_component','payment','allocation','economic_activity'].map(t=>rows(session,t,scope)));
+      const after=await workspace(); // current grant + consistent revision, after every supporting read
+      if (before.data_revision === after.data_revision) return projectIncome({workspace:after,invoices,components,payments,allocations,activities},year);
+    }
+    throw problem('conflict');
+  }
+  async function command(name,id,key,payload) {
+    if (!uuid.test(id) || !uuid.test(key)) throw problem('invalid');
+    const actor=auth.getState().user?.id;
+    if (!actor) throw problem('forbidden');
+    // Freeze the exact payload before any asynchronous work. A retry must not
+    // substitute newer revisions, allocation targets, or a different context.
+    const frozen=JSON.stringify(payload);
+    return auth.withContextSession(async session=>{
+      const context=session.context.context_type+':'+session.context.context_id;
+      const identity=actor+':'+context+':'+id+':'+name+':'+key;
+      const active=pending.get(identity);
+      if(active) { if(active.body!==frozen)throw problem('idempotency'); return active.promise; }
+      const promise=(async()=>{
+        let response;
+        try { response=await fetchImpl(session.config.supabaseUrl+'/rest/v1/rpc/'+name,{
+          method:'POST',credentials:'omit',cache:'no-store',redirect:'error',signal:AbortSignal.timeout(15000),
+          headers:{apikey:session.config.publishableKey,Authorization:'Bearer '+session.token,'Content-Type':'application/json','Content-Profile':'public','x-tal-context':context},
+          body:JSON.stringify({p_workspace_id:id,p_context:context,p_idempotency_key:key,p_payload:JSON.parse(frozen)}),
+        }); } catch {throw problem('uncertain');}
+        let body;try {body=await response.json();}catch {throw problem('uncertain');}
+        if(!response.ok) {
+          if(response.status===401)throw problem('expired');
+          if(response.status===403||body?.code==='42501')throw problem('forbidden');
+          if(response.status===409||body?.code==='PT409')throw problem('conflict');
+          if(body?.message==='IDEMPOTENCY_CONFLICT')throw problem('idempotency');
+          if(response.status>=500)throw problem('uncertain');
+          throw problem('invalid');
+        }
+        if(!uuid.test(body?.invoiceId)||!Number.isSafeInteger(body?.dataRevision) || (name==='tal_record_payment'&&!uuid.test(body?.paymentId)))throw problem('uncertain');
+        return body;
+      })();
+      pending.set(identity,{body:frozen,promise});
+      try{return await promise;}finally{pending.delete(identity);}
+    });
+  }
   return {
     loadContext: () => auth.withContextSession(session => load(session)),
     readPosition: id => auth.withContextSession(async session => (await load(session, id)).positions.find(p => p.id === id)),
+    listInvoices: (id,year=new Date().getFullYear()) => auth.withContextSession(session=>income(session,id,year)),
+    readInvoice: (id,invoiceId,year=new Date().getFullYear()) => auth.withContextSession(async session=>{
+      const found=(await income(session,id,year)).invoices.find(i=>i.id===invoiceId);if(!found)throw problem('missing');return found;
+    }),
+    listPayments: (id,year=new Date().getFullYear()) => auth.withContextSession(async session=>(await income(session,id,year)).payments),
+    createInvoice: (id,input,key) => {
+      const number=text(input.number),customer=text(input.customer),amount=cents(input.amountCents);
+      if(!number||!customer||!amount || (input.activityId!==null&&!uuid.test(input.activityId)))throw problem('invalid');
+      return command('tal_create_invoice',id,key,{expectedDataRevision:cents(input.expectedDataRevision),
+        invoice:{type:'invoice',number,customer,issueDate:isoDate(input.issueDate),currency:'EUR'},
+        components:[{kind:'compensation',amountCents:amount,activityId:input.activityId}]});
+    },
+    recordPayment: (id,input,key) => {
+      const i=input.invoice,amount=cents(input.amountCents);
+      if(!i?.simple || !uuid.test(i.id) || !amount || amount>i.residual || amount>i.components[0].amount-i.components[0].allocated)throw incomeProblem('amount');
+      return command('tal_record_payment',id,key,{action:'create_payment',expectedDataRevision:cents(input.expectedDataRevision),
+        invoiceId:i.id,expectedInvoiceRevision:cents(i.revision),amountCents:amount,cashReceivedCents:amount,withholdingCents:0,
+        payment:{cashDate:isoDate(input.cashDate),currency:'EUR'},allocations:[{componentId:i.components[0].id,amountCents:amount}]});
+    },
   };
 }
 

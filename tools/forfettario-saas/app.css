@@ -116,6 +116,15 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 button.text-link { border: 0; background: transparent; padding: 0; min-height: 44px; text-align: left; }
 .cloud-profile dt { color: var(--muted); }
 .cloud-profile dd { margin: 0; overflow-wrap: anywhere; }
+.income-refresh { margin-left: auto; }
+.receipt-list { list-style: none; padding: 0; }
+.receipt-list li { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+#amount-form .field { margin-bottom: 18px; }
+#amount-form input, #amount-form select { width: 100%; min-height: 48px; font: inherit; }
+#amount-form select { border: 1px solid var(--line-strong); border-radius: 8px; padding: 10px; background: var(--surface); color: var(--ink); }
+#amount-form > .button { width: 100%; }
+.row-main h3 button { font: inherit; color: inherit; }
+.button:disabled { cursor: default; opacity: .55; }
 .profile strong, .rail-label, .client-bar strong, .client-link h2 { overflow-wrap: anywhere; }
 .avatar svg { width: 22px; height: 22px; }
 @media (max-width: 600px) {

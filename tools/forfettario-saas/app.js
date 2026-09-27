@@ -1,7 +1,10 @@
 import { createDemoService } from './demo-service.js';
 import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
-import { cloud } from './tal-data-runtime.js';
+import { cloud, service } from './tal-data-runtime.js';
+import { createIncomeController } from './income-controller.js';
+import { parseAmount, amountInput, formatCents } from './income-model.js';
+const incomes = createIncomeController({auth,service});
 let access = auth.getState();
 let structural = cloud.getState();
 const fiscalDemos = new Map();
@@ -17,7 +20,7 @@ let loginEmail = '';
 const app = document.querySelector('#app');
 const panel = document.querySelector('#panel');
 const notice = document.querySelector('#notice');
-const euro = value => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', useGrouping: 'always', maximumFractionDigits: value % 100 ? 2 : 0 }).format(value / 100);
+const euro = formatCents;
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const paths = {
   home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
@@ -73,7 +76,7 @@ const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<
 const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Posizioni e clienti provengono dal profilo collegato. Entrate, tasse, scadenze, documenti e attività sono esempi locali: non descrivono la situazione del cliente.</p>'; }
+function footer() { return '<p class="page-footer">Entrate reali · dati fiscali ancora demo. Oggi, tasse, scadenze, documenti e attività restano esempi locali. Usa soltanto dati sintetici.</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -160,11 +163,15 @@ function today(r, p) {
 
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.paid < i.total);
-  if (!list.length) return '<p class="empty">Non ci sono importi da incassare.</p>';
-  return list.map(i => `<article class="row"><div class="row-main"><h3>Fattura ${esc(i.number)}</h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.paid === i.total ? 'paid' : ''}">${i.paid === i.total ? 'Incassata' : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span></div><div class="row-action">${i.paid < i.total ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`) : ''}</div></article>`).join('');
+  if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
+  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.paid === i.total ? 'paid' : ''}">${!i.simple ? 'Dettaglio da controllare' : i.paid === i.total ? 'Incassata' : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`) : ''}</div></article>`).join('');
 }
-function income(r, p) {
-  return `${heading('Entrate', 'Fatture e incassi, senza perdere il filo.', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" data-action="import" type="button">${icon('upload')}Importa fatture</button>`)}<div class="summary-inline"><div><span>Incassati nel 2026</span><strong class="money">${euro(p.received)}</strong></div><div><span>Da incassare</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
+function income(r) {
+  incomes.select(r.id);
+  const state=incomes.getState();
+  if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Carichiamo fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
+  const p=state.data;
+  return `${heading('Entrate', 'Entrate reali · dati fiscali ancora demo', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" disabled title="Disponibile in un prossimo aggiornamento">${icon('upload')}Importa fatture</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
 
 function taxes(r, p) {
@@ -205,6 +212,7 @@ function render(focus = false) {
     if (!location.hash.startsWith(prefix)) history.replaceState({ panel: null }, '', prefix + (access.selected.context_type === 'personal' ? 'oggi' : 'da-fare'));
   }
   const r = route();
+  if(r.page!=='entrate')incomes.select(null);
   renderedHash = location.hash;
   document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
   if (r.role === 'entry') app.innerHTML = entry();
@@ -247,18 +255,21 @@ function done(message) {
   closePanel(() => { render(true); window.scrollTo(0, scroll); notify(message); });
 }
 function syntheticFile(name) { return `<div class="demo-file"><span class="example-stamp">SYNTHETIC TEST DATA</span><div class="doc-icon">${icon('file')}</div><h3>${name}</h3><p>Documento fittizio per esplorare la preview. Non è una ricevuta valida e non contiene dati personali reali.</p></div>`; }
-function readAmount(form) {
-  const raw = new FormData(form).get('amount').trim().replace(',', '.');
-  if (!/^\d{1,6}(\.\d{1,2})?$/.test(raw)) throw new Error('Usa un importo positivo, con al massimo due decimali.');
-  return Math.round(Number(raw) * 100);
+const localDate=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function moneyForm(command, initial='', invoice=null) {
+  const data=incomes.getState().data, creating=command==='invoice-save';
+  const activities=data?.activities||[];
+  return `<form id="amount-form" data-command="${command}" novalidate>${creating?'<div class="field"><label for="invoice-number">Numero fattura</label><input id="invoice-number" name="number" maxlength="80" required autocomplete="off"></div><div class="field"><label for="invoice-customer">Cliente</label><input id="invoice-customer" name="customer" maxlength="180" required autocomplete="off"></div>':''}<div class="field"><label for="money-date">${creating?'Data fattura':'Data incasso'}</label><input id="money-date" name="date" type="date" value="${localDate()}" required></div><div class="field"><label for="amount">${creating?'Importo della fattura (€)':'Quanto hai ricevuto? (€)'}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off" required><p id="amount-help">${creating?'Registra una fattura già emessa. In questa prova usa soltanto dati fittizi.':'Restano '+euro(invoice.residual)+' da incassare.'}</p></div>${creating&&activities.length>1?'<div class="field"><label for="invoice-activity">Attività</label><select id="invoice-activity" name="activity" required><option value="">Scegli l’attività</option>'+activities.map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join('')+'</select></div>':''}<p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${creating?'Aggiungi fattura':'Registra incasso'}</button></form>`;
 }
-function moneyForm(action, label, initial, description) { return `<form id="amount-form" data-command="${action}" novalidate><div class="field"><label for="amount">${label}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off"><p id="amount-help">${description}</p></div><p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${action === 'payment-save' ? 'Registra incasso' : 'Aggiungi fattura'}</button></form>`; }
+const moneyJobs=new WeakMap();
+const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione: controlla e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Non abbiamo ricevuto conferma. Riprova: lo stesso tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
   const r = route(); const p = r.id && positionFor(r.id) ? demoFor(r.id).getPosition('mario') : null;
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
   switch (name) {
+    case 'income-retry': await incomes.refresh(); break;
     case 'data-retry': await cloud.refresh(); break;
     case 'profile': if(positionFor(r.id)) openPanel('Dati della posizione',profileDetails(positionFor(r.id))); break;
     case 'account':
@@ -285,13 +296,19 @@ async function action(name, element) {
       if (!d) return;
       openPanel(d.name, `<p>${r.role === 'studio' ? esc(positionLabel(r.id))+' · ' : ''}${d.state === 'completed' ? 'Verificato dallo Studio.' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio.' : 'Condiviso con lo Studio.'}</p>${syntheticFile(d.name)}<p>Anteprima simulata: nessun file viene scaricato.</p>${link(href(r,'documenti'),'Archivio documenti','text-link',false)}`); break;
     }
-    case 'add-invoice': openPanel('Una nuova fattura', `<p>Prova l’aggiunta rapida. Cliente, numero e data sono già compilati con dati di esempio.</p>${moneyForm('invoice-save', 'Importo della fattura (€)', '1200', 'Cliente di esempio · 27 settembre 2026')}`); break;
+    case 'add-invoice': if(incomes.getState().phase==='ready')openPanel('Una nuova fattura',moneyForm('invoice-save')); break;
     case 'payment': {
-      currentInvoice = p.invoices.find(i => i.id === element.dataset.invoice);
-      openPanel('Registra un incasso', `<p>Fattura ${esc(currentInvoice.number)} · ${esc(currentInvoice.customer)}</p>${moneyForm('payment-save', 'Quanto hai ricevuto? (€)', String((currentInvoice.total - currentInvoice.paid) / 100).replace('.', ','), `Restano ${euro(currentInvoice.total - currentInvoice.paid)} da incassare. Data di esempio: oggi.`)}`); break;
+      currentInvoice = incomes.getState().data?.invoices.find(i=>i.id===element.dataset.invoice);
+      if(!currentInvoice?.simple||currentInvoice.residual<=0)return;
+      openPanel('Registra un incasso', `<p>Fattura ${esc(currentInvoice.number)} · ${esc(currentInvoice.customer)}</p>${moneyForm('payment-save',amountInput(currentInvoice.residual),currentInvoice)}`); break;
     }
-    case 'import': openPanel('Importa una fattura', `<p>In futuro potrai usare XML, CSV o Excel. Qui puoi provare l’esito con una fattura di esempio, senza caricare file reali.</p><div class="demo-file"><h3>Laboratorio Acero</h3><p>Fattura IMP/2026 · 26 settembre</p><strong class="money">950 €</strong><p>Da incassare</p></div>${button('import-save', 'Importa esempio')}`); break;
-    case 'import-save': { const added = demoFor(r.id).importExample('mario'); done(added ? 'Fattura importata. Nessun incasso aggiunto.' : 'Questa fattura è già presente. Nessun duplicato.'); break; }
+    case 'invoice-detail': {
+      let item;
+      try { item=await service.readInvoice(r.id,element.dataset.invoice); }
+      catch(error) { if(route().id===r.id)await incomes.refresh();throw error; }
+      if(route().id!==r.id||route().page!=='entrate')return;
+      openPanel('Fattura '+esc(item.number),'<p>'+esc(item.customer)+'</p><dl class="cloud-profile"><dt>Importo</dt><dd>'+euro(item.total)+'</dd><dt>Residuo</dt><dd>'+euro(item.residual)+'</dd></dl><h3>Incassi registrati</h3>'+(item.payments.length?'<ul class="receipt-list">'+item.payments.map(x=>'<li><span>'+new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(x.date))+'</span><strong>'+ (x.cash===null?'Da verificare':euro(x.cash))+'</strong></li>').join('')+'</ul>':'<p>Nessun incasso registrato.</p>')+(!item.simple?'<p>Questa fattura richiede un controllo dei dettagli prima di registrare altri incassi.</p>':''));break;
+    }
     case 'send': document.querySelector('#message-form').requestSubmit(); break;
     case 'difference': openPanel('Un versamento da chiarire', `<p>${esc(positionLabel(r.id))} ha indicato 320 € in più rispetto alla ricevuta. Nell’esempio si tratta del saldo dell’anno precedente.</p>${syntheticFile('Nota del cliente · esempio')}${button('difference-save', 'Segna controllato')}`); break;
     case 'difference-save': demoFor(r.id).resolveDifference('mario'); done('Differenza controllata. La nota è in Attività.'); break;
@@ -321,7 +338,7 @@ document.addEventListener('input', event => {
     document.querySelector('#search-status').textContent = `${count} ${count === 1 ? 'cliente trovato' : 'clienti trovati'}.`;
   }
 });
-document.addEventListener('submit', event => {
+document.addEventListener('submit', async event => {
   event.preventDefault();
   if (event.target.id === 'login-form') {
     if (access.phase !== 'signed-out') return;
@@ -341,19 +358,47 @@ document.addEventListener('submit', event => {
     render(); document.querySelector('#message').focus(); notify('Messaggio inviato nella demo.');
   }
   if (event.target.id === 'amount-form') {
+    const form=event.target;if(form.dataset.busy==='true')return;
+    const actor=access.user.id,context=access.selected.context_type+':'+access.selected.context_id;
+    const stillCurrent=()=>access.phase==='ready'&&access.user.id===actor&&access.selected.context_type+':'+access.selected.context_id===context&&route().id===r.id;
     try {
-      const amount = readAmount(event.target);
-      if (event.target.dataset.command === 'payment-save') demoFor(r.id).recordPayment('mario', currentInvoice.id, amount);
-      else demoFor(r.id).addInvoice('mario', amount);
-      done(event.target.dataset.command === 'payment-save' ? 'Incasso registrato.' : 'Fattura aggiunta.');
+      if(!moneyJobs.has(form)) {
+        const data=incomes.getState().data;if(!data||data.workspaceId!==r.id)throw Object.assign(Error(),{code:'stale'});
+        const fields=new FormData(form),amount=parseAmount(fields.get('amount')),key=crypto.randomUUID();
+        const method=form.dataset.command==='payment-save'?'recordPayment':'createInvoice';
+        const input=method==='recordPayment'?{invoice:data.invoices.find(i=>i.id===currentInvoice?.id),amountCents:amount,cashDate:fields.get('date'),expectedDataRevision:data.dataRevision}:{number:fields.get('number'),customer:fields.get('customer'),issueDate:fields.get('date'),amountCents:amount,expectedDataRevision:data.dataRevision,activityId:data.activities.length===1?data.activities[0].id:fields.get('activity')||null};
+        if(method==='createInvoice'&&data.activities.length>1&&!input.activityId)throw Object.assign(Error(),{code:'invalid'});
+        moneyJobs.set(form,{method,input:structuredClone(input),key});
+      }
+      const job=moneyJobs.get(form);form.dataset.busy='true';
+      for(const el of form.querySelectorAll('input,select,button'))el.disabled=true;
+      form.querySelector('[type="submit"]').textContent='Salvataggio…';form.querySelector('#form-error').textContent='';
+      await service[job.method](r.id,job.input,job.key);
+      moneyJobs.delete(form);
+      if(!stillCurrent())return;
+      await incomes.refresh();
+      if(form.isConnected&&panel.open)done(job.method==='recordPayment'?'Incasso registrato.':'Fattura aggiunta.');
     } catch (error) {
-      const message = document.querySelector('#form-error'); message.textContent = error.message; document.querySelector('#amount').setAttribute('aria-invalid', 'true'); document.querySelector('#amount').focus();
+      if(!stillCurrent()||!form.isConnected)return;
+      const uncertain=['uncertain','stale'].includes(error.code);
+      if(!uncertain)moneyJobs.delete(form);
+      if(['conflict','forbidden'].includes(error.code))await incomes.refresh();
+      for(const el of form.querySelectorAll('input,select'))el.disabled=uncertain;
+      const submit=form.querySelector('[type="submit"]');submit.disabled=['forbidden','expired'].includes(error.code);submit.textContent='Riprova';
+      if(error.code==='conflict'&&form.dataset.command==='payment-save') {
+        const latest=incomes.getState().data?.invoices.find(i=>i.id===currentInvoice?.id);
+        form.querySelector('#amount-help').textContent=latest ? latest.residual>0?'Restano '+euro(latest.residual)+' da incassare.':'La fattura è già saldata. Puoi controllare gli incassi nel dettaglio.' : 'Non riusciamo a rileggere la fattura. Chiudi e aggiorna le entrate.';
+        submit.disabled=!latest?.simple||latest.residual<=0;
+      }
+      const message=form.querySelector('#form-error');message.textContent=error.code==='amount'&&form.dataset.command==='invoice-save'?'Inserisci un importo positivo con al massimo due decimali.':moneyErrors[error.code]||'Operazione non completata. Riprova.';message.focus();
+    } finally {
+      form.dataset.busy='false';
     }
   }
 });
 panel.addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;
-  const controls = [...panel.querySelectorAll('button:not(:disabled),input,textarea,a[href]')].filter(e => e.getClientRects().length);
+  const controls = [...panel.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]')].filter(e => e.getClientRects().length);
   const first = controls[0], last = controls.at(-1);
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
@@ -384,6 +429,7 @@ function clearPosition() {
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
   clearTimeout(notificationTimer); notice.textContent = '';
   fiscalDemos.clear();
+  incomes.select(null);
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 auth.subscribe(next => {
@@ -405,4 +451,5 @@ cloud.subscribe(next => {
   if (next.phase !== 'ready' || oldIds.some(id=>!ids.includes(id))) clearPosition();
   render(false);
 });
+incomes.subscribe(()=>{if(route().page==='entrate')render(false);});
 void auth.restore();

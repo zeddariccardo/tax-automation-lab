@@ -1,4 +1,5 @@
 #requires -Version 7.0
+param([ValidateSet('auth','data')][string]$Suite='auth')
 # Run as the Windows user who owns the six existing synthetic credentials.
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
@@ -30,7 +31,8 @@ $node=(Get-Command node -ErrorAction Stop).Source
 $info=[Diagnostics.ProcessStartInfo]::new()
 $info.FileName=$node;$info.UseShellExecute=$false;$info.CreateNoWindow=$true
 $info.RedirectStandardInput=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true
-$info.ArgumentList.Add((Join-Path $PSScriptRoot 'auth-hosted-smoke.mjs'))
+$scriptName=if($Suite -eq 'data'){'data-hosted-smoke.mjs'}else{'auth-hosted-smoke.mjs'}
+$info.ArgumentList.Add((Join-Path $PSScriptRoot $scriptName))
 $p=[Diagnostics.Process]::new();$p.StartInfo=$info;[void]$p.Start()
 $out=$p.StandardOutput.ReadToEndAsync();$err=$p.StandardError.ReadToEndAsync()
 try {$p.StandardInput.Write(($result|ConvertTo-Json -Compress));$p.StandardInput.Close();$p.WaitForExit();Write-Output $out.Result}

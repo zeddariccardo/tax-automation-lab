@@ -121,6 +121,22 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
   const api = {
     sessionKey, contextKey,
     getState: snapshot,
+    // Internal service port: reuse session rotation; never put credentials in UI state.
+    async withContextSession(work) {
+      if (state.phase !== 'ready' || !state.selected) throw problem('forbidden');
+      const version = epoch, selected = { ...state.selected }, userId = state.user.id;
+      const current = () => state.phase === 'ready' && state.user.id === userId && same(state.selected, selected);
+      try {
+        const s = await session(version);
+        if (!current()) throw problem('stale');
+        const result = await work({ config, token: s.access_token, context: selected });
+        if (!current() || version !== epoch) throw problem('stale');
+        return result;
+      } catch (error) {
+        if (error.code === 'expired') await failed(error, version);
+        throw error;
+      }
+    },
     subscribe(listener) { listeners.add(listener); listener(snapshot()); return () => listeners.delete(listener); },
     restore() { return run(async version => { if (!saved()) { emit(blank('signed-out')); return; } await discover(version); }); },
     login(email, password) {

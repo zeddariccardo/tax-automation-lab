@@ -1,7 +1,17 @@
-import { demoService as service } from './demo-service.js';
+import { createDemoService } from './demo-service.js';
 import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
+import { cloud } from './tal-data-runtime.js';
 let access = auth.getState();
+let structural = cloud.getState();
+const fiscalDemos = new Map();
+function demoFor(id) {
+  if (!fiscalDemos.has(id)) fiscalDemos.set(id, createDemoService());
+  return fiscalDemos.get(id);
+}
+const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
+const positionFor = id => positions().find(p => p.id === id);
+const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
 let loginEmail = '';
 
 const app = document.querySelector('#app');
@@ -51,19 +61,19 @@ history.replaceState({ ...history.state, panel: null }, '', location.href);
 function route() {
   if (access.phase !== 'ready' || !access.selected) return { role: 'entry', page: 'ingresso' };
   const bits = location.hash.replace(/^#\/?/, '').split('/');
-  if (access.selected.context_type === 'personal' && bits[0] === 'io' && positionPages.includes(bits[1])) return { role: 'personal', id: 'mario', page: bits[1], client: false };
+  if (access.selected.context_type === 'personal' && bits[0] === 'io' && positionPages.includes(bits[1])) return { role: 'personal', id: access.selected.context_id, page: bits[1], client: false };
   if (access.selected.context_type === 'studio' && bits[0] === 'studio') {
-    if (bits[1] === 'clienti' && bits[2] && service.listClients().some(p => p.id === bits[2]) && positionPages.includes(bits[3])) return { role: 'studio', id: bits[2], page: bits[3], client: true };
+    if (bits[1] === 'clienti' && bits[2] && positionPages.includes(bits[3])) return { role: 'studio', id: bits[2], page: bits[3], client: true };
     if (studioItems.some(n => n[0] === bits[1]) && !bits[2]) return { role: 'studio', page: bits[1], client: false };
   }
-  return access.selected.context_type === 'personal' ? { role: 'personal', id: 'mario', page: 'oggi', client: false } : { role: 'studio', page: 'da-fare', client: false };
+  return access.selected.context_type === 'personal' ? { role: 'personal', id: access.selected.context_id, page: 'oggi', client: false } : { role: 'studio', page: 'da-fare', client: false };
 }
 const href = (r, page) => r.client ? `#/studio/clienti/${r.id}/${page}` : `#/io/${page}`;
 const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<a class="${cls}" href="${url}" ${attributes}>${text}${arrow ? icon('arrow') : ''}</a>`;
 const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Entrate, tasse, documenti e attività sono esempi locali. Solo accesso e profilo sono collegati.</p>'; }
+function footer() { return '<p class="page-footer">Posizioni e clienti provengono dal profilo collegato. Entrate, tasse, scadenze, documenti e attività sono esempi locali: non descrivono la situazione del cliente.</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -80,6 +90,7 @@ function showRoute(focus) {
   filter = saved?.filter || 'all'; taxMode = focus === 'reserve-detail' ? 'current' : saved?.taxMode || 'current';
   if (route().role === 'studio' && route().page === 'clienti' && !route().client) clientQuery = saved?.query || '';
   render(true);
+  void cloud.refresh();
   window.scrollTo(0, saved?.scroll || 0);
 }
 function navigate(url, { open, focus } = {}) {
@@ -99,10 +110,20 @@ function entry() { return authEntry({ access, loginEmail, brand, icon, esc, butt
 
 function shell(r, content) {
   const studio = r.role === 'studio';
-  const p = r.id ? service.getPosition(r.id) : null;
+  const p = positionFor(r.id);
+  const studioName = structural.data?.studio?.name || access.selected.label;
   const activePage = r.page === 'documenti' ? 'attivita' : r.page;
-  const clientHeader = r.client ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${p.initials}</span><div class="row-main"><strong>${p.name}</strong><small>${p.talId} · ${p.profession}</small></div></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r, key)}" ${activePage === key ? 'aria-current="page"' : ''}>${label}</a>`).join('')}</nav>` : '';
-  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? 'Studio Rossi' : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage, 'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${studio ? 'GR' : 'MR'}</span><div><strong>${studio ? 'Giulia' : 'Mario Rossi'}</strong><span class="small muted">${studio ? 'Studio Rossi' : 'Consulente'}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati demo</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems, `#/studio/clienti/${r.id}`, activePage, 'Posizione cliente mobile')}</div>` : ''}</div>`;
+  const clientHeader = r.client && p ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${icon('person')}</span><div class="row-main"><strong>${esc(p.label)}</strong>${p.studioReference ? '<small>Riferimento Studio · '+esc(p.studioReference)+'</small>' : ''}</div><button class="text-link" type="button" data-action="profile">Dati della posizione</button></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r,key)}" ${activePage===key?'aria-current="page"':''}>${label}</a>`).join('')}</nav>` : '';
+  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati fiscali demo</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
+}
+function cloudStatus() {
+  if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Un momento…')+'<p role="status">Stiamo caricando la tua posizione.</p>';
+  const denied = structural.phase === 'forbidden';
+  return heading(denied ? 'Posizione non disponibile' : 'Non riusciamo a caricare i dati')+'<p role="alert">'+(denied ? 'Il tuo accesso potrebbe essere cambiato. Ricontrolla le posizioni disponibili.' : 'Controlla la connessione e riprova.')+'</p>'+button(denied?'auth-retry':'data-retry','Riprova');
+}
+function profileDetails(p) {
+  const start = p.startDate ? new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(p.startDate)) : 'Non indicata';
+  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura. Gli importi della preview restano esempi.</p>`;
 }
 
 const reserveMeaning = 'La riserva stima imposte e contributi sugli incassi considerati, tenendo conto dei versamenti indicati. Non misura il denaro già messo da parte.';
@@ -117,8 +138,8 @@ function requestAction(r, p) {
 }
 function requestState(r, p) {
   if (p.request.state === 'todo') return '';
-  if (p.request.state === 'submitted') return r.role === 'studio' ? 'Documento ricevuto. Da verificare.' : 'Ricevuta inviata. Ora la controlla Studio Rossi.';
-  return `Ricevuta verificata da ${p.request.completedBy || 'Studio Rossi'}.`;
+  if (p.request.state === 'submitted') return r.role === 'studio' ? 'Documento ricevuto. Da verificare.' : 'Ricevuta inviata. Ora la controlla Studio di esempio.';
+  return `Ricevuta verificata da ${'Studio di esempio'}.`;
 }
 function deadlineStrip(r) {
   return `<section class="deadline-strip" aria-label="Prossimo pagamento previsto"><div class="deadline-detail"><div class="date-tile"><strong>30</strong><span>nov</span></div><div><p class="eyebrow">Prossimo pagamento previsto</p><h3>Acconti di novembre</h3><p class="muted small">Imposte e contributi</p></div></div><div class="deadline-end"><strong class="money">${euro(214000)}</strong>${link(href(r, 'tasse'), 'Dettaglio pagamento', 'text-link', false, 'data-focus="payment-detail"')}</div></section>`;
@@ -129,12 +150,12 @@ function today(r, p) {
   const actionable = discrepancy || (studio ? p.request.state === 'submitted' : p.request.state === 'todo');
   let task;
   if (actionable) {
-    task = `<section class="task-card" id="current-task" tabindex="-1"><span class="task-label">${icon('todo')}${studio ? 'Da fare' : 'Da fare · Studio Rossi'}</span><h2>${discrepancy ? 'Un versamento da controllare' : 'Ricevuta contributi'}</h2>${discrepancy ? '<p>Il cliente ha indicato 320 € in più rispetto alla ricevuta.</p>'+button('difference', 'Controlla differenza') : requestAction(r, p)}</section>`;
+    task = `<section class="task-card" id="current-task" tabindex="-1"><span class="task-label">${icon('todo')}${studio ? 'Da fare' : 'Da fare · Studio di esempio'}</span><h2>${discrepancy ? 'Un versamento da controllare' : 'Ricevuta contributi'}</h2>${discrepancy ? '<p>Il cliente ha indicato 320 € in più rispetto alla ricevuta.</p>'+button('difference', 'Controlla differenza') : requestAction(r, p)}</section>`;
   } else {
     const text = p.request.state === 'submitted' ? requestState(r,p) : p.request.state === 'todo' ? 'Ricevuta richiesta. In attesa del cliente.' : 'Nessuna attività da svolgere.';
     task = `<div class="task-status"><p>${text}</p>${p.request.state !== 'completed' ? link(href(r,'attivita'),'Apri attività','text-link',false) : ''}</div>`;
   }
-  return `${heading(studio ? 'Riepilogo di '+p.firstName : 'Buongiorno, Mario.')}<div class="today-grid"><section class="income-hero" aria-label="Incassi e riserva fiscale"><div class="income-line"><div><p class="eyebrow">Incassati nel 2026</p><strong class="hero-amount money">${euro(p.received)}</strong></div>${link(href(r, 'entrate'), 'Vedi entrate')}</div><div class="reserve"><div><p class="reserve-label">Riserva fiscale stimata</p><strong class="amount money">${p.tax ? euro(p.tax.current.reserve) : 'Da definire'}</strong><p>${p.tax ? 'Su '+euro(p.tax.current.income)+' incassati'+(p.received !== p.tax.current.income ? ' · stima iniziale della demo' : '') : 'Stima non disponibile nella demo'}</p></div>${link(href(r,'tasse'),'Dettaglio riserva','text-link',false,'data-focus="reserve-detail"')}</div>${p.tax ? amountMeaning() : ''}</section>${task}${p.tax ? deadlineStrip(r) : ''}</div>`;
+  return `${heading(studio ? 'Riepilogo' : 'Buongiorno',studio ? '' : esc(positionLabel(r.id)),studio ? '' : '<button class="text-link" type="button" data-action="profile">La mia posizione</button>')}<div class="today-grid"><section class="income-hero" aria-label="Incassi e riserva fiscale"><div class="income-line"><div><p class="eyebrow">Incassati nel 2026</p><strong class="hero-amount money">${euro(p.received)}</strong></div>${link(href(r, 'entrate'), 'Vedi entrate')}</div><div class="reserve"><div><p class="reserve-label">Riserva fiscale stimata</p><strong class="amount money">${p.tax ? euro(p.tax.current.reserve) : 'Da definire'}</strong><p>${p.tax ? 'Su '+euro(p.tax.current.income)+' incassati'+(p.received !== p.tax.current.income ? ' · stima iniziale della demo' : '') : 'Stima non disponibile nella demo'}</p></div>${link(href(r,'tasse'),'Dettaglio riserva','text-link',false,'data-focus="reserve-detail"')}</div>${p.tax ? amountMeaning() : ''}</section>${task}${p.tax ? deadlineStrip(r) : ''}</div>`;
 }
 
 function invoiceRows(p) {
@@ -158,25 +179,25 @@ function documents(r, p) {
 
 function activity(r, p) {
   const paymentContext = history.state?.context === 'payment-context';
-  return `${heading('Attività','',link(href(r,'documenti'),'Archivio documenti','text-link',false))}<div class="feed"><article class="feed-item"><span class="avatar">SR</span><div class="feed-meta"><strong>Studio Rossi</strong><time>${p.request.created}</time></div><p class="message">${p.request.text}</p><div class="feed-request">${p.request.state !== 'todo' ? '<p class="state-line">'+requestState(r,p)+'</p>' : ''}${requestAction(r,p)}</div></article>${p.messages.map(m => `<article class="feed-item"><span class="avatar ${m.from === 'you' ? 'warm' : ''}">${m.from === 'you' ? p.initials : 'SR'}</span><div class="feed-meta"><strong>${m.from === 'you' ? (r.role === 'personal' ? 'Tu' : p.name) : 'Studio Rossi'}</strong><time>${m.date}</time></div><p class="message">${esc(m.text)}</p>${m.context === 'payment-context' ? '<p class="message-context">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</p>' : ''}${m.documentId && m.documentId !== p.request.documentId ? documentButton(p.documents.find(d=>d.id===m.documentId)) : ''}</article>`).join('')}</div><form class="composer" id="message-form">${paymentContext ? '<div class="message-context" id="payment-context" tabindex="-1">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</div>' : ''}<label for="message">${r.role === 'studio' ? 'Scrivi al cliente' : 'Scrivi allo Studio'}</label><textarea id="message" name="message" rows="3" maxlength="500" required placeholder="Aggiungi un messaggio…"></textarea><div class="actions">${button('send', 'Invia messaggio', 'id="send-message"')}</div></form>`;
+  return `${heading('Attività','',link(href(r,'documenti'),'Archivio documenti','text-link',false))}<div class="feed"><article class="feed-item"><span class="avatar">SR</span><div class="feed-meta"><strong>Studio di esempio</strong><time>${p.request.created}</time></div><p class="message">${p.request.text}</p><div class="feed-request">${p.request.state !== 'todo' ? '<p class="state-line">'+requestState(r,p)+'</p>' : ''}${requestAction(r,p)}</div></article>${p.messages.map(m => `<article class="feed-item"><span class="avatar ${m.from === 'you' ? 'warm' : ''}">${m.from === 'you' ? 'CL' : 'SR'}</span><div class="feed-meta"><strong>${m.from === 'you' ? (r.role === 'personal' ? 'Tu' : esc(positionLabel(r.id))) : 'Studio di esempio'}</strong><time>${m.date}</time></div><p class="message">${esc(m.text)}</p>${m.context === 'payment-context' ? '<p class="message-context">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</p>' : ''}${m.documentId && m.documentId !== p.request.documentId ? documentButton(p.documents.find(d=>d.id===m.documentId)) : ''}</article>`).join('')}</div><form class="composer" id="message-form">${paymentContext ? '<div class="message-context" id="payment-context" tabindex="-1">Acconti di novembre · 30 novembre 2026 · '+euro(214000)+'</div>' : ''}<label for="message">${r.role === 'studio' ? 'Scrivi al cliente' : 'Scrivi allo Studio'}</label><textarea id="message" name="message" rows="3" maxlength="500" required placeholder="Aggiungi un messaggio…"></textarea><div class="actions">${button('send', 'Invia messaggio', 'id="send-message"')}</div></form>`;
 }
 
 function todo() {
-  const attention = service.listAttention();
-  const active = attention.filter(p => p.request.state === 'submitted' || (p.issue === 'difference' && !p.differenceResolved));
-  const waiting = attention.filter(p => !active.includes(p));
-  return `${heading('Da fare',active.length ? active.length+(active.length === 1 ? ' cliente su cui intervenire.' : ' clienti su cui intervenire.') : 'Nessuna attività da svolgere.')}<div class="attention-list">${active.map(p => {
-    const difference = p.issue === 'difference' && !p.differenceResolved;
-    return `<article class="attention-row"><span class="avatar">${p.initials}</span><div class="row-main"><h2>${p.name}</h2><p>${difference ? 'Un versamento da chiarire' : 'Ricevuta contributi · da verificare'}</p></div>${link(`#/studio/clienti/${p.id}/${difference ? 'oggi' : 'attivita'}`,difference ? 'Controlla differenza' : 'Verifica documento','button secondary',false,`data-open="${difference ? 'difference' : 'review'}"`)}</article>`;
-  }).join('')}</div>${waiting.length ? '<section class="waiting-list"><h2>In attesa del cliente</h2>'+waiting.map(p=>'<div class="waiting-row"><div><strong>'+p.name+'</strong><p>Ricevuta contributi richiesta</p></div>'+link('#/studio/clienti/'+p.id+'/attivita','Apri attività','text-link',false)+'</div>').join('')+'</section>' : ''}`;
+  const clients = positions();
+  if (!clients.length) return heading('Da fare')+'<p class="empty">Nessun cliente collegato.</p>';
+  const waiting = clients.filter(c=>demoFor(c.id).getPosition('mario').request.state !== 'completed');
+  return `${heading('Da fare','Le attività mostrate sono esempi, non richieste effettive.')}<section class="waiting-list"><h2>In attesa del cliente · esempio</h2>${waiting.length ? waiting.map(c=>'<div class="waiting-row"><div><strong>'+esc(c.label)+'</strong><p>Ricevuta contributi richiesta · esempio</p></div>'+link('#/studio/clienti/'+c.id+'/attivita','Apri attività','text-link',false)+'</div>').join('') : '<p>Nessuna attività nell’esempio.</p>'}</section>`;
 }
-
 function clientRows(query = '') {
-  const clients = service.listClients().filter(p => `${p.name} ${p.talId}`.toLowerCase().includes(query.toLowerCase()));
-  return clients.length ? clients.map(p => `<a class="client-link" href="#/studio/clienti/${p.id}/oggi"><span class="avatar">${p.initials}</span><div class="row-main"><h2>${p.name}</h2><p>${p.profession} · <span class="tal-id">${p.talId}</span></p></div>${p.request.state !== 'completed' ? `<span class="client-status">${p.request.state === 'submitted' ? 'Documento ricevuto' : 'Documento atteso'}</span>` : ''}${icon('chevron')}</a>`).join('') : '<p class="empty">Nessun cliente trovato. Prova con il nome o l’ID TAL.</p>';
+  const all = positions();
+  if (!all.length) return '<p class="empty">Nessun cliente collegato.</p>';
+  const found = all.filter(p => (p.label+' '+(p.studioReference||'')).toLocaleLowerCase('it').includes(query.toLocaleLowerCase('it')));
+  return found.length ? found.map(p => `<a class="client-link" href="#/studio/clienti/${p.id}/oggi"><span class="avatar">${icon('person')}</span><div class="row-main"><h2>${esc(p.label)}</h2>${p.studioReference ? '<p>Riferimento Studio · '+esc(p.studioReference)+'</p>' : ''}</div>${icon('chevron')}</a>`).join('') : '<p class="empty">Nessun cliente trovato. Prova con un altro nome o riferimento.</p>';
 }
-function clients() { return `${heading('Clienti')}<label class="search">${icon('search')}<input id="client-search" type="search" aria-label="Cerca un cliente per nome o ID TAL" placeholder="Cerca per nome o ID TAL" autocomplete="off" value="${esc(clientQuery)}"></label><div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
-function deadlines() { return `${heading('Scadenze')}<p class="eyebrow">Novembre 2026</p><article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>Mario Rossi · imposte e contributi</p>${link('#/studio/clienti/mario/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article><p class="calendar-note">Le altre posizioni non hanno scadenze aggiunte in questa demo.</p>`; }
+function clients() { return `${heading('Clienti')}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
+function deadlines() {
+  return heading('Scadenze','Pagamenti di esempio: non sono scadenze effettive.')+(positions().length ? '<p class="eyebrow">Novembre 2026 · esempio</p>'+positions().map(p=>`<article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>${esc(p.label)}</p>${link('#/studio/clienti/'+p.id+'/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article>`).join('') : '<p class="empty">Nessun cliente collegato.</p>');
+}
 
 function render(focus = false) {
   if (access.phase === 'ready') {
@@ -189,8 +210,10 @@ function render(focus = false) {
   if (r.role === 'entry') app.innerHTML = entry();
   else {
     let content;
-    if (r.id) {
-      const p = service.getPosition(r.id);
+    if (structural.phase !== 'ready') content = cloudStatus();
+    else if (r.id && !positionFor(r.id)) content = heading('Posizione non disponibile')+'<p role="status">Questa posizione non è disponibile nel contesto scelto.</p>'+returnLink();
+    else if (r.id) {
+      const p = demoFor(r.id).getPosition('mario');
       content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity })[r.page](r, p);
     } else content = ({ 'da-fare': todo, clienti: clients, scadenze: deadlines })[r.page]();
     app.innerHTML = shell(r, content);
@@ -233,8 +256,11 @@ function moneyForm(action, label, initial, description) { return `<form id="amou
 let currentInvoice;
 async function action(name, element) {
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
-  const r = route(); const p = r.id ? service.getPosition(r.id) : null;
+  const r = route(); const p = r.id && positionFor(r.id) ? demoFor(r.id).getPosition('mario') : null;
+  if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
   switch (name) {
+    case 'data-retry': await cloud.refresh(); break;
+    case 'profile': if(positionFor(r.id)) openPanel('Dati della posizione',profileDetails(positionFor(r.id))); break;
     case 'account':
       openPanel('Il tuo account', '<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia contesto') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
     case 'auth-switch': await auth.chooseAgain(); break;
@@ -249,15 +275,15 @@ async function action(name, element) {
       element.disabled = true; element.textContent = 'Aggiunta in corso…';
       await new Promise(resolve => setTimeout(resolve, 280));
       if (!panel.open || closingPanel || token !== history.state?.panel) return;
-      service.uploadExample(r.id, name === 'upload-save-request'); done(name === 'upload-save-request' ? 'Ricevuta inviata. Ora la controlla Studio Rossi.' : 'Documento aggiunto all’archivio. Le richieste aperte restano invariate.'); break;
+      demoFor(r.id).uploadExample('mario', name === 'upload-save-request'); done(name === 'upload-save-request' ? 'Ricevuta inviata. Ora la controlla Studio di esempio.' : 'Documento aggiunto all’archivio. Le richieste aperte restano invariate.'); break;
     }
     case 'review':
-      openPanel('Verifica la ricevuta', `<p>${p.name} ha condiviso questo documento. Nella demo puoi simularne la verifica.</p>${syntheticFile('Ricevuta contributi')}${button('review-save', icon('check')+'Segna verificato')}`); break;
-    case 'review-save': service.completeRequest(r.id); done('Ricevuta verificata. Il cliente vede l’aggiornamento.'); break;
+      openPanel('Verifica la ricevuta', `<p>${esc(positionLabel(r.id))} ha condiviso questo documento. Nella demo puoi simularne la verifica.</p>${syntheticFile('Ricevuta contributi')}${button('review-save', icon('check')+'Segna verificato')}`); break;
+    case 'review-save': demoFor(r.id).completeRequest('mario'); done('Ricevuta verificata. Il cliente vede l’aggiornamento.'); break;
     case 'document': {
       const d = p.documents.find(d => d.id === element.dataset.document);
       if (!d) return;
-      openPanel(d.name, `<p>${r.role === 'studio' ? p.name+' · ' : ''}${d.state === 'completed' ? 'Verificato dallo Studio.' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio.' : 'Condiviso con lo Studio.'}</p>${syntheticFile(d.name)}<p>Anteprima simulata: nessun file viene scaricato.</p>${link(href(r,'documenti'),'Archivio documenti','text-link',false)}`); break;
+      openPanel(d.name, `<p>${r.role === 'studio' ? esc(positionLabel(r.id))+' · ' : ''}${d.state === 'completed' ? 'Verificato dallo Studio.' : d.kind === 'receipt' ? 'In attesa di verifica dello Studio.' : 'Condiviso con lo Studio.'}</p>${syntheticFile(d.name)}<p>Anteprima simulata: nessun file viene scaricato.</p>${link(href(r,'documenti'),'Archivio documenti','text-link',false)}`); break;
     }
     case 'add-invoice': openPanel('Una nuova fattura', `<p>Prova l’aggiunta rapida. Cliente, numero e data sono già compilati con dati di esempio.</p>${moneyForm('invoice-save', 'Importo della fattura (€)', '1200', 'Cliente di esempio · 27 settembre 2026')}`); break;
     case 'payment': {
@@ -265,10 +291,10 @@ async function action(name, element) {
       openPanel('Registra un incasso', `<p>Fattura ${esc(currentInvoice.number)} · ${esc(currentInvoice.customer)}</p>${moneyForm('payment-save', 'Quanto hai ricevuto? (€)', String((currentInvoice.total - currentInvoice.paid) / 100).replace('.', ','), `Restano ${euro(currentInvoice.total - currentInvoice.paid)} da incassare. Data di esempio: oggi.`)}`); break;
     }
     case 'import': openPanel('Importa una fattura', `<p>In futuro potrai usare XML, CSV o Excel. Qui puoi provare l’esito con una fattura di esempio, senza caricare file reali.</p><div class="demo-file"><h3>Laboratorio Acero</h3><p>Fattura IMP/2026 · 26 settembre</p><strong class="money">950 €</strong><p>Da incassare</p></div>${button('import-save', 'Importa esempio')}`); break;
-    case 'import-save': { const added = service.importExample(r.id); done(added ? 'Fattura importata. Nessun incasso aggiunto.' : 'Questa fattura è già presente. Nessun duplicato.'); break; }
+    case 'import-save': { const added = demoFor(r.id).importExample('mario'); done(added ? 'Fattura importata. Nessun incasso aggiunto.' : 'Questa fattura è già presente. Nessun duplicato.'); break; }
     case 'send': document.querySelector('#message-form').requestSubmit(); break;
-    case 'difference': openPanel('Un versamento da chiarire', `<p>${p.name} ha indicato 320 € in più rispetto alla ricevuta. Nell’esempio si tratta del saldo dell’anno precedente.</p>${syntheticFile('Nota del cliente · esempio')}${button('difference-save', 'Segna controllato')}`); break;
-    case 'difference-save': service.resolveDifference(r.id); done('Differenza controllata. La nota è in Attività.'); break;
+    case 'difference': openPanel('Un versamento da chiarire', `<p>${esc(positionLabel(r.id))} ha indicato 320 € in più rispetto alla ricevuta. Nell’esempio si tratta del saldo dell’anno precedente.</p>${syntheticFile('Nota del cliente · esempio')}${button('difference-save', 'Segna controllato')}`); break;
+    case 'difference-save': demoFor(r.id).resolveDifference('mario'); done('Differenza controllata. La nota è in Attività.'); break;
   }
 }
 
@@ -305,19 +331,20 @@ document.addEventListener('submit', event => {
     void auth.login(loginEmail, password);
     return;
   }
-  if (access.phase !== 'ready') return;
+  if (access.phase !== 'ready' || structural.phase !== 'ready') return;
   const r = route();
+  if(r.id && !positionFor(r.id)) return;
   if (event.target.id === 'message-form') {
     const input = document.querySelector('#message');
     if (!input.value.trim()) { input.setCustomValidity('Scrivi un messaggio.'); input.reportValidity(); input.addEventListener('input', () => input.setCustomValidity(''), { once: true }); return; }
-    service.sendMessage(r.id, r.role === 'studio' ? 'studio' : 'you', input.value, history.state?.context);
+    demoFor(r.id).sendMessage('mario', r.role === 'studio' ? 'studio' : 'you', input.value, history.state?.context);
     render(); document.querySelector('#message').focus(); notify('Messaggio inviato nella demo.');
   }
   if (event.target.id === 'amount-form') {
     try {
       const amount = readAmount(event.target);
-      if (event.target.dataset.command === 'payment-save') service.recordPayment(r.id, currentInvoice.id, amount);
-      else service.addInvoice(r.id, amount);
+      if (event.target.dataset.command === 'payment-save') demoFor(r.id).recordPayment('mario', currentInvoice.id, amount);
+      else demoFor(r.id).addInvoice('mario', amount);
       done(event.target.dataset.command === 'payment-save' ? 'Incasso registrato.' : 'Fattura aggiunta.');
     } catch (error) {
       const message = document.querySelector('#form-error'); message.textContent = error.message; document.querySelector('#amount').setAttribute('aria-invalid', 'true'); document.querySelector('#amount').focus();
@@ -356,7 +383,7 @@ function clearPosition() {
   afterPanelClose = null; panelOpener = null; closingPanel = false;
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
   clearTimeout(notificationTimer); notice.textContent = '';
-  service.reset();
+  fiscalDemos.clear();
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 auth.subscribe(next => {
@@ -369,5 +396,13 @@ auth.subscribe(next => {
   if (current && was !== current) history.replaceState({ panel: null }, '', next.selected.context_type === 'personal' ? '#/io/oggi' : '#/studio/da-fare');
   render(next.phase !== 'loading');
   if (next.phase === 'signed-out' && next.message) document.querySelector('#login-password')?.focus();
+});
+cloud.subscribe(next => {
+  if (JSON.stringify(next) === JSON.stringify(structural)) return;
+  const oldIds = structural.data?.positions.map(p=>p.id) || [];
+  structural = next;
+  const ids = next.data?.positions.map(p=>p.id) || [];
+  if (next.phase !== 'ready' || oldIds.some(id=>!ids.includes(id))) clearPosition();
+  render(false);
 });
 void auth.restore();

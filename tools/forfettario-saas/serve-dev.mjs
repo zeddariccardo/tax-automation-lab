@@ -10,9 +10,9 @@ let config = null;
 try { config = validateConfig((await import(pathToFileURL(path.join(dir, 'config.local.js')).href)).default); }
 catch { /* Missing local configuration is a supported screen, not a 404. */ }
 const prefix = '/tools/forfettario-saas/';
-const allowed = new Set(['index.html', 'app.js', 'app.css', 'mark.svg', 'demo-service.js', 'auth-runtime.js', 'auth-context-service.js', 'auth-view.js']);
+const allowed = new Set(['index.html', 'app.js', 'app.css', 'mark.svg', 'demo-service.js', 'auth-runtime.js', 'auth-context-service.js', 'auth-view.js', 'tal-data-service.js', 'tal-data-runtime.js']);
 const types = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.woff2':'font/woff2' };
-const connections = config ? config.supabaseUrl + '/auth/v1/ ' + config.supabaseUrl + '/rest/v1/rpc/tal_list_my_contexts' : "'none'";
+const connections = config ? config.supabaseUrl + '/auth/v1/ ' + config.supabaseUrl + '/rest/v1/rpc/tal_list_my_contexts' + ["tax_workspace","economic_activity","tax_year","studio","studio_client_link","studio_client_private"].map(t => ' ' + config.supabaseUrl + '/rest/v1/' + t).join('') : "'none'";
 http.createServer(async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');

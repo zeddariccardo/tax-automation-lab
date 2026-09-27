@@ -34,12 +34,13 @@ function position(person) {
   };
 }
 
+export function createDemoService() {
 const state = new Map(people.map(p => [p.id, position(p)]));
 let sequence = 0;
 const clone = value => structuredClone(value);
 function get(id) { const p = state.get(id); if (!p) throw new Error('Posizione non disponibile.'); return p; }
 
-export const demoService = {
+const demoService = {
   reset() { state.clear(); for (const person of people) state.set(person.id, position(person)); sequence = 0; },
   getPosition(id) {
     const p = get(id);
@@ -77,3 +78,6 @@ export const demoService = {
   importExample(id) { const p = get(id); if (p.invoices.some(i => i.id === 'import-example')) return false; p.invoices.unshift({ id: 'import-example', number: 'IMP/2026', customer: 'Laboratorio Acero', date: '2026-09-26', total: 95000, paid: 0 }); return true; },
   resolveDifference(id) { const p = get(id); p.differenceResolved = true; p.messages.push({ from: 'studio', text: 'Differenza controllata: il versamento si riferisce al saldo precedente.', date: 'Oggi' }); },
 };
+return demoService;
+}
+export const demoService = createDemoService();

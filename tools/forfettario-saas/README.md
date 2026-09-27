@@ -1,3 +1,123 @@
+# S07 Step 3 — strutture cloud in sola lettura
+
+Base frontend: `7040e3c2a3d47e8ca6b57e18b010c7e22d3d57f7`, branch
+`feature/s07-saas-integration`. Backend invariato a
+`b587962f7f106140c9968e8d5dc16d656b06f911`. Checkpoint limitato al frontend
+sul branch feature; nessun merge su main o deployment.
+
+## Dati effettivamente collegati
+
+Auth e i collegamenti Account TAL / TaxWorkspace / Studio sono reali:
+l'identità Account è risolta dal backend tramite la discovery autenticata.
+TaxWorkspace, annualità, attività economiche e portafoglio Studio sono letti dal cloud.
+Fatture, incassi, tasse, previdenza, forecast, scadenze, Document e Attività
+restano invece fixture demo locali.
+
+`tal-data-service.js` legge soltanto sei tabelle via GET, con publishable key,
+JWT utente, `Accept-Profile: tal` e `x-tal-context` derivato dalla discovery.
+Nessun UUID di fixture nel codice applicativo; nessun privilegio amministrativo nelle letture.
+
+| Tabella | Proiezione utile alla UI |
+|---|---|
+| TaxWorkspace | UUID, etichetta identity.label, identity.startDate opzionale, stato |
+| TaxYear | UUID, workspace, anno; mai facts fiscali |
+| EconomicActivity | UUID, workspace, facts.atecoCode; mai parametri di calcolo |
+| Studio | UUID, nome, stato verified |
+| StudioClientLink | ID/scope e status active; mai token_hash |
+| StudioClientPrivate | solo alias.clientCode come riferimento dello Studio; nessuna nota/facts completa |
+
+Il seed attuale ha tre etichette SYNTHETIC, un'annualità 2026 per A, nessuna
+attività economica, data di avvio o alias valorizzati. Nessun nome personale affidabile
+e nessun ID TAL globale canonico: non sono generati o dedotti. Un eventuale clientCode
+importato è un riferimento privato dello Studio, non un identificativo globale o un grant.
+La definizione dell'ID TAL globale canonico resta una decisione successiva di
+dominio/backend: il frontend non lo inventa né lo ricava da altri identificativi.
+
+## Separazione e ciclo di vita
+
+- `loadContext()` e `readPosition(id)` restituiscono strutture marcate `source: cloud`.
+  Il servizio proietta solo i campi necessari, pagina con ordine stabile, gestisce
+  401/403/404/rete e non conserva payload diagnostici del provider.
+- `auth-context-service.withContextSession()` riusa la sessione/rotazione esistente;
+  non espone token nello stato UI. La RLS resta il confine: i filtri client non
+  sostituiscono i controlli server.
+- `createTalDataController()` invalida letture tardive, dati e pannelli al cambio
+  identità/contesto, logout o diniego. Nessuna cache cloud persistente.
+  Le nuove letture avvengono all'ingresso, navigazione e alla discovery periodica/focus
+  già prevista. La revoca è rilevata alla lettura successiva, non tramite Realtime.
+- `tal-data-runtime.js` collega Auth e letture; le view non contengono fetch.
+- Le fixture fiscali rimangono istanze separate di `demo-service`, in memoria per
+  posizione e contesto. Nessun oggetto unisce implicitamente facts cloud e demo.
+  Fatture, incassi, tasse, previdenza, forecast, scadenze, Document/Activity,
+  messaggi e simulazioni restano locali. Nessuna lettura Storage/gateway/Worker.
+- Portafoglio e intestazioni usano solo posizioni autorizzate; nessun cliente demo
+  supplementare. Le attività/scadenze simulate sono etichettate come esempi.
+  Il saluto è neutro; banner: **Ambiente di sviluppo · dati fiscali demo**.
+- Stati: caricamento annunciato, errore con Riprova, posizione non disponibile,
+  Nessun cliente collegato, Nessuna attività indicata, Nessuna annualità disponibile.
+  I dati anagrafici si consultano nel pannello Dati della posizione, senza form di modifica.
+
+La Data API applicativa effettua esclusivamente GET. I POST Auth/discovery preesistenti
+servono solo per sessione/identità; non sono scritture dei dati TAL.
+La CSP e il server locale ammettono solo i sei endpoint strutturali oltre ad Auth/discovery.
+Configurazione pubblica reale ancora solo in `config.local.js`, escluso localmente da Git.
+
+## Verifica Step 3 — 27 settembre 2026
+
+- Auth locale **20/20**, S06 **9/9**, nuovi dati/ciclo di vita **20/20**, statici **310/310**.
+- Auth/context hosted **18/18**, login/discovery delle sei identità **6/6**.
+- Dati hosted **25/25**, inclusa una revoca/ripristino amministrativa controllata;
+  66 richieste del data service, tutte GET, zero scritture applicative.
+- A vede soltanto A (2026); B soltanto B (senza annualità); admin/member Studio A
+  vedono soltanto A; Studio B nessun cliente. Dual-role: propria posizione personale
+  oppure A nel contesto Studio; mai sommate.
+- UUID altrui, Studio forzato, contesto errato e JWT assente: negati dalle RLS reali.
+- Revoca con **JWT identico**: cliente assente alla lettura successiva e UUID noto
+  negato. Ripristino verificato. Link active, revisione **13 → 14 → 15**;
+  workspace revision **9 → 10 → 11**, auth_epoch **8 → 9 → 10**.
+  Sono cambiati soltanto questi metadati di revoca/ripristino e i timestamp server.
+  Nessuna modifica a schema/RLS, membership, documenti o dati fiscali.
+- Browser reale: A, B, Studio B e dual-role personale/Studio; portafoglio A, profilo,
+  annualità/attività vuote, ritorno, focus/Tab/Escape. Viewport 1440/1024/390/375,
+  nessun overflow o errore console non gestito; risorse locali tutte HTTP 200.
+  Errori/retry e risposte tardive verificati nei test locali; non simulata una rete mobile fisica.
+
+Ripetizione per il checkpoint: Auth locale **20/20**, dati/lifecycle **20/20**,
+S06 **9/9**, statici **310/310**, Auth hosted **18/18** e dati hosted **25/25**,
+login/discovery **6/6**. Tutte le 66 richieste del data service sono GET.
+La prova dinamica ha lasciato il link nuovamente active: revisione **15 → 16 → 17**,
+workspace revision **11 → 12 → 13**, auth_epoch **10 → 11 → 12**.
+Il dataset funzionale è ripristinato; rimangono i soli incrementi e timestamp
+previsti dalla revoca/ripristino. Browser: journey contribuente/Studio,
+dual-role, pannello dati, stati vuoti e logout ai quattro viewport richiesti;
+nessun overflow o errore console non gestito.
+Le suite generali già bloccate dall'avvio Chromium `EPERM` non sono dichiarate
+verdi né attribuite a S07; non sono state rieseguite per questo checkpoint frontend.
+
+Comandi, oltre alle verifiche Auth/S06 già descritte:
+
+```powershell
+node --test tools/forfettario-saas/tal-data.test.mjs
+pwsh -File tools/forfettario-saas/run-hosted-smoke.ps1 -Suite data
+```
+
+Il secondo comando riesegue **21** prove read-only senza revoche.
+`data-hosted-smoke.mjs --dynamic` è riservato all'orchestratore locale autorizzato:
+mantiene la sessione durante i segnali REVOKE/REVOKED/RESTORE/RESTORED; non contiene
+credenziali amministrative né SQL. Il test dinamico svolto in questo step ha usato
+Windows Credential Manager e psql TLS verify-full fuori dal browser, con ripristino
+in finally. Non avviarlo da solo: attende l'orchestratore.
+
+Riferimenti: [schemi Data API](https://supabase.com/docs/guides/api/using-custom-schemas),
+[proiezioni JSON](https://docs.postgrest.org/en/stable/references/api/tables_views.html#json-columns),
+[paginazione](https://docs.postgrest.org/en/stable/references/api/pagination_count.html).
+Nessun grant suggerito dalle guide è stato applicato.
+
+Le sezioni seguenti sono lo storico S07 Step 2/S06: l'esclusività Auth della rete
+e il portafoglio interamente mock descrivono versioni precedenti.
+
+---
+
 # S07 Step 2 — accesso reale, contenuti demo
 
 Questa è la preview locale sul branch `feature/s07-saas-integration`, derivata dal checkpoint UX `50635c9ded13d2074dee47eb9093e4ba29f13cb5`. Login e scoperta contesti sono reali; tutte le viste operative S06.1 conservano esclusivamente le fixture locali. Nessuna integrazione di fatture, tasse, documenti, attività, Storage, gateway o Worker.

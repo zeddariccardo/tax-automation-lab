@@ -9,10 +9,10 @@ const root = path.resolve(dir, '../..');
 const read = name => readFileSync(path.join(dir, name), 'utf8');
 const fresh = async () => (await import(`./demo-service.js?test=${crypto.randomUUID()}`)).demoService;
 
-test('preview isolated: no index, network, real services or persistence', () => {
+test('preview operational data isolated; only the Auth adapter may connect', () => {
   const html = read('index.html');
   assert.match(html, /name="robots" content="noindex,nofollow"/);
-  assert.match(html, /connect-src 'none'/);
+  assert.ok(html.includes('connect-src https://*.supabase.co/auth/v1/ https://*.supabase.co/rest/v1/rpc/tal_list_my_contexts'));
   assert.match(html, /form-action 'none'/);
   for (const name of ['app.js', 'demo-service.js']) {
     assert.doesNotMatch(read(name), /\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon|localStorage|sessionStorage|indexedDB)\s*[.(]/);

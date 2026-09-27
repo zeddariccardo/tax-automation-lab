@@ -1,3 +1,74 @@
+# S07 Step 2 — accesso reale, contenuti demo
+
+Questa è la preview locale sul branch `feature/s07-saas-integration`, derivata dal checkpoint UX `50635c9ded13d2074dee47eb9093e4ba29f13cb5`. Login e scoperta contesti sono reali; tutte le viste operative S06.1 conservano esclusivamente le fixture locali. Nessuna integrazione di fatture, tasse, documenti, attività, Storage, gateway o Worker.
+
+## Avvio locale
+
+1. Copiare `config.example.js` in `config.local.js`; inserire soltanto URL del progetto development e publishable key. Il file locale è escluso tramite `.git/info/exclude`, senza cambiare il `.gitignore` condiviso.
+2. Dalla radice frontend: `node tools/forfettario-saas/serve-dev.mjs`.
+3. Aprire `http://127.0.0.1:4174/tools/forfettario-saas/`. Arrestare con Ctrl+C.
+
+Il server ascolta solo 127.0.0.1. Serve asset locali e configurazione pubblica: non è un proxy Supabase, non riceve password e non effettua deploy. Niente nuove dipendenze.
+Configurazione assente/errata: schermata esplicita, nessuna richiesta Supabase e nessun import mancante/404. Un server statico generico usa il fallback `runtime-config.js` e mostra la stessa schermata.
+Il server limita CSP al progetto configurato e ai soli percorsi Auth/discovery, rifiuta redirect e non serve test, README o il file sorgente di configurazione locale.
+
+## Confine di integrazione
+
+- `auth-context-service.js`: login, logout, identità, refresh, restore, discovery; porte fetch/storage/lock/clock sostituibili nei test.
+- `auth-runtime.js`: collega il service al browser, coordina schede tramite Web Locks e storage events, ricontrolla al focus/ritorno visibile e ogni 30 secondi mentre la pagina è visibile.
+- `auth-view.js`: ingresso, attesa, errore, zero contesti, scelta contesto.
+- `app.js`: autorizza la destinazione soltanto dal contesto appena scoperto; non effettua chiamate HTTP.
+- `demo-service.js`: dati operativi solo in memoria; reset al logout, cambio identità/contesto o invalidazione.
+
+Il client usa soltanto HTTP ufficiale: token password/refresh, GET user, logout con scope local, POST senza argomenti a `public.tal_list_my_contexts()`. Le chiamate discovery non inviano un contesto né ID arbitrari.
+Nessuna inferenza da email/nome/ID delle fixture. Mario, Giulia e Studio Rossi restano personaggi della demo, anche quando l'account autenticato è diverso. Il menu Account identifica invece email e contesto effettivi restituiti dal servizio.
+
+## Sessione e scelte
+
+- Sessione in localStorage, chiave specifica per progetto: access token, refresh token, scadenza locale e UUID Auth. Nessuna password, nessun dato fiscale. Nessuna cifratura client personalizzata.
+- Scelta del contesto in sessionStorage, legata all'utente, senza potere autorizzativo. A ogni restore/cambio viene confrontata con una nuova discovery. Uno Studio non più restituito non rimane selezionato.
+- Reload: inizialmente solo attesa; GET user e discovery precedono qualsiasi posizione. Le fixture ripartono dallo stato iniziale.
+- Un contesto: ingresso automatico. Due o più: scelta esplicita; menu Cambia contesto solo se disponibili più opzioni reali. Zero: nessun provisioning.
+- Refresh entro 90 secondi dalla scadenza; Web Locks evita rotazioni simultanee fra schede della stessa origine. Ogni operazione rilegge la sessione persistita. Un token respinto da GET user ha un solo tentativo di refresh.
+- Logout: chiusura della sessione corrente sul server, cancellazione sessione/preferenza/stato UI/fixture anche in caso di errore di rete. Non revoca le altre sessioni su altri dispositivi. Gli access token già emessi hanno la normale validità Supabase residua; la UI non li riutilizza.
+- Errori di rete/discovery nascondono la posizione e offrono Riprova; sessione invalida torna al login. Risposte tardive non possono ripristinare una posizione dopo logout/cambio.
+- La discovery decide solo l'ingresso. Non sostituisce RLS per future operazioni. Nessun permesso viene ricavato dal contesto salvato o dall'hash di navigazione.
+
+Riferimenti ufficiali: [sessioni Auth](https://supabase.com/docs/guides/auth/sessions), [logout e scope](https://supabase.com/docs/guides/auth/signout), [API Auth](https://supabase.github.io/auth/).
+L'accessibilità supporta label, autocomplete username/current-password, incolla, submit da tastiera, focus visibile e dialogo account con Escape/Tab/Indietro. Nessun signup/reset/OAuth aggiunto.
+
+## Verifiche riproducibili
+
+```powershell
+node --test tools/forfettario-saas/preview.test.mjs
+node --test tools/forfettario-saas/auth-context.test.mjs
+npm run test:static
+```
+
+`run-hosted-smoke.ps1` (PowerShell 7, profilo Windows proprietario delle credenziali, Node già presente) legge soltanto i sei target `TAL-S04-auth-*` autorizzati. Passa le password una volta via stdin al processo `auth-hosted-smoke.mjs`; nessun file/token/risposta provider nei log. Il runner usa soltanto la configurazione pubblica locale e chiude le sue sessioni. Non usare credenziali reali.
+
+- Locali Auth/context: **20/20 PASS**.
+- S06: **9/9 PASS**, aggiornato solo il controllo del confine rete per consentire Auth/discovery; gli otto test funzionali conservati.
+- Statici frontend: **310/310 PASS**.
+- Hosted service: **18/18 PASS**, login/discovery **6/6**, identità/contesti separati, restore, refresh reale con rotazione, UUID personale/Studio altrui negati, dual-role, assenza JWT, password errata/email inesistente.
+- Anche nella UI: login di tutte le sei identità, menu privo di cambio arbitrario per gli utenti con un solo contesto; chooser dual-role con due sole opzioni reali.
+- Revoca temporanea del professionista Studio A: senza logout/login né refresh intenzionale, alla nuova discovery la UI ha chiuso anche il pannello account e mostrato zero contesti. Non è Realtime: il rilevamento avviene alla nuova discovery, con polling soltanto a pagina visibile. Ripristino verificato. Membership revisione **7 → 8 → 9**; Studio revisione **9 → 10 → 11**, auth_epoch **8 → 9 → 10**. Nessun link/documento/dato operativo modificato.
+- Suite generali npm test frontend/backend e responsive e2e tentate: avvio Chromium bloccato da **EPERM** nell'ambiente di test. Non sono dichiarate verdi e non è stato cambiato il codice dei test per aggirarlo. Verifica UI svolta anche nel browser dell'app.
+
+
+### Verifica browser finale S07
+
+Controllo visuale e interazioni reali a 1440, 1024, 390 e 375 px: nessun overflow; login, attesa, errore, chooser, menu account e ritorno con Indietro. Tab/Shift+Tab, Invio, focus visibile, label e autocomplete verificati. Nessuna tastiera virtuale o password manager di un telefono fisico è stata emulata.
+Login/discovery 6/6 anche dalla UI. Journey contribuente: fattura 900 €, incasso, richiesta e documento simulato, previsione, Oggi. Journey Studio: Laura verificata, ritorno Da fare, ricerca tramite ID TAL conservata, Scadenze.
+Reload ripristina la sessione soltanto dopo nuova verifica; seconda scheda dual-role richiede la propria scelta; logout svuota entrambe le schede. Indietro non riapre il precedente contesto; routing vincolato al tipo autorizzato.
+16/16 risorse locali/font HTTP 200, nessun 404 osservato. Nessun errore console non gestito nella verifica finale. Le prove di credenziali errate sono dinieghi intenzionali gestiti dalla UI.
+La suite backend generale tentata ha riportato 572 PASS, 74 FAIL, 260 SKIP (906 test); nei fallimenti compare il blocco Chromium EPERM. Il backend è rimasto pulito e fermo al checkpoint S07; questi test non sono dichiarati superati.
+Frontend pubblico precedente, homepage/menu/sitemap e file utente esterni alla preview invariati; impronta del diff utente esterno ancora 82da3d783cfd7580d3e7e7eae6328174b8c4dada. Nessun commit/push/deploy. Supabase Free e Frankfurt ricontrollati nella dashboard; nessun servizio paid.
+
+Istruzioni e risultati S06 riportati sotto sono **storici, antecedenti ad Auth**: in particolare ingresso senza account, Cambio ruolo e CSP connect-src none non descrivono questa versione.
+
+---
+
 # S06 — preview locale del Forfettario SaaS
 
 Prima preview di prodotto, separata dal Forfettario pubblico. HTML, CSS e moduli JavaScript senza build o nuove dipendenze. Nessun login, collegamento a servizi reali o calcolo fiscale operativo.

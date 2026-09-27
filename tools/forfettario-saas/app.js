@@ -1,4 +1,8 @@
 import { demoService as service } from './demo-service.js';
+import { auth } from './auth-runtime.js';
+import { authEntry } from './auth-view.js';
+let access = auth.getState();
+let loginEmail = '';
 
 const app = document.querySelector('#app');
 const panel = document.querySelector('#panel');
@@ -45,20 +49,21 @@ history.scrollRestoration = 'manual';
 history.replaceState({ ...history.state, panel: null }, '', location.href);
 
 function route() {
+  if (access.phase !== 'ready' || !access.selected) return { role: 'entry', page: 'ingresso' };
   const bits = location.hash.replace(/^#\/?/, '').split('/');
-  if (bits[0] === 'io' && positionPages.includes(bits[1])) return { role: 'personal', id: 'mario', page: bits[1], client: false };
-  if (bits[0] === 'studio') {
+  if (access.selected.context_type === 'personal' && bits[0] === 'io' && positionPages.includes(bits[1])) return { role: 'personal', id: 'mario', page: bits[1], client: false };
+  if (access.selected.context_type === 'studio' && bits[0] === 'studio') {
     if (bits[1] === 'clienti' && bits[2] && service.listClients().some(p => p.id === bits[2]) && positionPages.includes(bits[3])) return { role: 'studio', id: bits[2], page: bits[3], client: true };
     if (studioItems.some(n => n[0] === bits[1]) && !bits[2]) return { role: 'studio', page: bits[1], client: false };
   }
-  return { role: 'entry', page: 'ingresso' };
+  return access.selected.context_type === 'personal' ? { role: 'personal', id: 'mario', page: 'oggi', client: false } : { role: 'studio', page: 'da-fare', client: false };
 }
 const href = (r, page) => r.client ? `#/studio/clienti/${r.id}/${page}` : `#/io/${page}`;
 const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<a class="${cls}" href="${url}" ${attributes}>${text}${arrow ? icon('arrow') : ''}</a>`;
 const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Anteprima con dati di esempio · Nessun dato viene inviato o conservato alla chiusura.</p>'; }
+function footer() { return '<p class="page-footer">Entrate, tasse, documenti e attività sono esempi locali. Solo accesso e profilo sono collegati.</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -90,16 +95,14 @@ function navigate(url, { open, focus } = {}) {
   if (panel.open) closePanel(proceed); else proceed();
 }
 
-function entry() {
-  return `<div class="entry"><header class="entry-header">${brand()}<span class="demo-label">Anteprima · dati di esempio</span></header><main class="entry-main" id="main" tabindex="-1"><div><p class="eyebrow">Il tuo forfettario, più semplice</p><h1 class="entry-title">Il tuo lavoro,<br><em>con meno pensieri.</em></h1><p class="entry-copy">Entrate, tasse e documenti. Tutto al suo posto, insieme al tuo commercialista.</p></div><div><div class="entry-choices"><a class="role-choice" href="#/io/oggi"><div class="choice-top"><span class="choice-icon">${icon('person')}</span>${icon('arrow')}</div><h2>Sono un forfettario</h2><p>Gestisci entrate, tasse e documenti senza complicazioni.</p></a><a class="role-choice" href="#/studio/da-fare"><div class="choice-top"><span class="choice-icon">${icon('briefcase')}</span>${icon('arrow')}</div><h2>Sono un commercialista</h2><p>Vedi subito quali clienti hanno bisogno di te.</p></a></div><p class="entry-privacy">${icon('lock')}Esplora liberamente. Qui usiamo solo esempi.</p></div></main><footer class="entry-footer"><span>Tax Automation Lab</span><span>Preview S06 · Nessun account richiesto</span></footer></div>`;
-}
+function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button }); }
 
 function shell(r, content) {
   const studio = r.role === 'studio';
   const p = r.id ? service.getPosition(r.id) : null;
   const activePage = r.page === 'documenti' ? 'attivita' : r.page;
   const clientHeader = r.client ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${p.initials}</span><div class="row-main"><strong>${p.name}</strong><small>${p.talId} · ${p.profession}</small></div></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r, key)}" ${activePage === key ? 'aria-current="page"' : ''}>${label}</a>`).join('')}</nav>` : '';
-  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? 'Studio Rossi' : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage, 'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${studio ? 'GR' : 'MR'}</span><div><strong>${studio ? 'Giulia' : 'Mario Rossi'}</strong><span class="small muted">${studio ? 'Studio Rossi' : 'Consulente'}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Demo · dati di esempio</span><button class="demo-switch" type="button" data-action="switch">Cambia ruolo</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems, `#/studio/clienti/${r.id}`, activePage, 'Posizione cliente mobile')}</div>` : ''}</div>`;
+  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? 'Studio Rossi' : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage, 'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${studio ? 'GR' : 'MR'}</span><div><strong>${studio ? 'Giulia' : 'Mario Rossi'}</strong><span class="small muted">${studio ? 'Studio Rossi' : 'Consulente'}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati demo</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems, `#/studio/clienti/${r.id}`, activePage, 'Posizione cliente mobile')}</div>` : ''}</div>`;
 }
 
 const reserveMeaning = 'La riserva stima imposte e contributi sugli incassi considerati, tenendo conto dei versamenti indicati. Non misura il denaro già messo da parte.';
@@ -176,6 +179,10 @@ function clients() { return `${heading('Clienti')}<label class="search">${icon('
 function deadlines() { return `${heading('Scadenze')}<p class="eyebrow">Novembre 2026</p><article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>Mario Rossi · imposte e contributi</p>${link('#/studio/clienti/mario/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article><p class="calendar-note">Le altre posizioni non hanno scadenze aggiunte in questa demo.</p>`; }
 
 function render(focus = false) {
+  if (access.phase === 'ready') {
+    const prefix = access.selected.context_type === 'personal' ? '#/io/' : '#/studio/';
+    if (!location.hash.startsWith(prefix)) history.replaceState({ panel: null }, '', prefix + (access.selected.context_type === 'personal' ? 'oggi' : 'da-fare'));
+  }
   const r = route();
   renderedHash = location.hash;
   document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
@@ -225,9 +232,15 @@ function readAmount(form) {
 function moneyForm(action, label, initial, description) { return `<form id="amount-form" data-command="${action}" novalidate><div class="field"><label for="amount">${label}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off"><p id="amount-help">${description}</p></div><p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${action === 'payment-save' ? 'Registra incasso' : 'Aggiungi fattura'}</button></form>`; }
 let currentInvoice;
 async function action(name, element) {
+  if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
   const r = route(); const p = r.id ? service.getPosition(r.id) : null;
   switch (name) {
-    case 'switch': navigate('#/ingresso'); break;
+    case 'account':
+      openPanel('Il tuo account', '<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia contesto') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
+    case 'auth-switch': await auth.chooseAgain(); break;
+    case 'auth-select': await auth.choose(access.contexts[Number(element.dataset.choice)]); break;
+    case 'auth-retry': await auth.restore(); break;
+    case 'auth-logout': loginEmail = ''; await auth.logout(); break;
     case 'close': closePanel(); break;
     case 'upload-request': case 'upload-other':
       openPanel(name === 'upload-request' ? 'Carica la ricevuta' : 'Aggiungi un documento', `<p>Per questa prova abbiamo preparato un documento di esempio. Non selezionare file personali.</p>${syntheticFile(name === 'upload-request' ? 'Ricevuta contributi · esempio' : 'Documento di esempio')}${button(name === 'upload-request' ? 'upload-save-request' : 'upload-save-other', icon('upload')+'Usa documento di esempio')}`); break;
@@ -283,7 +296,17 @@ document.addEventListener('input', event => {
   }
 });
 document.addEventListener('submit', event => {
-  event.preventDefault(); const r = route();
+  event.preventDefault();
+  if (event.target.id === 'login-form') {
+    if (access.phase !== 'signed-out') return;
+    loginEmail = event.target.elements.email.value;
+    const password = event.target.elements.password.value;
+    event.target.elements.password.value = '';
+    void auth.login(loginEmail, password);
+    return;
+  }
+  if (access.phase !== 'ready') return;
+  const r = route();
   if (event.target.id === 'message-form') {
     const input = document.querySelector('#message');
     if (!input.value.trim()) { input.setCustomValidity('Scrivi un messaggio.'); input.reportValidity(); input.addEventListener('input', () => input.setCustomValidity(''), { once: true }); return; }
@@ -327,4 +350,24 @@ window.addEventListener('popstate', () => {
   callback?.();
 });
 window.addEventListener('hashchange', () => { if (location.hash !== renderedHash) showRoute(); });
-render();
+function clearPosition() {
+  if (panel.open) panel.close();
+  panel.innerHTML = ''; panels.clear(); views.clear(); currentInvoice = null;
+  afterPanelClose = null; panelOpener = null; closingPanel = false;
+  filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
+  clearTimeout(notificationTimer); notice.textContent = '';
+  service.reset();
+  history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
+}
+auth.subscribe(next => {
+  if (JSON.stringify(next) === JSON.stringify(access) && app.childElementCount) return;
+  const previous = access;
+  access = next;
+  const was = previous.phase === 'ready' ? previous.user.id + ':' + previous.selected.context_id : '';
+  const current = next.phase === 'ready' ? next.user.id + ':' + next.selected.context_id : '';
+  if (was !== current || next.phase === 'loading') clearPosition();
+  if (current && was !== current) history.replaceState({ panel: null }, '', next.selected.context_type === 'personal' ? '#/io/oggi' : '#/studio/da-fare');
+  render(next.phase !== 'loading');
+  if (next.phase === 'signed-out' && next.message) document.querySelector('#login-password')?.focus();
+});
+void auth.restore();

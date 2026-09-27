@@ -40,6 +40,7 @@ const clone = value => structuredClone(value);
 function get(id) { const p = state.get(id); if (!p) throw new Error('Posizione non disponibile.'); return p; }
 
 export const demoService = {
+  reset() { state.clear(); for (const person of people) state.set(person.id, position(person)); sequence = 0; },
   getPosition(id) {
     const p = get(id);
     return clone({ ...p, received: p.invoices.reduce((n, i) => n + i.paid, 0), outstanding: p.invoices.reduce((n, i) => n + i.total - i.paid, 0) });

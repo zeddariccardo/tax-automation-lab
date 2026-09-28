@@ -1,0 +1,1071 @@
+{
+  "syntheticOnly": true,
+  "source": "Frozen S01: F03, F11, F12, F13",
+  "portfolio": [
+    {
+      "schema": "ProfessionalPracticeV1",
+      "workspaceId": "local-workspace",
+      "clientId": "s01-client-1",
+      "clientCode": "TAL-5DC7E160",
+      "revision": 1,
+      "personalState": {
+        "schemaVersion": "forfettario-pro-personal-v2",
+        "engineVersion": "6.4.0-phase6-local-documents",
+        "mode": "personal",
+        "onboarding": {
+          "completed": true,
+          "step": 4
+        },
+        "profile": {
+          "year": 2026,
+          "startDate": "2020-01-01",
+          "taxCode": "00000000701",
+          "vatCountry": "IT",
+          "vatCode": "20000000001",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "atecoCode": "69.20.01",
+              "officialDescription": "Attività di commercialisti",
+              "coefficientBps": 0,
+              "groupId": null,
+              "resolutionStatus": "pending",
+              "warning": null,
+              "resolutionTrace": null
+            }
+          ],
+          "eligibilityFacts": {
+            "isNaturalPerson": true,
+            "vatSpecialRegimeAbsent": true,
+            "residentEligibilitySatisfied": true,
+            "exclusiveBuildingsVehiclesActivityAbsent": true,
+            "partnershipParticipationAbsent": true,
+            "controlledSrlConflictAbsent": true,
+            "formerEmployerPrevalenceAbsent": true,
+            "employeeCostsCents": 0
+          },
+          "priorEmployeePensionIncomeCents": 0,
+          "employeeIncomeExceptionApplies": false,
+          "startupRateRequested": false,
+          "startupFacts": {
+            "noPriorActivityThreeYears": true,
+            "notMereContinuation": true,
+            "predecessorWithinThreshold": true
+          },
+          "pension": {
+            "managementId": "INPS_GS",
+            "options": {
+              "otherMandatoryCoverage": false
+            }
+          }
+        },
+        "ledger": {
+          "schemaVersion": "forfettario-ledger-v1",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "coefficientBps": 0
+            }
+          ],
+          "invoices": [
+            {
+              "type": "invoice",
+              "id": "S01-I1",
+              "number": "S01-BASE-1",
+              "issueDate": "2026-01-15",
+              "currency": "EUR",
+              "customer": "Cliente fittizio 1",
+              "components": [
+                {
+                  "id": "S01-C1",
+                  "invoiceId": "S01-I1",
+                  "kind": "compensation",
+                  "amountCents": 100000,
+                  "activityId": "s01-a1",
+                  "decisions": {
+                    "documentTotal": "ADD",
+                    "receivable": "ADD",
+                    "threshold": "INCLUDE_ON_SETTLEMENT",
+                    "forfaitIncome": "INCLUDE_ON_SETTLEMENT",
+                    "vatTurnover": "INCLUDE_ON_ISSUE",
+                    "pensionSubjectiveBase": "DERIVE_FROM_FORFAIT_INCOME",
+                    "pensionIntegrativeBase": "REQUIRES_PENSION_ADAPTER",
+                    "liquidity": "INFLOW_WHEN_SETTLED",
+                    "exclusionReason": null
+                  },
+                  "reconciliationStatus": "reconciled"
+                }
+              ],
+              "totals": {
+                "documentTotalCents": 100000,
+                "withholdingDisclosureCents": 0,
+                "customerCashDueCents": 100000
+              },
+              "reconciliationStatus": "reconciled"
+            }
+          ],
+          "creditNotes": [],
+          "payments": [
+            {
+              "type": "payment",
+              "id": "S01-P1",
+              "invoiceId": "S01-I1",
+              "cashDate": "2026-02-15",
+              "currency": "EUR",
+              "amountCents": 100000,
+              "cashReceivedCents": 100000,
+              "withholdingCents": 0
+            }
+          ],
+          "allocations": [
+            {
+              "type": "payment_allocation",
+              "id": "S01-A1",
+              "paymentId": "S01-P1",
+              "componentId": "S01-C1",
+              "amountCents": 100000
+            }
+          ],
+          "refunds": [],
+          "forecastScenarios": []
+        },
+        "contributionPayments": [],
+        "forecast": {
+          "expectedReceiptsCents": 0,
+          "newCompensationCents": null,
+          "activityId": "s01-a1",
+          "expectedDate": "2026-12-31"
+        },
+        "taxPlanning": {
+          "priorYearTaxCents": 100000,
+          "validAdvancesPaidCents": 40000,
+          "creditsCents": 0,
+          "method": "historical"
+        },
+        "liquidity": {
+          "items": [
+            {
+              "id": "liquidity-home",
+              "category": "home",
+              "label": "Casa",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-food",
+              "category": "food",
+              "label": "Alimentazione",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-car",
+              "category": "car",
+              "label": "Auto",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-insurance",
+              "category": "insurance",
+              "label": "Assicurazioni",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-subscriptions",
+              "category": "subscriptions",
+              "label": "Abbonamenti",
+              "amountCents": 0
+            }
+          ]
+        },
+        "fiscalYears": {
+          "2025": {
+            "year": 2025,
+            "forecast": {
+              "expectedReceiptsCents": null,
+              "newCompensationCents": null,
+              "activityId": null,
+              "expectedDate": "2025-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": null,
+              "residentEligibilitySatisfied": null,
+              "exclusiveBuildingsVehiclesActivityAbsent": null,
+              "partnershipParticipationAbsent": null,
+              "controlledSrlConflictAbsent": null,
+              "formerEmployerPrevalenceAbsent": null,
+              "employeeCostsCents": null
+            },
+            "priorEmployeePensionIncomeCents": null,
+            "employeeIncomeExceptionApplies": null,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": null,
+              "notMereContinuation": null,
+              "predecessorWithinThreshold": null
+            },
+            "pension": {
+              "managementId": null,
+              "options": {}
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": null,
+              "validAdvancesPaidCents": null,
+              "creditsCents": null,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          },
+          "2026": {
+            "year": 2026,
+            "forecast": {
+              "expectedReceiptsCents": 0,
+              "newCompensationCents": null,
+              "activityId": "s01-a1",
+              "expectedDate": "2026-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": true,
+              "residentEligibilitySatisfied": true,
+              "exclusiveBuildingsVehiclesActivityAbsent": true,
+              "partnershipParticipationAbsent": true,
+              "controlledSrlConflictAbsent": true,
+              "formerEmployerPrevalenceAbsent": true,
+              "employeeCostsCents": 0
+            },
+            "priorEmployeePensionIncomeCents": 0,
+            "employeeIncomeExceptionApplies": false,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": true,
+              "notMereContinuation": true,
+              "predecessorWithinThreshold": true
+            },
+            "pension": {
+              "managementId": "INPS_GS",
+              "options": {
+                "otherMandatoryCoverage": false
+              }
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": 100000,
+              "validAdvancesPaidCents": 40000,
+              "creditsCents": 0,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          }
+        },
+        "archive": [],
+        "demo": false,
+        "sequence": 100,
+        "updatedAt": "2026-09-22T12:00:00.000Z"
+      },
+      "professionalMetadata": {
+        "name": "S01 Fittizio 1",
+        "taxCode": "00000000701",
+        "vatCode": "20000000001",
+        "year": 2026,
+        "archived": false,
+        "createdAt": "2026-09-22T12:00:00.000Z",
+        "updatedAt": "2026-09-22T12:00:00.000Z",
+        "notes": "Solo dati sintetici S01",
+        "professionalValidations": []
+      },
+      "createdAt": "2026-09-22T12:00:00.000Z",
+      "updatedAt": "2026-09-22T12:00:00.000Z"
+    },
+    {
+      "schema": "ProfessionalPracticeV1",
+      "workspaceId": "local-workspace",
+      "clientId": "s01-client-2",
+      "clientCode": "TAL-2B0334BE",
+      "revision": 1,
+      "personalState": {
+        "schemaVersion": "forfettario-pro-personal-v2",
+        "engineVersion": "6.4.0-phase6-local-documents",
+        "mode": "personal",
+        "onboarding": {
+          "completed": true,
+          "step": 4
+        },
+        "profile": {
+          "year": 2026,
+          "startDate": "2020-01-01",
+          "taxCode": "00000000702",
+          "vatCountry": "IT",
+          "vatCode": "20000000002",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "atecoCode": "69.20.01",
+              "officialDescription": "Attività di commercialisti",
+              "coefficientBps": 0,
+              "groupId": null,
+              "resolutionStatus": "pending",
+              "warning": null,
+              "resolutionTrace": null
+            }
+          ],
+          "eligibilityFacts": {
+            "isNaturalPerson": true,
+            "vatSpecialRegimeAbsent": true,
+            "residentEligibilitySatisfied": true,
+            "exclusiveBuildingsVehiclesActivityAbsent": true,
+            "partnershipParticipationAbsent": true,
+            "controlledSrlConflictAbsent": true,
+            "formerEmployerPrevalenceAbsent": true,
+            "employeeCostsCents": 0
+          },
+          "priorEmployeePensionIncomeCents": 0,
+          "employeeIncomeExceptionApplies": false,
+          "startupRateRequested": false,
+          "startupFacts": {
+            "noPriorActivityThreeYears": true,
+            "notMereContinuation": true,
+            "predecessorWithinThreshold": true
+          },
+          "pension": {
+            "managementId": "INPS_GS",
+            "options": {
+              "otherMandatoryCoverage": false
+            }
+          }
+        },
+        "ledger": {
+          "schemaVersion": "forfettario-ledger-v1",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "coefficientBps": 0
+            }
+          ],
+          "invoices": [
+            {
+              "type": "invoice",
+              "id": "S01-I2",
+              "number": "S01-BASE-2",
+              "issueDate": "2026-01-15",
+              "currency": "EUR",
+              "customer": "Cliente fittizio 2",
+              "components": [
+                {
+                  "id": "S01-C2",
+                  "invoiceId": "S01-I2",
+                  "kind": "compensation",
+                  "amountCents": 200000,
+                  "activityId": "s01-a1",
+                  "decisions": {
+                    "documentTotal": "ADD",
+                    "receivable": "ADD",
+                    "threshold": "INCLUDE_ON_SETTLEMENT",
+                    "forfaitIncome": "INCLUDE_ON_SETTLEMENT",
+                    "vatTurnover": "INCLUDE_ON_ISSUE",
+                    "pensionSubjectiveBase": "DERIVE_FROM_FORFAIT_INCOME",
+                    "pensionIntegrativeBase": "REQUIRES_PENSION_ADAPTER",
+                    "liquidity": "INFLOW_WHEN_SETTLED",
+                    "exclusionReason": null
+                  },
+                  "reconciliationStatus": "reconciled"
+                }
+              ],
+              "totals": {
+                "documentTotalCents": 200000,
+                "withholdingDisclosureCents": 0,
+                "customerCashDueCents": 200000
+              },
+              "reconciliationStatus": "reconciled"
+            }
+          ],
+          "creditNotes": [],
+          "payments": [
+            {
+              "type": "payment",
+              "id": "S01-P2",
+              "invoiceId": "S01-I2",
+              "cashDate": "2026-02-15",
+              "currency": "EUR",
+              "amountCents": 200000,
+              "cashReceivedCents": 200000,
+              "withholdingCents": 0
+            }
+          ],
+          "allocations": [
+            {
+              "type": "payment_allocation",
+              "id": "S01-A2",
+              "paymentId": "S01-P2",
+              "componentId": "S01-C2",
+              "amountCents": 200000
+            }
+          ],
+          "refunds": [],
+          "forecastScenarios": []
+        },
+        "contributionPayments": [],
+        "forecast": {
+          "expectedReceiptsCents": 0,
+          "newCompensationCents": null,
+          "activityId": "s01-a1",
+          "expectedDate": "2026-12-31"
+        },
+        "taxPlanning": {
+          "priorYearTaxCents": 100000,
+          "validAdvancesPaidCents": 40000,
+          "creditsCents": 0,
+          "method": "historical"
+        },
+        "liquidity": {
+          "items": [
+            {
+              "id": "liquidity-home",
+              "category": "home",
+              "label": "Casa",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-food",
+              "category": "food",
+              "label": "Alimentazione",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-car",
+              "category": "car",
+              "label": "Auto",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-insurance",
+              "category": "insurance",
+              "label": "Assicurazioni",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-subscriptions",
+              "category": "subscriptions",
+              "label": "Abbonamenti",
+              "amountCents": 0
+            }
+          ]
+        },
+        "fiscalYears": {
+          "2025": {
+            "year": 2025,
+            "forecast": {
+              "expectedReceiptsCents": null,
+              "newCompensationCents": null,
+              "activityId": null,
+              "expectedDate": "2025-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": null,
+              "residentEligibilitySatisfied": null,
+              "exclusiveBuildingsVehiclesActivityAbsent": null,
+              "partnershipParticipationAbsent": null,
+              "controlledSrlConflictAbsent": null,
+              "formerEmployerPrevalenceAbsent": null,
+              "employeeCostsCents": null
+            },
+            "priorEmployeePensionIncomeCents": null,
+            "employeeIncomeExceptionApplies": null,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": null,
+              "notMereContinuation": null,
+              "predecessorWithinThreshold": null
+            },
+            "pension": {
+              "managementId": null,
+              "options": {}
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": null,
+              "validAdvancesPaidCents": null,
+              "creditsCents": null,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          },
+          "2026": {
+            "year": 2026,
+            "forecast": {
+              "expectedReceiptsCents": 0,
+              "newCompensationCents": null,
+              "activityId": "s01-a1",
+              "expectedDate": "2026-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": true,
+              "residentEligibilitySatisfied": true,
+              "exclusiveBuildingsVehiclesActivityAbsent": true,
+              "partnershipParticipationAbsent": true,
+              "controlledSrlConflictAbsent": true,
+              "formerEmployerPrevalenceAbsent": true,
+              "employeeCostsCents": 0
+            },
+            "priorEmployeePensionIncomeCents": 0,
+            "employeeIncomeExceptionApplies": false,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": true,
+              "notMereContinuation": true,
+              "predecessorWithinThreshold": true
+            },
+            "pension": {
+              "managementId": "INPS_GS",
+              "options": {
+                "otherMandatoryCoverage": false
+              }
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": 100000,
+              "validAdvancesPaidCents": 40000,
+              "creditsCents": 0,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          }
+        },
+        "archive": [],
+        "demo": false,
+        "sequence": 100,
+        "updatedAt": "2026-09-22T12:00:00.000Z"
+      },
+      "professionalMetadata": {
+        "name": "S01 Fittizio 2",
+        "taxCode": "00000000702",
+        "vatCode": "20000000002",
+        "year": 2026,
+        "archived": false,
+        "createdAt": "2026-09-22T12:00:00.000Z",
+        "updatedAt": "2026-09-22T12:00:00.000Z",
+        "notes": "Solo dati sintetici S01",
+        "professionalValidations": []
+      },
+      "createdAt": "2026-09-22T12:00:00.000Z",
+      "updatedAt": "2026-09-22T12:00:00.000Z"
+    },
+    {
+      "schema": "ProfessionalPracticeV1",
+      "workspaceId": "local-workspace",
+      "clientId": "s01-client-3",
+      "clientCode": "TAL-A724D1B4",
+      "revision": 1,
+      "personalState": {
+        "schemaVersion": "forfettario-pro-personal-v2",
+        "engineVersion": "6.4.0-phase6-local-documents",
+        "mode": "personal",
+        "onboarding": {
+          "completed": true,
+          "step": 4
+        },
+        "profile": {
+          "year": 2026,
+          "startDate": "2020-01-01",
+          "taxCode": "00000000703",
+          "vatCountry": "IT",
+          "vatCode": "20000000003",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "atecoCode": "69.20.01",
+              "officialDescription": "Attività di commercialisti",
+              "coefficientBps": 0,
+              "groupId": null,
+              "resolutionStatus": "pending",
+              "warning": null,
+              "resolutionTrace": null
+            }
+          ],
+          "eligibilityFacts": {
+            "isNaturalPerson": true,
+            "vatSpecialRegimeAbsent": true,
+            "residentEligibilitySatisfied": true,
+            "exclusiveBuildingsVehiclesActivityAbsent": true,
+            "partnershipParticipationAbsent": true,
+            "controlledSrlConflictAbsent": true,
+            "formerEmployerPrevalenceAbsent": true,
+            "employeeCostsCents": 0
+          },
+          "priorEmployeePensionIncomeCents": 0,
+          "employeeIncomeExceptionApplies": false,
+          "startupRateRequested": false,
+          "startupFacts": {
+            "noPriorActivityThreeYears": true,
+            "notMereContinuation": true,
+            "predecessorWithinThreshold": true
+          },
+          "pension": {
+            "managementId": "INPS_GS",
+            "options": {
+              "otherMandatoryCoverage": false
+            }
+          }
+        },
+        "ledger": {
+          "schemaVersion": "forfettario-ledger-v1",
+          "activities": [
+            {
+              "id": "s01-a1",
+              "coefficientBps": 0
+            }
+          ],
+          "invoices": [
+            {
+              "type": "invoice",
+              "id": "S01-I3",
+              "number": "S01-BASE-3",
+              "issueDate": "2026-01-15",
+              "currency": "EUR",
+              "customer": "Cliente fittizio 3",
+              "components": [
+                {
+                  "id": "S01-C3",
+                  "invoiceId": "S01-I3",
+                  "kind": "compensation",
+                  "amountCents": 300000,
+                  "activityId": "s01-a1",
+                  "decisions": {
+                    "documentTotal": "ADD",
+                    "receivable": "ADD",
+                    "threshold": "INCLUDE_ON_SETTLEMENT",
+                    "forfaitIncome": "INCLUDE_ON_SETTLEMENT",
+                    "vatTurnover": "INCLUDE_ON_ISSUE",
+                    "pensionSubjectiveBase": "DERIVE_FROM_FORFAIT_INCOME",
+                    "pensionIntegrativeBase": "REQUIRES_PENSION_ADAPTER",
+                    "liquidity": "INFLOW_WHEN_SETTLED",
+                    "exclusionReason": null
+                  },
+                  "reconciliationStatus": "reconciled"
+                }
+              ],
+              "totals": {
+                "documentTotalCents": 300000,
+                "withholdingDisclosureCents": 0,
+                "customerCashDueCents": 300000
+              },
+              "reconciliationStatus": "reconciled"
+            }
+          ],
+          "creditNotes": [],
+          "payments": [
+            {
+              "type": "payment",
+              "id": "S01-P3",
+              "invoiceId": "S01-I3",
+              "cashDate": "2026-02-15",
+              "currency": "EUR",
+              "amountCents": 300000,
+              "cashReceivedCents": 300000,
+              "withholdingCents": 0
+            }
+          ],
+          "allocations": [
+            {
+              "type": "payment_allocation",
+              "id": "S01-A3",
+              "paymentId": "S01-P3",
+              "componentId": "S01-C3",
+              "amountCents": 300000
+            }
+          ],
+          "refunds": [],
+          "forecastScenarios": []
+        },
+        "contributionPayments": [],
+        "forecast": {
+          "expectedReceiptsCents": 0,
+          "newCompensationCents": null,
+          "activityId": "s01-a1",
+          "expectedDate": "2026-12-31"
+        },
+        "taxPlanning": {
+          "priorYearTaxCents": 100000,
+          "validAdvancesPaidCents": 40000,
+          "creditsCents": 0,
+          "method": "historical"
+        },
+        "liquidity": {
+          "items": [
+            {
+              "id": "liquidity-home",
+              "category": "home",
+              "label": "Casa",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-food",
+              "category": "food",
+              "label": "Alimentazione",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-car",
+              "category": "car",
+              "label": "Auto",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-insurance",
+              "category": "insurance",
+              "label": "Assicurazioni",
+              "amountCents": 0
+            },
+            {
+              "id": "liquidity-subscriptions",
+              "category": "subscriptions",
+              "label": "Abbonamenti",
+              "amountCents": 0
+            }
+          ]
+        },
+        "fiscalYears": {
+          "2025": {
+            "year": 2025,
+            "forecast": {
+              "expectedReceiptsCents": null,
+              "newCompensationCents": null,
+              "activityId": null,
+              "expectedDate": "2025-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": null,
+              "residentEligibilitySatisfied": null,
+              "exclusiveBuildingsVehiclesActivityAbsent": null,
+              "partnershipParticipationAbsent": null,
+              "controlledSrlConflictAbsent": null,
+              "formerEmployerPrevalenceAbsent": null,
+              "employeeCostsCents": null
+            },
+            "priorEmployeePensionIncomeCents": null,
+            "employeeIncomeExceptionApplies": null,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": null,
+              "notMereContinuation": null,
+              "predecessorWithinThreshold": null
+            },
+            "pension": {
+              "managementId": null,
+              "options": {}
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": null,
+              "validAdvancesPaidCents": null,
+              "creditsCents": null,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          },
+          "2026": {
+            "year": 2026,
+            "forecast": {
+              "expectedReceiptsCents": 0,
+              "newCompensationCents": null,
+              "activityId": "s01-a1",
+              "expectedDate": "2026-12-31"
+            },
+            "eligibilityFacts": {
+              "isNaturalPerson": true,
+              "vatSpecialRegimeAbsent": true,
+              "residentEligibilitySatisfied": true,
+              "exclusiveBuildingsVehiclesActivityAbsent": true,
+              "partnershipParticipationAbsent": true,
+              "controlledSrlConflictAbsent": true,
+              "formerEmployerPrevalenceAbsent": true,
+              "employeeCostsCents": 0
+            },
+            "priorEmployeePensionIncomeCents": 0,
+            "employeeIncomeExceptionApplies": false,
+            "startupRateRequested": false,
+            "startupFacts": {
+              "noPriorActivityThreeYears": true,
+              "notMereContinuation": true,
+              "predecessorWithinThreshold": true
+            },
+            "pension": {
+              "managementId": "INPS_GS",
+              "options": {
+                "otherMandatoryCoverage": false
+              }
+            },
+            "taxPlanning": {
+              "priorYearTaxCents": 100000,
+              "validAdvancesPaidCents": 40000,
+              "creditsCents": 0,
+              "method": "historical",
+              "paymentPlan": {
+                "taxInstallments": 1,
+                "cnpadcMinimumInstallments": 2,
+                "cnpadcExcessInstallments": 1,
+                "cnpadcInterestBps": null
+              }
+            },
+            "liquidity": {
+              "items": [
+                {
+                  "id": "liquidity-home",
+                  "category": "home",
+                  "label": "Casa",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-food",
+                  "category": "food",
+                  "label": "Alimentazione",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-car",
+                  "category": "car",
+                  "label": "Auto",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-insurance",
+                  "category": "insurance",
+                  "label": "Assicurazioni",
+                  "amountCents": 0
+                },
+                {
+                  "id": "liquidity-subscriptions",
+                  "category": "subscriptions",
+                  "label": "Abbonamenti",
+                  "amountCents": 0
+                }
+              ]
+            }
+          }
+        },
+        "archive": [],
+        "demo": false,
+        "sequence": 100,
+        "updatedAt": "2026-09-22T12:00:00.000Z"
+      },
+      "professionalMetadata": {
+        "name": "S01 Fittizio 3",
+        "taxCode": "00000000703",
+        "vatCode": "20000000003",
+        "year": 2026,
+        "archived": false,
+        "createdAt": "2026-09-22T12:00:00.000Z",
+        "updatedAt": "2026-09-22T12:00:00.000Z",
+        "notes": "Solo dati sintetici S01",
+        "professionalValidations": []
+      },
+      "createdAt": "2026-09-22T12:00:00.000Z",
+      "updatedAt": "2026-09-22T12:00:00.000Z"
+    }
+  ],
+  "xml": {
+    "files": [
+      {
+        "name": "s01-fittizia.xml",
+        "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><p:FatturaElettronica xmlns:p=\"http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2\" versione=\"FPR12\"><FatturaElettronicaHeader><DatiTrasmissione><IdTrasmittente><IdPaese>IT</IdPaese><IdCodice>01234567890</IdCodice></IdTrasmittente><ProgressivoInvio>00001</ProgressivoInvio><FormatoTrasmissione>FPR12</FormatoTrasmissione><CodiceDestinatario>0000000</CodiceDestinatario></DatiTrasmissione><CedentePrestatore><DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>20000000001</IdCodice></IdFiscaleIVA><CodiceFiscale>00000000701</CodiceFiscale><Anagrafica><Nome>Mario</Nome><Cognome>Rossi</Cognome></Anagrafica><RegimeFiscale>RF19</RegimeFiscale></DatiAnagrafici><Sede><Indirizzo>Via Roma</Indirizzo><CAP>00100</CAP><Comune>Roma</Comune><Provincia>RM</Provincia><Nazione>IT</Nazione></Sede></CedentePrestatore><CessionarioCommittente><DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>09999999999</IdCodice></IdFiscaleIVA><Anagrafica><Denominazione>Cliente Fittizio</Denominazione></Anagrafica></DatiAnagrafici><Sede><Indirizzo>Via Milano</Indirizzo><CAP>20100</CAP><Comune>Milano</Comune><Provincia>MI</Provincia><Nazione>IT</Nazione></Sede></CessionarioCommittente></FatturaElettronicaHeader><FatturaElettronicaBody><DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa><Data>2026-05-10</Data><Numero>S01-XML</Numero><ImportoTotaleDocumento>123.45</ImportoTotaleDocumento></DatiGeneraliDocumento></DatiGenerali><DatiBeniServizi><DettaglioLinee><NumeroLinea>1</NumeroLinea><Descrizione>Prestazione fittizia S01</Descrizione><Quantita>1.00</Quantita><PrezzoUnitario>123.45</PrezzoUnitario><PrezzoTotale>123.45</PrezzoTotale><AliquotaIVA>0.00</AliquotaIVA><Natura>N2.2</Natura></DettaglioLinee><DatiRiepilogo><AliquotaIVA>0.00</AliquotaIVA><Natura>N2.2</Natura><ImponibileImporto>123.45</ImponibileImporto><Imposta>0.00</Imposta></DatiRiepilogo></DatiBeniServizi></FatturaElettronicaBody></p:FatturaElettronica>"
+      }
+    ],
+    "assignments": {}
+  },
+  "table": {
+    "csv": "ID cliente TAL;Numero fattura;Data fattura;Importo;Data incasso;Importo incassato;ATECO\nTAL-5DC7E160;S01-TAB-1;15/05/2026;1.000,01;20/05/2026;500,00;69.20.01\nTAL-2B0334BE;S01-TAB-2;15/05/2026;1.000,01;20/05/2026;500,00;69.20.01\nTAL-A724D1B4;S01-TAB-3;15/05/2026;1.000,01;20/05/2026;500,00;69.20.01"
+  }
+}

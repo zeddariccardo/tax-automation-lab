@@ -1,3 +1,4 @@
+import {createImportUI} from './import-ui.js';
 import {createOnboardingUI} from './onboarding-ui.js';
 import { createCollaborationController } from './collaboration-controller.js';
 import { collaborationView } from './collaboration-view.js';
@@ -144,18 +145,18 @@ function fiscalPage(r) {
  fiscals.select(r.id,year);
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading,button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La tua attività parte da qui','La posizione è pronta. Aggiungi la prima fattura per iniziare.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
+const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La tua attività parte da qui','La posizione è pronta. Aggiungi la prima fattura per iniziare.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p><p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
 function invoiceRows(p) {
-  const list = p.invoices.filter(i => filter !== 'outstanding' || i.paid < i.total);
+  const list = p.invoices.filter(i => filter !== 'outstanding' || i.residual > 0);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
-  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.paid === i.total ? 'paid' : ''}">${!i.simple ? 'Dettaglio da controllare' : i.paid === i.total ? 'Incassata' : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`) : ''}</div></article>`).join('');
+  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.residual === 0 ? 'paid' : ''}">${i.review ? 'Rettifica da controllare' : i.residual === 0 ? (i.credited ? 'Rettificata' : 'Incassata') : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`) : ''}</div></article>`).join('');
 }
 function income(r) {
   incomes.select(r.id);
   const state=incomes.getState();
   if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Carichiamo fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
   const p=state.data;
-  return `${heading('Entrate', 'Fatture e incassi della tua posizione', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" disabled title="Disponibile in un prossimo aggiornamento">${icon('upload')}Importa fatture</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
+  return `${heading('Entrate', 'Fatture e incassi della tua posizione', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" data-action="s13-import">${icon('upload')}Importa</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
 
 const taxes=fiscalPage;
@@ -168,7 +169,7 @@ function clientRows(query = '') {
   const found = all.filter(p => (p.label+' '+(p.studioReference||'')).toLocaleLowerCase('it').includes(query.toLocaleLowerCase('it')));
   return found.length ? found.map(p => `<a class="client-link" href="#/studio/clienti/${p.id}/oggi"><span class="avatar">${icon('person')}</span><div class="row-main"><h2>${esc(p.label)}</h2>${p.studioReference ? '<p>Riferimento Studio · '+esc(p.studioReference)+'</p>' : ''}</div>${icon('chevron')}</a>`).join('') : '<p class="empty">Nessun cliente trovato. Prova con un altro nome o riferimento.</p>';
 }
-function clients() { return `${heading('Clienti','',button('s11-links','Invita cliente'))}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
+function clients() { return `${heading('Clienti','',button('s11-links','Invita cliente')+'<button class="button secondary" type="button" data-action="s13-import">Importa</button>')}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
 function deadlines() {
   return heading('Scadenze','Pagamenti di esempio: non sono scadenze effettive.')+(positions().length ? '<p class="eyebrow">Novembre 2026 · esempio</p>'+positions().map(p=>`<article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>${esc(p.label)}</p>${link('#/studio/clienti/'+p.id+'/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article>`).join('') : '<p class="empty">Nessun cliente collegato.</p>');
 }
@@ -220,6 +221,7 @@ function openPanel(title, body, restoring = false) {
 function closePanel(after) {
   if (closingPanel) return;
   if (!panel.open) { after?.(); return; }
+  if(panel.querySelector('form[id^="import-"], #import-error'))importUI.clear();
   afterPanelClose = after;
   closingPanel = true;
   if (history.state?.panel) history.back();
@@ -269,6 +271,7 @@ document.addEventListener('submit',event=>{if(event.target.id==='pension-form'){
 const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione: controlla e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Non abbiamo ricevuto conferma. Riprova: lo stesso tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
+  if(await importUI.action(name,element))return;
   if(await onboardingUI.act(name,element))return;
   if(name==='auth-signup-mode'||name==='auth-login-mode'){signup=name==='auth-signup-mode';if(access.phase!=='signed-out')await auth.restore();render(true);return;}
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
@@ -303,7 +306,7 @@ async function action(name, element) {
       try { item=await service.readInvoice(r.id,element.dataset.invoice); }
       catch(error) { if(route().id===r.id)await incomes.refresh();throw error; }
       if(route().id!==r.id||route().page!=='entrate')return;
-      openPanel('Fattura '+esc(item.number),'<p>'+esc(item.customer)+'</p><dl class="cloud-profile"><dt>Importo</dt><dd>'+euro(item.total)+'</dd><dt>Residuo</dt><dd>'+euro(item.residual)+'</dd></dl><h3>Incassi registrati</h3>'+(item.payments.length?'<ul class="receipt-list">'+item.payments.map(x=>'<li><span>'+new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(x.date))+'</span><strong>'+ (x.cash===null?'Da verificare':euro(x.cash))+'</strong></li>').join('')+'</ul>':'<p>Nessun incasso registrato.</p>')+(!item.simple?'<p>Questa fattura richiede un controllo dei dettagli prima di registrare altri incassi.</p>':''));break;
+      openPanel('Fattura '+esc(item.number),'<p>'+esc(item.customer)+'</p><dl class="cloud-profile"><dt>Importo</dt><dd>'+euro(item.total)+'</dd>'+(item.credited?'<dt>Rettifica documento</dt><dd>'+euro(item.credited)+'</dd><dt>Rimborsi effettuati</dt><dd>'+euro(item.refunded)+'</dd>':'')+'<dt>Residuo</dt><dd>'+euro(item.residual)+'</dd></dl><h3>Incassi registrati</h3>'+(item.payments.length?'<ul class="receipt-list">'+item.payments.map(x=>'<li><span>'+new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(x.date))+'</span><strong>'+ (x.cash===null?'Da verificare':euro(x.cash))+'</strong></li>').join('')+'</ul>':'<p>Nessun incasso registrato.</p>')+(!item.simple?'<p>Questa fattura richiede un controllo dei dettagli prima di registrare altri incassi.</p>':''));break;
     }
 
   }
@@ -334,6 +337,7 @@ document.addEventListener('input', event => {
 });
 document.addEventListener('submit', async event => {
   event.preventDefault();
+  if(await importUI.submit(event.target))return;
   if(await onboardingUI.submit(event.target))return;
   if (event.target.id === 'login-form' || event.target.id === 'signup-form') {
     if (access.phase !== 'signed-out') return;
@@ -421,6 +425,7 @@ function clearPosition() {
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
   clearTimeout(notificationTimer); notice.textContent = '';
   collaborationUI.clear();
+  importUI.clear();
   collaborations.select([]);
   incomes.select(null);
   fiscals.select(null,null);
@@ -428,6 +433,7 @@ function clearPosition() {
 }
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
 
+const importUI=createImportUI({auth,service,positions,route,esc,openPanel,refresh:()=>cloud.refresh(),completed:async()=>{await auth.revalidate();await onboardingUI.load();await cloud.refresh();await incomes.refresh();await fiscals.refresh();}});
 const onboardingUI=createOnboardingUI({auth,service,esc,button,openPanel,notify,render,positions,refresh:()=>cloud.refresh()});
 
 auth.subscribe(next => {
@@ -435,6 +441,7 @@ auth.subscribe(next => {
   const previous = access;
   access = next;
   onboardingUI.sync();
+  importUI.sync();
   const was = previous.phase === 'ready' ? previous.user.id + ':' + previous.selected.context_id : '';
   const current = next.phase === 'ready' ? next.user.id + ':' + next.selected.context_id : '';
   if (was !== current || next.phase === 'loading') clearPosition();

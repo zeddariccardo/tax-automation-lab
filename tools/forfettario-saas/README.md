@@ -1,4 +1,44 @@
-# S11 — registrazione e collegamento reali
+# S13 — importazione e migrazione reale
+
+S13 completato con dati sintetici. Branch `feature/s07-saas-integration`, base
+`b2429f31458ef7a18268adfd2610653bdc17e82c`. Le sezioni successive sono storiche.
+
+- Entrate: **Aggiungi fattura** resta primaria; **Importa** secondaria. Backup TAL,
+  PracticeTransfer, backup Studio, FatturaPA XML, CSV e XLSX sono letti localmente.
+  Foglio/mapping quando necessari, preview e conferma prima di qualsiasi scrittura.
+  L'originale locale non viene alterato; nessuna AI, OCR o nuova libreria.
+- I parser sono estratti in modo riproducibile dal Forfettario congelato.
+  `node tools/forfettario-saas/build-import-legacy.mjs --check` ne verifica l'identità.
+  Il vecchio tool, homepage, menu e sitemap restano invariati.
+- Prima dell'onboarding: **Hai già usato TAL? Importa i tuoi dati** permette di
+  preservare un ID TAL legacy canonico. Un ID cloud diverso resta un conflitto.
+- Studio: import atomico su clienti già collegati e autorizzati. Nessun lookup
+  globale per ID TAL. Un cliente fuori perimetro blocca l'intero batch.
+- `tal-data-service` delega a `import-service`: nessun fetch nelle view.
+  Retry con la stessa chiave/payload, snapshot consistente, conflitti espliciti,
+  risposte tardive scartate dopo chiusura/logout/cambio contesto.
+- Note di credito e rimborsi sono operativi e distinti: una nota non genera cassa.
+  Entrate e adapter fiscale leggono lo stesso grafo cloud. Worker fiscale invariato.
+- Previdenza legacy ambigua conservata con originale/provenienza e “da verificare”.
+  Nessuna conversione inventata, né nuovo modello previdenziale prima di S12.
+- I checksum legacy restano compatibili. I nuovi hash dei binding e della
+  provenienza XML usano SHA-256 standard; vedere il README backend S13 per il limite
+  dell'helper di fingerprint storico, scoperto durante il confronto.
+
+Verifiche: **143/143** test SaaS locali (20 import/lifecycle), **310/310** statici,
+**42/42** responsive; hosted S13 **30/30**, S01 **15/15**, regressioni S02/S09/S13
+**65/65**. Browser reale: selettore file, XML/CSV, XLSX su due clienti con scelta
+foglio, mapping, commit, reload, reimport senza duplicati; mobile 390/375 senza
+overflow, nessun errore console non gestito. Tastiera mobile nativa non verificata.
+Suite generale frontend: 769 PASS e un timeout, passato al retry isolato; non è
+una singola esecuzione tutta verde. Backend generale: 644 PASS, 260 SKIP, zero FAIL.
+
+Configurazione development locale ignorata; nessuna credenziale nel repository.
+Nessun merge su main o deployment pubblico. Preview locale: porta 4174.
+**PUBLIC EMAIL SIGNUP resta DEFERRED**: la delivery pubblica della conferma email
+non è stata verificata; è obbligatoria prima del pilot.
+
+# S11 — registrazione e collegamento reali (storico)
 
 **S11 CORE: PASS · PUBLIC EMAIL SIGNUP: DEFERRED.**
 

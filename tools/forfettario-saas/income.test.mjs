@@ -5,7 +5,7 @@ import {createIncomeController} from './income-controller.js';
 import {parseAmount,sumCents,projectIncome,formatCents} from './income-model.js';
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 function harness(){
- const h={calls:[],revoked:false,failAfterCommit:false,sequence:100,revision:0,receipts:new Map(),rows:{invoice:[],invoice_component:[],payment:[],allocation:[],economic_activity:[]}};
+ const h={calls:[],revoked:false,failAfterCommit:false,sequence:100,revision:0,receipts:new Map(),rows:{invoice:[],invoice_component:[],payment:[],allocation:[],economic_activity:[],credit_note:[],credit_note_line:[],refund:[]}};
  const auth={getState:()=>({user:{id:id(9)}}),withContextSession:fn=>fn({config:{supabaseUrl:'https://example.test',publishableKey:'public-test'},token:'synthetic',context:{context_type:'personal',context_id:id(1)}})};
  h.service=createTalDataService({auth,fetchImpl:async(url,opts)=>{
   h.calls.push({url,opts});const u=new URL(url),name=u.pathname.split('/').at(-1);

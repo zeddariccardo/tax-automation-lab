@@ -2,11 +2,13 @@
 import { cents, isoDate, projectIncome, incomeProblem } from './income-model.js';
 import { createCollaborationService } from './collaboration-service.js';
 import { createOnboardingService } from './onboarding-service.js';
+import { createImportService } from './import-service.js';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const problem = code => Object.assign(new Error(code), { code });
 const text = value => typeof value === 'string' && value.trim().length <= 300 ? value.trim() || null : null;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value ? value : null;
 const columns = {
+  legacy_binding: 'id,workspace_id,source_scope,kind,legacy_id,target_id,ordinal,content_hash',
   tax_workspace: 'id,tal_id,label:identity->>label,start_date:identity->>startDate,status',
   tax_year: 'id,workspace_id,year',
   economic_activity: 'id,workspace_id,ateco_code:facts->>atecoCode',
@@ -17,6 +19,9 @@ const columns = {
   invoice_component: 'id,workspace_id,invoice_id,activity_id,amount_cents,kind:facts->>kind',
   payment: 'id,workspace_id,invoice_id,amount_cents,cash_received_cents,withholding_cents,cash_date:facts->>cashDate,currency:facts->>currency',
   allocation: 'id,workspace_id,invoice_id,payment_id,component_id,amount_cents',
+  credit_note: 'id,workspace_id,invoice_id,revision,issue_date:facts->>issueDate',
+  credit_note_line: 'id,workspace_id,invoice_id,credit_note_id,component_id,amount_cents',
+  refund: 'id,workspace_id,invoice_id,amount_cents,cash_date:facts->>cashDate',
 };
 export function createTalDataService({ auth, fetchImpl }) {
   const pending = new Map();
@@ -92,10 +97,10 @@ export function createTalDataService({ auth, fetchImpl }) {
     }
     for (let attempt=0;attempt<3;attempt++) {
       const before=await workspace(), scope={workspace_id:'eq.'+id};
-      const [invoices,components,payments,allocations,activities]=await Promise.all(
-        ['invoice','invoice_component','payment','allocation','economic_activity'].map(t=>rows(session,t,scope)));
+      const [invoices,components,payments,allocations,activities,creditNotes,creditNoteLines,refunds]=await Promise.all(
+        ['invoice','invoice_component','payment','allocation','economic_activity','credit_note','credit_note_line','refund'].map(t=>rows(session,t,scope)));
       const after=await workspace(); // current grant + consistent revision, after every supporting read
-      if (before.data_revision === after.data_revision) return projectIncome({workspace:after,invoices,components,payments,allocations,activities},year);
+      if (before.data_revision === after.data_revision) return projectIncome({workspace:after,invoices,components,payments,allocations,activities,creditNotes,creditNoteLines,refunds},year);
     }
     throw problem('conflict');
   }
@@ -135,6 +140,7 @@ export function createTalDataService({ auth, fetchImpl }) {
     });
   }
   return {
+    ...createImportService({auth,fetchImpl,rows}),
     ...createOnboardingService({auth,fetchImpl}),
     ...createCollaborationService({auth,fetchImpl}),
     calculateFiscal: (id,year) => auth.withContextSession(async session=>{

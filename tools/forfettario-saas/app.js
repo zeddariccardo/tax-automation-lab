@@ -1,3 +1,4 @@
+import {createOnboardingUI} from './onboarding-ui.js';
 import { createCollaborationController } from './collaboration-controller.js';
 import { collaborationView } from './collaboration-view.js';
 import { createCollaborationUI } from './collaboration-ui.js';
@@ -16,7 +17,7 @@ const collaborations=createCollaborationController({auth,service});
 const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
 const positionFor = id => positions().find(p => p.id === id);
 const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
-let loginEmail = '';
+let loginEmail = ''; let signup = false;
 
 const app = document.querySelector('#app');
 const panel = document.querySelector('#panel');
@@ -63,7 +64,7 @@ history.scrollRestoration = 'manual';
 history.replaceState({ ...history.state, panel: null }, '', location.href);
 
 function route() {
-  if (access.phase !== 'ready' || !access.selected) return { role: 'entry', page: 'ingresso' };
+  if (onboardingUI.mustSetup() || access.phase !== 'ready' || !access.selected) return { role: 'entry', page: 'ingresso' };
   const bits = location.hash.replace(/^#\/?/, '').split('/');
   if (access.selected.context_type === 'personal' && bits[0] === 'io' && positionPages.includes(bits[1])) return { role: 'personal', id: access.selected.context_id, page: bits[1], client: false };
   if (access.selected.context_type === 'studio' && bits[0] === 'studio') {
@@ -113,7 +114,7 @@ function navigate(url, { open, focus, requestId } = {}) {
   if (panel.open) closePanel(proceed); else proceed();
 }
 
-function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button }); }
+function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button, signup, setup:onboardingUI.mustSetup()?onboardingUI.content():null }); }
 
 function shell(r, content) {
   const studio = r.role === 'studio';
@@ -121,7 +122,7 @@ function shell(r, content) {
   const studioName = structural.data?.studio?.name || access.selected.label;
   const activePage = r.page === 'documenti' ? 'attivita' : r.page;
   const clientHeader = r.client && p ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${icon('person')}</span><div class="row-main"><strong>${esc(p.label)}</strong>${p.studioReference ? '<small>Riferimento Studio · '+esc(p.studioReference)+'</small>' : ''}</div><button class="text-link" type="button" data-action="profile">Dati della posizione</button></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r,key)}" ${activePage===key?'aria-current="page"':''}>${label}</a>`).join('')}</nav>` : '';
-  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">Domenica, 27 settembre 2026</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
+  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">${new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
 }
 function cloudStatus() {
   if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Un momento…')+'<p role="status">Stiamo caricando la tua posizione.</p>';
@@ -130,7 +131,7 @@ function cloudStatus() {
 }
 function profileDetails(p) {
   const start = p.startDate ? new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(p.startDate)) : 'Non indicata';
-  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura.</p>`;
+  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>ID TAL</dt><dd>${esc(p.talId || 'Non assegnato')}</dd><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura.</p>`;
 }
 
 function collaboration(r,mode='activity') {
@@ -143,7 +144,7 @@ function fiscalPage(r) {
  fiscals.select(r.id,year);
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading,button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=r=>fiscalPage(r)+collaboration(r,'today');
+const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La tua attività parte da qui','La posizione è pronta. Aggiungi la prima fattura per iniziare.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.paid < i.total);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
@@ -159,20 +160,21 @@ function income(r) {
 
 const taxes=fiscalPage;
 const documents=r=>collaboration(r,'documents');
-const activity=r=>collaboration(r);
-const todo=()=>collaboration(route(),'queue');
+const activity=r=>button('s11-links',r.role==='personal'?'Il tuo commercialista':'Collegamento cliente','','button secondary')+collaboration(r);
+const todo=()=>positions().length?collaboration(route(),'queue'):heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));
 function clientRows(query = '') {
   const all = positions();
   if (!all.length) return '<p class="empty">Nessun cliente collegato.</p>';
   const found = all.filter(p => (p.label+' '+(p.studioReference||'')).toLocaleLowerCase('it').includes(query.toLocaleLowerCase('it')));
   return found.length ? found.map(p => `<a class="client-link" href="#/studio/clienti/${p.id}/oggi"><span class="avatar">${icon('person')}</span><div class="row-main"><h2>${esc(p.label)}</h2>${p.studioReference ? '<p>Riferimento Studio · '+esc(p.studioReference)+'</p>' : ''}</div>${icon('chevron')}</a>`).join('') : '<p class="empty">Nessun cliente trovato. Prova con un altro nome o riferimento.</p>';
 }
-function clients() { return `${heading('Clienti')}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
+function clients() { return `${heading('Clienti','',button('s11-links','Invita cliente'))}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
 function deadlines() {
   return heading('Scadenze','Pagamenti di esempio: non sono scadenze effettive.')+(positions().length ? '<p class="eyebrow">Novembre 2026 · esempio</p>'+positions().map(p=>`<article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>${esc(p.label)}</p>${link('#/studio/clienti/'+p.id+'/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article>`).join('') : '<p class="empty">Nessun cliente collegato.</p>');
 }
 
 function render(focus = false) {
+  if(onboardingUI.mustSetup()&&document.querySelector('#onboarding-form,#studio-form')&&!focus&&!onboardingUI.isLoading())return;
   const composer=document.querySelector('#message-form');
   const draft=renderedHash===location.hash?composer?.elements.message.value:null;
   const messageFocused=document.activeElement?.id==='message';
@@ -183,7 +185,7 @@ function render(focus = false) {
     if (!location.hash.startsWith(prefix)) history.replaceState({ panel: null }, '', prefix + (access.selected.context_type === 'personal' ? 'oggi' : 'da-fare'));
   }
   const r = route();
-  if(r.page!=='entrate')incomes.select(null);
+  if(!['entrate','oggi'].includes(r.page))incomes.select(null);
   if(!['oggi','tasse'].includes(r.page))fiscals.select(null,null);
   renderedHash = location.hash;
   document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
@@ -203,7 +205,9 @@ function render(focus = false) {
 
 function notify(message) { clearTimeout(notificationTimer); notice.textContent = message; notificationTimer = setTimeout(() => { notice.textContent = ''; }, 5500); }
 function openPanel(title, body, restoring = false) {
-  if (!restoring) {
+  if (!restoring && panel.open && history.state?.panel) {
+    panels.set(history.state.panel, {title,body});
+  } else if (!restoring) {
     rememberView();
     panelOpener = document.activeElement;
     const key = ++panelSequence;
@@ -265,6 +269,8 @@ document.addEventListener('submit',event=>{if(event.target.id==='pension-form'){
 const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione: controlla e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Non abbiamo ricevuto conferma. Riprova: lo stesso tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
+  if(await onboardingUI.act(name,element))return;
+  if(name==='auth-signup-mode'||name==='auth-login-mode'){signup=name==='auth-signup-mode';if(access.phase!=='signed-out')await auth.restore();render(true);return;}
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
   const r = route();
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
@@ -280,12 +286,12 @@ async function action(name, element) {
     case 'data-retry': await cloud.refresh(); break;
     case 'profile': if(positionFor(r.id)) openPanel('Dati della posizione',profileDetails(positionFor(r.id))); break;
     case 'account':
-      openPanel('Il tuo account', '<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia contesto') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
+      openPanel('Il tuo account', (access.selected.context_type==='personal'?button('profile','Dati della posizione','','button secondary'):'')+'<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia contesto') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
     case 'auth-switch': await auth.chooseAgain(); break;
     case 'auth-select': await auth.choose(access.contexts[Number(element.dataset.choice)]); break;
     case 'auth-retry': await auth.restore(); break;
     case 'auth-logout': loginEmail = ''; await auth.logout(); break;
-    case 'close': closePanel(); break;
+    case 'close': onboardingUI.dismiss(); closePanel(); break;
     case 'add-invoice': if(incomes.getState().phase==='ready')openPanel('Una nuova fattura',moneyForm('invoice-save')); break;
     case 'payment': {
       currentInvoice = incomes.getState().data?.invoices.find(i=>i.id===element.dataset.invoice);
@@ -328,12 +334,13 @@ document.addEventListener('input', event => {
 });
 document.addEventListener('submit', async event => {
   event.preventDefault();
-  if (event.target.id === 'login-form') {
+  if(await onboardingUI.submit(event.target))return;
+  if (event.target.id === 'login-form' || event.target.id === 'signup-form') {
     if (access.phase !== 'signed-out') return;
     loginEmail = event.target.elements.email.value;
     const password = event.target.elements.password.value;
     event.target.elements.password.value = '';
-    void auth.login(loginEmail, password);
+    void (event.target.id==='signup-form'?auth.signup(loginEmail,password):auth.login(loginEmail, password));
     return;
   }
   if (access.phase !== 'ready' || structural.phase !== 'ready') return;
@@ -387,10 +394,11 @@ panel.addEventListener('keydown', event => {
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
 });
-panel.addEventListener('cancel', event => { event.preventDefault(); closePanel(); });
+panel.addEventListener('cancel', event => { event.preventDefault(); onboardingUI.dismiss(); closePanel(); });
 window.addEventListener('scroll', rememberView, { passive: true });
 window.addEventListener('popstate', () => {
   const wasOpen = panel.open;
+  if(wasOpen)onboardingUI.dismiss();
   if (wasOpen) panel.close();
   closingPanel = false;
   const callback = afterPanelClose; afterPanelClose = null;
@@ -420,10 +428,13 @@ function clearPosition() {
 }
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
 
+const onboardingUI=createOnboardingUI({auth,service,esc,button,openPanel,notify,render,positions,refresh:()=>cloud.refresh()});
+
 auth.subscribe(next => {
   if (JSON.stringify(next) === JSON.stringify(access) && app.childElementCount) return;
   const previous = access;
   access = next;
+  onboardingUI.sync();
   const was = previous.phase === 'ready' ? previous.user.id + ':' + previous.selected.context_id : '';
   const current = next.phase === 'ready' ? next.user.id + ':' + next.selected.context_id : '';
   if (was !== current || next.phase === 'loading') clearPosition();
@@ -439,7 +450,7 @@ cloud.subscribe(next => {
   if (next.phase !== 'ready' || oldIds.some(id=>!ids.includes(id))) clearPosition();
   render(false);
 });
-incomes.subscribe(()=>{if(route().page==='entrate')render(false);});
+incomes.subscribe(()=>{if(['entrate','oggi'].includes(route().page))render(false);});
 fiscals.subscribe(()=>{if(['oggi','tasse'].includes(route().page))render(false);});
 const refreshFiscal=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','tasse'].includes(route().page)&&!panel.open)void fiscals.refresh();};
 window.addEventListener('focus',refreshFiscal);

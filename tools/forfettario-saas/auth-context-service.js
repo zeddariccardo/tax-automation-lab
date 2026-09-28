@@ -9,6 +9,7 @@ export function validateConfig(value) {
 }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const messages = {
+  signup: 'Non è stato possibile completare la registrazione. Se hai già un account, accedi; altrimenti riprova tra poco.',
   credentials: 'Email o password non corrette.',
   expired: 'La sessione è terminata. Accedi di nuovo.',
   unavailable: 'Non riusciamo a verificare il tuo accesso. Riprova tra poco.',
@@ -59,6 +60,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
     } catch { throw problem('unavailable'); }
     if (!response.ok) {
       await response.body?.cancel();
+      if (path === '/auth/v1/signup' && response.status !== 429) throw problem('signup');
       throw problem(response.status === 429 ? 'limited' : credentials && [400,401,422].includes(response.status) ? 'credentials' : [400,401,403].includes(response.status) ? 'expired' : 'unavailable');
     }
     if (response.status === 204 || path.startsWith('/auth/v1/logout')) return null;
@@ -106,7 +108,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
   }
   async function failed(error, version) {
     if (version !== epoch || error.code === 'stale') return;
-    if (['expired','credentials'].includes(error.code)) {
+    if (['expired','credentials','signup'].includes(error.code)) {
       await lock(sessionKey, () => { if (version === epoch) clear(); });
       if (version !== epoch) return;
       emit(blank('signed-out', messages[error.code]));
@@ -121,6 +123,34 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
   const api = {
     sessionKey, contextKey,
     getState: snapshot,
+    // Bootstrap has no selected workspace yet. The caller receives only the current identity session.
+    async withIdentitySession(work) {
+      if (!['ready','choosing','empty'].includes(state.phase) || !state.user) throw problem('forbidden');
+      const version = epoch, userId = state.user.id;
+      try {
+      const s = await session(version);
+      const result = await work({config, token:s.access_token});
+      assertCurrent(version);
+      if (state.user?.id !== userId) throw problem('stale');
+      return result;
+      } catch (error) {
+        if (error.code === 'expired') await failed(error,version);
+        throw error;
+      }
+    },
+    signup(email, password) {
+      return run(async version => {
+        if (typeof password !== 'string' || password.length < 12) throw problem('credentials');
+        await lock(sessionKey, async () => {
+          assertCurrent(version); clear();
+          const data = await request('/auth/v1/signup', {body:{email:email.trim(),password}});
+          assertCurrent(version);
+          // Confirmation is a product requirement. Never accept a signup session as a bypass.
+          if (data?.access_token) throw problem('unavailable');
+        });
+        emit(blank('check-email', 'Controlla la tua email e conferma l’indirizzo. Poi torna qui e accedi.'));
+      });
+    },
     // Internal service port: reuse session rotation; never put credentials in UI state.
     async withContextSession(work) {
       if (state.phase !== 'ready' || !state.selected) throw problem('forbidden');

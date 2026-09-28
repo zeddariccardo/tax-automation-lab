@@ -1,6 +1,12 @@
 import config from './runtime-config.js';
 import { createAuthContextService } from './auth-context-service.js';
 
+// Email confirmation is completed by Supabase. Never adopt a session from a URL.
+// Remove callback credentials immediately and ask for a normal verified login.
+if (/(?:[?#&])(?:access_token|refresh_token|token_hash|code|error_description)=/.test(location.href)) {
+  history.replaceState(null, '', location.pathname + '#/ingresso');
+}
+
 const blockedStorage = { getItem() { throw new Error('storage'); }, setItem() { throw new Error('storage'); }, removeItem() {} };
 let sessionStoragePort, localStoragePort;
 try { localStoragePort = window.localStorage; sessionStoragePort = window.sessionStorage; } catch { /* controlled error in service */ }

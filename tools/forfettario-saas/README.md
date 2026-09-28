@@ -1,6 +1,55 @@
-# S10 — Collaborazione reale
+# S11 — registrazione e collegamento reali
 
-Stato corrente. Base frontend `15d0e995bd3ce5dbce98c4e6179b4eb8d0301671`,
+**S11 CORE: PASS · PUBLIC EMAIL SIGNUP: DEFERRED.**
+
+Base frontend `6e40eb3579b65caf6670f88aa7a181dfa33bebcc`, branch
+`feature/s07-saas-integration`. Le sezioni successive sono storiche.
+Accedi/Registrati, scelta Forfettario/Commercialista, onboarding minimo, primo accesso
+e invito/accettazione/revoca usano servizi reali. Nessun bypass development nella UI.
+
+Il normale signup richiede verifica email. UI e provisioning dopo conferma sono
+testati; **signup pubblico → email ricevuta → click conferma non è verificato hosted**.
+Il development usa SMTP predefinito Supabase. Due identità .test sono state create
+non confermate e poi confermate solo dal test harness amministrativo autorizzato.
+Questo non prova la delivery pubblica: SMTP adatto e test completo restano obbligatori
+prima del pilot/go-to-market. Nessun provider SMTP configurato in S11.
+
+- Provisioning atomico/idempotente: Account, posizione, ID TAL canonico, annualità;
+  oppure Studio/owner. Studio inizialmente non verificato, senza clienti/accessi.
+  Verifica manuale development testata, nessun KYC automatico.
+- Minimo fiscale: data inizio, anno, più ATECO. Resolver TAL esistente via helper Edge
+  autenticato; mapping ambiguo resta irrisolto. Non deduciamo previdenza/aliquota/
+  requisiti e non imponiamo una previdenza per posizione. Configurazione dopo S12.
+- Oggi iniziale invita a registrare la prima fattura; Studio invita il primo cliente.
+  Le eventuali richieste restano visibili anche per un nuovo contribuente.
+- Attività → Il tuo commercialista; Clienti → Invita cliente. Destinatario già
+  registrato/configurato, codice monouso manuale, 72 ore, consenso, uno Studio,
+  revoca/reinvito. Nessuna email automatica; token in memoria, mai URL/storage browser.
+  Anteprima destinatario con Studio e ID TAL, niente dati fiscali prima del consenso.
+- onboarding-service delegato da tal-data-service, niente fetch nelle view.
+  Retry conserva chiave/payload; logout/cambio contesto scarta risposte tardive.
+  Solo publishable key e JWT utente; config.local.js sempre ignorato.
+- Edge development tal-resolve-activity inoltra solo anno/codice al Worker esistente.
+  Nessuna modifica Worker, logica fiscale o dipendenza nuova. S07–S10 restano reali;
+  la lista complessiva Scadenze dello Studio resta demo dichiarata.
+
+Verifiche: frontend **123/123**, statici **310/310**; S11 SQL locale PASS,
+setup Auth **4/4**, hosted CORE **36/36**, smoke finale **18/18**.
+S10 read-only **18/18**, S09 **17/17**, S01 PostgreSQL **15/15**, gateway/byte/cleanup PASS.
+Browser reale: onboarding, entrambi gli inviti/consensi, revoca/reinvito, reload/login;
+1440/1024/390/375, focus, Escape/Indietro, nessun overflow.
+Hardware e tastiera virtuale mobile non verificati.
+Suite generali NON verdi: Chromium spawn EPERM (frontend 312 PASS/444 FAIL,
+backend 573 PASS/73 FAIL/260 SKIP; responsive E2E bloccato). Browser verificato a parte.
+
+Preview: node tools/forfettario-saas/serve-dev.mjs, porta 4174.
+Nessun dato reale, merge frontend main o deployment pubblico.
+Forfettario pubblico/homepage/menu/sitemap e file utente esterni invariati.
+Dettagli SQL/setup/stato sintetico: README S11 nel backend privato.
+
+# S10 — Collaborazione reale (storico)
+
+Stato storico. Base frontend `15d0e995bd3ce5dbce98c4e6179b4eb8d0301671`,
 branch `feature/s07-saas-integration`. Le sezioni S09–S06 sotto sono storiche.
 
 Attività, richieste in Oggi, eccezioni in Da fare e archivio secondario leggono

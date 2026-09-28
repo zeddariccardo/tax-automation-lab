@@ -1,12 +1,13 @@
 // Auth owns credentials/rotation. Reads use user RLS; financial writes only frozen RPCs.
 import { cents, isoDate, projectIncome, incomeProblem } from './income-model.js';
 import { createCollaborationService } from './collaboration-service.js';
+import { createOnboardingService } from './onboarding-service.js';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const problem = code => Object.assign(new Error(code), { code });
 const text = value => typeof value === 'string' && value.trim().length <= 300 ? value.trim() || null : null;
 const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value ? value : null;
 const columns = {
-  tax_workspace: 'id,label:identity->>label,start_date:identity->>startDate,status',
+  tax_workspace: 'id,tal_id,label:identity->>label,start_date:identity->>startDate,status',
   tax_year: 'id,workspace_id,year',
   economic_activity: 'id,workspace_id,ateco_code:facts->>atecoCode',
   studio: 'id,name,status',
@@ -69,7 +70,7 @@ export function createTalDataService({ auth, fetchImpl }) {
     const positions = workspaces.filter(w => personal || links.some(l => l.workspace_id === w.id && l.studio_id === c.context_id && l.status === 'active')).map(w => {
       const link = links.find(l => l.workspace_id === w.id);
       const alias = aliases.find(a => a.workspace_id === w.id && a.studio_id === c.context_id && a.link_id === link?.id);
-      return { source: 'cloud', id: w.id, label: text(w.label) || 'Posizione senza nome', startDate: date(w.start_date),
+      return { source: 'cloud', id: w.id, talId:/^TAL-[A-Z0-9]{8}$/.test(w.tal_id||'')?w.tal_id:null, label: text(w.label) || 'Posizione senza nome', startDate: date(w.start_date),
         studioReference: text(alias?.reference), // private import reference, NOT a global TAL ID
         years: years.filter(y => y.workspace_id === w.id).map(y => {
           if (!Number.isInteger(y.year) || y.year < 2000 || y.year > 2200) throw problem('unavailable');
@@ -134,6 +135,7 @@ export function createTalDataService({ auth, fetchImpl }) {
     });
   }
   return {
+    ...createOnboardingService({auth,fetchImpl}),
     ...createCollaborationService({auth,fetchImpl}),
     calculateFiscal: (id,year) => auth.withContextSession(async session=>{
       if(!uuid.test(id)||![2025,2026].includes(year))throw problem('invalid');

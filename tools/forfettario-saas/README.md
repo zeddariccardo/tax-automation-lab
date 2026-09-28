@@ -1,4 +1,45 @@
-# S12-D — più obblighi previdenziali, senza redesign
+# S14 — bozza Redditi PF per lo Studio
+
+La posizione cliente ha la nuova tab primaria **Dichiarazione**: bozza cloud
+automatica Redditi PF 2026/periodo 2025, salvata/versionata e auditabile.
+Nessun pulsante Genera, formula fiscale nel browser o importo inventato.
+Il Worker TAL resta autorevole. Mapping annuale e persistenza sono nel backend
+`test-support/forfettario-s14/`, insieme ad audit del prototipo e fonti AdE.
+
+La UI distingue imposta calcolata e importo da versare; unknown non è zero.
+Prima riepilogo comprensibile, poi attività/previdenza, dettaglio ministeriale
+con provenienza e storico delle verifiche. Lo Studio può confermare assenza di
+perdite e integrare acconti verificati mancanti; non può alterare l'imposta o
+riscrivere fatture. I fatti sbagliati si correggono alla fonte.
+Contribuente: **Tasse → Dati per la dichiarazione**, read-only sugli stessi facts.
+
+Il service layer usa solo JWT utente/publishable key; nessuna credenziale server.
+Il controller rivalida all'apertura/focus, dopo conferme ed ogni 30 s mentre visibile.
+In caricamento, conflitto, revoca e cambio contesto non presenta una vecchia bozza
+come aggiornata. ExportJSON dopo rivalidazione, escluso se cambia cliente.
+Stampa browser predisposta; nessun PDF ministeriale, Entratel/F24 o file d'invio.
+
+Annualità supportata: 2025. Mancanti/da verificare: altri redditi, frontespizio
+completo, perdite effettive, crediti/ritenute/eccedenze, saldo dichiarativo, RS e
+raccordi RR non provati. Casse/ENASARCO parziali rimangono incompleti.
+Non è una dichiarazione pronta all'invio né una precompilata ufficiale AdE.
+
+Test SaaS **160/160**, statici **310/310**, generale frontend **770/770**,
+responsive generale **42/42**. Test backend mapping/HTTP **40/40**, hosted full **28/28**
+e smoke finale **18/18**, SQL locale/remoto PASS; S01 **15/15** tramite adapter S12-D.
+Controllo browser con app/view/CSS reali, sessione simulata dichiarata e risultato
+hosted sintetico a 1440/1024/390/375: nessun overflow, zero errori/404 osservati,
+Tab/Escape/focus, ritorno Clienti, JSON realmente scaricato e riletto.
+Il login/JWT/service/cloud è testato separatamente sul remoto; non si dichiara
+un login browser manuale completo. Nessun bypass nel frontend pubblicabile.
+Tastiera mobile nativa e PDF stampato non verificati.
+
+Conservati vecchio Forfettario, homepage/menu/sitemap, Worker e dati utente
+preesistenti. Nessuna nuova dipendenza o servizio paid. Preview resta noindex.
+Branch feature soltanto, nessun merge/deployment frontend pubblico.
+**PUBLIC EMAIL SIGNUP: DEFERRED** invariato. Le sezioni sotto sono storiche.
+
+# S12-D — più obblighi previdenziali, senza redesign (storico)
 
 Oggi/Tasse leggono risultati fiscali reali versionati per anno. Il Worker calcola ogni
 gestione separatamente: la UI distingue **dovuto stimato**, **versato registrato** e

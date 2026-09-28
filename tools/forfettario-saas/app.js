@@ -9,9 +9,13 @@ import { cloud, service } from './tal-data-runtime.js';
 import { createIncomeController } from './income-controller.js';
 import { createFiscalController } from './fiscal-controller.js';
 import { fiscalView } from './fiscal-view.js';
+import { createDeclarationController } from './declaration-controller.js';
+import { declarationView } from './declaration-view.js';
+import { createDeclarationUI } from './declaration-ui.js';
 import { parseAmount, amountInput, formatCents } from './income-model.js';
 const incomes = createIncomeController({auth,service});
 const fiscals = createFiscalController({auth,service});
+const declarations = createDeclarationController({auth,service});
 let access = auth.getState();
 let structural = cloud.getState();
 const collaborations=createCollaborationController({auth,service});
@@ -49,8 +53,8 @@ const paths = {
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.file}</svg>`;
 const brand = () => '<div class="brand"><img src="./mark.svg" alt=""><span>TAL</span><span>TAX AUTOMATION<br>LAB</span></div>';
 const navItems = [['oggi', 'Oggi', 'home'], ['entrate', 'Entrate', 'income'], ['tasse', 'Tasse', 'taxes'], ['attivita', 'Attività', 'activity']];
-const clientItems = navItems.map(([key, label, glyph]) => [key, key === 'oggi' ? 'Riepilogo' : label, glyph]);
-const positionPages = [...navItems.map(n => n[0]), 'documenti'];
+const clientItems = [...navItems.map(([key, label, glyph]) => [key, key === 'oggi' ? 'Riepilogo' : label, glyph]), ['dichiarazione','Dichiarazione','file']];
+const positionPages = [...navItems.map(n => n[0]), 'documenti', 'dichiarazione'];
 const studioItems = [['da-fare', 'Da fare', 'todo'], ['clienti', 'Clienti', 'people'], ['scadenze', 'Scadenze', 'calendar']];
 let filter = 'all'; let taxMode = 'current'; let notificationTimer;
 const fiscalYears = new Map();
@@ -99,6 +103,7 @@ function showRoute(focus) {
   render(true);
   void cloud.refresh();
   if(['oggi','tasse'].includes(route().page))void fiscals.refresh();
+  if(route().page==='dichiarazione')void declarations.refresh();
   if(['oggi','attivita','documenti','da-fare'].includes(route().page))void collaborations.refresh();
   window.scrollTo(0, saved?.scroll || 0);
 }
@@ -162,7 +167,8 @@ function income(r) {
   return `${heading('Entrate', 'Fatture e incassi della tua posizione', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" data-action="s13-import">${icon('upload')}Importa</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
 
-const taxes=fiscalPage;
+const taxes=r=>fiscalPage(r)+(r.role==='personal'?'<p>'+link(href(r,'dichiarazione'),'Dati per la dichiarazione')+'</p>':'');
+function declarationPage(r){declarations.select(r.id,2025);return declarationView({state:declarations.getState(),heading,button,esc,euro,studio:r.role==='studio'});}
 const documents=r=>collaboration(r,'documents');
 const activity=r=>button('s11-links',r.role==='personal'?'Il tuo commercialista':'Collegamento cliente','','button secondary')+collaboration(r);
 const todo=()=>positions().length?collaboration(route(),'queue'):heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));
@@ -177,7 +183,10 @@ function deadlines() {
   return heading('Scadenze','Pagamenti di esempio: non sono scadenze effettive.')+(positions().length ? '<p class="eyebrow">Novembre 2026 · esempio</p>'+positions().map(p=>`<article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>${esc(p.label)}</p>${link('#/studio/clienti/'+p.id+'/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article>`).join('') : '<p class="empty">Nessun cliente collegato.</p>');
 }
 
+let declarationLayout=null;
 function render(focus = false) {
+  if(renderedHash===location.hash&&document.querySelector('.declaration-page'))declarationLayout={hash:location.hash,scroll:window.scrollY,open:[...document.querySelectorAll('.declaration-page details')].map(x=>x.open)};
+  else if(declarationLayout?.hash!==location.hash)declarationLayout=null;
   if(onboardingUI.mustSetup()&&document.querySelector('#onboarding-form,#studio-form')&&!focus&&!onboardingUI.isLoading())return;
   const composer=document.querySelector('#message-form');
   const draft=renderedHash===location.hash?composer?.elements.message.value:null;
@@ -191,19 +200,24 @@ function render(focus = false) {
   const r = route();
   if(!['entrate','oggi'].includes(r.page))incomes.select(null);
   if(!['oggi','tasse'].includes(r.page))fiscals.select(null,null);
+  if(r.page!=='dichiarazione')declarations.select(null,null);
   renderedHash = location.hash;
-  document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
+  document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems, ['dichiarazione','Dichiarazione']].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
   if (r.role === 'entry') app.innerHTML = entry();
   else {
     let content;
     if (structural.phase !== 'ready') content = cloudStatus();
     else if (r.id && !positionFor(r.id)) content = heading('Posizione non disponibile')+'<p role="status">Questa posizione non è disponibile nel contesto scelto.</p>'+returnLink();
     else if (r.id) {
-      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity })[r.page](r);
+      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity, dichiarazione: declarationPage })[r.page](r);
     } else content = ({ 'da-fare': todo, clienti: clients, scadenze: deadlines })[r.page]();
     app.innerHTML = shell(r, content);
   }
   if(draft!==null&&draft!==undefined&&document.querySelector('#message')){const input=document.querySelector('#message');input.value=draft;if(messageFocused){input.focus({preventScroll:true});input.setSelectionRange(...selection);}}
+  if(declarationLayout?.hash===location.hash&&document.querySelector('.declaration-page')){
+    document.querySelectorAll('.declaration-page details').forEach((x,i)=>{if(i<declarationLayout.open.length)x.open=declarationLayout.open[i];});
+    if(!focus)window.scrollTo(0,declarationLayout.scroll);
+  }
   if (focus) document.querySelector('#main').focus({ preventScroll: true });
 }
 
@@ -281,9 +295,11 @@ async function action(name, element) {
   const r = route();
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
   if(await collaborationUI.action(name,element))return;
+  if(await declarationUI.act(name))return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
     case 'fiscal-retry': await fiscals.refresh(); break;
+    case 'declaration-retry': await declarations.refresh(); break;
     case 'pension': {
       const d=fiscals.getState().data;if(!d||d.workspaceId!==r.id)return;
       openPanel('Contributi già versati',pensionForm(d));break;
@@ -436,13 +452,17 @@ function clearPosition() {
   fiscalYears.clear();
   clearTimeout(notificationTimer); notice.textContent = '';
   collaborationUI.clear();
+  declarationUI.clear();
   importUI.clear();
   collaborations.select([]);
   incomes.select(null);
   fiscals.select(null,null);
+  declarations.select(null,null);
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
+const declarationUI=createDeclarationUI({auth,service,controller:declarations,route,openPanel,done,notify,esc});
+document.addEventListener('submit',event=>{if(event.target.id==='declaration-review-form'){event.preventDefault();void declarationUI.submit(event.target);}});
 
 const importUI=createImportUI({auth,service,positions,route,esc,openPanel,refresh:()=>cloud.refresh(),completed:async()=>{await auth.revalidate();await onboardingUI.load();await cloud.refresh();await incomes.refresh();await fiscals.refresh();}});
 const onboardingUI=createOnboardingUI({auth,service,esc,button,openPanel,notify,render,positions,refresh:()=>cloud.refresh()});
@@ -470,10 +490,15 @@ cloud.subscribe(next => {
 });
 incomes.subscribe(()=>{if(['entrate','oggi'].includes(route().page))render(false);});
 fiscals.subscribe(()=>{if(['oggi','tasse'].includes(route().page))render(false);});
+declarations.subscribe(()=>{if(route().page==='dichiarazione')render(false);});
 const refreshFiscal=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','tasse'].includes(route().page)&&!panel.open)void fiscals.refresh();};
 window.addEventListener('focus',refreshFiscal);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)fiscals.invalidate();else refreshFiscal();});
 window.setInterval(refreshFiscal,30000);
+const refreshDeclaration=()=>{if(!document.hidden&&access.phase==='ready'&&route().page==='dichiarazione'&&!panel.open)void declarations.refresh();};
+window.addEventListener('focus',refreshDeclaration);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)declarations.invalidate();else refreshDeclaration();});
+window.setInterval(refreshDeclaration,30000);
 collaborations.subscribe(()=>{if(['oggi','attivita','documenti','da-fare'].includes(route().page))render(false);});
 const refreshCollaboration=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','attivita','documenti','da-fare'].includes(route().page)&&!panel.open)void collaborations.refresh();};
 window.addEventListener('focus',refreshCollaboration);

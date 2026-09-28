@@ -3,6 +3,7 @@ import { cents, isoDate, projectIncome, incomeProblem } from './income-model.js'
 import { createCollaborationService } from './collaboration-service.js';
 import { createOnboardingService } from './onboarding-service.js';
 import { createImportService } from './import-service.js';
+import { createDeclarationService } from './declaration-service.js';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const problem = code => Object.assign(new Error(code), { code });
 const text = value => typeof value === 'string' && value.trim().length <= 300 ? value.trim() || null : null;
@@ -140,6 +141,7 @@ export function createTalDataService({ auth, fetchImpl }) {
     });
   }
   return {
+    ...createDeclarationService({auth,fetchImpl}),
     ...createImportService({auth,fetchImpl,rows}),
     ...createOnboardingService({auth,fetchImpl}),
     ...createCollaborationService({auth,fetchImpl}),

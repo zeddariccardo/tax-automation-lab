@@ -12,10 +12,13 @@ import { fiscalView } from './fiscal-view.js';
 import { createDeclarationController } from './declaration-controller.js';
 import { declarationView } from './declaration-view.js';
 import { createDeclarationUI } from './declaration-ui.js';
+import { paymentsView } from './payments-view.js';
+import { createPaymentsUI } from './payments-ui.js';
 import { parseAmount, amountInput, formatCents } from './income-model.js';
 const incomes = createIncomeController({auth,service});
 const fiscals = createFiscalController({auth,service});
 const declarations = createDeclarationController({auth,service});
+const payments = createFiscalController({auth,service:{calculateFiscal:(id,year)=>service.readPayments(id,year)}});
 let access = auth.getState();
 let structural = cloud.getState();
 const collaborations=createCollaborationController({auth,service});
@@ -52,8 +55,8 @@ const paths = {
 };
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.file}</svg>`;
 const brand = () => '<div class="brand"><img src="./mark.svg" alt=""><span>TAL</span><span>TAX AUTOMATION<br>LAB</span></div>';
-const navItems = [['oggi', 'Oggi', 'home'], ['entrate', 'Entrate', 'income'], ['tasse', 'Tasse', 'taxes'], ['attivita', 'Attività', 'activity']];
-const clientItems = [...navItems.map(([key, label, glyph]) => [key, key === 'oggi' ? 'Riepilogo' : label, glyph]), ['dichiarazione','Dichiarazione','file']];
+const navItems = [['oggi', 'Oggi', 'home'], ['entrate', 'Entrate', 'income'], ['tasse', 'Tasse', 'taxes'], ['pagamenti','Pagamenti','calendar'], ['attivita', 'Attività', 'activity']];
+const clientItems = [...navItems.filter(n=>n[0]!=='tasse').map(([key, label, glyph]) => [key, key === 'oggi' ? 'Riepilogo' : label, glyph]), ['dichiarazione','Dichiarazione','file']];
 const positionPages = [...navItems.map(n => n[0]), 'documenti', 'dichiarazione'];
 const studioItems = [['da-fare', 'Da fare', 'todo'], ['clienti', 'Clienti', 'people'], ['scadenze', 'Scadenze', 'calendar']];
 let filter = 'all'; let taxMode = 'current'; let notificationTimer;
@@ -169,6 +172,7 @@ function income(r) {
 
 const taxes=r=>fiscalPage(r)+(r.role==='personal'?'<p>'+link(href(r,'dichiarazione'),'Dati per la dichiarazione')+'</p>':'');
 function declarationPage(r){declarations.select(r.id,2025);return declarationView({state:declarations.getState(),heading,button,esc,euro,studio:r.role==='studio'});}
+function paymentsPage(r){payments.select(r.id,2025);return paymentsView({state:payments.getState(),heading,button,esc,euro,studio:r.role==='studio',base:href(r,'pagamenti').replace(/pagamenti$/,'')});}
 const documents=r=>collaboration(r,'documents');
 const activity=r=>button('s11-links',r.role==='personal'?'Il tuo commercialista':'Collegamento cliente','','button secondary')+collaboration(r);
 const todo=()=>positions().length?collaboration(route(),'queue'):heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));
@@ -201,6 +205,7 @@ function render(focus = false) {
   if(!['entrate','oggi'].includes(r.page))incomes.select(null);
   if(!['oggi','tasse'].includes(r.page))fiscals.select(null,null);
   if(r.page!=='dichiarazione')declarations.select(null,null);
+  if(r.page!=='pagamenti')payments.select(null,null);
   renderedHash = location.hash;
   document.title = `${r.role === 'entry' ? 'Benvenuto' : r.page === 'documenti' ? 'Archivio documenti' : r.client && r.page === 'oggi' ? 'Riepilogo' : [...navItems, ...studioItems, ['dichiarazione','Dichiarazione']].find(n => n[0] === r.page)?.[1] || 'TAL'} · TAL — Anteprima`;
   if (r.role === 'entry') app.innerHTML = entry();
@@ -209,7 +214,7 @@ function render(focus = false) {
     if (structural.phase !== 'ready') content = cloudStatus();
     else if (r.id && !positionFor(r.id)) content = heading('Posizione non disponibile')+'<p role="status">Questa posizione non è disponibile nel contesto scelto.</p>'+returnLink();
     else if (r.id) {
-      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity, dichiarazione: declarationPage })[r.page](r);
+      content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity, dichiarazione: declarationPage, pagamenti: paymentsPage })[r.page](r);
     } else content = ({ 'da-fare': todo, clienti: clients, scadenze: deadlines })[r.page]();
     app.innerHTML = shell(r, content);
   }
@@ -296,6 +301,7 @@ async function action(name, element) {
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;
   if(await collaborationUI.action(name,element))return;
   if(await declarationUI.act(name))return;
+  if(await paymentsUI.act(name))return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
     case 'fiscal-retry': await fiscals.refresh(); break;
@@ -453,15 +459,19 @@ function clearPosition() {
   clearTimeout(notificationTimer); notice.textContent = '';
   collaborationUI.clear();
   declarationUI.clear();
+  paymentsUI.clear();
   importUI.clear();
   collaborations.select([]);
   incomes.select(null);
   fiscals.select(null,null);
   declarations.select(null,null);
+  payments.select(null,null);
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
 const declarationUI=createDeclarationUI({auth,service,controller:declarations,route,openPanel,done,notify,esc});
+const paymentsUI=createPaymentsUI({auth,service,controller:payments,route,openPanel,done,notify,esc});
+document.addEventListener('submit',event=>{if(event.target.id.startsWith('payments-')){event.preventDefault();void paymentsUI.submit(event.target,event.submitter);}});
 document.addEventListener('submit',event=>{if(event.target.id==='declaration-review-form'){event.preventDefault();void declarationUI.submit(event.target);}});
 
 const importUI=createImportUI({auth,service,positions,route,esc,openPanel,refresh:()=>cloud.refresh(),completed:async()=>{await auth.revalidate();await onboardingUI.load();await cloud.refresh();await incomes.refresh();await fiscals.refresh();}});
@@ -491,6 +501,11 @@ cloud.subscribe(next => {
 incomes.subscribe(()=>{if(['entrate','oggi'].includes(route().page))render(false);});
 fiscals.subscribe(()=>{if(['oggi','tasse'].includes(route().page))render(false);});
 declarations.subscribe(()=>{if(route().page==='dichiarazione')render(false);});
+payments.subscribe(()=>{if(route().page==='pagamenti')render(false);});
+const refreshPayments=()=>{if(!document.hidden&&access.phase==='ready'&&route().page==='pagamenti'&&!panel.open)void payments.refresh();};
+window.addEventListener('focus',refreshPayments);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)payments.invalidate();else refreshPayments();});
+window.setInterval(refreshPayments,30000);
 const refreshFiscal=()=>{if(!document.hidden&&access.phase==='ready'&&['oggi','tasse'].includes(route().page)&&!panel.open)void fiscals.refresh();};
 window.addEventListener('focus',refreshFiscal);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)fiscals.invalidate();else refreshFiscal();});

@@ -672,3 +672,24 @@ Verifica nel browser: confronto TAL/F24 e SaaS alla stessa larghezza, entrambe l
 Test S06 **9/9 PASS**, statici frontend **310/310 PASS**. Nessun errore/warning console o 404 osservato; sette risorse locali e CSP `connect-src 'none'`. Contrasto minimo dei testi visibili campionati nelle schermate mobili: **4,68:1**, senza failure; non costituisce certificazione completa di accessibilità. Il confronto visivo conferma la stessa identità TAL con layout S06 autonomo.
 
 `app.js`, `demo-service.js` e i test funzionali sono invariati; nessuna modifica fuori dalla preview rispetto allo snapshot iniziale. Lavoro locale su `checkpoint/s06-ux-preview`, senza commit, push, deployment o collegamenti a servizi reali.
+# S15 — Pagamenti condivisi
+
+Pagamenti legge il risultato riconciliato dell'Edge `tal-payment-draft`, costruito
+da S14 e dal Worker. Il browser non calcola imposte, acconti, codici o scadenze.
+Studio e contribuente vedono gli stessi modelli; verifica/conferma e pagamento
+documentato restano allo Studio. PDF e JSON si scaricano solo dopo il controllo
+del server. Scaricato non significa pagato; dati cambiati rendono il modello stale.
+
+Supporto iniziale: saldo 2025 e acconti storici 2026 dell'imposta sostitutiva,
+fatti completi, percorso ordinario non rateizzato. Previdenza non riconciliata,
+compensazioni, rateazioni, previsionale e differimenti non verificati restano
+esplicitamente bloccati. Nessun ordine bancario o formato telematico.
+Il renderer PDF riusa template/geometria e jsPDF già incorporati nel vecchio F24,
+con adapter monetario integer cents e blocco overflow: nessuna nuova dipendenza.
+
+Verifiche S15: 10 test service/PDF, 170 regressioni SaaS complessive, parità delle
+tre pagine con il vecchio renderer nei casi compatibili; controlli browser
+1440/1024/390/375, focus, form Studio e PDF scaricato. Le prove visive utilizzano
+il server sintetico separato nel backend; JWT/RLS e transazioni sono testati
+contro il cloud col service layer reale. Nessun bypass di login nel prodotto.
+Limiti e matrice completa: backend `test-support/forfettario-s15/`.

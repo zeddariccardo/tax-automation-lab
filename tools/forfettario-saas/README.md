@@ -1,4 +1,36 @@
-# S13 — importazione e migrazione reale
+# S12-D — più obblighi previdenziali, senza redesign
+
+Oggi/Tasse leggono risultati fiscali reali versionati per anno. Il Worker calcola ogni
+gestione separatamente: la UI distingue **dovuto stimato**, **versato registrato** e
+previsione. Se una componente è PARTIAL/BLOCKED, riserva e totale completo restano
+**Da definire**; il dettaglio mostra la gestione **Da verificare**, senza sostituirla
+con zero o nasconderla nel totale. La previsione non ripiega sui valori attuali.
+
+Il selettore annuale appare solo se esistono più annualità cloud; ammette soltanto
+quelle della posizione corrente e si azzera al cambio contesto/logout. Target touch
+44 px. Nessun calcolo fiscale browser, nuovo questionario, dichiarazione o F24.
+Vecchio Forfettario pubblico, homepage/menu/sitemap e navigazione S06.1 invariati.
+
+Verifiche S12-D: SaaS **145/145**, statici **310/310**, generale frontend **770/770**,
+responsive generale **42/42**. S01 **15/15** e test backend/hosted documentati nel README
+backend `test-support/forfettario-s12d/`. Un timeout del test generale backend LIPE è
+passato al retry isolato; non dichiarato come esecuzione generale interamente verde.
+
+Controllo visuale Oggi/Tasse, annualità singola/multipla e previsione, a
+1440/1024/390/375: nessun overflow o errore console. Per la nuova presentazione è stata
+usata anche una pagina locale isolata con le view/CSS reali e risultati hosted
+sintetici senza credenziali. Non equivale a un nuovo login browser completo; login,
+RLS/revoca e calcolo hosted sono testati separatamente con JWT reali. Tastiera mobile
+nativa non verificata. Nessun bypass di autenticazione nel prodotto.
+
+`serve-dev.mjs` versiona coerentemente il grafo dei moduli a ogni avvio per evitare
+che una vecchia configurazione statica nulla resti nella cache locale. Nessun endpoint
+aggiunto al CSP. Configurazione locale e segreti restano ignorati da Git.
+
+Nessun merge/deployment frontend pubblico. **PUBLIC EMAIL SIGNUP: DEFERRED** invariato.
+Le sezioni successive descrivono i checkpoint storici.
+
+# S13 — importazione e migrazione reale (storico)
 
 S13 completato con dati sintetici. Branch `feature/s07-saas-integration`, base
 `b2429f31458ef7a18268adfd2610653bdc17e82c`. Le sezioni successive sono storiche.

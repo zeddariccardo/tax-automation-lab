@@ -148,3 +148,6 @@ button.text-link { border: 0; background: transparent; padding: 0; min-height: 4
 .auth-tabs{display:flex;gap:1.5rem;margin-bottom:1.5rem}.auth-tabs [aria-pressed="true"]{text-decoration:underline;text-underline-offset:.5rem}.auth-card form{min-width:0}.auth-card input,#panel textarea{max-width:100%;box-sizing:border-box}.auth-card small{display:block;margin-top:.5rem}#share-code,#invite-code{width:100%;overflow-wrap:anywhere;font:inherit;padding:.8rem;border:1px solid #c4d0d4;border-radius:.6rem;margin:.5rem 0 1rem}#panel hr{border:0;border-top:1px solid #d5dfe2;margin:1.5rem 0}
 #import-mapping-form select,#import-xml-client-form select,#import-xml-activities-form select{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--input-line);border-radius:9px;background:white;color:var(--ink);font:inherit;font-size:16px}
 .import-preview{padding-left:20px;font-size:14px;overflow-wrap:anywhere}.import-preview li{margin:10px 0}
+
+.fiscal-year{display:inline-flex;align-items:center;gap:8px}
+.fiscal-year select{min-height:44px;min-width:80px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}

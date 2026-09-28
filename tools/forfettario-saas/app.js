@@ -53,6 +53,7 @@ const clientItems = navItems.map(([key, label, glyph]) => [key, key === 'oggi' ?
 const positionPages = [...navItems.map(n => n[0]), 'documenti'];
 const studioItems = [['da-fare', 'Da fare', 'todo'], ['clienti', 'Clienti', 'people'], ['scadenze', 'Scadenze', 'calendar']];
 let filter = 'all'; let taxMode = 'current'; let notificationTimer;
+const fiscalYears = new Map();
 let clientQuery = '';
 const views = new Map();
 let renderedHash = '';
@@ -141,9 +142,11 @@ function collaboration(r,mode='activity') {
  return collaborationView({r,state:collaborations.getState(),access,positions:positions(),heading,link,href,button,esc,icon,mode});
 }
 function fiscalPage(r) {
- const year=positionFor(r.id)?.years[0]?.year || new Date().getFullYear();
+ const years=positionFor(r.id)?.years.map(y=>y.year)||[];
+ const year=years.includes(fiscalYears.get(r.id))?fiscalYears.get(r.id):years[0]||new Date().getFullYear();
  fiscals.select(r.id,year);
- return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading,button,link,href,euro,esc,label:positionLabel(r.id)});
+ const yearControl=years.length>1?'<label class="small fiscal-year">Anno <select aria-label="Anno fiscale" data-fiscal-year>'+years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>':'';
+ return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading:(title,text,actions='')=>heading(title,text,yearControl+actions),button,link,href,euro,esc,label:positionLabel(r.id)});
 }
 const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La tua attività parte da qui','La posizione è pronta. Aggiungi la prima fattura per iniziare.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p><p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
 function invoiceRows(p) {
@@ -326,6 +329,13 @@ document.addEventListener('click', event => {
   if (target.dataset.filter) { filter = target.dataset.filter; render(); document.querySelector(`[data-filter="${filter}"]`).focus(); }
   if (target.dataset.tax) { taxMode = target.dataset.tax; render(); document.querySelector(`[data-tax="${taxMode}"]`).focus(); }
 });
+document.addEventListener('change',event=>{
+ if(!event.target.matches('[data-fiscal-year]'))return;
+ const r=route(),year=Number(event.target.value);
+ if(!positionFor(r.id)?.years.some(y=>y.year===year))return;
+ fiscalYears.set(r.id,year);taxMode='current';render();
+ document.querySelector('[data-fiscal-year]')?.focus();
+});
 document.addEventListener('input', event => {
   if (event.target.id === 'client-search') {
     clientQuery = event.target.value;
@@ -423,6 +433,7 @@ function clearPosition() {
   panel.innerHTML = ''; panels.clear(); views.clear(); currentInvoice = null;
   afterPanelClose = null; panelOpener = null; closingPanel = false;
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
+  fiscalYears.clear();
   clearTimeout(notificationTimer); notice.textContent = '';
   collaborationUI.clear();
   importUI.clear();

@@ -36,7 +36,7 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
   let docs=[];if(r.role==='studio'&&allowed&&g.status!=='PAID'){try{docs=(await service.listCollaboration(r.id)).documents;}catch{}if(!valid(o))return true;}
   opened.documents=docs;
   const row=g.lines.map(l=>'<tr><td>'+esc(l.taxCode)+'</td><td>'+esc(l.referenceTaxYear)+'</td><td>'+formatCents(l.amountCents)+'</td></tr>').join('');
-  openPanel('F24 · '+(g.dueDate||'da verificare'),'<div class="payment-preview"><p>'+esc(data.draft.taxpayer.name)+' · '+esc(data.draft.taxpayer.cf)+'</p><table><caption>Sezione Erario</caption><thead><tr><th>Codice</th><th>Anno</th><th>Importo</th></tr></thead><tbody>'+row+'</tbody></table><p><strong>Totale '+formatCents(g.totalCents)+'</strong></p><p class="small">Modello precompilato, non file telematico. Controlla anagrafica e termine di versamento; il ravvedimento non è incluso.</p></div>'+
+  openPanel('F24 · '+(g.dueDate?new Intl.DateTimeFormat('it-IT',{dateStyle:'long',timeZone:'UTC'}).format(new Date(g.dueDate)):'scadenza da verificare'),'<div class="payment-preview"><p>'+esc(data.draft.taxpayer.name)+' · '+esc(data.draft.taxpayer.cf)+'</p><table><caption>Sezione Erario</caption><thead><tr><th>Codice</th><th>Anno</th><th>Importo</th></tr></thead><tbody>'+row+'</tbody></table><p><strong>Totale '+formatCents(g.totalCents)+'</strong></p><p class="small">Modello precompilato, non file telematico. Controlla anagrafica e termine di versamento; il ravvedimento non è incluso.</p></div>'+
    '<form id="payments-action-form">'+errors+
    (g.status==='DRAFT'&&r.role==='studio'?'<p>Conferma dopo aver controllato imposta, versamenti e dati del contribuente.</p><button class="button" type="submit" name="command" value="READY">Conferma F24</button>':
     allowed?'<button class="button" type="submit" name="command" value="PDF">Scarica F24 PDF</button> <button class="text-link" type="submit" name="command" value="JSON">Esporta dati JSON</button>':'<p>Questa versione non è ancora disponibile per il download.</p>')+
@@ -75,7 +75,7 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
    if(job.review)await service.reviewPayments(o.id,job.payload,job.key);else await service.actF24(o.id,job.payload,job.key);
    jobs.delete(form);if(!still())return true;
    if(job.blob)download(job.blob,'TAL-F24-'+o.group.key+'.'+(job.cmd==='PDF'?'pdf':'json'));
-   await controller.refresh();if(still())done(job.cmd==='PAID'?'Pagamento registrato con la ricevuta.':job.blob?'Modello scaricato. Lo stato del pagamento non cambia.':'Verifica salvata.');
+   await controller.refresh();if(still())done(job.cmd==='PAID'?'Pagamento registrato con la ricevuta.':job.blob?'F24 scaricato. Il download non registra un pagamento.':'Verifica salvata.');
   }catch(e){
    if(!still())return true;const uncertain=['uncertain','stale'].includes(e.code);if(!uncertain)jobs.delete(form);
    error.textContent=e.code==='conflict'?'I dati sono cambiati. Chiudi e riapri i pagamenti aggiornati.':['forbidden','expired'].includes(e.code)?'Non sei più autorizzato a questa operazione.':uncertain?'Conferma non ricevuta. Riprova lo stesso tentativo, senza duplicarlo.':'Controlla i dati. La verifica o il modello non sono disponibili.';

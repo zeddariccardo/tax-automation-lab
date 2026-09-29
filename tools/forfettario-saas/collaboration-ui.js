@@ -14,14 +14,14 @@ export function createCollaborationUI({service,controller,route,access,openPanel
   const d=data(),item=d?.activities.find(x=>x.id===element?.dataset.request);
   switch(name){
    case 'collaboration-retry':await controller.refresh();return true;
-   case 'new-request':if(d)openPanel('Richiedi un documento',form('collaboration-request','<div class="field"><label for="request-text">Di cosa hai bisogno?</label><textarea id="request-text" name="text" rows="3" maxlength="4000" required placeholder="Carica la ricevuta dei contributi versati"></textarea></div>','Invia richiesta'));return true;
+   case 'new-request':if(d)openPanel('Richiedi un documento',form('collaboration-request','<div class="field"><label for="request-text">Documento richiesto</label><textarea id="request-text" name="text" rows="3" maxlength="4000" required placeholder="Carica la ricevuta dei contributi versati"></textarea></div>','Invia richiesta'));return true;
    case 'upload-request':if(item)openPanel('Carica documento',fileForm(item));return true;
    case 'upload-other':if(d)openPanel('Aggiungi un documento',fileForm(null));return true;
    case 'document':{const doc=d?.documents.find(x=>x.id===element.dataset.document);if(!doc)return true;element.disabled=true;try{if(await download(doc))notify('Documento scaricato.');}finally{element.disabled=false;}return true;}
    case 'review':case 'complete-request':case 'confirm-request':{
     if(!item)return true;const doc=d.documents.find(x=>x.id===item.document_id);
-    openPanel(name==='confirm-request'?'Conferma il dato':'Verifica la richiesta',form('collaboration-complete','<p>'+esc(item.body)+'</p>'+(doc?'<p>'+esc(doc.original_filename)+'</p><p role="status" id="review-download">Apertura del documento…</p>':'') ,name==='confirm-request'?'Conferma':'Segna completata','data-request="'+item.id+'" data-status="'+(name==='confirm-request'?'submitted':'completed')+'"'));
-    const target=document.querySelector('#collaboration-complete');if(doc){target.querySelector('[type=submit]').disabled=true;try{if(await download(doc)&&target.isConnected){target.querySelector('#review-download').textContent='Documento scaricato. Dopo il controllo, completa la richiesta.';target.querySelector('[type=submit]').disabled=false;}}catch(e){if(target.isConnected){target.querySelector('#review-download').textContent='Non riusciamo ad aprire il documento. Chiudi e riprova.';}throw e;}}return true;
+    openPanel(name==='confirm-request'?'Conferma il dato':'Verifica la richiesta',form('collaboration-complete','<p>'+esc(item.body)+'</p>'+(doc?'<p>'+esc(doc.original_filename)+'</p><p role="status" id="review-download">Download del documento…</p>':'') ,name==='confirm-request'?'Conferma':'Completa richiesta','data-request="'+item.id+'" data-status="'+(name==='confirm-request'?'submitted':'completed')+'"'));
+    const target=document.querySelector('#collaboration-complete');if(doc){target.querySelector('[type=submit]').disabled=true;try{if(await download(doc)&&target.isConnected){target.querySelector('#review-download').textContent='Documento scaricato. Dopo il controllo, completa la richiesta.';target.querySelector('[type=submit]').disabled=false;}}catch(e){if(target.isConnected){target.querySelector('#review-download').textContent='Download non riuscito. Chiudi e riprova.';}throw e;}}return true;
    }
   }return false;
  }
@@ -45,7 +45,7 @@ export function createCollaborationUI({service,controller,route,access,openPanel
    jobs.delete(target);if(!current())return true;
    if(target.id==='message-form')target.elements.message.value='';
    await controller.refresh();
-   if(identity()===stamp){if(target.id==='message-form'){target.dataset.busy='false';render(false);notify('Messaggio inviato.');document.querySelector('#message')?.focus();}else done(target.id==='collaboration-upload'?(target.dataset.request?'Documento inviato. La richiesta è in attesa di verifica.':'Documento aggiunto.') :target.id==='collaboration-request'?'Richiesta inviata.':'Richiesta aggiornata.');}
+   if(identity()===stamp){if(target.id==='message-form'){target.dataset.busy='false';render(false);notify('Messaggio inviato.');document.querySelector('#message')?.focus();}else done(target.id==='collaboration-upload'?(target.dataset.request?'Documento inviato · da verificare':'Documento aggiunto.') :target.id==='collaboration-request'?'Richiesta inviata.':'Richiesta aggiornata.');}
   }catch(e){
    if(!current())return true;
    // Preserve the exact payload/file and keys after uncertain outcomes; never auto-renew a reservation.

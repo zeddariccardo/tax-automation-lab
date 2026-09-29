@@ -17,7 +17,7 @@ const messages = {
   storage: 'Consenti il salvataggio locale della sessione per accedere.',
   configuration: 'Configurazione di sviluppo assente. Avvia la preview con serve-dev.mjs dopo aver configurato config.local.js.',
 };
-const problem = code => Object.assign(new Error(code), { code });
+const problem = (code, transient = false) => Object.assign(new Error(code), { code, transient });
 const same = (a, b) => !!a && !!b && a.context_type === b.context_type && a.context_id === b.context_id;
 
 export function createAuthContextService({ config: input, fetchImpl, storage, preferenceStorage, lock, now = Date.now }) {
@@ -57,11 +57,11 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
         headers: { apikey: config.publishableKey, ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
         ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(15000),
       });
-    } catch { throw problem('unavailable'); }
+    } catch { throw problem('unavailable', true); }
     if (!response.ok) {
       await response.body?.cancel();
       if (path === '/auth/v1/signup' && response.status !== 429) throw problem('signup');
-      throw problem(response.status === 429 ? 'limited' : credentials && [400,401,422].includes(response.status) ? 'credentials' : [400,401,403].includes(response.status) ? 'expired' : 'unavailable');
+      throw problem(response.status === 429 ? 'limited' : credentials && [400,401,422].includes(response.status) ? 'credentials' : [400,401,403].includes(response.status) ? 'expired' : 'unavailable', response.status === 429 || response.status >= 500);
     }
     if (response.status === 204 || path.startsWith('/auth/v1/logout')) return null;
     try { return await response.json(); } catch { throw problem('unavailable'); }
@@ -79,7 +79,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
       return s;
     });
   }
-  async function discover(version, desired = null, chooser = false) {
+  async function discover(version, desired = null, chooser = false, background = false) {
     let s = await session(version), user;
     try { user = await request('/auth/v1/user', { token: s.access_token, method: 'GET' }); }
     catch (error) {
@@ -104,6 +104,8 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
       if (selected) preferenceStorage.setItem(contextKey, JSON.stringify({ userId: user.id, ...selected }));
       else preferenceStorage.removeItem(contextKey);
     } catch { throw problem('storage'); }
+    // Only an actual identity/scope change invalidates pending operational reads.
+    if (background && (state.user?.id !== user.id || !same(state.selected, selected) && (state.selected || selected))) epoch++;
     emit({ phase: selected ? 'ready' : contexts.length ? 'choosing' : 'empty', user: { id: user.id, email: user.email || '' }, contexts, selected, message: '' });
   }
   async function failed(error, version) {
@@ -183,8 +185,22 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
     revalidate() {
       if (checking) return checking;
       if (!['ready','choosing','empty'].includes(state.phase)) return Promise.resolve();
-      // No repaint while a background check is in flight; a denial clears everything.
-      checking = run(version => discover(version), { loading: false }).finally(() => { checking = null; });
+      // Focus/timer checks do not create a new identity epoch. Current RLS remains
+      // mandatory on every operation; discovery is never an authorization cache.
+      const version = epoch;
+      checking = (async () => {
+        try { await discover(version, null, false, true); }
+        catch (error) {
+          if (version !== epoch || error.code === 'stale') return;
+          let active;
+          try { active = saved(); } catch { /* invalid storage must still fail closed */ }
+          // A transport/5xx/429 failure is not evidence of a revoked identity.
+          // Keep the already verified screen only while its access token is valid.
+          // Expired-token refresh failures hide data but keep credentials for retry.
+          if (error.transient && active?.userId === state.user?.id && active.expires_at > now()) return;
+          await failed(error, ++epoch);
+        }
+      })().finally(() => { checking = null; });
       return checking;
     },
     choose(candidate) { return run(version => discover(version, { context_type: candidate?.context_type, context_id: candidate?.context_id })); },

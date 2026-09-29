@@ -67,6 +67,8 @@ let renderedHash = '';
 let panelSequence = 0;
 const panels = new Map();
 let panelOpener;
+let lastActionFocus;
+let panelActionFocus;
 let afterPanelClose;
 let closingPanel = false;
 history.scrollRestoration = 'manual';
@@ -84,10 +86,10 @@ function route() {
 }
 const href = (r, page) => r.client ? `#/studio/clienti/${r.id}/${page}` : `#/io/${page}`;
 const link = (url, text, cls = 'text-link', arrow = true, attributes = '') => `<a class="${cls}" href="${url}" ${attributes}>${text}${arrow ? icon('arrow') : ''}</a>`;
-const button = (action, text, options = '') => `<button class="button" type="button" data-action="${action}" ${options}>${text}</button>`;
+const button = (action, text, options = '', cls = 'button') => `<button class="${cls}" type="button" data-action="${action}" ${options}>${text}</button>`;
 function nav(items, base, current, name, cls = '') { return `<nav aria-label="${name}" class="primary-nav ${cls}">${items.map(([key, label, glyph]) => `<a class="nav-link" href="${base}/${key}" ${key === current ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${label}</span></a>`).join('')}</nav>`; }
 function heading(title, text = '', actions = '') { return `<div class="heading"><div><h1>${title}</h1>${text ? `<p>${text}</p>` : ''}</div>${actions ? `<div class="actions">${actions}</div>` : ''}</div>`; }
-function footer() { return '<p class="page-footer">Entrate e calcoli fiscali collegati ai dati cloud. Attività e documenti sono condivisi con lo Studio. La lista Scadenze dello Studio resta demo. Ambiente di sviluppo: usa soltanto dati sintetici.</p>'; }
+function footer() { return '<p class="page-footer">TAL · Anteprima di sviluppo · solo dati sintetici</p>'; }
 
 function origin() { return history.state?.origin || { href: '#/studio/clienti', label: 'Clienti' }; }
 function returnLink(cls = 'text-link') { const o = origin(); return link(o.href, `${icon('back')}Torna a ${o.label}`, cls, false); }
@@ -132,22 +134,22 @@ function shell(r, content) {
   const studioName = structural.data?.studio?.name || access.selected.label;
   const activePage = r.page === 'documenti' ? 'attivita' : r.page;
   const clientHeader = r.client && p ? `<div class="client-bar"><span class="desktop-return">${returnLink()}</span><span class="avatar">${icon('person')}</span><div class="row-main"><strong>${esc(p.label)}</strong>${p.studioReference ? '<small>Riferimento Studio · '+esc(p.studioReference)+'</small>' : ''}</div><button class="text-link" type="button" data-action="profile">Dati della posizione</button></div><nav class="client-nav" aria-label="Posizione cliente">${clientItems.map(([key, label]) => `<a href="${href(r,key)}" ${activePage===key?'aria-current="page"':''}>${label}</a>`).join('')}</nav>` : '';
-  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Studio collegato' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">${new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
+  return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Area Studio' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">${new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
 }
 function cloudStatus() {
-  if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Un momento…')+'<p role="status">Stiamo caricando la tua posizione.</p>';
+  if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Caricamento')+'<p role="status">Caricamento della posizione…</p>';
   const denied = structural.phase === 'forbidden';
-  return heading(denied ? 'Posizione non disponibile' : 'Non riusciamo a caricare i dati')+'<p role="alert">'+(denied ? 'Il tuo accesso potrebbe essere cambiato. Ricontrolla le posizioni disponibili.' : 'Controlla la connessione e riprova.')+'</p>'+button(denied?'auth-retry':'data-retry','Riprova');
+  return heading(denied ? 'Posizione non disponibile' : 'Dati non disponibili')+'<p role="alert">'+(denied ? 'Il tuo accesso potrebbe essere cambiato. Ricontrolla le posizioni disponibili.' : 'Controlla la connessione e riprova.')+'</p>'+button(denied?'auth-retry':'data-retry','Riprova');
 }
 function profileDetails(p) {
   const start = p.startDate ? new Intl.DateTimeFormat('it-IT',{timeZone:'UTC'}).format(new Date(p.startDate)) : 'Non indicata';
-  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>ID TAL</dt><dd>${esc(p.talId || 'Non assegnato')}</dd><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati del profilo collegato, consultabili in sola lettura.</p>`;
+  return `<p>${esc(p.label)}</p><dl class="cloud-profile"><dt>ID TAL</dt><dd>${esc(p.talId || 'Non assegnato')}</dd><dt>Inizio attività</dt><dd>${start}</dd><dt>Annualità disponibili</dt><dd>${p.years.length ? p.years.map(y=>y.year).join(', ') : 'Nessuna annualità disponibile'}</dd><dt>Attività dichiarate</dt><dd>${p.activities.length ? p.activities.map(a=>esc(a.atecoCode || 'Codice ATECO non indicato')).join('<br>') : 'Nessuna attività indicata'}</dd>${p.studioReference ? '<dt>Riferimento dello Studio</dt><dd>'+esc(p.studioReference)+'</dd>' : ''}</dl><p class="small muted">Dati della posizione · sola lettura</p>`;
 }
 
 function collaboration(r,mode='activity') {
  const ids=mode==='queue'?positions().map(p=>p.id):r.id?[r.id]:[];
  collaborations.select(ids);
- return collaborationView({r,state:collaborations.getState(),access,positions:positions(),heading,link,href,button,esc,icon,mode});
+ return collaborationView({r,state:collaborations.getState(),access,positions:positions(),heading,link,href,button,esc,icon,mode,connection:mode==='activity'?button('s11-links',r.role==='personal'?'Il tuo commercialista':'Collegamento cliente','','button secondary'):''});
 }
 function fiscalPage(r) {
  const years=positionFor(r.id)?.years.map(y=>y.year)||[];
@@ -156,25 +158,25 @@ function fiscalPage(r) {
  const yearControl=years.length>1?'<label class="small fiscal-year">Anno <select aria-label="Anno fiscale" data-fiscal-year>'+years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>':'';
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading:(title,text,actions='')=>heading(title,text,yearControl+actions),button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La tua attività parte da qui','La posizione è pronta. Aggiungi la prima fattura per iniziare.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p><p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
+const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La mia attività','Aggiungi una fattura già emessa o importa i dati esistenti.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p><p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.residual > 0);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
-  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.residual === 0 ? 'paid' : ''}">${i.review ? 'Rettifica da controllare' : i.residual === 0 ? (i.credited ? 'Rettificata' : 'Incassata') : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`) : ''}</div></article>`).join('');
+  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.residual === 0 ? 'paid' : ''}">${i.review ? 'Rettifica da controllare' : i.residual === 0 ? (i.credited ? 'Rettificata' : 'Incassata') : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`, 'button secondary') : ''}</div></article>`).join('');
 }
 function income(r) {
   incomes.select(r.id);
   const state=incomes.getState();
-  if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Carichiamo fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
+  if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Caricamento di fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
   const p=state.data;
-  return `${heading('Entrate', 'Fatture e incassi della tua posizione', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" data-action="s13-import">${icon('upload')}Importa</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
+  return `${heading('Entrate', '', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" data-action="s13-import">${icon('upload')}Importa</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
 
 const taxes=r=>fiscalPage(r)+(r.role==='personal'?'<p>'+link(href(r,'dichiarazione'),'Dati per la dichiarazione')+'</p>':'');
 function declarationPage(r){declarations.select(r.id,2025);return declarationView({state:declarations.getState(),heading,button,esc,euro,studio:r.role==='studio'});}
 function paymentsPage(r){payments.select(r.id,2025);return paymentsView({state:payments.getState(),heading,button,esc,euro,studio:r.role==='studio',base:href(r,'pagamenti').replace(/pagamenti$/,'')});}
 const documents=r=>collaboration(r,'documents');
-const activity=r=>button('s11-links',r.role==='personal'?'Il tuo commercialista':'Collegamento cliente','','button secondary')+collaboration(r);
+const activity=r=>collaboration(r);
 const todo=()=>positions().length?collaboration(route(),'queue'):heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));
 function clientRows(query = '') {
   const all = positions();
@@ -233,12 +235,14 @@ function openPanel(title, body, restoring = false) {
   } else if (!restoring) {
     rememberView();
     panelOpener = document.activeElement;
+    panelActionFocus = lastActionFocus?.hash === location.hash ? lastActionFocus : null;
     const key = ++panelSequence;
     panels.set(key, { title, body });
     history.pushState({ ...history.state, panel: key }, '', location.href);
   }
   panel.innerHTML = `<div class="dialog-head"><h2 id="panel-title">${title}</h2><button class="icon-button" aria-label="Chiudi" type="button" data-action="close">${icon('close')}</button></div><div class="dialog-body">${body}</div>`;
   panel.showModal();
+  if (!panel.contains(document.activeElement)) panel.querySelector('[data-action="close"]').focus();
 }
 function closePanel(after) {
   if (closingPanel) return;
@@ -258,12 +262,12 @@ const localDate=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getM
 function moneyForm(command, initial='', invoice=null) {
   const data=incomes.getState().data, creating=command==='invoice-save';
   const activities=data?.activities||[];
-  return `<form id="amount-form" data-command="${command}" novalidate>${creating?'<div class="field"><label for="invoice-number">Numero fattura</label><input id="invoice-number" name="number" maxlength="80" required autocomplete="off"></div><div class="field"><label for="invoice-customer">Cliente</label><input id="invoice-customer" name="customer" maxlength="180" required autocomplete="off"></div>':''}<div class="field"><label for="money-date">${creating?'Data fattura':'Data incasso'}</label><input id="money-date" name="date" type="date" value="${localDate()}" required></div><div class="field"><label for="amount">${creating?'Importo della fattura (€)':'Quanto hai ricevuto? (€)'}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off" required><p id="amount-help">${creating?'Registra una fattura già emessa. In questa prova usa soltanto dati fittizi.':'Restano '+euro(invoice.residual)+' da incassare.'}</p></div>${creating&&activities.length>1?'<div class="field"><label for="invoice-activity">Attività</label><select id="invoice-activity" name="activity" required><option value="">Scegli l’attività</option>'+activities.map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join('')+'</select></div>':''}<p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${creating?'Aggiungi fattura':'Registra incasso'}</button></form>`;
+  return `<form id="amount-form" data-command="${command}" novalidate>${creating?'<div class="field"><label for="invoice-number">Numero fattura</label><input id="invoice-number" name="number" maxlength="80" required autocomplete="off"></div><div class="field"><label for="invoice-customer">Cliente</label><input id="invoice-customer" name="customer" maxlength="180" required autocomplete="off"></div>':''}<div class="field"><label for="money-date">${creating?'Data fattura':'Data incasso'}</label><input id="money-date" name="date" type="date" value="${localDate()}" required></div><div class="field"><label for="amount">${creating?'Importo della fattura (€)':'Importo incassato (€)'}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off" required><p id="amount-help">${creating?'Inserisci l’importo di una fattura già emessa.':'Restano '+euro(invoice.residual)+' da incassare.'}</p></div>${creating&&activities.length>1?'<div class="field"><label for="invoice-activity">Attività</label><select id="invoice-activity" name="activity" required><option value="">Scegli l’attività</option>'+activities.map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join('')+'</select></div>':''}<p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${creating?'Aggiungi fattura':'Registra incasso'}</button></form>`;
 }
 const moneyJobs=new WeakMap();
 const pensionJobs=new WeakMap();
 function pensionForm(d){
- return '<p>Indica i contributi previdenziali obbligatori che hai pagato e che sono rimasti a tuo carico. Non inserire quelli ancora da pagare. Aggiungi tutti i versamenti effettuati.</p><form id="pension-form" data-year="'+d.year+'" data-revision="'+d.dataRevision+'"><div class="field"><label for="pension-date">Data del versamento</label><input id="pension-date" name="date" type="date" min="'+d.year+'-01-01" max="'+d.year+'-12-31" value="'+localDate()+'" required></div><div class="field"><label for="pension-amount">Importo versato (€)</label><input id="pension-amount" name="amount" inputmode="decimal" required autocomplete="off"></div><p id="pension-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Registra versamento</button>'+(d.pensionPayments.length?'':'<button class="text-link auth-exit" type="button" data-action="pension-none">Non ho effettuato versamenti nel '+d.year+'</button>')+'</form>';
+ return '<p>Registra tutti i contributi previdenziali obbligatori già pagati e rimasti a tuo carico. Escludi quelli ancora da versare.</p><form id="pension-form" data-year="'+d.year+'" data-revision="'+d.dataRevision+'"><div class="field"><label for="pension-date">Data del versamento</label><input id="pension-date" name="date" type="date" min="'+d.year+'-01-01" max="'+d.year+'-12-31" value="'+localDate()+'" required></div><div class="field"><label for="pension-amount">Importo versato (€)</label><input id="pension-amount" name="amount" inputmode="decimal" required autocomplete="off"></div><p id="pension-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Registra versamento</button>'+(d.pensionPayments.length?'':'<button class="text-link auth-exit" type="button" data-action="pension-none">Non ho effettuato versamenti nel '+d.year+'</button>')+'</form>';
 }
 async function savePension(form,action){
  if(!form||form.dataset.busy==='true')return;
@@ -290,7 +294,7 @@ async function savePension(form,action){
  }finally{form.dataset.busy='false';}
 }
 document.addEventListener('submit',event=>{if(event.target.id==='pension-form'){event.preventDefault();void savePension(event.target,'add');}});
-const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'Questi dati sono cambiati nel frattempo. Abbiamo aggiornato la situazione: controlla e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Non abbiamo ricevuto conferma. Riprova: lo stesso tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
+const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'I dati sono cambiati. Controlla la situazione aggiornata e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Conferma non ricevuta. Riprova senza modificare i dati: il tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
   if(await importUI.action(name,element))return;
@@ -314,13 +318,13 @@ async function action(name, element) {
     case 'data-retry': await cloud.refresh(); break;
     case 'profile': if(positionFor(r.id)) openPanel('Dati della posizione',profileDetails(positionFor(r.id))); break;
     case 'account':
-      openPanel('Il tuo account', (access.selected.context_type==='personal'?button('profile','Dati della posizione','','button secondary'):'')+'<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia contesto') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
+      openPanel('Il tuo account', (access.selected.context_type==='personal'?button('profile','Dati della posizione','','button secondary'):'')+'<p class="account-email">'+esc(access.user.email)+'</p><p><strong>'+esc(access.selected.context_type === 'personal' ? 'La mia attività' : access.selected.label)+'</strong></p>'+(access.contexts.length > 1 ? button('auth-switch', 'Cambia profilo') : '')+'<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>'); break;
     case 'auth-switch': await auth.chooseAgain(); break;
     case 'auth-select': await auth.choose(access.contexts[Number(element.dataset.choice)]); break;
     case 'auth-retry': await auth.restore(); break;
     case 'auth-logout': loginEmail = ''; await auth.logout(); break;
     case 'close': onboardingUI.dismiss(); closePanel(); break;
-    case 'add-invoice': if(incomes.getState().phase==='ready')openPanel('Una nuova fattura',moneyForm('invoice-save')); break;
+    case 'add-invoice': if(incomes.getState().phase==='ready')openPanel('Aggiungi fattura',moneyForm('invoice-save')); break;
     case 'payment': {
       currentInvoice = incomes.getState().data?.invoices.find(i=>i.id===element.dataset.invoice);
       if(!currentInvoice?.simple||currentInvoice.residual<=0)return;
@@ -347,6 +351,7 @@ document.addEventListener('click', event => {
   }
   const target = event.target.closest('[data-action],[data-filter],[data-tax]');
   if (!target) return;
+  if (target.dataset.action && !panel.open) lastActionFocus = { hash: location.hash, action: target.dataset.action };
   if (target.dataset.action) action(target.dataset.action, target).catch(() => notify('Operazione non completata. Riprova.'));
   if (target.dataset.filter) { filter = target.dataset.filter; render(); document.querySelector(`[data-filter="${filter}"]`).focus(); }
   if (target.dataset.tax) { taxMode = target.dataset.tax; render(); document.querySelector(`[data-tax="${taxMode}"]`).focus(); }
@@ -444,8 +449,11 @@ window.addEventListener('popstate', () => {
     if (cached) openPanel(cached.title, cached.body, true);
     else history.replaceState({ ...history.state, panel: null }, '', location.href);
   } else if (wasOpen && !callback) {
-    if (panelOpener?.isConnected) panelOpener.focus({ preventScroll: true });
-    else document.querySelector('#main').focus({ preventScroll: true });
+    const replacement = panelActionFocus?.hash === location.hash
+      ? [...app.querySelectorAll('[data-action]')].find(el => el.dataset.action === panelActionFocus.action && !el.disabled)
+      : null;
+    const opener = panelOpener?.isConnected && panelOpener !== document.body ? panelOpener : replacement;
+    (opener || document.querySelector('#main')).focus({ preventScroll: true });
   }
   callback?.();
 });
@@ -454,6 +462,7 @@ function clearPosition() {
   if (panel.open) panel.close();
   panel.innerHTML = ''; panels.clear(); views.clear(); currentInvoice = null;
   afterPanelClose = null; panelOpener = null; closingPanel = false;
+  lastActionFocus = null; panelActionFocus = null;
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
   fiscalYears.clear();
   clearTimeout(notificationTimer); notice.textContent = '';

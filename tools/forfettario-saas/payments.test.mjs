@@ -58,3 +58,15 @@ test('legacy PDF renderer exact cents, three pages, overflow and blocked gates',
  assert.throws(()=>renderF24Pdf(taxpayer,{...group,lines:Array(7).fill(group.lines[0])}));
  delete globalThis.window;
 });
+
+test('both browser CSP layers allow exactly the S15 transport endpoints',async()=>{
+ const html=await readFile(new URL('./index.html',import.meta.url),'utf8');
+ const server=await readFile(new URL('./serve-dev.mjs',import.meta.url),'utf8');
+ const policy=html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
+ const connect=policy.split(';').find(x=>x.trim().startsWith('connect-src')).trim().split(/\s+/).slice(1);
+ for(const path of ['/functions/v1/tal-payment-draft','/rest/v1/rpc/tal_review_payments','/rest/v1/rpc/tal_f24_action']){
+  assert.ok(connect.includes('https://*.supabase.co'+path),path+' missing from HTML CSP');
+  assert.ok(server.includes(path)||server.includes(path.replace('/rest/v1/','')),path+' missing from preview CSP');
+ }
+ assert.ok(!connect.includes('*')&&!connect.includes('https:'));
+});

@@ -18,6 +18,7 @@ function harness(options={}) {
   const fetchImpl=async(url,opts)=>{
     const path=new URL(url).pathname;
     h.calls.push({url,opts});
+    if(h.networkError) throw h.networkError;
     if (h.pause && path.includes('/rpc/')) await h.pause;
     if(h.fail?.(path,opts)) return reply({error:'redacted provider error'},h.fail(path,opts));
     if(path==='/auth/v1/token') return reply(token());
@@ -125,10 +126,10 @@ test('credential errors are generic for wrong password and unknown email',async(
     assert.equal(h.service.getState().user,null);
   }
 });
-test('transient discovery failure hides the position and allows recovery',async()=>{
+test('transient background discovery keeps the valid session and recovers without login',async()=>{
   const h=harness(); await login(h); h.fail=p=>p.includes('/rpc/')?503:0;
-  await h.service.revalidate(); assert.equal(h.service.getState().phase,'error'); assert.equal(h.service.getState().selected,null);
-  h.fail=null; await h.service.restore(); assert.equal(h.service.getState().phase,'ready');
+  await h.service.revalidate(); assert.equal(h.service.getState().phase,'ready'); assert.deepEqual(h.service.getState().selected,personal);
+  h.fail=null; await h.service.revalidate(); assert.equal(h.service.getState().phase,'ready');
 });
 test('malformed persisted session and malformed discovery fail closed',async()=>{
   const h=harness(); h.storage.setItem(h.service.sessionKey,'{bad'); await h.service.restore();
@@ -150,4 +151,48 @@ test('context reset removes every modified operational fixture',()=>{
   assert.equal(demoService.getPosition('mario').invoices.length,5);
   assert.equal(demoService.getPosition('mario').request.state,'todo');
   assert.equal(demoService.listAttention().length,3);
+});
+
+const tick=()=>new Promise(r=>setTimeout(r,0));
+const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};};
+test('background discovery does not invalidate an in-flight same-context read',async()=>{
+ const h=harness();await login(h);const gate=deferred();
+ const read=h.service.withContextSession(async()=>{await gate.promise;return 'current';});
+ await tick();await h.service.revalidate();gate.resolve();assert.equal(await read,'current');
+});
+test('context switch still rejects old in-flight reads even if the context is selected again',async()=>{
+ const h=harness({contexts:[personal,studio]});await login(h);await h.service.choose(personal);const gate=deferred();
+ const read=h.service.withContextSession(async()=>{await gate.promise;return 'old';});
+ const rejected=assert.rejects(read,e=>e.code==='stale');await tick();await h.service.choose(studio);await h.service.choose(personal);gate.resolve();await rejected;
+});
+test('revocation during discovery rejects an in-flight read',async()=>{
+ const h=harness({contexts:[studio]});await login(h);const gate=deferred();
+ const read=h.service.withContextSession(async()=>{await gate.promise;return 'old';});
+ const rejected=assert.rejects(read,e=>e.code==='stale');await tick();h.contexts=[];await h.service.revalidate();gate.resolve();await rejected;
+});
+test('expired token plus transient refresh outage hides data but retains recovery credentials',async()=>{
+ const h=harness();await login(h);const before=h.storage.getItem(h.service.sessionKey);h.clock+=3600000;h.fail=p=>p==='/auth/v1/token'?503:0;
+ await h.service.revalidate();assert.equal(h.service.getState().phase,'error');assert.equal(h.service.getState().selected,null);assert.equal(h.storage.getItem(h.service.sessionKey),before);
+ h.fail=null;await h.service.restore();assert.equal(h.service.getState().phase,'ready');
+});
+test('initial discovery outage never grants access from stored preferences',async()=>{
+ const h=harness();await login(h);const next=harness({storage:h.storage,preferenceStorage:h.preferenceStorage,fail:p=>p.includes('/rpc/')?503:0});
+ await next.service.restore();assert.equal(next.service.getState().phase,'error');assert.equal(next.service.getState().selected,null);
+});
+test('malformed background discovery still hides data',async()=>{
+ const h=harness();await login(h);h.contexts=[{...personal,context_type:'admin'}];await h.service.revalidate();assert.equal(h.service.getState().phase,'error');
+});
+test('focus and timer revalidation coalesce; logout prevents late background resurrection',async()=>{
+ const h=harness();await login(h);const gate=deferred();h.pause=gate.promise;
+ const before=h.calls.length;const a=h.service.revalidate(),b=h.service.revalidate();await tick();assert.equal(h.calls.length-before,2);
+ await h.service.logout();gate.resolve();await Promise.all([a,b]);assert.equal(h.service.getState().phase,'signed-out');
+});
+
+test('network failure keeps a still-valid background session; next check recovers',async()=>{
+ const h=harness();await login(h);const before=h.storage.getItem(h.service.sessionKey);
+ h.networkError=new TypeError('Failed to fetch');await h.service.revalidate();assert.equal(h.service.getState().phase,'ready');assert.equal(h.storage.getItem(h.service.sessionKey),before);
+ h.networkError=null;await h.service.revalidate();assert.equal(h.service.getState().phase,'ready');
+});
+test('background rate limit does not log out a valid user',async()=>{
+ const h=harness();await login(h);h.fail=()=>429;await h.service.revalidate();assert.equal(h.service.getState().phase,'ready');assert.ok(h.storage.getItem(h.service.sessionKey));
 });

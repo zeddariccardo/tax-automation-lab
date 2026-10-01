@@ -70,3 +70,10 @@ test('both browser CSP layers allow exactly the S15 transport endpoints',async()
  }
  assert.ok(!connect.includes('*')&&!connect.includes('https:'));
 });
+
+for (const [remaining,text] of [[134000,'134000'],[0,'0'],[null,'Da verificare']]) test('Sprint A F12 residual presentation '+remaining,()=>{
+ const settlement={grossLiabilityCents:234000,priorPaymentsCents:0,balanceDueCents:234000,documentedPaidCents:100000,remainingBalanceCents:remaining,completeness:remaining===null?'BLOCKED':'COMPLETE'};
+ const html=paymentsView({state:{phase:'ready',data:{draft:{groups:[],diagnostics:[],blocked:[],settlement,credit:{availableCents:0},declarationRevision:2}}},heading:()=>'',button:()=>'',esc:String,euro:String,studio:true,base:'/'});
+ assert.ok(html.includes('Saldo ancora da versare</span><strong>'+text+'</strong>'));
+ assert.ok(html.includes('Saldo già versato e documentato</span><strong>100000</strong>'));
+});

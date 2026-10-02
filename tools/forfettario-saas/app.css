@@ -254,6 +254,7 @@ button.text-link { border: 0; background: transparent; padding: 0; min-height: 4
   .payment-preview th{font-weight:600;color:var(--ink-secondary)}
   .payment-preview caption{font-weight:600}
   .payment-preview td{vertical-align:top}
+  .payment-preview td small{overflow-wrap:anywhere}
   .payment-preview tbody tr:last-child td{border-bottom-color:var(--line-strong)}
   .payment-evidence{border-top:1px solid var(--line);padding-top:var(--space-3)}
   #payments-action-form>.text-link{margin-top:var(--space-2)}

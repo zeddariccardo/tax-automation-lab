@@ -23,9 +23,9 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
     '<div class="field"><label for="pay-method">Metodo acconti 2026</label><select id="pay-method" name="method"><option value="">Da confermare</option><option value="historical">Storico</option><option value="forecast">Previsionale · da verificare</option></select></div>'+
     '<details><summary>Ripartizione acconti · verifica professionale</summary><div class="field"><label for="pay-scope">Perimetro articolo 58</label><select id="pay-scope" name="scope"><option value="">Da verificare</option><option value="inside">Attività nel perimetro ISA · verificato</option><option value="outside">Fuori dal perimetro · verificato</option></select></div>'+
     field('isaCode','Codice ISA')+field('activityCode','Codice attività verificato')+field('revenue','Ricavi per il test ISA','', 'inputmode="decimal"')+field('limit','Limite ISA applicabile','', 'inputmode="decimal"')+
-    '<p class="small">I dati ISA servono solo per il perimetro verificato. Situazioni con più attività restano da verificare per la ripartizione.</p></details>'+
+    '<p class="small">I dati ISA servono solo per il perimetro verificato.</p><label><input type="checkbox" name="multiActivityAssociationVerified"> Associazione di tutte le attività al perimetro verificata</label></details>'+
     field('reason','Riferimento della verifica',facts?.reason||'','required minlength="3" maxlength="1000"')+errors+'<button class="button" type="submit">Salva verifica</button></form>');
-   const form=document.querySelector('#payments-review-form');form.elements.method.value=facts?.method||'';form.elements.scope.value=facts?.scope?.scope||'';
+   const form=document.querySelector('#payments-review-form');form.elements.method.value=facts?.method||'';form.elements.scope.value=facts?.scope?.scope||'';form.elements.multiActivityAssociationVerified.checked=facts?.scope?.multiActivityAssociationVerified===true;
    for(const k of ['isaCode','activityCode'])form.elements[k].value=facts?.scope?.[k]||'';
    for(const [k,p]of [['revenue','revenueCents'],['limit','limitCents']])form.elements[k].value=Number.isSafeInteger(facts?.scope?.[p])?amountInput(facts.scope[p]):'';
    return true;
@@ -35,8 +35,8 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
   const allowed=['READY','DOWNLOADED','PAID'].includes(g.status);
   let docs=[];if(r.role==='studio'&&allowed&&g.status!=='PAID'){try{docs=(await service.listCollaboration(r.id)).documents;}catch{}if(!valid(o))return true;}
   opened.documents=docs;
-  const row=g.lines.map(l=>'<tr><td>'+esc(l.taxCode)+'</td><td>'+esc(l.referenceTaxYear)+'</td><td>'+formatCents(l.amountCents)+'</td></tr>').join('');
-  openPanel('F24 · '+(g.dueDate?new Intl.DateTimeFormat('it-IT',{dateStyle:'long',timeZone:'UTC'}).format(new Date(g.dueDate)):'scadenza da verificare'),'<div class="payment-preview"><p>'+esc(data.draft.taxpayer.name)+' · '+esc(data.draft.taxpayer.cf)+'</p><table><caption>Sezione Erario</caption><thead><tr><th>Codice</th><th>Anno</th><th>Importo</th></tr></thead><tbody>'+row+'</tbody></table><p><strong>Totale '+formatCents(g.totalCents)+'</strong></p><p class="small">Modello precompilato, non file telematico. Controlla anagrafica e termine di versamento; il ravvedimento non è incluso.</p></div>'+
+  const row=g.lines.map(l=>'<tr><td>'+esc(l.section)+'<br>'+esc(l.taxCode)+(l.section==='INPS'?'<br><small>Sede '+esc(l.officeCode)+'<br>'+esc(l.inpsCode||'')+'</small>':'')+'</td><td>'+(l.section==='INPS'?esc(l.periodFrom)+' - '+esc(l.periodTo):esc(l.referenceTaxYear))+'</td><td>'+formatCents(l.amountCents)+'</td></tr>').join('');
+  openPanel('F24 · '+(g.dueDate?new Intl.DateTimeFormat('it-IT',{dateStyle:'long',timeZone:'UTC'}).format(new Date(g.dueDate)):'scadenza da verificare'),'<div class="payment-preview"><p>'+esc(data.draft.taxpayer.name)+' · '+esc(data.draft.taxpayer.cf)+'</p><table><caption>Righe di versamento</caption><thead><tr><th>Codice</th><th>Periodo</th><th>Importo</th></tr></thead><tbody>'+row+'</tbody></table><p><strong>Totale '+formatCents(g.totalCents)+'</strong></p><p class="small">Modello precompilato, non file telematico. Controlla anagrafica e termine di versamento; il ravvedimento non è incluso.</p></div>'+
    '<form id="payments-action-form">'+errors+
    (g.status==='DRAFT'&&r.role==='studio'?'<p>Conferma dopo aver controllato imposta, versamenti e dati del contribuente.</p><button class="button" type="submit" name="command" value="READY">Conferma F24</button>':
     allowed?'<button class="button" type="submit" name="command" value="PDF">Scarica F24 PDF</button> <button class="text-link" type="submit" name="command" value="JSON">Esporta dati JSON</button>':'<p>Questa versione non è ancora disponibile per il download.</p>')+
@@ -58,7 +58,7 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
    if(!job){
     if(form.id==='payments-review-form'){
      const amounts=Object.fromEntries(Object.keys(labels).map(k=>[k,amount(form.elements[k].value)])),scope=form.elements.scope.value;
-     const facts={amounts,method:form.elements.method.value||null,scope:scope?{scope,verified:true,isaCode:form.elements.isaCode.value.trim()||null,activityCode:form.elements.activityCode.value.trim()||null,revenueCents:amount(form.elements.revenue.value),limitCents:amount(form.elements.limit.value)}:null,reason:form.elements.reason.value.trim()};
+     const facts={amounts,method:form.elements.method.value||null,scope:scope?{scope,verified:true,isaCode:form.elements.isaCode.value.trim()||null,activityCode:form.elements.activityCode.value.trim()||null,revenueCents:amount(form.elements.revenue.value),limitCents:amount(form.elements.limit.value),multiActivityAssociationVerified:form.elements.multiActivityAssociationVerified.checked}:null,reason:form.elements.reason.value.trim()};
      if(facts.reason.length<3)throw Object.assign(Error(),{code:'invalid'});
      job={key:crypto.randomUUID(),review:true,payload:{inputHash:o.data.reviewInput,facts}};
     }else{

@@ -170,7 +170,7 @@ function fitSize(box, testo, base) {
 
 const APP_VERSION="S15";const cents=v=>{if(v===undefined||v===null)return 0;if(!Number.isSafeInteger(v)||v<0)throw Error("Invalid cents");return v;};const fromCents=v=>v;
 const normalizeId=v=>String(v??"").toUpperCase().replace(/[^A-Z0-9]/g,"");
-const sectionedRows=g=>({erario:g.filled});
+const sectionedRows=g=>({erario:g.filled.filter(r=>r.section==="ERARIO"),inps:g.filled.filter(r=>r.section==="INPS")});
 function pdfDocForGroup(g) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
@@ -333,7 +333,7 @@ function pdfDocForGroup(g) {
 
 
 export function renderF24Pdf(taxpayer,group){
-if(!["READY","DOWNLOADED","PAID"].includes(group.status)||group.lines.length<1||group.lines.length>6)throw Error("F24 not ready");
-let sum=0;const rows=group.lines.map(l=>{if(l.section!=="ERARIO"||!["1790","1791","1792"].includes(l.taxCode)||!Number.isSafeInteger(l.amountCents)||l.amountCents<=0)throw Error("Unsupported row");sum+=l.amountCents;return {section:"ERARIO",taxCode:l.taxCode,period:l.period,year:String(l.referenceTaxYear),debit:l.amountCents,credit:0};});
+if(!["READY","DOWNLOADED","PAID"].includes(group.status)||group.lines.length<1||group.lines.filter(l=>l.section==="ERARIO").length>6||group.lines.filter(l=>l.section==="INPS").length>4)throw Error("F24 not ready");
+let sum=0;const rows=group.lines.map(l=>{if(!Number.isSafeInteger(l.amountCents)||l.amountCents<=0)throw Error("Unsupported row");const base={section:l.section,taxCode:l.taxCode,debit:l.amountCents,credit:0};sum+=l.amountCents;if(l.section==="ERARIO"&&["1790","1791","1792"].includes(l.taxCode))return {...base,period:l.period,year:String(l.referenceTaxYear)};if(l.section==="INPS"&&["PXX","P10","AP","CP","AF","CF"].includes(l.taxCode)&&/^\d{4}$/.test(l.officeCode)&&/^\d{6}$/.test(l.periodFrom)&&/^\d{6}$/.test(l.periodTo)&&(["PXX","P10"].includes(l.taxCode)?l.inpsCode==="":/^\d{17}$/.test(l.inpsCode)))return {...base,officeCode:l.officeCode,reference:l.inpsCode,periodFrom:l.periodFrom,periodTo:l.periodTo};throw Error("Unsupported row");});
 if(!Number.isSafeInteger(sum)||sum!==group.totalCents)throw Error("Totals mismatch");
 return pdfDocForGroup({client:taxpayer,filled:rows,rows,balance:sum,date:"",flow:"S15"});}

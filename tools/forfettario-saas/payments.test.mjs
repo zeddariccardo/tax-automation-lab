@@ -71,6 +71,21 @@ test('both browser CSP layers allow exactly the S15 transport endpoints',async()
  assert.ok(!connect.includes('*')&&!connect.includes('https:'));
 });
 
+test('Sprint C PDF INPS GS and Commercianti preserve codeline, months and exact cents',async()=>{
+ globalThis.window=globalThis;const {renderF24Pdf}=await import('./f24-renderer.generated.js');
+ const taxpayer={name:'SYNTHETIC TEST DATA',cf:'RSSMRA80A01H501U',city:'ROMA',province:'RM',address:'VIA TEST 1'};
+ const group={status:'READY',key:'2026-06-30',dueDate:'2026-06-30',totalCents:801574,lines:[
+ {section:'INPS',taxCode:'PXX',officeCode:'0100',inpsCode:'',periodFrom:'012025',periodTo:'122025',amountCents:521400},
+ {section:'INPS',taxCode:'CP',officeCode:'0100',inpsCode:'12345678901234567',periodFrom:'012025',periodTo:'122025',amountCents:280174}]};
+ const doc=renderF24Pdf(taxpayer,group);assert.equal(doc.getNumberOfPages(),3);
+ const operations=doc.internal.pages.join('\n');assert.match(operations,/12345678901234567/);assert.match(operations,/PXX/);assert.match(operations,/CP/);
+ await writeFile(join(tmpdir(),'tal-sprint-c-f24-synthetic.pdf'),Buffer.from(doc.output('arraybuffer')));
+ for(const invalid of [{...group.lines[0],inpsCode:'invented'},{...group.lines[1],inpsCode:''},{...group.lines[0],officeCode:null}]){
+  assert.throws(()=>renderF24Pdf(taxpayer,{...group,lines:[invalid],totalCents:invalid.amountCents}));
+ }
+ delete globalThis.window;
+});
+
 for (const [remaining,text] of [[134000,'134000'],[0,'0'],[null,'Da verificare']]) test('Sprint A F12 residual presentation '+remaining,()=>{
  const settlement={grossLiabilityCents:234000,priorPaymentsCents:0,balanceDueCents:234000,documentedPaidCents:100000,remainingBalanceCents:remaining,completeness:remaining===null?'BLOCKED':'COMPLETE'};
  const html=paymentsView({state:{phase:'ready',data:{draft:{groups:[],diagnostics:[],blocked:[],settlement,credit:{availableCents:0},declarationRevision:2}}},heading:()=>'',button:()=>'',esc:String,euro:String,studio:true,base:'/'});

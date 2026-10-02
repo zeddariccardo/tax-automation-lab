@@ -19,6 +19,11 @@ export function createPaymentsService({auth,fetchImpl}){
   pending.set(key,{fingerprint,promise});promise.finally(()=>pending.delete(key)).catch(()=>{});return promise;
  });
  return {
+  readWorkflow:id=>auth.withContextSession(async s=>{
+   if(!uuid.test(id))throw fail('invalid');
+   const d=await request(s,'/rest/v1/rpc/tal_workflow_summary',{p_workspace_id:id});
+   if(!d||d.workspaceId!==id)throw fail('forbidden');return d;
+  }),
   readPayments:(id,year=2025)=>auth.withContextSession(async s=>{
    if(!uuid.test(id))throw fail('invalid');
    const d=await request(s,'/functions/v1/tal-payment-draft',{workspaceId:id,year});

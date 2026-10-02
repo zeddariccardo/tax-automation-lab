@@ -2,7 +2,7 @@
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const fail=code=>Object.assign(Error(code),{code});
 const context=s=>s.context.context_type+':'+s.context.context_id;
-const cols={document:'id,workspace_id,original_filename,media_type,size_bytes,sha256,upload_status,revision,created_at,ready_at,expires_at,uploader_context',activity_feed_item:'id,workspace_id,actor_id,actor_context,kind,body,document_id,reply_to,recipient_context,status,revision,created_at,updated_at',tax_workspace:'id,status',studio_client_link:'id,workspace_id,studio_id,status'};
+const cols={document:'id,workspace_id,original_filename,media_type,size_bytes,sha256,upload_status,revision,created_at,ready_at,expires_at,uploader_context',activity_feed_item:'id,workspace_id,actor_id,actor_context,kind,body,document_id,reply_to,recipient_context,fact_target,status,revision,created_at,updated_at',tax_workspace:'id,status',studio_client_link:'id,workspace_id,studio_id,status'};
 export const MAX_DOCUMENT_BYTES=10*1024*1024;
 export function documentType(file){
  const ext=file.name?.split('.').pop()?.toLowerCase();const mime={pdf:'application/pdf',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',xml:'application/xml'}[ext];
@@ -51,6 +51,9 @@ export function createCollaborationService({auth,fetchImpl}){
    if(wanted.some(id=>!current.some(w=>w.id===id)))throw fail('forbidden');
    return wanted.map(id=>({workspaceId:id,activities:activities.filter(x=>x.workspace_id===id).sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id)),documents:documents.filter(x=>x.workspace_id===id),links:links.filter(x=>x.workspace_id===id)}));
   }),
+  requestFactDocument:(id,input,key)=>command('tal_request_fact_document',id,input,key),
+  reopenRequest:(id,input,key)=>command('tal_reopen_document_request',id,input,key),
+  resolveDocumentFact:(id,input,key)=>command('tal_resolve_document_fact',id,input,key),
   postActivity:(id,input,key)=>command('tal_post_activity',id,input,key),
   completeRequest:(id,item,key)=>command('tal_advance_request',id,{requestId:item.id,expectedRevision:Number(item.revision),status:'completed'},key),
   submitConfirmation:(id,item,key)=>command('tal_advance_request',id,{requestId:item.id,expectedRevision:Number(item.revision),status:'submitted'},key),

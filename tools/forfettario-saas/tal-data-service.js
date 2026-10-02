@@ -159,6 +159,7 @@ export function createTalDataService({ auth, fetchImpl }) {
       if(data?.workspaceId!==id||data.year!==year||!Number.isSafeInteger(data.dataRevision)||!Array.isArray(data.missing)||!Array.isArray(data.pensionPayments))throw problem('unavailable');
       return data;
     }),
+    recordPensionMovement:(id,input,key)=>command('tal_record_pension_movement',id,key,input),
     recordPension: (id,input,key) => command('tal_record_pension_payment',id,key,input),
     loadContext: () => auth.withContextSession(session => load(session)),
     readPosition: id => auth.withContextSession(async session => (await load(session, id)).positions.find(p => p.id === id)),

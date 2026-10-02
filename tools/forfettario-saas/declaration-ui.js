@@ -1,13 +1,13 @@
-import {parseAmount,amountInput} from './income-model.js';
-export function createDeclarationUI({auth,service,controller,route,openPanel,done,notify,esc}){
+export function createDeclarationUI({auth,service,controller,route,openPanel,done,notify,esc,canConfirm=()=>false}){
  let opened=null,jobs=new WeakMap();
  const identity=()=>{const a=auth.getState();return a.phase==='ready'?a.user.id+':'+a.selected.context_type+':'+a.selected.context_id:'';};
  const current=stamp=>identity()===stamp&&route().page==='dichiarazione';
  async function act(name){
   if(!name.startsWith('declaration-')||name==='declaration-retry')return false;
   const r=route(),stamp=identity(),d=controller.getState().data?.draft;
-  if(!d||d.workspaceId!==r.id||r.role!=='studio')return true;
+  if(!d||d.workspaceId!==r.id)return true;
   if(name==='declaration-json'||name==='declaration-print'){
+   if(r.role!=='studio')return true;
    await controller.refresh();if(!current(stamp)||route().id!==r.id)return true;
    const record=controller.getState().data;if(!record||record.draft?.workspaceId!==r.id){notify('La bozza deve essere aggiornata prima di esportarla.');return true;}
    if(name==='declaration-json'){
@@ -21,14 +21,13 @@ export function createDeclarationUI({auth,service,controller,route,openPanel,don
    }
    return true;
   }
-  if(!['declaration-losses','declaration-advances'].includes(name))return true;
-  const losses=name==='declaration-losses',field=losses?'priorLossesNone':'lmAdvancesPaidCents';
-  opened={stamp,workspaceId:r.id,year:2025,expectedRevision:d.reviewRevision,sourceHash:d.sourceHash,field};
-  const previous=d.fields.find(f=>f.id===(losses?'LM37.5':'LM45.2'))?.value;
-  openPanel(losses?'Perdite pregresse':'Acconti versati 2025',
-   '<form id="declaration-review-form">'+(losses?'<p>Conferma soltanto dopo aver verificato che non esistono perdite pregresse da utilizzare. Se esistono, il relativo calcolo resta da verificare.</p><div class="field"><label for="declaration-loss-value">Esito della verifica</label><select id="declaration-loss-value" name="value"><option value="confirm">Confermo: nessuna perdita pregressa</option value="clear">Da verificare · rimuovi conferma</option></select></div>':
-    '<p>Importo effettivamente versato per gli acconti dell’imposta sostitutiva 2025, esclusi interessi e maggiorazioni. Non inserire acconti previdenziali.</p><div class="field"><label for="declaration-amount">Importo in euro</label><input id="declaration-amount" name="amount" inputmode="decimal" required value="'+(Number.isSafeInteger(previous)?amountInput(previous):'')+'"></div>')+
+  if(name!=='declaration-losses'||!canConfirm(r.id))return true;
+  opened={stamp,workspaceId:r.id,year:2025,expectedRevision:d.reviewRevision,sourceHash:d.sourceHash,field:'priorLossesNone'};
+  openPanel('Perdite pregresse',
+   '<form id="declaration-review-form"><p>Conferma soltanto dopo aver verificato che non esistono perdite pregresse da utilizzare. Se esistono, il relativo calcolo resta da verificare.</p><div class="field"><label for="declaration-loss-value">Esito della verifica</label><select id="declaration-loss-value" name="lossAssessment"><option value="confirm">Confermo: nessuna perdita pregressa</option><option value="clear">Da verificare · rimuovi conferma</option></select></div>'+
    '<div class="field"><label for="declaration-reason">Riferimento della verifica</label><input id="declaration-reason" name="reason" required minlength="3" maxlength="1000" autocomplete="off"></div><p class="small">La conferma conserva autore, motivazione e valore precedente. Va rivista quando cambiano i dati fiscali.</p><p class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Salva verifica</button></form>');
+  const form=document.querySelector('#declaration-review-form'),old=d.previousReview?.facts?.priorLossesNone;
+  if(old){form.elements.namedItem('lossAssessment').value=old.value===true?'confirm':'clear';form.elements.reason.value=old.reason||'';}
   return true;
  }
  async function submit(form){
@@ -39,9 +38,7 @@ export function createDeclarationUI({auth,service,controller,route,openPanel,don
   form.dataset.busy='true';error.textContent='';
   try{
    if(!jobs.has(form)){
-    const raw=form.elements.amount?.value.trim();
-    const value=captured.field==='priorLossesNone'?(form.elements.value.value==='confirm'?true:null):/^0+(?:[.,]0{1,2})?$/.test(raw)?0:parseAmount(raw);
-    if(value!==null&&captured.field==='lmAdvancesPaidCents'&&(!Number.isSafeInteger(value)||value<0))throw Object.assign(Error(),{code:'invalid'});
+    const value=form.elements.namedItem('lossAssessment').value==='confirm'?true:null;
     const reason=form.elements.reason.value.trim();if(reason.length<3)throw Object.assign(Error(),{code:'invalid'});
     jobs.set(form,{key:crypto.randomUUID(),payload:{year:captured.year,expectedRevision:captured.expectedRevision,sourceHash:captured.sourceHash,field:captured.field,value,reason}});
    }

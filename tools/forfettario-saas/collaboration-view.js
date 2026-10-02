@@ -1,4 +1,5 @@
 const request=item=>['request_upload','request_confirm'].includes(item.kind);
+const actionLabel=item=>item.fact_target?.kind==='f24'?'Riconcilia quietanza':item.fact_target?.kind==='pension'?'Registra contributi':'Verifica documento';
 export const currentContext=access=>access.selected.context_type+':'+access.selected.context_id;
 export function collaborationView({r,state,access,positions,heading,link,href,button,esc,icon,mode='activity',connection=''}){
  const ctx=currentContext(access),data=state.data?.find(x=>x.workspaceId===r.id);
@@ -11,7 +12,7 @@ export function collaborationView({r,state,access,positions,heading,link,href,bu
   if(request(item)){
    status=item.status==='completed'?'Completata':item.status==='submitted'?(mine?'Da verificare':item.actor_context.startsWith('studio:')?'Inviato · in attesa dello Studio':'Inviato · in attesa del cliente'):recipient?'Da fare':item.recipient_context.startsWith('personal:')?'In attesa del cliente':'In attesa dello Studio';
    if(item.status==='todo'&&recipient)action=button(item.kind==='request_upload'?'upload-request':'confirm-request',item.kind==='request_upload'?'Carica documento':'Conferma il dato',`data-request="${item.id}"`);
-   else if(item.status==='submitted'&&mine)action=button(doc?'review':'complete-request',doc?'Verifica documento':'Completa richiesta',`data-request="${item.id}"`);
+   else if(item.status==='submitted'&&mine)action=button(doc?'review':'complete-request',doc?actionLabel(item):'Completa richiesta',`data-request="${item.id}"`);
   }
   const file=doc&&!(item.status==='submitted'&&mine)&&!(item.kind==='event'&&d.activities.some(a=>request(a)&&a.document_id===doc.id))?'<button class="text-link contextual-document" type="button" data-action="document" data-document="'+doc.id+'">'+icon('file')+esc(doc.original_filename)+'</button>':'';
   return '<article class="feed-item collaboration-item" id="activity-'+item.id+'"><div class="feed-meta"><strong>'+esc(label(item))+'</strong><time>'+date(item.created_at)+'</time></div><p class="message">'+esc(item.body)+'</p>'+ (status?'<p class="state-line">'+esc(status)+'</p>':'')+file+(action?'<div class="actions">'+action+'</div>':'')+'</article>';
@@ -21,12 +22,12 @@ export function collaborationView({r,state,access,positions,heading,link,href,bu
   if(state.phase!=='ready')return heading('Da fare')+error();
   const list=state.data.flatMap(d=>d.activities.filter(x=>request(x)&&x.status!=='completed'&&(x.actor_context===ctx||x.recipient_context===ctx)).map(x=>({item:x,data:d})));
   const actionable=({item:x})=>x.status==='submitted'&&x.actor_context===ctx||x.status==='todo'&&x.recipient_context===ctx;
-  const section=(title,items)=>items.length?'<section class="waiting-list '+(title==='Da controllare'?'actionable-list':'')+'"><h2>'+title+'</h2>'+items.map(({item:x,data:d})=>'<article class="waiting-row"><div class="row-main"><strong>'+esc(positions.find(p=>p.id===d.workspaceId)?.label||'Cliente')+'</strong><p>'+esc(x.body)+'</p></div>'+link('#/studio/clienti/'+d.workspaceId+'/attivita',x.status==='submitted'?'Verifica documento':'Apri attività','text-link',false,'data-request="'+x.id+'" data-open="'+(x.status==='submitted'&&x.document_id?'review':'')+'" data-focus="activity-'+x.id+'"')+'</article>').join('')+'</section>':'';
-  return heading('Da fare')+(list.length?section('Da controllare',list.filter(actionable))+section('In attesa',list.filter(x=>!actionable(x))):'<p class="empty">Nessuna richiesta aperta.</p>');
+  const section=(title,items)=>items.length?'<section class="waiting-list '+(title==='Da controllare'?'actionable-list':'')+'"><h2>'+title+'</h2>'+items.map(({item:x,data:d})=>'<article class="waiting-row"><div class="row-main"><strong>'+esc(positions.find(p=>p.id===d.workspaceId)?.label||'Cliente')+'</strong><p>'+esc(x.body)+'</p></div>'+link('#/studio/clienti/'+d.workspaceId+'/attivita',x.status==='submitted'?actionLabel(x):'Apri attività','text-link',false,'data-request="'+x.id+'" data-open="'+(x.status==='submitted'&&x.document_id?'review':'')+'" data-focus="activity-'+x.id+'"')+'</article>').join('')+'</section>':'';
+  return heading('Da fare')+(list.length?section('Da controllare',list.filter(actionable))+section('In attesa',list.filter(x=>!actionable(x))):'<p class="empty">Nessuna richiesta documentale aperta.</p>');
  }
  if(mode==='today'){
   if(!data)return '<section class="today-activity"><h2>Attività</h2>'+error()+'</section>';
-  const todo=data.activities.filter(x=>request(x)&&x.status==='todo'&&x.recipient_context===ctx);
+  const todo=data.activities.filter(x=>request(x)&&(x.status==='todo'&&x.recipient_context===ctx||x.status==='submitted'&&x.actor_context===ctx));
   const submitted=data.activities.filter(x=>request(x)&&x.status==='submitted'&&x.recipient_context===ctx);
   return '<section class="today-activity"><div class="section-line"><h2>'+ (todo.length?'Da fare':'Attività')+'</h2>'+link(href(r,'attivita'),'Vedi attività','text-link',false)+'</div>'+(todo.length?todo.map(x=>card(x,data,true)).join(''):submitted.length?'<p class="muted">Richieste inviate · in attesa di verifica</p>':'<p class="muted">Non hai richieste a cui rispondere.</p>')+'</section>';
  }

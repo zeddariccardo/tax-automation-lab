@@ -25,24 +25,14 @@ try{
   return route.continue();
  });
  const search=page.getByRole('combobox',{name:'Cerca nel Forfettario'});
- const goHome=async()=>{await page.goto(base+'/app/#/io/oggi');await page.reload();await search.waitFor();};
+ const goHome=async()=>{await page.goto(base+'/app/#/io/oggi');await page.reload();await page.locator('#main h1').waitFor();};
  const logout=async()=>{await page.getByRole('button',{name:'Account',exact:true}).click();await page.getByRole('button',{name:'Esci',exact:true}).click();await page.locator('.hero-access').waitFor();};
- const chooseStudio=async()=>{await page.getByRole('button',{name:'Account',exact:true}).click();await page.getByRole('button',{name:'Cambia profilo',exact:true}).click();await page.getByRole('button',{name:'Studio di prova Gestisci i clienti dello Studio'}).click();await search.waitFor();};
- await check('personal search: keyboard, Escape, outside click, shortcut and real navigation',async()=>{
-  await goHome();await search.fill('dove inserisco una fattura?');
-  assert.deepEqual(await page.locator('#product-results').getByRole('option').allTextContents(),['EntrateFatture, incassi e importazione.']);
-  await search.press('ArrowDown');assert.equal(await search.getAttribute('aria-activedescendant'),'product-option-0');
-  await search.press('Escape');assert.equal(await search.getAttribute('aria-expanded'),'false');
-  await page.keyboard.press('Control+k');assert.equal(await search.getAttribute('aria-expanded'),'true');
-  await page.getByRole('heading',{name:'Oggi',exact:true}).click();assert.equal(await search.getAttribute('aria-expanded'),'false');
-  await search.fill('fatture');await search.press('ArrowUp');await search.press('Enter');
-  await page.waitForURL('**/#/io/entrate');assert.equal(await page.locator('#main h1').textContent(),'Entrate');
- });
- await check('Studio root and selected client never reuse personal search scope',async()=>{
-  await goHome();await chooseStudio();await search.fill('fatture');
-  assert.deepEqual(await page.locator('#product-results').getByRole('option').allTextContents(),['ClientiApri una posizione collegata per consultarne i dati.']);
-  await search.press('ArrowDown');await search.press('Enter');await page.getByRole('link',{name:'Cliente sintetico S16',exact:true}).click();
-  await search.fill('saldo');await search.press('ArrowDown');await search.press('Enter');
+ const chooseStudio=async()=>{await page.getByRole('button',{name:'Account',exact:true}).click();await page.getByRole('button',{name:'Cambia profilo',exact:true}).click();await page.getByRole('button',{name:'Studio di prova Gestisci i clienti dello Studio'}).click();await page.locator('#main h1').waitFor();};
+ await check('direct navigation replaces product search; Studio exception queue opens the selected client',async()=>{
+  await goHome();assert.equal(await search.count(),0);assert.equal(await page.locator('[data-product-search]').count(),0);
+  await page.keyboard.press('Control+k');assert.equal(await search.count(),0);
+  await page.getByRole('link',{name:'Vedi entrate',exact:true}).click();await page.waitForURL('**/#/io/entrate');
+  await goHome();await chooseStudio();await page.getByRole('link',{name:'Riconferma i pagamenti',exact:true}).click();
   await page.waitForURL('**/#/studio/clienti/synthetic-position/pagamenti');
  });
  await check('existing checkbox is native, labelled, keyboard operable and focus visible',async()=>{
@@ -53,7 +43,7 @@ try{
   await cb.evaluate(e=>Promise.all(e.getAnimations().map(a=>a.finished)));
   const styles=await cb.evaluate(e=>({tag:e.tagName,type:e.type,color:getComputedStyle(e).backgroundColor,outline:getComputedStyle(e).outlineWidth,transform:getComputedStyle(e).transform,labelHeight:e.labels[0].getBoundingClientRect().height}));
   assert.equal(styles.tag,'INPUT');assert.equal(styles.type,'checkbox');assert.equal(styles.color,'rgb(20, 83, 104)');
-  assert.ok(parseFloat(styles.outline)>=3);assert.ok(styles.labelHeight>=44);
+  assert.equal(styles.transform,'none');assert.ok(parseFloat(styles.outline)>=3);assert.ok(styles.labelHeight>=44);
   await cb.press('Space');assert.equal(await cb.isChecked(),false);
   await page.keyboard.press('Escape');
  });
@@ -121,7 +111,7 @@ try{
   assert.equal(await page.locator('.hero-motion').isVisible(),false);
   await goHome();await chooseStudio();await page.getByRole('link',{name:'Clienti',exact:true}).click();
   await page.getByRole('link',{name:'Cliente sintetico S16',exact:true}).click();
-  await search.fill('saldo');await search.press('ArrowDown');await search.press('Enter');
+  await page.getByRole('link',{name:'Pagamenti',exact:true}).click();
   await page.getByRole('button',{name:'Verifica versamenti e crediti'}).click();await page.locator('#panel summary').click();
   const cb=page.getByRole('checkbox',{name:'Associazione di tutte le attività al perimetro verificata'});
   await cb.check();assert.equal(await cb.evaluate(e=>getComputedStyle(e).transform),'none');await page.keyboard.press('Escape');

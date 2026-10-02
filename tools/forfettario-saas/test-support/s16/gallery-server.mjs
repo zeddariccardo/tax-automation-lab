@@ -5,7 +5,7 @@ import {readFile} from 'node:fs/promises';
 const app=new URL('../../',import.meta.url),root=new URL('../../../../',import.meta.url);
 const views=new Set(['auth-view.js','fiscal-view.js','declaration-view.js','payments-view.js','collaboration-view.js','onboarding-ui.js','onboarding-service.js','app.css']);
 const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>S16 · Stati simulati</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/fonts/fonts.css"><link rel="stylesheet" href="/app.css"><body><header class="page"><div class="field"><label for="state">S16 · Galleria locale · dati e sessioni simulati</label><select id="state"></select></div></header><div id="preview"></div><script type="module" src="/test-support/s16/gallery.mjs"></script></body></html>`;
-views.add('product-ui.js');
+views.add('product-ui.js');views.add('workflow-view.js');
 const port=Number(process.env.TAL_GALLERY_PORT)||4179;
 http.createServer(async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('Content-Security-Policy',"default-src 'self'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'");

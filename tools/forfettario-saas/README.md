@@ -1,4 +1,66 @@
-# S14 — bozza Redditi PF per lo Studio
+# SaaS Forfettario — stato corrente S17-C
+
+## Product workflow hardening
+
+Il contribuente senza Studio può confermare i facts procedurali, ottenere F24
+supportati `READY_BY_TAL`, scaricarli e registrare una quietanza. Non basta il
+download per segnare il pagamento. I casi fiscali non determinabili restano
+PARTIAL/BLOCKED; nessuna formula o regola è stata spostata nel browser.
+
+- Oggi legge il prossimo pagamento effettivo dal workflow F24. Nessuna stima
+  alternativa: importi stale/bloccati richiedono verifica. Gli scaduti hanno un
+  avviso nel riepilogo e nel pannello prima del download; ravvedimento non incluso.
+- Studio: Da fare e Clienti. Nella posizione: Riepilogo, Entrate, Tasse, Attività,
+  Dichiarazione, Pagamenti. La catena mostra dati raccolti, conferme e F24 reali.
+  I pagamenti documentati restano visibili dopo la rigenerazione della bozza.
+- Da fare unisce richieste e azioni derivate da dichiarazione, F24 e previdenza.
+  Una richiesta ricevuta da verificare appare anche nel riepilogo cliente.
+- Dichiarazione: preparato da TAL, conferme necessarie, fuori perimetro separato.
+  Nessuno stato significa pronta all'invio. La conferma perdite si può revocare;
+  i dati di una review stale precompilano solo il form, mai i facts correnti.
+- Un solo fact server-side per gli acconti 2025. Tasse, dichiarazione e settlement
+  lo leggono; divergenze legacy richiedono riconciliazione esplicita in Pagamenti.
+- Richieste qualificate: ricevuta contributi/F24 → conferma → fact ed evidenza
+  atomici. Il documento va prima verificato dal percorso già esistente. Richiedi
+  di nuovo conserva documento precedente e motivazione. Nessun OCR o automatismo
+  deduce importo/data dal file. Il contribuente standalone può usare direttamente
+  la ricevuta nei pannelli Pagamenti o Contributi.
+- Omnibox e Ctrl/Cmd+K rimossi, ricerca clienti conservata. Scadenze demo rimossa.
+  Checkbox senza rotazione; hero fatture/tasse/documenti/dichiarazioni/pagamenti.
+  Niente UUID, identificatori previdenziali interni o export JSON professionale
+  nelle viste personali. Brand, autenticazione e vecchio Forfettario invariati.
+
+Backend, migration e prove JWT: `test-support/forfettario-s17c/` nel repository
+privato. Solo cinque nuove destinazioni RPC sono state aggiunte alle allowlist
+CSP esistenti (HTML e preview); nessun accesso generico aggiunto.
+
+Verifiche finali: SaaS **196/196**, statici **310/310**, UI isolata **8/8**,
+hosted browser **19/19** con 7 identità sintetiche/login e controlli accesso.
+Journey contribuente standalone e Studio sulle sei superfici, form reale perdite
+confirm/clear/confirm, review precedente precompilata e riconfermata, logout,
+1440/1024/390/375, nessun overflow/errori JavaScript/HTTP falliti/404.
+Le normali richieste annullate cambiando pagina sono rilevate separatamente.
+Screenshot e log solo nella directory temporanea, non nel repository.
+UI isolata: focus/tastiera, checkbox, contrasto, reduced motion, ciclo hero.
+Verifica visuale interattiva supplementare su galleria locale e screenshot del
+journey hosted. Tastiera/screen reader fisici mobili non certificati.
+
+Regressioni backend pertinenti **263/263**, SQL locale transazionale con rollback,
+S01/v1 pubblico **15/15**. Le prove hosted finanziarie registrano solo ricevute
+sintetiche: nessun pagamento bancario. Public email signup rimane **DEFERRED**;
+conferma email obbligatoria invariata. Nessun deployment pubblico.
+
+Controlli generali richiesti da AGENTS: backend `npm test` 644 PASS, 260 skip,
+zero failure; responsive pubblico 42/42. Frontend `npm test` 769/770: una failure
+di geometria nel tour legacy a 1024 px/passaggio 6, poi PASS nella riesecuzione
+isolata dello stesso test sulle quattro viewport. Esito intermittente separato,
+non una suite generale dichiarata tutta verde. I file pubblici coinvolti sono
+identici al checkpoint precedente. Nessuna correzione fuori dallo scope SaaS.
+
+Le sezioni seguenti conservano lo storico degli step: i riferimenti precedenti
+a ricerca, Scadenze demo e conferme esclusivamente Studio sono superati da S17-C.
+
+## S14 — bozza Redditi PF per lo Studio
 
 La posizione cliente ha la nuova tab primaria **Dichiarazione**: bozza cloud
 automatica Redditi PF 2026/periodo 2025, salvata/versionata e auditabile.

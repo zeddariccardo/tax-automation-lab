@@ -1,3 +1,4 @@
+import {workflowActions,nextPaymentView,clientWorkflow,managementLabel} from './workflow-view.js';
 import {createImportUI} from './import-ui.js';
 import {createOnboardingUI} from './onboarding-ui.js';
 import { createCollaborationController } from './collaboration-controller.js';
@@ -5,7 +6,6 @@ import { collaborationView } from './collaboration-view.js';
 import { createCollaborationUI } from './collaboration-ui.js';
 import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
-import {createProductSearch,searchDestinations} from './product-ui.js';
 import { cloud, service } from './tal-data-runtime.js';
 import { createIncomeController } from './income-controller.js';
 import { createFiscalController } from './fiscal-controller.js';
@@ -23,6 +23,10 @@ const payments = createFiscalController({auth,service:{calculateFiscal:(id,year)
 let access = auth.getState();
 let structural = cloud.getState();
 const collaborations=createCollaborationController({auth,service});
+const workflows=createCollaborationController({auth,service:{listCollaborationQueue:async ids=>{const out=[];for(let i=0;i<ids.length;i+=4)out.push(...await Promise.all(ids.slice(i,i+4).map(id=>service.readWorkflow(id))));return out;}}});
+const workflow=id=>workflows.getState().phase==='ready'?workflows.getState().data.find(w=>w.workspaceId===id):null;
+const canConfirm=id=>workflow(id)?.canConfirm===true;
+const workflowPending=()=>workflows.getState().phase==='loading'?'<p role="status">Aggiornamento delle verifiche…</p>':'<p role="alert">Non riusciamo a caricare le verifiche aggiornate.</p>'+button('workflow-retry','Riprova');
 const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
 const positionFor = id => positions().find(p => p.id === id);
 const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
@@ -57,9 +61,9 @@ const paths = {
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.file}</svg>`;
 const brand = () => '<div class="brand"><img src="./mark.svg" alt=""><span>TAL</span><span>TAX AUTOMATION<br>LAB</span></div>';
 const navItems = [['oggi', 'Oggi', 'home'], ['entrate', 'Entrate', 'income'], ['tasse', 'Tasse', 'taxes'], ['pagamenti','Pagamenti','calendar'], ['attivita', 'Attività', 'activity']];
-const clientItems = [...navItems.filter(n=>n[0]!=='tasse').map(([key, label, glyph]) => [key, key === 'oggi' ? 'Riepilogo' : label, glyph]), ['dichiarazione','Dichiarazione','file']];
+const clientItems = [['oggi','Riepilogo','home'],['entrate','Entrate','income'],['tasse','Tasse','taxes'],['attivita','Attività','activity'],['dichiarazione','Dichiarazione','file'],['pagamenti','Pagamenti','calendar']];
 const positionPages = [...navItems.map(n => n[0]), 'documenti', 'dichiarazione'];
-const studioItems = [['da-fare', 'Da fare', 'todo'], ['clienti', 'Clienti', 'people'], ['scadenze', 'Scadenze', 'calendar']];
+const studioItems = [['da-fare', 'Da fare', 'todo'], ['clienti', 'Clienti', 'people']];
 let filter = 'all'; let taxMode = 'current'; let notificationTimer;
 const fiscalYears = new Map();
 let clientQuery = '';
@@ -108,6 +112,7 @@ function showRoute(focus) {
   if (route().role === 'studio' && route().page === 'clienti' && !route().client) clientQuery = saved?.query || '';
   render(true);
   void cloud.refresh();
+  void workflows.refresh();
   if(['oggi','tasse'].includes(route().page))void fiscals.refresh();
   if(route().page==='dichiarazione')void declarations.refresh();
   if(['oggi','attivita','documenti','da-fare'].includes(route().page))void collaborations.refresh();
@@ -128,15 +133,6 @@ function navigate(url, { open, focus, requestId } = {}) {
 }
 
 function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button, signup, heroPaused, setup:onboardingUI.mustSetup()?onboardingUI.content():null }); }
-function productDestinations(){
- const r=route(),ready=access.phase==='ready'&&structural.phase==='ready'&&(!r.id||!!positionFor(r.id));
- return searchDestinations({signedOut:access.phase==='signed-out',role:r.role,ready,base:ready&&r.id?href(r,''):null});
-}
-const productSearch=createProductSearch({document,getEntries:productDestinations,icon,onSelect:destination=>{
- if(destination.href)navigate(destination.href);
- else void action(destination.action,{dataset:{authFocus:''}});
-}});
-
 function shell(r, content) {
   const studio = r.role === 'studio';
   const p = positionFor(r.id);
@@ -167,7 +163,7 @@ function fiscalPage(r) {
  const yearControl=years.length>1?'<label class="small fiscal-year">Anno <select aria-label="Anno fiscale" data-fiscal-year>'+years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>':'';
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading:(title,text,actions='')=>heading(title,text,yearControl+actions),button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=r=>{incomes.select(r.id);const s=incomes.getState();if(s.phase==='ready'&&!s.data.invoices.length)return heading(r.client?'La posizione è pronta':'La mia attività','Aggiungi una fattura già emessa o importa i dati esistenti.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Entrate e situazione fiscale compariranno quando saranno disponibili i dati necessari.</p><p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>'+button('s11-links',r.client?'Collegamenti':'Il tuo commercialista','','button secondary')+collaboration(r,'today');return fiscalPage(r)+collaboration(r,'today');};
+const today=r=>{const w=workflow(r.id);if(r.client)return (w?clientWorkflow(w,{heading,label:positionLabel(r.id),base:href(r,''),esc,link}):heading('Riepilogo',esc(positionLabel(r.id)))+workflowPending())+collaboration(r,'today');incomes.select(r.id);const s=incomes.getState();const start=s.phase==='ready'&&!s.data.invoices.length?heading('La mia attività','Aggiungi una fattura già emessa o importa i dati esistenti.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>':fiscalPage(r);return start+(w?nextPaymentView(w,{href:href(r,'pagamenti'),esc,euro}):workflowPending())+'<p>'+link(href(r,'dichiarazione'),'Dichiarazione TAL')+'</p>'+collaboration(r,'today');};
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.residual > 0);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
@@ -182,11 +178,11 @@ function income(r) {
 }
 
 const taxes=r=>fiscalPage(r)+(r.role==='personal'?'<p>'+link(href(r,'dichiarazione'),'Dati per la dichiarazione')+'</p>':'');
-function declarationPage(r){declarations.select(r.id,2025);return declarationView({state:declarations.getState(),heading,button,esc,euro,studio:r.role==='studio'});}
-function paymentsPage(r){payments.select(r.id,2025);return paymentsView({state:payments.getState(),heading,button,esc,euro,studio:r.role==='studio',base:href(r,'pagamenti').replace(/pagamenti$/,'')});}
+function declarationPage(r){declarations.select(r.id,2025);return declarationView({state:declarations.getState(),heading,button,esc,euro,studio:r.role==='studio',canConfirm:canConfirm(r.id),linkedStudio:workflow(r.id)?.linkedStudio===true,base:href(r,'')});}
+function paymentsPage(r){payments.select(r.id,2025);return paymentsView({state:payments.getState(),heading,button,esc,euro,studio:r.role==='studio',canConfirm:canConfirm(r.id),base:href(r,'pagamenti').replace(/pagamenti$/,'')});}
 const documents=r=>collaboration(r,'documents');
 const activity=r=>collaboration(r);
-const todo=()=>positions().length?collaboration(route(),'queue'):heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));
+function todo(){if(!positions().length)return heading('Nessun cliente collegato','Invita un cliente già registrato su TAL.',button('s11-links','Invita il primo cliente'));const state=workflows.getState();const items=state.data?.flatMap(w=>workflowActions(w).map(a=>({...a,id:w.workspaceId})))||[];return collaboration(route(),'queue')+(state.phase==='ready'?(items.length?'<section class="waiting-list actionable-list"><h2>Dichiarazioni e pagamenti</h2>'+items.map(a=>'<article class="waiting-row"><div class="row-main"><strong>'+esc(positionLabel(a.id))+'</strong><p>'+esc(a.detail)+'</p></div>'+link('#/studio/clienti/'+a.id+'/'+a.page,a.label,'text-link',false)+'</article>').join('')+'</section>':''):workflowPending());}
 function clientRows(query = '') {
   const all = positions();
   if (!all.length) return '<p class="empty">Nessun cliente collegato.</p>';
@@ -194,13 +190,8 @@ function clientRows(query = '') {
   return found.length ? found.map(p => `<a class="client-link" href="#/studio/clienti/${p.id}/oggi"><span class="avatar">${icon('person')}</span><div class="row-main"><h2>${esc(p.label)}</h2>${p.studioReference ? '<p>Riferimento Studio · '+esc(p.studioReference)+'</p>' : ''}</div>${icon('chevron')}</a>`).join('') : '<p class="empty">Nessun cliente trovato. Prova con un altro nome o riferimento.</p>';
 }
 function clients() { return `${heading('Clienti','',button('s11-links','Invita cliente')+'<button class="button secondary" type="button" data-action="s13-import">Importa</button>')}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
-function deadlines() {
-  return heading('Scadenze','Pagamenti di esempio: non sono scadenze effettive.')+(positions().length ? '<p class="eyebrow">Novembre 2026 · esempio</p>'+positions().map(p=>`<article class="calendar-row"><div class="date-tile"><strong>30</strong><span>nov</span></div><div class="row-main"><h2>Acconti di novembre</h2><p>${esc(p.label)}</p>${link('#/studio/clienti/'+p.id+'/tasse','Dettaglio pagamento','text-link',true,'data-focus="payment-detail"')}</div><strong class="money">${euro(214000)}</strong></article>`).join('') : '<p class="empty">Nessun cliente collegato.</p>');
-}
-
 let declarationLayout=null;
 function render(focus = false) {
-  productSearch.capture();
   if(renderedHash===location.hash&&document.querySelector('.declaration-page'))declarationLayout={hash:location.hash,scroll:window.scrollY,open:[...document.querySelectorAll('.declaration-page details')].map(x=>x.open)};
   else if(declarationLayout?.hash!==location.hash)declarationLayout=null;
   if(onboardingUI.mustSetup()&&document.querySelector('#onboarding-form,#studio-form')&&!focus&&!onboardingUI.isLoading())return;
@@ -214,6 +205,7 @@ function render(focus = false) {
     if (!location.hash.startsWith(prefix)) history.replaceState({ panel: null }, '', prefix + (access.selected.context_type === 'personal' ? 'oggi' : 'da-fare'));
   }
   const r = route();
+  workflows.select(structural.phase==='ready'&&r.role!=='entry'?(r.id?[r.id]:r.page==='da-fare'?positions().map(p=>p.id):[]):[]);
   if(!['entrate','oggi'].includes(r.page))incomes.select(null);
   if(!['oggi','tasse'].includes(r.page))fiscals.select(null,null);
   if(r.page!=='dichiarazione')declarations.select(null,null);
@@ -227,7 +219,7 @@ function render(focus = false) {
     else if (r.id && !positionFor(r.id)) content = heading('Posizione non disponibile')+'<p role="status">Questa posizione non è disponibile nel contesto scelto.</p>'+returnLink();
     else if (r.id) {
       content = ({ oggi: today, entrate: income, tasse: taxes, documenti: documents, attivita: activity, dichiarazione: declarationPage, pagamenti: paymentsPage })[r.page](r);
-    } else content = ({ 'da-fare': todo, clienti: clients, scadenze: deadlines })[r.page]();
+    } else content = ({ 'da-fare': todo, clienti: clients })[r.page]();
     app.innerHTML = shell(r, content);
   }
   if(draft!==null&&draft!==undefined&&document.querySelector('#message')){const input=document.querySelector('#message');input.value=draft;if(messageFocused){input.focus({preventScroll:true});input.setSelectionRange(...selection);}}
@@ -236,12 +228,7 @@ function render(focus = false) {
     if(!focus)window.scrollTo(0,declarationLayout.scroll);
   }
   if (focus) document.querySelector('#main').focus({ preventScroll: true });
-  let searchRoot=document.querySelector('[data-product-search]');
-  if(!searchRoot&&productDestinations().length&&['oggi','da-fare'].includes(r.page)){
-   searchRoot=document.createElement('div');searchRoot.dataset.productSearch='';
-   document.querySelector('#main .heading')?.after(searchRoot);
-  }
-  productSearch.mount(searchRoot,access.phase+':'+access.selected?.context_id+':'+location.hash,!focus);
+
 }
 
 function notify(message) { clearTimeout(notificationTimer); notice.textContent = message; notificationTimer = setTimeout(() => { notice.textContent = ''; }, 5500); }
@@ -270,6 +257,7 @@ function closePanel(after) {
   else { panel.close(); closingPanel = false; afterPanelClose = null; after?.(); }
 }
 function done(message) {
+  void workflows.refresh();
   const scroll = window.scrollY;
   panels.delete(history.state?.panel);
   closePanel(() => { render(true); window.scrollTo(0, scroll); notify(message); });
@@ -281,30 +269,36 @@ function moneyForm(command, initial='', invoice=null) {
   return `<form id="amount-form" data-command="${command}" novalidate>${creating?'<div class="field"><label for="invoice-number">Numero fattura</label><input id="invoice-number" name="number" maxlength="80" required autocomplete="off"></div><div class="field"><label for="invoice-customer">Cliente</label><input id="invoice-customer" name="customer" maxlength="180" required autocomplete="off"></div>':''}<div class="field"><label for="money-date">${creating?'Data fattura':'Data incasso'}</label><input id="money-date" name="date" type="date" value="${localDate()}" required></div><div class="field"><label for="amount">${creating?'Importo della fattura (€)':'Importo incassato (€)'}</label><input id="amount" name="amount" inputmode="decimal" value="${initial}" aria-describedby="amount-help form-error" autocomplete="off" required><p id="amount-help">${creating?'Inserisci l’importo di una fattura già emessa.':'Restano '+euro(invoice.residual)+' da incassare.'}</p></div>${creating&&activities.length>1?'<div class="field"><label for="invoice-activity">Attività</label><select id="invoice-activity" name="activity" required><option value="">Scegli l’attività</option>'+activities.map(a=>'<option value="'+a.id+'">'+esc(a.label)+'</option>').join('')+'</select></div>':''}<p class="error" id="form-error" tabindex="-1" role="alert"></p><button class="button" type="submit">${creating?'Aggiungi fattura':'Registra incasso'}</button></form>`;
 }
 const moneyJobs=new WeakMap();
-const pensionJobs=new WeakMap();
+const pensionJobs=new WeakMap(),pensionUploads=new WeakMap();let pensionContext=null,pensionDocuments=[];
 function pensionForm(d){
- return '<p>Registra tutti i contributi previdenziali obbligatori già pagati e rimasti a tuo carico. Escludi quelli ancora da versare.</p><form id="pension-form" data-year="'+d.year+'" data-revision="'+d.dataRevision+'"><div class="field"><label for="pension-date">Data del versamento</label><input id="pension-date" name="date" type="date" min="'+d.year+'-01-01" max="'+d.year+'-12-31" value="'+localDate()+'" required></div><div class="field"><label for="pension-amount">Importo versato (€)</label><input id="pension-amount" name="amount" inputmode="decimal" required autocomplete="off"></div><p id="pension-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Registra versamento</button>'+(d.pensionPayments.length?'':'<button class="text-link auth-exit" type="button" data-action="pension-none">Non ho effettuato versamenti nel '+d.year+'</button>')+'</form>';
+ const obligations=pensionContext?.pensionObligations||[];const detail=obligations.length?'<div class="field"><label for="pension-obligation">Gestione previdenziale</label><select id="pension-obligation" name="obligation" required><option value="">Scegli la gestione</option>'+obligations.map(o=>'<option value="'+o.id+'">'+esc(managementLabel(o.managementId))+' · '+o.year+'</option>').join('')+'</select></div><div class="field"><label for="pension-reference">Anno cui si riferiscono i contributi</label><input id="pension-reference" name="referenceYear" type="number" min="1900" max="2200" required></div><div class="field"><label for="pension-role">Tipo di versamento</label><select id="pension-role" name="settlementRole" required><option value="">Scegli</option><option value="minimum">Minimale</option><option value="advance">Acconto</option><option value="balance">Saldo</option><option value="unknown">Da verificare</option></select></div>':'';
+ return '<p>Registra tutti i contributi previdenziali obbligatori già pagati e rimasti a tuo carico. Escludi quelli ancora da versare.</p><form id="pension-form" data-year="'+d.year+'" data-revision="'+d.dataRevision+'">'+detail+'<div class="field"><label for="pension-date">Data del versamento</label><input id="pension-date" name="date" type="date" min="'+d.year+'-01-01" max="'+d.year+'-12-31" value="'+(Number(localDate().slice(0,4))===d.year?localDate():'')+'" required></div><div class="field"><label for="pension-amount">Importo versato (€)</label><input id="pension-amount" name="amount" inputmode="decimal" required autocomplete="off"></div><div class="field"><label for="pension-document">Ricevuta già caricata · facoltativa</label><select id="pension-document" name="document"><option value="">Nessun documento</option>'+pensionDocuments.map(doc=>'<option value="'+doc.id+'">'+esc(doc.original_filename)+'</option>').join('')+'</select></div><div class="field"><label for="pension-file">Oppure carica la ricevuta</label><input id="pension-file" name="receipt" type="file" accept=".pdf,.png,.jpg,.jpeg,.xml"></div><p id="pension-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Registra versamento</button>'+(d.pensionPayments.length?'':'<button class="text-link auth-exit" type="button" data-action="pension-none">Non ho effettuato versamenti nel '+d.year+'</button>')+'</form>';
 }
 async function savePension(form,action){
  if(!form||form.dataset.busy==='true')return;
+ form.dataset.busy='true';
  const r=route(),identity=access.user?.id+':'+access.selected?.context_id;
  const current=()=>access.phase==='ready'&&identity===access.user.id+':'+access.selected.context_id&&route().id===r.id&&form.isConnected;
  try{
   if(!pensionJobs.has(form)){
    const fields=new FormData(form);const input={year:Number(form.dataset.year),action,expectedDataRevision:Number(form.dataset.revision)};
-   if(action==='add'){input.paidDate=fields.get('date');input.amountCents=parseAmount(fields.get('amount'));}
+   if(action==='add'){input.paidDate=fields.get('date');input.amountCents=parseAmount(fields.get('amount'));let evidenceId=fields.get('document')||null;
+    if(!evidenceId&&form.elements.receipt.files[0]){if(!pensionUploads.has(form))pensionUploads.set(form,await service.prepareUpload(r.id,form.elements.receipt.files[0]));const res=await service.uploadDocument(pensionUploads.get(form));if(!current())return;evidenceId=res.documentId;}
+    if(evidenceId)input.evidenceId=evidenceId;
+    if(fields.get('obligation')){delete input.action;Object.assign(input,{movementKind:'payment',obligationId:fields.get('obligation'),referenceYear:Number(fields.get('referenceYear')),settlementRole:fields.get('settlementRole')});}
+   }
    pensionJobs.set(form,{key:crypto.randomUUID(),input});
   }
-  const job=pensionJobs.get(form);form.dataset.busy='true';for(const el of form.querySelectorAll('input,button'))el.disabled=true;
+  const job=pensionJobs.get(form);for(const el of form.querySelectorAll('input,select,button'))el.disabled=true;
   form.querySelector('#pension-error').textContent='';fiscals.invalidate();
-  await service.recordPension(r.id,job.input,job.key);pensionJobs.delete(form);
+  await service[job.input.movementKind?'recordPensionMovement':'recordPension'](r.id,job.input,job.key);pensionJobs.delete(form);
   if(!current())return;await fiscals.refresh();if(current())done(action==='none'?'Nessun versamento dichiarato.':'Versamento registrato.');
  }catch(error){
   if(!current())return;
   const uncertain=error.code==='uncertain'||error.code==='stale';if(!uncertain)pensionJobs.delete(form);
   await fiscals.refresh();if(!current())return;
   const data=fiscals.getState().data;if(data)form.dataset.revision=data.dataRevision;
-  for(const el of form.querySelectorAll('input,button'))el.disabled=uncertain&&el.tagName==='INPUT'||['forbidden','expired'].includes(error.code);
+  for(const el of form.querySelectorAll('input,select,button'))el.disabled=uncertain&&el.tagName!=='BUTTON'||['forbidden','expired'].includes(error.code);
   form.querySelector('[type="submit"]').textContent='Riprova';
   const message=form.querySelector('#pension-error');message.textContent=error.code==='conflict'?'La posizione è cambiata. Controlla i dati e riprova.':error.code==='amount'?'Inserisci un importo positivo, con al massimo due decimali.':uncertain?'Non abbiamo ricevuto conferma. Riprova: il versamento non verrà duplicato.':'Non è stato possibile registrare il versamento. Controlla data e importo.';message.focus();
  }finally{form.dataset.busy='false';}
@@ -328,11 +322,13 @@ async function action(name, element) {
   if(await paymentsUI.act(name))return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
+    case 'workflow-retry': await workflows.refresh(); break;
     case 'fiscal-retry': await fiscals.refresh(); break;
     case 'declaration-retry': await declarations.refresh(); break;
     case 'pension': {
       const d=fiscals.getState().data;if(!d||d.workspaceId!==r.id)return;
-      openPanel('Contributi già versati',pensionForm(d));break;
+      const stamp=access.user.id+':'+access.selected.context_id;const [w,collab]=await Promise.all([service.readWorkflow(r.id),service.listCollaboration(r.id)]);if(access.phase!=='ready'||stamp!==access.user.id+':'+access.selected.context_id||route().id!==r.id)return;
+      pensionContext=w;pensionDocuments=collab.documents;openPanel('Contributi già versati',pensionForm(d));break;
     }
     case 'pension-none': await savePension(document.querySelector('#pension-form'),'none');break;
     case 'data-retry': await cloud.refresh(); break;
@@ -484,13 +480,14 @@ function clearPosition() {
   afterPanelClose = null; panelOpener = null; closingPanel = false;
   lastActionFocus = null; panelActionFocus = null;
   filter = 'all'; taxMode = 'current'; clientQuery = ''; renderedHash = '';
-  fiscalYears.clear();
+  fiscalYears.clear();pensionContext=null;pensionDocuments=[];
   clearTimeout(notificationTimer); notice.textContent = '';
   collaborationUI.clear();
   declarationUI.clear();
   paymentsUI.clear();
   importUI.clear();
   collaborations.select([]);
+  workflows.clear();
   incomes.select(null);
   fiscals.select(null,null);
   declarations.select(null,null);
@@ -498,8 +495,8 @@ function clearPosition() {
   history.replaceState({ panel: null, origin: null, context: null }, '', location.href);
 }
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
-const declarationUI=createDeclarationUI({auth,service,controller:declarations,route,openPanel,done,notify,esc});
-const paymentsUI=createPaymentsUI({auth,service,controller:payments,route,openPanel,done,notify,esc});
+const declarationUI=createDeclarationUI({auth,service,controller:declarations,route,canConfirm,openPanel,done,notify,esc});
+const paymentsUI=createPaymentsUI({auth,service,controller:payments,route,canConfirm,openPanel,done,notify,esc});
 document.addEventListener('submit',event=>{if(event.target.id.startsWith('payments-')){event.preventDefault();void paymentsUI.submit(event.target,event.submitter);}});
 document.addEventListener('submit',event=>{if(event.target.id==='declaration-review-form'){event.preventDefault();void declarationUI.submit(event.target);}});
 
@@ -549,3 +546,9 @@ window.addEventListener('focus',refreshCollaboration);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)collaborations.clear();else {render(false);refreshCollaboration();}});
 window.setInterval(refreshCollaboration,30000);
 void auth.restore();
+
+workflows.subscribe(()=>{if(access.phase==='ready')render(false);});
+const refreshWorkflow=()=>{if(!document.hidden&&access.phase==='ready'&&!panel.open)void workflows.refresh();};
+window.addEventListener('focus',refreshWorkflow);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)workflows.clear();else {render(false);refreshWorkflow();}});
+window.setInterval(refreshWorkflow,30000);

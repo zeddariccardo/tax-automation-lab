@@ -17,6 +17,7 @@ const readonly=async()=>{throw {code:'unavailable'};};
 export const service={
  getOnboarding:async()=>({personal:{configured:true,talId:position.talId},studios:[{status:'verified',name:'Studio di prova'}]}),
  listLinks:async()=>[{id:'synthetic-link',status:'active',workspaceId:position.id,studioName:'Studio di prova',canRevoke:false}],
+ readWorkflow:async workspaceId=>({workspaceId,dataRevision:1,linkedStudio:false,canConfirm:true,pensionObligations:[],counts:{invoices:2,payments:2,documents:1,contributions:0},declaration:{current:true,workflow:{state:'confirm'}},reviewStale:true,paymentReviewStale:true,pensionMissing:true,payments:{id:payments.id,result:structuredClone(payments.draft)}}),
  listInvoices:async()=>({year:2025,invoices:structuredClone(invoices),activities:position.activities,received:240000,outstanding:40000}),
  readInvoice:async(_w,id)=>structuredClone(invoices.find(i=>i.id===id)),
  calculateFiscal:async()=>({...structuredClone(fixtures.fiscal),workspaceId:position.id}),

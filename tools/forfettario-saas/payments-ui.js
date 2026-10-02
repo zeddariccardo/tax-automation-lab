@@ -1,7 +1,8 @@
+import {overdue} from './workflow-view.js';
 import {parseAmount,amountInput,formatCents} from './income-model.js';
 const labels={advancesPaid:'Acconti imposta sostitutiva 2025 versati',taxCredits:'Crediti d’imposta pertinenti',withholdings:'Ritenute pertinenti',priorCredit:'Credito dalla dichiarazione precedente',priorCreditUsed:'Credito precedente già utilizzato',suspendedAdvances:'Acconti sospesi',otherPayments:'Altri versamenti da riconciliare',adjustments:'Altre rettifiche dichiarative'};
 const amount=v=>{const s=v.trim();if(!s)return null;if(/^0+(?:[.,]0{1,2})?$/.test(s))return 0;return parseAmount(s);};
-export function createPaymentsUI({auth,service,controller,route,openPanel,done,notify,esc}){
+export function createPaymentsUI({auth,service,controller,route,openPanel,done,notify,esc,canConfirm=()=>false}){
  let opened=null,jobs=new WeakMap();
  const stamp=()=>{const s=auth.getState();return s.phase==='ready'?s.user.id+':'+s.selected.context_type+':'+s.selected.context_id:'';};
  const valid=o=>o&&stamp()===o.stamp&&route().id===o.id&&route().page==='pagamenti';
@@ -16,10 +17,12 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
   const data=controller.getState().data;if(!data){notify('Pagamenti non disponibili. Riprova.');return true;}
   opened={...o,data};
   if(name==='payments-review'){
-   if(r.role!=='studio')return true;
-   const facts=data.reviewFacts;
-   openPanel('Verifica versamenti e crediti','<form id="payments-review-form"><p>Importi dell’imposta sostitutiva 2025. Lascia vuoto ciò che non hai verificato; indica 0 soltanto quando ne hai accertato l’assenza.</p>'+
-    Object.entries(labels).map(([k,l])=>field(k,l,Number.isSafeInteger(facts?.amounts?.[k])?amountInput(facts.amounts[k]):'','inputmode="decimal"')).join('')+
+   if(!canConfirm(r.id))return true;
+   const facts=data.reviewFacts||data.previousReview?.facts;
+   const legacy=data.advanceFact;
+   const conflict=legacy?.state==='conflict';
+   openPanel('Verifica versamenti e crediti','<form id="payments-review-form">'+(data.previousReview?'<p class="review-stale">Verifica precedente: questi valori sono precompilati per il controllo, ma devono essere riconfermati sui dati aggiornati.</p>':'')+(conflict?'<p role="alert">Acconti discordanti: verifica e indica l’importo corretto. La riconciliazione conserverà i valori precedenti.</p><ul>'+Object.entries(legacy.legacy).map(([k,v])=>'<li>'+esc(({taxPlanning:'Tasse',declaration:'Dichiarazione',payments:'Pagamenti'})[k])+' · '+(Number.isSafeInteger(v)?formatCents(v):'non indicato')+'</li>').join('')+'</ul>':'')+'<p>Importi dell’imposta sostitutiva 2025. Lascia vuoto ciò che non hai verificato; indica 0 soltanto quando ne hai accertato l’assenza.</p>'+
+    Object.entries(labels).map(([k,l])=>field(k,l,k==='advancesPaid'&&legacy&&!conflict?(Number.isSafeInteger(legacy.amountCents)?amountInput(legacy.amountCents):''):conflict&&k==='advancesPaid'?'':Number.isSafeInteger(facts?.amounts?.[k])?amountInput(facts.amounts[k]):'','inputmode="decimal"')).join('')+
     '<div class="field"><label for="pay-method">Metodo acconti 2026</label><select id="pay-method" name="method"><option value="">Da confermare</option><option value="historical">Storico</option><option value="forecast">Previsionale · da verificare</option></select></div>'+
     '<details><summary>Ripartizione acconti · verifica professionale</summary><div class="field"><label for="pay-scope">Perimetro articolo 58</label><select id="pay-scope" name="scope"><option value="">Da verificare</option><option value="inside">Attività nel perimetro ISA · verificato</option><option value="outside">Fuori dal perimetro · verificato</option></select></div>'+
     field('isaCode','Codice ISA')+field('activityCode','Codice attività verificato')+field('revenue','Ricavi per il test ISA','', 'inputmode="decimal"')+field('limit','Limite ISA applicabile','', 'inputmode="decimal"')+
@@ -33,16 +36,16 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
   if(!name.startsWith('payments-open:'))return true;
   const key=decodeURIComponent(name.slice(14)),g=data.draft.groups.find(g=>g.key===key);if(!g)return true;opened.group=g;
   const allowed=['READY','DOWNLOADED','PAID'].includes(g.status);
-  let docs=[];if(r.role==='studio'&&allowed&&g.status!=='PAID'){try{docs=(await service.listCollaboration(r.id)).documents;}catch{}if(!valid(o))return true;}
+  let docs=[];if(allowed&&g.status!=='PAID'){try{docs=(await service.listCollaboration(r.id)).documents;}catch{}if(!valid(o))return true;}
   opened.documents=docs;
   const row=g.lines.map(l=>'<tr><td>'+esc(l.section)+'<br>'+esc(l.taxCode)+(l.section==='INPS'?'<br><small>Sede '+esc(l.officeCode)+'<br>'+esc(l.inpsCode||'')+'</small>':'')+'</td><td>'+(l.section==='INPS'?esc(l.periodFrom)+' - '+esc(l.periodTo):esc(l.referenceTaxYear))+'</td><td>'+formatCents(l.amountCents)+'</td></tr>').join('');
   openPanel('F24 · '+(g.dueDate?new Intl.DateTimeFormat('it-IT',{dateStyle:'long',timeZone:'UTC'}).format(new Date(g.dueDate)):'scadenza da verificare'),'<div class="payment-preview"><p>'+esc(data.draft.taxpayer.name)+' · '+esc(data.draft.taxpayer.cf)+'</p><table><caption>Righe di versamento</caption><thead><tr><th>Codice</th><th>Periodo</th><th>Importo</th></tr></thead><tbody>'+row+'</tbody></table><p><strong>Totale '+formatCents(g.totalCents)+'</strong></p><p class="small">Modello precompilato, non file telematico. Controlla anagrafica e termine di versamento; il ravvedimento non è incluso.</p></div>'+
-   '<form id="payments-action-form">'+errors+
-   (g.status==='DRAFT'&&r.role==='studio'?'<p>Conferma dopo aver controllato imposta, versamenti e dati del contribuente.</p><button class="button" type="submit" name="command" value="READY">Conferma F24</button>':
-    allowed?'<button class="button" type="submit" name="command" value="PDF">Scarica F24 PDF</button> <button class="text-link" type="submit" name="command" value="JSON">Esporta dati JSON</button>':'<p>Questa versione non è ancora disponibile per il download.</p>')+
-   (r.role==='studio'&&allowed&&g.status!=='PAID'?'<details class="payment-evidence"><summary>Registra pagamento documentato</summary><p>Seleziona una ricevuta già caricata e verifica che attesti il versamento completo di questo F24.</p>'+
+   '<form id="payments-action-form">'+errors+(overdue(g)?'<p class="review-stale" role="alert"><strong>Scadenza superata</strong>. L’F24 predisposto non include automaticamente eventuale ravvedimento, interessi o sanzioni. Verifica prima di pagare.</p>':'')+
+   (g.status==='DRAFT'&&canConfirm(r.id)?'<p>Conferma dopo aver controllato imposta, versamenti e dati del contribuente.</p><button class="button" type="submit" name="command" value="READY">Conferma F24</button>':
+    allowed?'<button class="button" type="submit" name="command" value="PDF">Scarica F24 PDF</button>'+(r.role==='studio'?' <button class="text-link" type="submit" name="command" value="JSON">Esporta dati JSON</button>':'')+'':'<p>Questa versione non è ancora disponibile per il download.</p>')+
+   (allowed&&g.status!=='PAID'?'<details class="payment-evidence"><summary>Hai pagato? Registra il pagamento</summary><p>Seleziona una quietanza o caricala. Conferma data e importo effettivamente pagato.</p>'+
     '<div class="field"><label for="pay-document">Ricevuta del versamento</label><select id="pay-document" name="document" required><option value="">Seleziona documento</option>'+docs.map(d=>'<option value="'+esc(d.id)+'">'+esc(d.original_filename)+'</option>').join('')+'</select></div>'+
-    field('paidDate','Data di pagamento','','type="date" required')+field('reason','Riferimento della verifica','','minlength="3" maxlength="1000" required')+
+    '<div class="field"><label for="pay-receipt">Carica la quietanza</label><input id="pay-receipt" name="receipt" type="file" accept=".pdf,.png,.jpg,.jpeg,.xml"></div>'+field('paidAmount','Importo effettivamente pagato',amountInput(g.totalCents),'inputmode="decimal" required')+field('paidDate','Data di pagamento','','type="date" required')+field('reason','Riferimento della verifica','','minlength="3" maxlength="1000" required')+
     '<button class="button" type="submit" name="command" value="PAID">Registra pagamento</button></details>':'')+'</form>');
   // Receipt fields are validated only for PAID, never block a download.
   document.querySelector('#payments-action-form').noValidate=true;
@@ -62,8 +65,14 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
      if(facts.reason.length<3)throw Object.assign(Error(),{code:'invalid'});
      job={key:crypto.randomUUID(),review:true,payload:{inputHash:o.data.reviewInput,facts}};
     }else{
-     const cmd=submitter?.value,g=o.group;if(!['READY','PDF','JSON','PAID'].includes(cmd))return true;
-     const evidence=cmd==='PAID'?{documentId:form.elements.document.value,paidDate:form.elements.paidDate.value,amountCents:g.totalCents,reason:form.elements.reason.value.trim()}:null;
+     const cmd=submitter?.value,g=o.group;if(!['READY','PDF','JSON','PAID'].includes(cmd)||cmd==='JSON'&&route().role!=='studio')return true;
+     let docId=form.elements.document?.value;
+     if(cmd==='PAID'&&!docId&&form.elements.receipt?.files[0]){
+      o.uploadJob ||= await service.prepareUpload(o.id,form.elements.receipt.files[0]);
+      const result=await service.uploadDocument(o.uploadJob);docId=result.documentId;
+      o.documents=(await service.listCollaboration(o.id)).documents;
+     }
+     const evidence=cmd==='PAID'?{documentId:docId,paidDate:form.elements.paidDate.value,amountCents:amount(form.elements.paidAmount.value),reason:form.elements.reason.value.trim()}:null;
      if(evidence&&(!o.documents.some(d=>d.id===evidence.documentId)||!evidence.paidDate||evidence.reason.length<3))throw Object.assign(Error(),{code:'invalid'});
      job={key:crypto.randomUUID(),cmd,payload:{draftId:o.data.id,groupKey:g.key,action:cmd==='PDF'||cmd==='JSON'?'DOWNLOADED':cmd,expectedRevision:g.eventRevision,evidence}};
      if(cmd==='PDF'){const {renderF24Pdf}=await import('./f24-renderer.generated.js');job.blob=renderF24Pdf(o.data.draft.taxpayer,g).output('blob');}
@@ -75,7 +84,7 @@ export function createPaymentsUI({auth,service,controller,route,openPanel,done,n
    if(job.review)await service.reviewPayments(o.id,job.payload,job.key);else await service.actF24(o.id,job.payload,job.key);
    jobs.delete(form);if(!still())return true;
    if(job.blob)download(job.blob,'TAL-F24-'+o.group.key+'.'+(job.cmd==='PDF'?'pdf':'json'));
-   await controller.refresh();if(still())done(job.cmd==='PAID'?'Pagamento registrato con la ricevuta.':job.blob?'F24 scaricato. Il download non registra un pagamento.':'Verifica salvata.');
+   await controller.refresh();if(still())done(job.cmd==='PAID'?'Pagamento registrato con la ricevuta.':job.blob?'F24 scaricato. Hai pagato? Apri il modello e carica la quietanza o registra il pagamento.':'Verifica salvata.');
   }catch(e){
    if(!still())return true;const uncertain=['uncertain','stale'].includes(e.code);if(!uncertain)jobs.delete(form);
    error.textContent=e.code==='conflict'?'I dati sono cambiati. Chiudi e riapri i pagamenti aggiornati.':['forbidden','expired'].includes(e.code)?'Non sei più autorizzato a questa operazione.':uncertain?'Conferma non ricevuta. Riprova lo stesso tentativo, senza duplicarlo.':'Controlla i dati. La verifica o il modello non sono disponibili.';

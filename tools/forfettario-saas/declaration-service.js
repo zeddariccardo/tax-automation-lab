@@ -22,11 +22,11 @@ export function createDeclarationService({auth,fetchImpl}){
   reviewDeclaration:(id,payload,key)=>{
    if(!uuid.test(id)||!uuid.test(key))return Promise.reject(problem('invalid'));
    const state=auth.getState(),c=state.selected;
-   if(state.phase!=='ready'||c?.context_type!=='studio')return Promise.reject(problem('forbidden'));
+   if(state.phase!=='ready'||!['personal','studio'].includes(c?.context_type)||c.context_type==='personal'&&c.context_id!==id)return Promise.reject(problem('forbidden'));
    const fingerprint=JSON.stringify({id,payload,key,user:state.user.id,context:c.context_id});
    if(pending.has(key)){const p=pending.get(key);return p.fingerprint===fingerprint?p.promise:Promise.reject(problem('idempotency'));}
    const frozen=structuredClone(payload);
-   const promise=auth.withContextSession(s=>request(s,'/rest/v1/rpc/tal_review_declaration',{p_workspace_id:id,p_context:'studio:'+c.context_id,p_idempotency_key:key,p_payload:frozen}));
+   const promise=auth.withContextSession(s=>request(s,'/rest/v1/rpc/tal_review_declaration',{p_workspace_id:id,p_context:c.context_type+':'+c.context_id,p_idempotency_key:key,p_payload:frozen}));
    pending.set(key,{fingerprint,promise});promise.finally(()=>pending.delete(key)).catch(()=>{});
    return promise;
   }

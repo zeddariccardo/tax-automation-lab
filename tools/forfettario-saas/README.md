@@ -736,3 +736,14 @@ responsive generale **42/42**. Suite backend non modificata: **643 PASS, 260 ski
 e un timeout `lipe / clean`; ripetuto isolatamente **1/1 PASS**.
 Le prime esecuzioni nel sandbox sono state bloccate da Chromium EPERM/ownership;
 le verifiche browser sono state rieseguite con l'utente normale senza installazioni.
+
+### Correzione mirata ingresso
+
+La schermata disconnessa non mostra più la ricerca. La CTA hero diventa Registrati
+e attiva il form esistente con focus su Email; Accedi resta il tab iniziale.
+Il padding desktop porta il pannello 48 px più in alto, mantenendo il footer;
+su mobile resta lo spacing normale. Animazione, checkbox e indice/controllore
+della ricerca autenticata sono invariati.
+Verifiche ripetute: SaaS **192/192**, statici **310/310**, browser dedicato **9/9**;
+controllo visuale 1440/1024/390/375, nessun overflow/errore console/404,
+registrazione da tastiera, focus visibile, ritorno ad Accedi e reduced motion.

@@ -21,12 +21,11 @@ test('matching is accent/case insensitive, bounded, deterministic and has an hon
  assert.deepEqual(ids(''),ids(''));assert.equal(ids('').length,4);
  assert.deepEqual(ids('quanto devo?'),[]);
 });
-test('logged-out search only offers existing authentication paths',()=>{
- const rows=searchDestinations({signedOut:true});
- assert.deepEqual(ids('fatture',rows),['login']);
- assert.deepEqual(ids('registrati',rows),['signup']);
- assert.ok(rows.every(x=>!x.destination.href));
- assert.deepEqual(rows.map(x=>x.destination.action),['auth-login-mode','auth-signup-mode']);
+test('logged-out entry never mounts the product search',()=>{
+ for(const signup of [false,true]){
+  const html=authEntry({access:{phase:'signed-out',message:''},signup,loginEmail:'',brand:()=>'',icon:()=>'',esc:s=>s,button:()=>''});
+  assert.doesNotMatch(html,/data-product-search|Cosa vuoi fare|role="combobox"/);
+ }
 });
 test('no destinations before current context and structural data are ready',()=>{
  for(const role of ['entry','personal','studio'])assert.deepEqual(searchDestinations({role,base:'#/io/',ready:false}),[]);
@@ -59,7 +58,7 @@ test('hero CTA uses the existing Auth action; loading and context choice do not 
  const render=phase=>authEntry({access:{phase,message:'',contexts:[]},loginEmail:'',brand:()=>'',icon:()=>'',esc:s=>s,button:()=>''});
  const html=render('signed-out');
  assert.equal((html.match(/class="button hero-access"/g)||[]).length,1);
- assert.match(html,/class="button hero-access"[^>]*data-action="auth-login-mode"/);
+ assert.match(html,/class="button hero-access"[^>]*data-action="auth-signup-mode" data-auth-focus>Registrati/);
  assert.match(html,/id="login-form"/);assert.match(html,/autocomplete="current-password"/);
  for(const phase of ['loading','choosing','config-error']){
   assert.equal((render(phase).match(/<h1\b/g)||[]).length,1);

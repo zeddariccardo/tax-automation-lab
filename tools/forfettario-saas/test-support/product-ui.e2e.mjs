@@ -57,29 +57,43 @@ try{
   await cb.press('Space');assert.equal(await cb.isChecked(),false);
   await page.keyboard.press('Escape');
  });
- await check('logged-out hero and search both use existing Auth form, never operational routes',async()=>{
+ await check('logged-out has no search; hero Registrati focuses existing signup; panel Accedi still works',async()=>{
   await logout();assert.equal(await page.locator('h1').count(),1);
-  await search.fill('quanto devo pagare?');assert.equal(await page.locator('#product-results').getByRole('option').count(),1);
-  await search.press('ArrowDown');await search.press('Enter');
-  assert.equal(await page.locator('#login-email').evaluate(e=>document.activeElement===e),true);
-  await page.locator('.hero-access').click();
-  assert.equal(await page.locator('#login-email').evaluate(e=>document.activeElement===e),true);
+  assert.equal(await search.count(),0);
   assert.equal(await page.locator('#login-form').count(),1);
+  assert.equal(await page.locator('.hero-access').textContent(),'Registrati');
+  await page.locator('.hero-access').focus();await page.locator('.hero-access').press('Enter');
+  assert.equal(await page.locator('#signup-form').count(),1);
+  assert.equal(await page.locator('.auth-tabs [data-action=auth-signup-mode]').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('#login-email').evaluate(e=>document.activeElement===e),true);
+  await page.locator('.auth-tabs [data-action=auth-login-mode]').click();
+  assert.equal(await page.locator('#login-form').count(),1);
+  assert.equal(await page.locator('.auth-tabs [data-action=auth-login-mode]').getAttribute('aria-pressed'),'true');
   assert.equal(await page.locator('.hero-access').count(),1);
   assert.equal(await page.locator('#auth-error').textContent(),'');
+  await page.keyboard.press('Control+k');assert.equal(await search.count(),0);
  });
- await check('responsive hero/search at 1440, 1024, 390 and 375; no horizontal overflow',async()=>{
+ await check('entry at 1440, 1024, 390 and 375: no search, visible signup focus, no overflow',async()=>{
   for(const width of [1440,1024,390,375]){
    await page.setViewportSize({width,height:width<500?812:900});
-   await search.fill('documenti');
+   assert.equal(await search.count(),0);
    const geometry=await page.evaluate(()=>{
-    const a=document.querySelector('.hero-fixed'),b=document.querySelector('.hero-word'),popup=document.querySelector('.product-search-popup');
+    const a=document.querySelector('.hero-fixed'),b=document.querySelector('.hero-word');
     const typ=e=>{const s=getComputedStyle(e);return [s.fontFamily,s.fontSize,s.fontWeight,s.lineHeight];};
-    return {width:innerWidth,scroll:document.documentElement.scrollWidth,typA:typ(a),typB:typ(b),popup:popup.getBoundingClientRect().toJSON()};
+    return {width:innerWidth,scroll:document.documentElement.scrollWidth,typA:typ(a),typB:typ(b),
+     header:document.querySelector('.entry-header').getBoundingClientRect().toJSON(),
+     card:document.querySelector('.auth-card').getBoundingClientRect().toJSON(),
+     footer:document.querySelector('.entry-footer').getBoundingClientRect().toJSON()};
    });
    assert.ok(geometry.scroll<=width+1,JSON.stringify(geometry));assert.deepEqual(geometry.typA,geometry.typB);
-   assert.ok(geometry.popup.left>=0&&geometry.popup.right<=width+1);
-   await search.press('Escape');
+   assert.ok(geometry.card.top>geometry.header.bottom);
+   assert.ok(geometry.footer.top>geometry.card.bottom);
+   if(width>=1024)assert.ok(geometry.card.top>=180&&geometry.card.top<=205,'desktop card lifted about 48px from its prior ~240px top');
+   await page.locator('.hero-access').click();
+   assert.equal(await page.locator('#signup-form').count(),1);
+   const focused=await page.locator('#login-email').evaluate(e=>({active:document.activeElement===e,top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom,height:innerHeight}));
+   assert.ok(focused.active&&focused.top>=0&&focused.bottom<=focused.height,JSON.stringify(focused));
+   await page.locator('.auth-tabs [data-action=auth-login-mode]').click();
   }
  });
  await check('loop holds five words then seamless repeated first word, without moving the layout',async()=>{

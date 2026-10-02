@@ -5,6 +5,8 @@ import {readFile} from 'node:fs/promises';
 const app=new URL('../../',import.meta.url),root=new URL('../../../../',import.meta.url);
 const views=new Set(['auth-view.js','fiscal-view.js','declaration-view.js','payments-view.js','collaboration-view.js','onboarding-ui.js','onboarding-service.js','app.css']);
 const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>S16 · Stati simulati</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/fonts/fonts.css"><link rel="stylesheet" href="/app.css"><body><header class="page"><div class="field"><label for="state">S16 · Galleria locale · dati e sessioni simulati</label><select id="state"></select></div></header><div id="preview"></div><script type="module" src="/test-support/s16/gallery.mjs"></script></body></html>`;
+views.add('product-ui.js');
+const port=Number(process.env.TAL_GALLERY_PORT)||4179;
 http.createServer(async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('Content-Security-Policy',"default-src 'self'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'");
  try{const p=new URL(req.url,'http://127.0.0.1').pathname;
@@ -24,4 +26,4 @@ http.createServer(async(req,res)=>{
   const target=new URL(p.slice(1),font?root:app);
   res.setHeader('Content-Type',p.endsWith('.css')?'text/css':p.endsWith('.woff2')?'font/woff2':'text/javascript; charset=utf-8');res.end(await readFile(target));
  }catch{res.writeHead(404).end();}
-}).listen(4179,'127.0.0.1',()=>console.log('S16 visual states: http://127.0.0.1:4179 · no external connections'));
+}).listen(port,'127.0.0.1',()=>console.log('S16 visual states: http://127.0.0.1:'+port+' · no external connections'));

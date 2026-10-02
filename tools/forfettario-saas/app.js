@@ -5,6 +5,7 @@ import { collaborationView } from './collaboration-view.js';
 import { createCollaborationUI } from './collaboration-ui.js';
 import { auth } from './auth-runtime.js';
 import { authEntry } from './auth-view.js';
+import {createProductSearch,searchDestinations} from './product-ui.js';
 import { cloud, service } from './tal-data-runtime.js';
 import { createIncomeController } from './income-controller.js';
 import { createFiscalController } from './fiscal-controller.js';
@@ -25,7 +26,7 @@ const collaborations=createCollaborationController({auth,service});
 const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
 const positionFor = id => positions().find(p => p.id === id);
 const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
-let loginEmail = ''; let signup = false;
+let loginEmail = ''; let signup = false; let heroPaused = false;
 
 const app = document.querySelector('#app');
 const panel = document.querySelector('#panel');
@@ -126,7 +127,15 @@ function navigate(url, { open, focus, requestId } = {}) {
   if (panel.open) closePanel(proceed); else proceed();
 }
 
-function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button, signup, setup:onboardingUI.mustSetup()?onboardingUI.content():null }); }
+function entry() { return authEntry({ access, loginEmail, brand, icon, esc, button, signup, heroPaused, setup:onboardingUI.mustSetup()?onboardingUI.content():null }); }
+function productDestinations(){
+ const r=route(),ready=access.phase==='ready'&&structural.phase==='ready'&&(!r.id||!!positionFor(r.id));
+ return searchDestinations({signedOut:access.phase==='signed-out',role:r.role,ready,base:ready&&r.id?href(r,''):null});
+}
+const productSearch=createProductSearch({document,getEntries:productDestinations,icon,onSelect:destination=>{
+ if(destination.href)navigate(destination.href);
+ else void action(destination.action,{dataset:{authFocus:''}});
+}});
 
 function shell(r, content) {
   const studio = r.role === 'studio';
@@ -191,6 +200,7 @@ function deadlines() {
 
 let declarationLayout=null;
 function render(focus = false) {
+  productSearch.capture();
   if(renderedHash===location.hash&&document.querySelector('.declaration-page'))declarationLayout={hash:location.hash,scroll:window.scrollY,open:[...document.querySelectorAll('.declaration-page details')].map(x=>x.open)};
   else if(declarationLayout?.hash!==location.hash)declarationLayout=null;
   if(onboardingUI.mustSetup()&&document.querySelector('#onboarding-form,#studio-form')&&!focus&&!onboardingUI.isLoading())return;
@@ -226,6 +236,12 @@ function render(focus = false) {
     if(!focus)window.scrollTo(0,declarationLayout.scroll);
   }
   if (focus) document.querySelector('#main').focus({ preventScroll: true });
+  let searchRoot=document.querySelector('[data-product-search]');
+  if(!searchRoot&&productDestinations().length&&['oggi','da-fare'].includes(r.page)){
+   searchRoot=document.createElement('div');searchRoot.dataset.productSearch='';
+   document.querySelector('#main .heading')?.after(searchRoot);
+  }
+  productSearch.mount(searchRoot,access.phase+':'+access.selected?.context_id+':'+location.hash,!focus);
 }
 
 function notify(message) { clearTimeout(notificationTimer); notice.textContent = message; notificationTimer = setTimeout(() => { notice.textContent = ''; }, 5500); }
@@ -299,7 +315,11 @@ let currentInvoice;
 async function action(name, element) {
   if(await importUI.action(name,element))return;
   if(await onboardingUI.act(name,element))return;
-  if(name==='auth-signup-mode'||name==='auth-login-mode'){signup=name==='auth-signup-mode';if(access.phase!=='signed-out')await auth.restore();render(true);return;}
+  if(name==='hero-motion'){
+   heroPaused=!heroPaused;const intro=document.querySelector('.entry-intro');if(intro)intro.dataset.heroPaused=String(heroPaused);
+   element.setAttribute('aria-pressed',String(heroPaused));element.textContent=heroPaused?'Riprendi animazione':'Ferma animazione';return;
+  }
+  if(name==='auth-signup-mode'||name==='auth-login-mode'){signup=name==='auth-signup-mode';if(access.phase!=='signed-out')await auth.restore();render(true);if(element?.dataset.authFocus!==undefined)document.querySelector('#login-email')?.focus();return;}
   if (!name.startsWith('auth-') && !['close','account'].includes(name) && access.phase !== 'ready') return;
   const r = route();
   if (!name.startsWith('auth-') && !['account','close','data-retry'].includes(name) && (structural.phase !== 'ready' || (r.id && !positionFor(r.id)))) return;

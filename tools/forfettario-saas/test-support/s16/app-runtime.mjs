@@ -2,7 +2,7 @@
 // Only gallery-server substitutes this module; the production app never imports it.
 import {fixtures} from './states.mjs';
 const {personal,studio}=fixtures;
-const state={phase:'ready',user:{id:'synthetic-user',email:'visual-only@tal.test'},selected:personal,contexts:[personal,studio]};
+const state={phase:'ready',message:'',user:{id:'synthetic-user',email:'visual-only@tal.test'},selected:personal,contexts:[personal,studio]};
 const listeners=new Set(),emit=()=>{for(const fn of listeners)fn(structuredClone(state));};
 export const auth={getState:()=>structuredClone(state),subscribe(fn){listeners.add(fn);fn(structuredClone(state));return()=>listeners.delete(fn);},restore:async()=>{},revalidate:async()=>{},chooseAgain:async()=>{state.phase='choosing';state.selected=null;emit();},choose:async c=>{state.phase='ready';state.selected=c;emit();},logout:async()=>{state.phase='signed-out';state.selected=null;emit();}};
 const position={id:personal.context_id,label:'Cliente sintetico S16',talId:'TAL-TEST0001',years:[{year:2025},{year:2026}],activities:[{id:'synthetic-activity',atecoCode:'62.10.00',label:'Attività sintetica'}],startDate:'2020-01-01'};

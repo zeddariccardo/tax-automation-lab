@@ -693,3 +693,46 @@ tre pagine con il vecchio renderer nei casi compatibili; controlli browser
 il server sintetico separato nel backend; JWT/RLS e transazioni sono testati
 contro il cloud col service layer reale. Nessun bypass di login nel prodotto.
 Limiti e matrice completa: backend `test-support/forfettario-s15/`.
+
+## Product UI enhancement — 2 ottobre 2026
+
+Quattro interventi di presentazione, senza nuove dipendenze o cambi ai contratti:
+
+- Ingresso disconnesso: un solo H1, Inter, “semplifica” grigio e cinque parole nei
+  colori TAL. Ciclo di 10,75 s: 1,72 s di lettura e 0,43 s di transizione per parola.
+  Larghezza riservata alla parola più lunga; copia finale per il ritorno continuo.
+  Testo statico per screen reader, pausa manuale e frase fissa con reduced motion.
+- Solo la CTA hero Accedi usa l'alone viola. Focalizza il form Auth esistente;
+  non aggiunge login, redirect o procedure alternative.
+- Ricerca locale in ingresso, Oggi, Da fare e riepilogo cliente: massimo quattro
+  destinazioni, frecce/Invio/Esc, click esterno e Ctrl/Cmd+K quando presente.
+  Da disconnessi offre solo Accedi/Registrati; nello Studio generale apre il
+  portafoglio, senza elencare clienti. Dentro una posizione usa il contesto corrente
+  e lo ricontrolla alla selezione. Nessuna richiesta di rete per cercare.
+  Pagamenti/Dichiarazione sono destinazioni di consultazione, non comandi per
+  sbloccare, confermare o pagare. Scadenze Studio è ancora demo e non è indicizzata.
+- Stile checkbox riusabile in `app.css` (`input[type=checkbox]` nell'app/pannello,
+  oppure classe `tal-checkbox` su un input nativo). Applicato all'unico checkbox
+  booleano già presente nel form di verifica pagamenti; nessun nuovo fact.
+  Label nativa, Space, focus, checked/disabled, reduced motion e forced colors.
+
+Verifiche: `node --test tools/forfettario-saas/product-ui.test.mjs` **8/8**;
+`node tools/forfettario-saas/test-support/product-ui.e2e.mjs` **9/9**.
+Il secondo avvia il banco di prova S16 isolato, blocca richieste esterne e salva
+eventuali screenshot solo nella directory temporanea del sistema, fuori da Git.
+Le sessioni del banco sono simulate: non sostituisce una prova Auth hosted.
+Smoke aggiuntivo sulla preview configurata `127.0.0.1:4173`: ripristino della
+sessione Studio esistente, ricerca → Clienti e ricerca nel cliente → Entrate,
+senza scritture hosted né errori JavaScript osservati.
+Percorsi e click verificati anche nel browser interattivo: ingresso → ricerca →
+Accedi (focus Email), contribuente → Entrate, Studio → Clienti → posizione →
+Pagamenti; checkbox toggled senza salvare. Viewport 1440/1024/390/375, nessun
+overflow, errore console o 404 osservato. Tastiera, contrasto dei nuovi colori,
+riduzione movimento e geometria del loop verificati; tastiera nativa mobile e
+screen reader su dispositivo fisico non certificati.
+
+Regressioni: SaaS **192/192**, statici **310/310**, suite frontend **770/770**,
+responsive generale **42/42**. Suite backend non modificata: **643 PASS, 260 skip**
+e un timeout `lipe / clean`; ripetuto isolatamente **1/1 PASS**.
+Le prime esecuzioni nel sandbox sono state bloccate da Chromium EPERM/ownership;
+le verifiche browser sono state rieseguite con l'utente normale senza installazioni.

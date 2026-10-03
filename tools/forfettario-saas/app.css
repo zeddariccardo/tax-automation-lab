@@ -191,7 +191,8 @@ button.text-link{border:0;background:transparent;padding:0;text-align:left}
 .breakdown span{min-width:0;color:var(--ink-secondary)}
 .breakdown strong{font-variant-numeric:tabular-nums;font-size:17px;font-weight:600;text-align:right;letter-spacing:-.01em}
 .receipt-list{list-style:none;padding:0;margin:var(--space-3) 0}
-.receipt-list li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.receipt-list li{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px 16px;padding:12px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.receipt-list li>.text-link{flex-basis:100%;text-align:left}
 .receipt-list li:last-child{border-bottom:0}
 .cloud-profile{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;padding:var(--space-4);margin:var(--space-3) 0;background:var(--paper);border-radius:12px;font-size:var(--text-sm)}
 .cloud-profile dt{color:var(--muted)}

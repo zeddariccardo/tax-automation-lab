@@ -30,7 +30,9 @@ test('personal backup preserves both years, originals, private plan and exact le
 });
 test('canonical transfer integrity, no fuzzy identity, immutable cloud ID conflict',()=>{
  const b=transfer(),[r]=parseBackup(b);assert.equal(r.talId,b.metadata.clientCode);
- assert.throws(()=>migrationTarget(r,{id:'w',talId:'TAL-XXXXXXXX',dataRevision:0}),/diverso/);
+ const chosen=migrationTarget(r,{id:'w',talId:'TAL-XXXXXXXX',dataRevision:0});
+ assert.equal(chosen.target.workspaceId,'w');assert.equal(chosen.target.talId,'TAL-XXXXXXXX');
+ assert.equal(chosen.target.legacyTalId,r.talId);assert.ok(chosen.warnings.some(x=>x.includes('riferimento di origine')));
  b.identity.taxCode='00000000702';assert.throws(()=>parseBackup(b),/integrità/);
 });
 test('invalid backup money, schema and tax-year data rejected before preview',()=>{

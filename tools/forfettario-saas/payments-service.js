@@ -32,5 +32,6 @@ export function createPaymentsService({auth,fetchImpl}){
   }),
   reviewPayments:(id,payload,key)=>command('tal_review_payments',id,payload,key),
   actF24:(id,payload,key)=>command('tal_f24_action',id,payload,key),
+  verifyPaymentFact:(id,payload,key)=>command('tal_verify_payment_fact',id,payload,key),
  };
 }

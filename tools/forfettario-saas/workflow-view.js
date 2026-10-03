@@ -3,12 +3,17 @@ export const managementLabel=id=>({INPS_GS:'Gestione Separata',INPS_ARTIGIANI:'A
 export const humanDiagnostic=text=>String(text).replace(/INPS_GS/g,'Gestione Separata').replace(/INPS_ARTIGIANI/g,'Artigiani').replace(/INPS_COMMERCIANTI/g,'Commercianti');
 // One receipt may contain multiple lines. Display the documented event once,
 // independently from the current draft (which contains only amounts still due).
+export function confirmationLabel(confirmation,verifications=[]){
+ if(confirmation?.state==='studio_verified')return 'Verificato dallo Studio';
+ const origin=confirmation?.state==='evidence_backed'?'Dichiarato dal titolare · evidenza allegata':confirmation?.state==='self_declared'?'Dichiarato dal titolare':'Origine da verificare';
+ return origin+(verifications.some(v=>v.state==='studio_verified')?' · verificato dallo Studio':'');
+}
 export function paymentRecords(draft){
  const records=new Map();
  for(const p of draft?.paymentReconciliation?.payments||[]){
   if(!p.eventId||p.eventId.startsWith('pension:'))continue;
   if(!Number.isSafeInteger(p.amountCents)||p.amountCents<=0)throw Error('Invalid payment record');
-  const r=records.get(p.eventId)||{id:p.eventId,paidDate:p.paidDate,amountCents:0,documentId:p.documentId};
+  const r=records.get(p.eventId)||{id:p.eventId,paidDate:p.paidDate,amountCents:0,documentId:p.documentId,...(p.confirmation?{confirmation:p.confirmation,verifications:p.verifications||[]}:{})};
   r.amountCents+=p.amountCents;if(!Number.isSafeInteger(r.amountCents))throw Error('Invalid payment total');
   records.set(p.eventId,r);
  }

@@ -15,6 +15,7 @@ import { declarationView } from './declaration-view.js';
 import { createDeclarationUI } from './declaration-ui.js';
 import { paymentsView } from './payments-view.js';
 import { createPaymentsUI } from './payments-ui.js';
+import { createVerificationUI } from './verification-ui.js';
 import { parseAmount, amountInput, formatCents } from './income-model.js';
 const incomes = createIncomeController({auth,service});
 const fiscals = createFiscalController({auth,service});
@@ -331,6 +332,7 @@ async function action(name, element) {
   if(await collaborationUI.action(name,element))return;
   if(await declarationUI.act(name))return;
   if(await paymentsUI.act(name))return;
+  if(await verificationUI.act(name))return;
   switch (name) {
     case 'income-retry': await incomes.refresh(); break;
     case 'workflow-retry': await workflows.refresh(); break;
@@ -496,6 +498,7 @@ function clearPosition() {
   collaborationUI.clear();
   declarationUI.clear();
   paymentsUI.clear();
+  verificationUI.clear();
   importUI.clear();
   collaborations.select([]);
   workflows.clear();
@@ -508,6 +511,8 @@ function clearPosition() {
 const collaborationUI=createCollaborationUI({service,controller:collaborations,route,access:()=>access,openPanel,done,notify,esc,button,render});
 const declarationUI=createDeclarationUI({auth,service,controller:declarations,route,canConfirm,openPanel,done,notify,esc});
 const paymentsUI=createPaymentsUI({auth,service,controller:payments,route,canConfirm,openPanel,done,notify,esc});
+const verificationUI=createVerificationUI({auth,service,route,fiscals,payments,openPanel,done});
+document.addEventListener('submit',event=>{if(event.target.id==='fact-verification-form'){event.preventDefault();void verificationUI.submit(event.target);}});
 document.addEventListener('submit',event=>{if(event.target.id.startsWith('payments-')){event.preventDefault();void paymentsUI.submit(event.target,event.submitter);}});
 document.addEventListener('submit',event=>{if(event.target.id==='declaration-review-form'){event.preventDefault();void declarationUI.submit(event.target);}});
 

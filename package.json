@@ -12,7 +12,7 @@
     "test:browser": "node tests/run-test-group.mjs browser",
     "test:e2e": "node tests/responsive.e2e.mjs",
     "test:e2e:lipe": "node tests/lipe-azioni.e2e.mjs",
-    "serve": "python -m http.server 4173"
+    "serve": "node scripts/serve-local.mjs"
   },
   "devDependencies": {
     "playwright": "^1.47.0"

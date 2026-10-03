@@ -809,3 +809,31 @@ della ricerca autenticata sono invariati.
 Verifiche ripetute: SaaS **192/192**, statici **310/310**, browser dedicato **9/9**;
 controllo visuale 1440/1024/390/375, nessun overflow/errore console/404,
 registrazione da tastiera, focus visibile, ritorno ad Accedi e reduced motion.
+
+## S18-A — provenance, import e server locali
+
+Il titolare può ancora registrare versamenti e dichiarare F24 pagati. La UI
+mostra separatamente dichiarazione del titolare, evidenza allegata e verifica
+dello Studio. Lo Studio può verificare esplicitamente un versamento esistente,
+con riferimento e retry idempotente: actor, contesto e grant sono risolti dal
+server. La dichiarazione originale resta nella cronologia. Le righe precedenti
+non vengono retroattivamente etichettate come verificate.
+
+I backup dello Studio richiedono selezione esplicita delle posizioni autorizzate
+e conferma della preview. Il TAL ID legacy del file non assegna identità canonica
+e non instrada automaticamente il backup. Facts fiscali/previdenziali non
+verificabili sono conservati per revisione; non completano onboarding o deduzioni.
+I comandi ordinari restano disponibili per il contribuente standalone.
+
+Preview SaaS e server statico npm sono su loopback con contenimento realpath,
+anche in presenza di junction. Nessuna modifica al vecchio Forfettario, Worker,
+Auth o policy RLS. Nessun deployment del sito. Dettaglio migration e prove nel
+backend test-support/forfettario-s18a/README.md.
+
+Verifiche finali: SaaS 201/201, statici 310/310, responsive generale 42/42,
+galleria 9/9; browser hosted standalone/Studio 1440/1024/390/375 senza
+overflow, errori JavaScript o HTTP. Prova reale della RPC di verifica separata
+dal pannello browser aperto/annullato. Screenshot solo nella TEMP di sistema.
+Suite frontend generale 769/770: resta riproducibile un overflow della guida
+del vecchio Forfettario a 1024px, passo 6, su file/test/asset invariati.
+Questo controllo non viene dichiarato PASS né corretto nello sprint security.

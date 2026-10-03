@@ -1,6 +1,6 @@
 // Loopback-only static preview. No API proxy and no production deployment.
 import http from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { validateConfig } from './auth-context-service.js';
@@ -13,9 +13,9 @@ const prefix = '/tools/forfettario-saas/';
 // A fresh module graph per server run also invalidates a cached static null config.
 const previewVersion = Date.now().toString(36);
 const allowed = new Set(['payments-service.js','payments-view.js','payments-ui.js','f24-renderer.generated.js','f24-pdf-vendor.generated.js','declaration-service.js','declaration-controller.js','declaration-view.js','declaration-ui.js','index.html', 'app.js', 'app.css', 'mark.svg', 'demo-service.js', 'auth-runtime.js', 'auth-context-service.js', 'auth-view.js', 'tal-data-service.js', 'tal-data-runtime.js', 'income-model.js', 'income-controller.js', 'fiscal-controller.js', 'fiscal-view.js', 'collaboration-service.js', 'collaboration-controller.js', 'collaboration-view.js', 'collaboration-ui.js','onboarding-service.js','onboarding-ui.js','import-ui.js','import-model.js','import-service.js','import-legacy.generated.js']);
-allowed.add('product-ui.js');allowed.add('workflow-view.js');
+allowed.add('verification-ui.js');allowed.add('product-ui.js');allowed.add('workflow-view.js');
 const types = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.woff2':'font/woff2' };
-const connections = config ? config.supabaseUrl + '/auth/v1/ ' + config.supabaseUrl + '/rest/v1/rpc/tal_list_my_contexts' + ["rpc/tal_workflow_summary","rpc/tal_request_fact_document","rpc/tal_reopen_document_request","rpc/tal_resolve_document_fact","rpc/tal_record_pension_movement","credit_note","credit_note_line","refund","legacy_binding","rpc/tal_review_payments","rpc/tal_f24_action","rpc/tal_review_declaration","rpc/tal_fiscal_snapshot","rpc/tal_commit_import","rpc/tal_migrate_personal","tax_workspace","economic_activity","tax_year","studio","studio_client_link","studio_client_private","invoice","invoice_component","payment","allocation","rpc/tal_create_invoice","rpc/tal_record_payment","rpc/tal_record_pension_payment","document","activity_feed_item","rpc/tal_post_activity","rpc/tal_reserve_document","rpc/tal_finalize_document","rpc/tal_advance_request","rpc/tal_delete_document","rpc/tal_get_onboarding","rpc/tal_provision_personal","rpc/tal_provision_studio","rpc/tal_save_onboarding","rpc/tal_create_link_invite","rpc/tal_preview_link_invite","rpc/tal_list_my_links","rpc/tal_accept_link","rpc/tal_revoke_link"].map(t => ' ' + config.supabaseUrl + '/rest/v1/' + t).join('') + " " + config.supabaseUrl + "/functions/v1/tal-calculate-fiscal" + ["/functions/v1/tal-payment-draft","/functions/v1/tal-declaration-draft","/functions/v1/tal-verify-document-upload","/functions/v1/tal-download-document","/functions/v1/tal-resolve-activity","/storage/v1/object/tal-documents/"].map(p=>" "+config.supabaseUrl+p).join("") : "'none'";
+const connections = config ? config.supabaseUrl + '/auth/v1/ ' + config.supabaseUrl + '/rest/v1/rpc/tal_list_my_contexts' + ["rpc/tal_verify_payment_fact","rpc/tal_workflow_summary","rpc/tal_request_fact_document","rpc/tal_reopen_document_request","rpc/tal_resolve_document_fact","rpc/tal_record_pension_movement","credit_note","credit_note_line","refund","legacy_binding","rpc/tal_review_payments","rpc/tal_f24_action","rpc/tal_review_declaration","rpc/tal_fiscal_snapshot","rpc/tal_commit_import","rpc/tal_migrate_personal","tax_workspace","economic_activity","tax_year","studio","studio_client_link","studio_client_private","invoice","invoice_component","payment","allocation","rpc/tal_create_invoice","rpc/tal_record_payment","rpc/tal_record_pension_payment","document","activity_feed_item","rpc/tal_post_activity","rpc/tal_reserve_document","rpc/tal_finalize_document","rpc/tal_advance_request","rpc/tal_delete_document","rpc/tal_get_onboarding","rpc/tal_provision_personal","rpc/tal_provision_studio","rpc/tal_save_onboarding","rpc/tal_create_link_invite","rpc/tal_preview_link_invite","rpc/tal_list_my_links","rpc/tal_accept_link","rpc/tal_revoke_link"].map(t => ' ' + config.supabaseUrl + '/rest/v1/' + t).join('') + " " + config.supabaseUrl + "/functions/v1/tal-calculate-fiscal" + ["/functions/v1/tal-payment-draft","/functions/v1/tal-declaration-draft","/functions/v1/tal-verify-document-upload","/functions/v1/tal-download-document","/functions/v1/tal-resolve-activity","/storage/v1/object/tal-documents/"].map(p=>" "+config.supabaseUrl+p).join("") : "'none'";
 http.createServer(async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -33,7 +33,9 @@ http.createServer(async (req, res) => {
     const font = /^\/assets\/fonts\/[A-Za-z0-9/_-]+\.(css|woff2)$/.test(pathname);
     const vendor = pathname === '/assets/vendor/sheetjs-0.20.3.min.js';
     if (!(pathname.startsWith(prefix) && allowed.has(name)) && !font && !vendor) { res.writeHead(404).end(); return; }
-    const target = font || vendor ? path.join(root, pathname) : path.join(dir, name);
+    const target = await realpath(font || vendor ? path.join(root, pathname) : path.join(dir, name));
+    const relative = path.relative(await realpath(root), target);
+    if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) { res.writeHead(404).end(); return; }
     let data = await readFile(target);
     if (name === 'index.html') data = Buffer.from(data.toString().replace('src="./app.js"', 'src="./app.js?preview=' + previewVersion + '"'));
     if (path.extname(target) === '.js' && !vendor) data = Buffer.from(data.toString().replace(/(['"])(\.\/[\w.-]+\.js)\1/g, (_all, quote, source) => quote + source + '?preview=' + previewVersion + quote));

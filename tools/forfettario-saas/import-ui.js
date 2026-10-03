@@ -2,11 +2,11 @@ import {formatCents,sumCents} from './income-model.js';
 // Local-only drafts. Only the explicit confirmation calls a cloud write.
 export function createImportUI({auth,service,positions,route,esc,openPanel,refresh,completed}) {
  let model,document0=null,snapshots=new Map(),plan=null,bootstrap=false,scope=[],busy=false,generation=0,identity='';
- let sheetIndex=0,year=new Date().getFullYear(),mapping=null;
+ let sheetIndex=0,year=new Date().getFullYear(),mapping=null,legacyAssignments=null;
  const button=(action,label)=>'<button class="button" type="button" data-action="'+action+'">'+label+'</button>';
  const secondary=(action,label)=>'<button class="text-link" type="button" data-action="'+action+'">'+label+'</button>';
  const errorText=e=>({conflict:'I dati sono cambiati o entrano in conflitto. Riapri il file e controlla l’anteprima. Nessun dato è stato sovrascritto.',forbidden:'L’accesso a una delle posizioni è cambiato. Nessuna importazione parziale.',expired:'Accedi di nuovo per continuare.',uncertain:'Non abbiamo ricevuto conferma. Riprova la stessa importazione: non creerà duplicati.',stale:'La sessione è cambiata. Riapri il file per controllare lo stato.'}[e.code]||e.message||'Controlla il file e riprova.');
- function clear(){generation++;document0=null;snapshots.clear();plan=null;scope=[];busy=false;mapping=null;sheetIndex=0;}
+ function clear(){generation++;document0=null;snapshots.clear();plan=null;scope=[];busy=false;mapping=null;sheetIndex=0;legacyAssignments=null;}
  function sync(){const a=auth.getState(),next=JSON.stringify([a.user?.id,a.selected]);if(next!==identity){identity=next;clear();}}
  function fileForm(){return '<p>Backup TAL, FatturaPA XML o file CSV/Excel. Controlla l’anteprima prima di confermare.</p><form id="import-file-form"><div class="field"><label for="import-file">File da importare</label><input id="import-file" name="file" type="file" accept=".json,.xml,.csv,.xlsx" multiple required></div><p class="small muted">Il file viene letto sul tuo dispositivo. L’originale locale rimane invariato.</p><p role="alert" class="error" tabindex="-1"></p><button class="button" type="submit">Controlla il file</button></form>';}
  async function loadSnapshots(ids){const v=generation;for(const id of ids){if(!snapshots.has(id)){const s=await service.importSnapshot(id,year);if(v!==generation)return;snapshots.set(id,s);}}}
@@ -41,14 +41,18 @@ export function createImportUI({auth,service,positions,route,esc,openPanel,refre
    (counts.years?'<p>'+counts.years+' annualità, attività e dati originali conservati.</p>':'')+
    warnings.map(w=>'<p class="small muted">'+esc(w)+'</p>').join('')+
    (errors.length?'<div role="alert"><h3>'+errors.length+' elementi da controllare</h3><ul>'+errors.slice(0,30).map(e=>'<li>'+esc(e)+'</li>').join('')+'</ul><p>Nessun dato verrà importato finché questi problemi non sono risolti.</p></div>':'<p>'+ (targets.length>1?'L’importazione riguarda '+targets.length+' clienti e verrà completata tutta insieme.':!targets.length&&!bootstrapTarget?'Non c’è nulla di nuovo da importare.':'Controlla che il file riguardi questa posizione.')+'</p>')+
+   (targets.length?'<ul>'+targets.map(t=>{const p=scope.find(p=>p.id===t.workspaceId);return '<li>Destinazione: '+esc(p?.label||'La mia attività')+' · '+esc(p?.talId||'')+'</li>';}).join('')+'</ul>':'')+
    (!errors.length&&(targets.length||bootstrapTarget)?button('s13-confirm','Conferma importazione'):'')+
    '<p role="alert" id="import-error" class="error" tabindex="-1"></p>'+secondary('s13-import','Scegli un altro file'));
  }
  async function prepareLegacy(){
+  if(!bootstrap&&auth.getState().selected.context_type==='studio'&&!legacyAssignments){
+   openPanel('Associa le posizioni','<p>Scegli la destinazione di ogni backup tra i clienti collegati. L’ID contenuto nel file non autorizza l’importazione.</p><form id="import-legacy-clients-form">'+document0.records.map((r,i)=>'<div class="field"><label for="legacy-client-'+i+'">'+esc(r.label)+' · '+esc(r.talId||'ID non presente')+'</label><select id="legacy-client-'+i+'" name="'+i+'" required><option value="">Scegli cliente</option>'+scope.map(p=>'<option value="'+p.id+'">'+esc(p.label+' · '+(p.talId||''))+'</option>').join('')+'</select></div>').join('')+'<p role="alert" class="error" tabindex="-1"></p><button class="button" type="submit">Mostra anteprima</button></form>');return;
+  }
   const v=generation,targets=[],warnings=[],errors=[],counts={payments:0,creditNotes:0,refunds:0,years:0};let bootstrapTarget,duplicates=0,newInvoices=0;
   if(bootstrap&&document0.records.length!==1)throw Error('Per iniziare scegli il backup della tua sola posizione.');
   for(const r of document0.records){let p;
-   if(!bootstrap){p=scope.length===1&&auth.getState().selected.context_type==='personal'?scope[0]:scope.find(p=>p.talId&&p.talId===r.talId);
+   if(!bootstrap){p=scope.length===1&&auth.getState().selected.context_type==='personal'?scope[0]:scope.find(p=>p.id===legacyAssignments?.[document0.records.indexOf(r)]);
     if(!p){errors.push(r.label+': nessuna posizione collegata con questo ID TAL.');continue;}await loadSnapshots([p.id]);}
    if(v!==generation)return;
    try{const built=model.migrationTarget(r,p?position(snapshots.get(p.id)):null,{personal:bootstrap||auth.getState().selected.context_type==='personal'});
@@ -95,7 +99,8 @@ export function createImportUI({auth,service,positions,route,esc,openPanel,refre
   }
   if(name==='s13-confirm'&&plan){busy=true;const v=generation,actor=auth.getState().user?.id,context=JSON.stringify(auth.getState().selected),wasBootstrap=!!plan.bootstrapTarget;let output;
    const b=document.querySelector('[data-action="s13-confirm"]');if(b)b.disabled=true;
-   try{output=plan.bootstrapTarget?await service.migratePersonal(plan.bootstrapTarget,plan.key):await service.commitImport(plan.payload,plan.key);
+   try{if(auth.getState().selected?.context_type==='studio')for(const t of plan.payload.targets)t.destinationConfirmed=true;
+    output=plan.bootstrapTarget?await service.migratePersonal(plan.bootstrapTarget,plan.key):await service.commitImport(plan.payload,plan.key);
     if(v!==generation)return true;
     const invoiceCount=plan.invoiceCount,count=output.targets.reduce((n,t)=>n+t.inserted,0);
     await refresh();await completed(output);
@@ -122,6 +127,10 @@ export function createImportUI({auth,service,positions,route,esc,openPanel,refre
     mapping=model.autoMapBulkHeaders(headers);await configure();
    }else if(form.id==='import-mapping-form'){
     await prepareTable(Object.fromEntries(new FormData(form)));
+   }else if(form.id==='import-legacy-clients-form'){
+    const choices=Object.fromEntries(new FormData(form));
+    if(Object.values(choices).some(id=>!scope.some(p=>p.id===id))||new Set(Object.values(choices)).size!==Object.values(choices).length)throw Error('Scegli una posizione collegata distinta per ogni backup.');
+    legacyAssignments=choices;await prepareLegacy();
    }else if(form.id==='import-xml-client-form')await prepareXML(form.elements.client.value);
    else if(form.id==='import-xml-activities-form')await prepareXML(form.dataset.position,Object.fromEntries(new FormData(form)));
   }catch(e){if(v===generation){const el=form.querySelector('[role="alert"]');if(el){el.textContent=errorText(e);el.focus();}else errorPanel(e);}}

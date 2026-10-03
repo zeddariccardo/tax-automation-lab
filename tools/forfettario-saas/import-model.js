@@ -64,7 +64,8 @@ export function parseBackup(document) {
 // No zero/unknown conversion; no pension scheme inferred from dates/ATECO/profile.
 export function migrationTarget(record,position,{personal=true,confirmNoContributions=[]}={}) {
  const s=record.state,profile=s.profile,graph=graphFromLedger(s.ledger,profile.activities),warnings=[];
- if(position?.talId&&record.talId&&position.talId!==record.talId)fail('Questa posizione ha già un ID TAL diverso. Non è possibile sostituirlo.');
+ if(record.talId)warnings.push('L’ID nel backup è conservato come riferimento di origine. Non assegna né sostituisce l’ID della posizione cloud.');
+ warnings.push('Dati fiscali e previdenziali del backup conservati, da confermare in TAL. Le conferme precedenti non vengono importate come verifiche.');
  const {activities,year,pension,eligibilityFacts,priorEmployeePensionIncomeCents,employeeIncomeExceptionApplies,startupRateRequested,startupFacts,...identity}=profile;
  const years=Object.entries(s.fiscalYears).map(([year0,annual])=>{
   const {pension:p,forecast,liquidity,...facts}=clone(annual);
@@ -106,17 +107,17 @@ export async function bindingDigest(value){
 }
 export async function migrationPreview(target,snapshot){
  const errors=[],counts={},bindings=snapshot.bindings.filter(b=>b.source_scope===target.sourceScope),ids=new Map(bindings.map(b=>[b.legacy_id,b.target_id]));let duplicates=0;
- for(const [kind,rows]of Object.entries(target.graph)){counts[kind]=0;for(const row of rows){const old=bindings.find(b=>b.kind===kind&&b.legacy_id===row.id);if(!old){counts[kind]++;continue;}
+ for(const [kind,rows]of Object.entries(target.graph)){counts[kind]=0;if(kind==='pensionPayments')continue;for(const row of rows){const old=bindings.find(b=>b.kind===kind&&b.legacy_id===row.id);if(!old){counts[kind]++;continue;}
   const copy=clone(row);delete copy._talOrder;
   if(await bindingDigest(copy)!==old.content_hash)errors.push('Un dato già importato è cambiato nel file. Nessuna sostituzione automatica.');
   else if(kind==='invoices')duplicates++;
  }}
  for(const y of target.years||[]){const old=snapshot.years.find(v=>v.year===y.year),facts=clone(y.facts);if(facts.forecast?.activityId)facts.forecast.activityId=ids.get(facts.forecast.activityId)||facts.forecast.activityId;
-  if(old&&Object.keys(old.facts).length&&canonicalJson(old.facts)!==canonicalJson(facts))errors.push('I dati dell’anno '+y.year+' sono diversi da quelli già presenti.');
+  if(old&&Object.keys(old.facts).length&&canonicalJson(old.facts.importReview?.state==='needs_review'?old.facts.legacyOriginal:old.facts)!==canonicalJson(old.facts.importReview?.state==='needs_review'?y.facts:facts))errors.push('I dati dell’anno '+y.year+' sono diversi da quelli già presenti.');
  }
  for(const [k,v]of Object.entries(target.identity||{}))if(Object.hasOwn(snapshot.workspace.identity,k)&&canonicalJson(v)!==canonicalJson(snapshot.workspace.identity[k]))errors.push('I dati della posizione non coincidono con il file.');
  const declaration=target.pensionDeclarations?.find(d=>d.year===snapshot.taxYear?.year);
- if(declaration&&snapshot.pensionDeclaration&&declaration.state!==snapshot.pensionDeclaration.state)errors.push('I contributi versati hanno già una conferma diversa: verifica i dati prima di importare.');
+ if(declaration&&snapshot.pensionDeclaration&&snapshot.pensionDeclaration.state!=='unknown')errors.push('I contributi versati hanno già una conferma: verifica i dati prima di importare.');
  return {counts,duplicates,errors:[...new Set(errors)]};
 }
 

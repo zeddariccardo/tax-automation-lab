@@ -26,7 +26,7 @@ const collaborations=createCollaborationController({auth,service});
 const workflows=createCollaborationController({auth,service:{listCollaborationQueue:async ids=>{const out=[];for(let i=0;i<ids.length;i+=4)out.push(...await Promise.all(ids.slice(i,i+4).map(id=>service.readWorkflow(id))));return out;}}});
 const workflow=id=>workflows.getState().phase==='ready'?workflows.getState().data.find(w=>w.workspaceId===id):null;
 const canConfirm=id=>workflow(id)?.canConfirm===true;
-const workflowPending=()=>workflows.getState().phase==='loading'?'<p role="status">Aggiornamento delle verifiche…</p>':'<p role="alert">Non riusciamo a caricare le verifiche aggiornate.</p>'+button('workflow-retry','Riprova');
+const workflowPending=()=>workflows.getState().phase==='loading'?'<p class="loading" role="status">Aggiornamento delle verifiche…</p>':'<p role="alert">Non riusciamo a caricare le verifiche aggiornate.</p>'+button('workflow-retry','Riprova');
 const positions = () => structural.phase === 'ready' ? structural.data.positions : [];
 const positionFor = id => positions().find(p => p.id === id);
 const positionLabel = id => positionFor(id)?.label || 'Posizione non disponibile';
@@ -110,6 +110,7 @@ function showRoute(focus) {
   const saved = views.get(location.hash);
   filter = saved?.filter || 'all'; taxMode = focus === 'reserve-detail' ? 'current' : saved?.taxMode || 'current';
   if (route().role === 'studio' && route().page === 'clienti' && !route().client) clientQuery = saved?.query || '';
+  entering = { hash: location.hash, at: performance.now() };
   render(true);
   void cloud.refresh();
   void workflows.refresh();
@@ -142,7 +143,7 @@ function shell(r, content) {
   return `<div class="${r.client ? 'client-mode' : ''}"><aside class="rail"><div class="rail-brand">${brand()}</div><p class="eyebrow rail-label">${studio ? esc(studioName) : 'Il tuo forfettario'}</p>${nav(studio ? studioItems : navItems, studio ? '#/studio' : '#/io', r.client ? 'clienti' : activePage,'Principale')}<div class="rail-bottom"><div class="profile"><span class="avatar">${icon(studio?'briefcase':'person')}</span><div><strong>${studio ? esc(studioName) : 'La mia attività'}</strong><span class="small muted">${studio ? 'Area Studio' : esc(p?.label || '')}</span></div></div></div></aside><div class="shell"><header class="topbar"><div class="mobile-brand">${brand()}</div><span class="small muted desktop-date">${new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}</span><div class="demo-tools"><span class="demo-label">Ambiente di sviluppo · dati sintetici</span><button class="demo-switch" type="button" data-action="account">Account</button></div></header><main class="page" id="main" tabindex="-1">${clientHeader}${content}${footer()}</main></div>${r.client ? `<div class="mobile-client-nav">${returnLink('text-link context-return')}${nav(clientItems,`#/studio/clienti/${r.id}`,activePage,'Posizione cliente mobile')}</div>` : ''}</div>`;
 }
 function cloudStatus() {
-  if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Caricamento')+'<p role="status">Caricamento della posizione…</p>';
+  if (structural.phase === 'loading' || structural.phase === 'idle') return heading('Caricamento')+'<p class="loading" role="status">Caricamento della posizione…</p>';
   const denied = structural.phase === 'forbidden';
   return heading(denied ? 'Posizione non disponibile' : 'Dati non disponibili')+'<p role="alert">'+(denied ? 'Il tuo accesso potrebbe essere cambiato. Ricontrolla le posizioni disponibili.' : 'Controlla la connessione e riprova.')+'</p>'+button(denied?'auth-retry':'data-retry','Riprova');
 }
@@ -163,16 +164,16 @@ function fiscalPage(r) {
  const yearControl=years.length>1?'<label class="small fiscal-year">Anno <select aria-label="Anno fiscale" data-fiscal-year>'+years.map(y=>'<option value="'+y+'"'+(y===year?' selected':'')+'>'+y+'</option>').join('')+'</select></label>':'';
  return fiscalView({r,state:fiscals.getState(),mode:taxMode,heading:(title,text,actions='')=>heading(title,text,yearControl+actions),button,link,href,euro,esc,label:positionLabel(r.id)});
 }
-const today=r=>{const w=workflow(r.id);if(r.client)return (w?clientWorkflow(w,{heading,label:positionLabel(r.id),base:href(r,''),esc,link}):heading('Riepilogo',esc(positionLabel(r.id)))+workflowPending())+collaboration(r,'today');incomes.select(r.id);const s=incomes.getState();const start=s.phase==='ready'&&!s.data.invoices.length?heading('La mia attività','Aggiungi una fattura già emessa o importa i dati esistenti.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>':fiscalPage(r);return start+(w?nextPaymentView(w,{href:href(r,'pagamenti'),esc,euro}):workflowPending())+'<p>'+link(href(r,'dichiarazione'),'Dichiarazione TAL')+'</p>'+collaboration(r,'today');};
+const today=r=>{const w=workflow(r.id);if(r.client)return (w?clientWorkflow(w,{heading,label:positionLabel(r.id),base:href(r,''),esc,link}):heading('Riepilogo',esc(positionLabel(r.id)))+workflowPending())+collaboration(r,'today');incomes.select(r.id);const s=incomes.getState();const start=s.phase==='ready'&&!s.data.invoices.length?heading('La mia attività','Aggiungi una fattura già emessa o importa i dati esistenti.',button('add-invoice','Aggiungi la prima fattura'))+'<p>Hai già usato TAL? <button class="text-link" type="button" data-action="s13-import">Importa i tuoi dati</button></p>':fiscalPage(r);return start+'<div class="today-follow"><div class="today-side">'+(w?nextPaymentView(w,{href:href(r,'pagamenti'),esc,euro}):workflowPending())+link(href(r,'dichiarazione'),icon('file')+'<span>Dichiarazione TAL</span>','link-card')+'</div>'+collaboration(r,'today')+'</div>';};
 function invoiceRows(p) {
   const list = p.invoices.filter(i => filter !== 'outstanding' || i.residual > 0);
   if (!list.length) return '<p class="empty">'+(filter==='outstanding'?'Non ci sono importi da incassare.':'Non hai ancora registrato fatture. Aggiungi la prima.')+'</p>';
-  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.residual === 0 ? 'paid' : ''}">${i.review ? 'Rettifica da controllare' : i.residual === 0 ? (i.credited ? 'Rettificata' : 'Incassata') : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`, 'button secondary') : ''}</div></article>`).join('');
+  return list.map(i => `<article class="row"><div class="row-main"><h3><button type="button" class="text-link" data-action="invoice-detail" data-invoice="${i.id}">Fattura ${esc(i.number)}</button></h3><p>${esc(i.customer)} · ${new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(i.date))}</p></div><div class="row-end"><strong class="money">${euro(i.total)}</strong><span class="payment-state ${i.review ? 'tone-warn' : i.residual === 0 ? 'paid tone-ok' : i.paid ? 'tone-info' : 'tone-neutral'}">${i.review ? 'Rettifica da controllare' : i.residual === 0 ? (i.credited ? 'Rettificata' : 'Incassata') : i.paid ? `${euro(i.paid)} incassati` : 'Da incassare'}</span>${i.paid>0&&i.residual>0?'<span class="muted small">Restano '+euro(i.residual)+'</span>':''}</div><div class="row-action">${i.residual>0&&i.simple ? button('payment', 'Registra incasso', `data-invoice="${i.id}"`, 'button secondary') : ''}</div></article>`).join('');
 }
 function income(r) {
   incomes.select(r.id);
   const state=incomes.getState();
-  if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p role="status">Caricamento di fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
+  if(state.phase!=='ready')return heading('Entrate')+(state.phase==='loading'?'<p class="loading" role="status">Caricamento di fatture e incassi…</p>':'<p role="alert">'+(state.phase==='forbidden'?'L’accesso alla posizione non è più disponibile.':'Non riusciamo a caricare le entrate. Controlla la connessione.')+'</p>'+button('income-retry','Riprova'));
   const p=state.data;
   return `${heading('Entrate', '', `${button('add-invoice', icon('plus')+'Aggiungi fattura')}<button class="button secondary" type="button" data-action="s13-import">${icon('upload')}Importa</button>`)}<div class="summary-inline"><div><span>Incassati nel ${p.year}</span><strong class="money">${p.received===null?'Da verificare':euro(p.received)}</strong></div><div><span>Da incassare · tutte le fatture</span><strong class="money">${euro(p.outstanding)}</strong></div></div><div class="filterbar" aria-label="Filtra fatture"><button class="chip" aria-pressed="${filter === 'all'}" data-filter="all">Tutte</button><button class="chip" aria-pressed="${filter === 'outstanding'}" data-filter="outstanding">Da incassare</button><button class="text-link income-refresh" data-action="income-retry" type="button">Aggiorna</button></div><div class="list" id="invoice-list">${invoiceRows(p)}</div>`;
 }
@@ -191,6 +192,16 @@ function clientRows(query = '') {
 }
 function clients() { return `${heading('Clienti','',button('s11-links','Invita cliente')+'<button class="button secondary" type="button" data-action="s13-import">Importa</button>')}${positions().length ? '<label class="search">'+icon('search')+'<input id="client-search" type="search" aria-label="Cerca un cliente per nome o riferimento" placeholder="Cerca per nome o riferimento" autocomplete="off" value="'+esc(clientQuery)+'"></label>' : ''}<div class="list" id="client-list">${clientRows(clientQuery)}</div><p class="small muted" id="search-status" role="status"></p>`; }
 let declarationLayout=null;
+// Entry motion runs once per navigation, on the first paint without loading states:
+// periodic refreshes rebuild the DOM and must not replay it.
+let entering=null;
+function markEntering(){
+  const main=document.querySelector('#main');
+  if(!entering||entering.hash!==location.hash||!main)return;
+  if(performance.now()-entering.at>4000){entering=null;return;}
+  if(main.querySelector('.loading,[aria-busy="true"]'))return;
+  main.classList.add('is-entering');entering=null;
+}
 function render(focus = false) {
   if(renderedHash===location.hash&&document.querySelector('.declaration-page'))declarationLayout={hash:location.hash,scroll:window.scrollY,open:[...document.querySelectorAll('.declaration-page details')].map(x=>x.open)};
   else if(declarationLayout?.hash!==location.hash)declarationLayout=null;
@@ -228,7 +239,7 @@ function render(focus = false) {
     if(!focus)window.scrollTo(0,declarationLayout.scroll);
   }
   if (focus) document.querySelector('#main').focus({ preventScroll: true });
-
+  markEntering();
 }
 
 function notify(message) { clearTimeout(notificationTimer); notice.textContent = message; notificationTimer = setTimeout(() => { notice.textContent = ''; }, 5500); }
@@ -512,7 +523,7 @@ auth.subscribe(next => {
   const was = previous.phase === 'ready' ? previous.user.id + ':' + previous.selected.context_id : '';
   const current = next.phase === 'ready' ? next.user.id + ':' + next.selected.context_id : '';
   if (was !== current || next.phase === 'loading') clearPosition();
-  if (current && was !== current) history.replaceState({ panel: null }, '', next.selected.context_type === 'personal' ? '#/io/oggi' : '#/studio/da-fare');
+  if (current && was !== current) { history.replaceState({ panel: null }, '', next.selected.context_type === 'personal' ? '#/io/oggi' : '#/studio/da-fare'); entering = { hash: location.hash, at: performance.now() }; }
   render(next.phase !== 'loading');
   if (next.phase === 'signed-out' && next.message) document.querySelector('#login-password')?.focus();
 });

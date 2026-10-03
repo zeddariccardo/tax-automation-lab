@@ -3,7 +3,7 @@ const actionLabel=item=>item.fact_target?.kind==='f24'?'Riconcilia quietanza':it
 export const currentContext=access=>access.selected.context_type+':'+access.selected.context_id;
 export function collaborationView({r,state,access,positions,heading,link,href,button,esc,icon,mode='activity',connection=''}){
  const ctx=currentContext(access),data=state.data?.find(x=>x.workspaceId===r.id);
- const error=()=>'<p role="'+(state.phase==='loading'?'status':'alert')+'">'+(state.phase==='loading'?'Caricamento delle attività…':state.phase==='forbidden'?'Il tuo accesso alla posizione è cambiato.':'Non riusciamo a caricare le attività.')+'</p>'+(state.phase==='loading'?'':button('collaboration-retry','Riprova'));
+ const error=()=>'<p '+(state.phase==='loading'?'class="loading" role="status"':'role="alert"')+'>'+(state.phase==='loading'?'Caricamento delle attività…':state.phase==='forbidden'?'Il tuo accesso alla posizione è cambiato.':'Non riusciamo a caricare le attività.')+'</p>'+(state.phase==='loading'?'':button('collaboration-retry','Riprova'));
  const label=item=>item.actor_context.startsWith('studio:')?(item.actor_context===ctx?'Il tuo Studio':'Lo Studio'):item.actor_context===ctx?'Tu':'Il cliente';
  const date=value=>new Intl.DateTimeFormat('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(value));
  function card(item,d,compact=false){
@@ -15,7 +15,8 @@ export function collaborationView({r,state,access,positions,heading,link,href,bu
    else if(item.status==='submitted'&&mine)action=button(doc?'review':'complete-request',doc?actionLabel(item):'Completa richiesta',`data-request="${item.id}"`);
   }
   const file=doc&&!(item.status==='submitted'&&mine)&&!(item.kind==='event'&&d.activities.some(a=>request(a)&&a.document_id===doc.id))?'<button class="text-link contextual-document" type="button" data-action="document" data-document="'+doc.id+'">'+icon('file')+esc(doc.original_filename)+'</button>':'';
-  return '<article class="feed-item collaboration-item" id="activity-'+item.id+'"><div class="feed-meta"><strong>'+esc(label(item))+'</strong><time>'+date(item.created_at)+'</time></div><p class="message">'+esc(item.body)+'</p>'+ (status?'<p class="state-line">'+esc(status)+'</p>':'')+file+(action?'<div class="actions">'+action+'</div>':'')+'</article>';
+  const tone=status==='Completata'?'ok':['Da verificare','Da fare'].includes(status)?'warn':'neutral';
+  return '<article class="feed-item collaboration-item '+(item.actor_context.startsWith('studio:')?'from-studio':'from-personal')+(mine?' from-me':'')+'" id="activity-'+item.id+'"><div class="feed-meta"><strong>'+esc(label(item))+'</strong><time>'+date(item.created_at)+'</time></div><p class="message">'+esc(item.body)+'</p>'+ (status?'<p class="state-line status-badge tone-'+tone+'">'+esc(status)+'</p>':'')+file+(action?'<div class="actions">'+action+'</div>':'')+'</article>';
  }
  if(mode==='queue'){
   if(!positions.length)return heading('Da fare')+'<p class="empty">Nessun cliente collegato.</p>';

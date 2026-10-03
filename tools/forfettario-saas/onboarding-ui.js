@@ -41,23 +41,26 @@ export function createOnboardingUI({auth,service,esc,button,openPanel,notify,ren
    try{const links=await service.listLinks();if(v!==generation)return true;
     const personal=a.selected.context_type==='personal';
     openPanel(personal?'Il tuo commercialista':'Collegamenti clienti',
-     links.filter(l=>l.status==='active').map(l=>'<article class="row"><div class="row-main"><h3>'+esc(personal?l.studioName:(positions().find(p=>p.id===l.workspaceId)?.label||'Cliente')+' · '+(positions().find(p=>p.id===l.workspaceId)?.talId||''))+'</h3><p>Collegamento attivo</p></div>'+ (l.canRevoke?button('s11-revoke','Interrompi collegamento','data-link="'+l.id+'" data-revision="'+l.revision+'"'):'')+'</article>').join('')+
+     links.filter(l=>l.status==='active').map(l=>'<article class="row"><div class="row-main"><h3>'+esc(personal?l.studioName:(positions().find(p=>p.id===l.workspaceId)?.label||'Cliente')+' · '+(positions().find(p=>p.id===l.workspaceId)?.talId||''))+'</h3><p>Collegamento attivo</p></div>'+ (l.canRevoke?button('s11-revoke','Interrompi collegamento','data-link="'+esc(l.id)+'" data-revision="'+esc(l.revision)+'"'):'')+'</article>').join('')+
+     links.filter(l=>l.canCancel).map(l=>'<article class="row"><div class="row-main"><h3>Invito inviato</h3><p>In attesa di accettazione</p></div>'+button('s11-cancel','Annulla invito','data-link="'+esc(l.id)+'" data-revision="'+esc(l.revision)+'"','button secondary')+'</article>').join('')+
      (personal&&links.some(l=>l.status==='active')?'<p>Per cambiare Studio, interrompi prima il collegamento attuale.</p>':'<p>Condividi un invito con una persona che abbia già configurato il proprio profilo TAL. Sarà lei ad accettare.</p><form id="invite-form"><div class="field"><label for="recipient-email">'+(personal?'Email del titolare dello Studio':'Email del cliente')+'</label><input id="recipient-email" name="email" type="email" autocomplete="off" required></div><p id="s11-error" class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">'+(personal?'Richiedi collegamento':'Crea invito')+'</button></form><hr><form id="accept-code-form"><div class="field"><label for="invite-code">Hai ricevuto un codice invito?</label><textarea id="invite-code" name="code" rows="3" autocomplete="off" spellcheck="false" required></textarea></div><p class="error" id="invite-error" role="alert" tabindex="-1"></p><button type="submit" class="button secondary">Apri invito</button></form>'));
    }catch(e){if(v!==generation)return true;openPanel('Collegamenti','<p role="alert">'+esc(message(e))+'</p>'+button('s11-links','Riprova'));}return true;
   }
   if(name==='s11-copy'){if(!invite){notify('Riapri il collegamento per controllare l’invito.');return true;}try{await navigator.clipboard.writeText(invite);notify('Codice copiato. Condividilo soltanto con il destinatario.');}catch{notify('Seleziona e copia il codice.');}return true;}
   if(name==='s11-revoke'){
-   openPanel('Interrompere il collegamento?','<p>Lo Studio non potrà più accedere alla posizione. I dati della posizione rimarranno su TAL.</p>'+button('s11-revoke-confirm','Interrompi collegamento','data-link="'+element.dataset.link+'" data-revision="'+element.dataset.revision+'"'));
+   openPanel('Interrompere il collegamento?','<p>Lo Studio non potrà più accedere alla posizione. I dati della posizione rimarranno su TAL.</p>'+button('s11-revoke-confirm','Interrompi collegamento','data-link="'+esc(element.dataset.link)+'" data-revision="'+esc(element.dataset.revision)+'"'));
    return true;
   }
-  if(name==='s11-revoke-confirm'||name==='s11-accept'){
+  if(['s11-revoke-confirm','s11-accept','s11-cancel','s11-reject'].includes(name)){
    busy=true;const v=generation;
    try{
     let job=jobs.get(element);if(!job){job={key:crypto.randomUUID(),link:{id:element.dataset.link,revision:Number(element.dataset.revision)}};jobs.set(element,job);}
     if(name==='s11-accept')await service.acceptInvite(preview.code,preview.data,job.key);
+    else if(name==='s11-cancel')await service.endInvite(job.link,'cancel',job.key);
+    else if(name==='s11-reject')await service.endInvite({id:preview.data.linkId,revision:preview.data.revision},'reject',job.key,preview.code);
     else await service.revokeLink(job.link,job.key);
     if(v!==generation)return true;
-    invite=null;preview=null;await refresh();openPanel('Collegamento aggiornato','<p>'+ (name==='s11-accept'?'Il collegamento è attivo. La posizione è condivisa.':'Il collegamento è stato interrotto.')+'</p>');
+    invite=null;preview=null;await refresh();openPanel('Collegamento aggiornato','<p>'+ (name==='s11-accept'?'Il collegamento è attivo. La posizione è condivisa.':name==='s11-cancel'?'Invito annullato.':name==='s11-reject'?'Invito rifiutato.':'Il collegamento è stato interrotto.')+'</p>');
    }catch(e){notify(message(e));}finally{busy=false;}return true;
   }
   return true;
@@ -84,11 +87,11 @@ export function createOnboardingUI({auth,service,esc,button,openPanel,notify,ren
     const out=await service.createInvite({p_recipient_email:job.values.email,p_idempotency_key:job.key,p_token:job.token});
     if(out.status!=='pending')throw Object.assign(Error(),{code:out.status==='limited'?'limited':'invalid'});
     if(version!==generation)return true;invite=inviteCode(out.linkId,job.token);
-    openPanel('Invito pronto','<p>Condividi questo codice soltanto con il destinatario. Scade tra 72 ore. Nessun accesso è concesso prima dell’accettazione.</p><label for="share-code">Codice invito</label><textarea id="share-code" readonly rows="4" spellcheck="false">'+esc(invite)+'</textarea>'+button('s11-copy','Copia codice'));
+    openPanel('Invito pronto','<p>Condividi questo codice soltanto con il destinatario. Il destinatario potrà usarlo se il suo profilo TAL è idoneo. Scade tra 72 ore. Nessun accesso è concesso prima dell’accettazione.</p><label for="share-code">Codice invito</label><textarea id="share-code" readonly rows="4" spellcheck="false">'+esc(invite)+'</textarea>'+button('s11-copy','Copia codice'));
    }
    if(form.id==='accept-code-form'){
     const data=await service.previewInvite(job.values.code);if(version!==generation)return true;preview={code:job.values.code,data};
-    openPanel('Accetta il collegamento','<p><strong>'+esc(data.studioName)+'</strong></p><p>'+(data.direction==='studio_to_client'?'Lo Studio vuole collegarsi alla tua posizione. Potrà vedere i dati condivisi per gestirla.':esc(data.workspaceLabel)+' · '+esc(data.talId||'Riferimento non assegnato')+' chiede di collegarsi al tuo Studio.')+'</p><p>Puoi interrompere il collegamento in seguito.</p>'+button('s11-accept','Accetta'));
+    openPanel('Accetta il collegamento','<p><strong>'+esc(data.studioName)+'</strong></p><p>'+(data.direction==='studio_to_client'?'Lo Studio vuole collegarsi alla tua posizione. Potrà vedere i dati condivisi per gestirla.':esc(data.workspaceLabel)+' · '+esc(data.talId||'Riferimento non assegnato')+' chiede di collegarsi al tuo Studio.')+'</p><p>Puoi interrompere il collegamento in seguito.</p>'+button('s11-accept','Accetta')+button('s11-reject','Rifiuta','','button secondary'));
    }
   }catch(e){if(version===generation&&form.isConnected){err.textContent=message(e);err.focus();if(!['uncertain','stale'].includes(e.code))jobs.delete(form);}}
   finally{busy=false;form.dataset.busy='false';controls.forEach(c=>c.disabled=false);}

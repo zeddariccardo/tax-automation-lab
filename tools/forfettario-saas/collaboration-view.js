@@ -11,19 +11,19 @@ export function collaborationView({r,state,access,positions,heading,link,href,bu
   let action='',status='';
   if(request(item)){
    status=item.status==='completed'?'Completata':item.status==='submitted'?(mine?'Da verificare':item.actor_context.startsWith('studio:')?'Inviato · in attesa dello Studio':'Inviato · in attesa del cliente'):recipient?'Da fare':item.recipient_context.startsWith('personal:')?'In attesa del cliente':'In attesa dello Studio';
-   if(item.status==='todo'&&recipient)action=button(item.kind==='request_upload'?'upload-request':'confirm-request',item.kind==='request_upload'?'Carica documento':'Conferma il dato',`data-request="${item.id}"`);
-   else if(item.status==='submitted'&&mine)action=button(doc?'review':'complete-request',doc?actionLabel(item):'Completa richiesta',`data-request="${item.id}"`);
+   if(item.status==='todo'&&recipient)action=button(item.kind==='request_upload'?'upload-request':'confirm-request',item.kind==='request_upload'?'Carica documento':'Conferma il dato',`data-request="${esc(item.id)}"`);
+   else if(item.status==='submitted'&&mine)action=button(doc?'review':'complete-request',doc?actionLabel(item):'Completa richiesta',`data-request="${esc(item.id)}"`);
   }
-  const file=doc&&!(item.status==='submitted'&&mine)&&!(item.kind==='event'&&d.activities.some(a=>request(a)&&a.document_id===doc.id))?'<button class="text-link contextual-document" type="button" data-action="document" data-document="'+doc.id+'">'+icon('file')+esc(doc.original_filename)+'</button>':'';
+  const file=doc&&!(item.status==='submitted'&&mine)&&!(item.kind==='event'&&d.activities.some(a=>request(a)&&a.document_id===doc.id))?'<button class="text-link contextual-document" type="button" data-action="document" data-document="'+esc(doc.id)+'">'+icon('file')+esc(doc.original_filename)+'</button>':'';
   const tone=status==='Completata'?'ok':['Da verificare','Da fare'].includes(status)?'warn':'neutral';
-  return '<article class="feed-item collaboration-item '+(item.actor_context.startsWith('studio:')?'from-studio':'from-personal')+(mine?' from-me':'')+'" id="activity-'+item.id+'"><div class="feed-meta"><strong>'+esc(label(item))+'</strong><time>'+date(item.created_at)+'</time></div><p class="message">'+esc(item.body)+'</p>'+ (status?'<p class="state-line status-badge tone-'+tone+'">'+esc(status)+'</p>':'')+file+(action?'<div class="actions">'+action+'</div>':'')+'</article>';
+  return '<article class="feed-item collaboration-item '+(item.actor_context.startsWith('studio:')?'from-studio':'from-personal')+(mine?' from-me':'')+'" id="activity-'+esc(item.id)+'"><div class="feed-meta"><strong>'+esc(label(item))+'</strong><time>'+date(item.created_at)+'</time></div><p class="message">'+esc(item.body)+'</p>'+ (status?'<p class="state-line status-badge tone-'+tone+'">'+esc(status)+'</p>':'')+file+(action?'<div class="actions">'+action+'</div>':'')+'</article>';
  }
  if(mode==='queue'){
   if(!positions.length)return heading('Da fare')+'<p class="empty">Nessun cliente collegato.</p>';
   if(state.phase!=='ready')return heading('Da fare')+error();
   const list=state.data.flatMap(d=>d.activities.filter(x=>request(x)&&x.status!=='completed'&&(x.actor_context===ctx||x.recipient_context===ctx)).map(x=>({item:x,data:d})));
   const actionable=({item:x})=>x.status==='submitted'&&x.actor_context===ctx||x.status==='todo'&&x.recipient_context===ctx;
-  const section=(title,items)=>items.length?'<section class="waiting-list '+(title==='Da controllare'?'actionable-list':'')+'"><h2>'+title+'</h2>'+items.map(({item:x,data:d})=>'<article class="waiting-row"><div class="row-main"><strong>'+esc(positions.find(p=>p.id===d.workspaceId)?.label||'Cliente')+'</strong><p>'+esc(x.body)+'</p></div>'+link('#/studio/clienti/'+d.workspaceId+'/attivita',x.status==='submitted'?actionLabel(x):'Apri attività','text-link',false,'data-request="'+x.id+'" data-open="'+(x.status==='submitted'&&x.document_id?'review':'')+'" data-focus="activity-'+x.id+'"')+'</article>').join('')+'</section>':'';
+  const section=(title,items)=>items.length?'<section class="waiting-list '+(title==='Da controllare'?'actionable-list':'')+'"><h2>'+title+'</h2>'+items.map(({item:x,data:d})=>'<article class="waiting-row"><div class="row-main"><strong>'+esc(positions.find(p=>p.id===d.workspaceId)?.label||'Cliente')+'</strong><p>'+esc(x.body)+'</p></div>'+link('#/studio/clienti/'+d.workspaceId+'/attivita',x.status==='submitted'?actionLabel(x):'Apri attività','text-link',false,'data-request="'+esc(x.id)+'" data-open="'+(x.status==='submitted'&&x.document_id?'review':'')+'" data-focus="activity-'+esc(x.id)+'"')+'</article>').join('')+'</section>':'';
   return heading('Da fare')+(list.length?section('Da controllare',list.filter(actionable))+section('In attesa',list.filter(x=>!actionable(x))):'<p class="empty">Nessuna richiesta documentale aperta.</p>');
  }
  if(mode==='today'){
@@ -35,7 +35,7 @@ export function collaborationView({r,state,access,positions,heading,link,href,bu
  if(mode==='documents'){
   const head=link(href(r,'attivita'),icon('back')+'Torna ad Attività','text-link archive-back',false)+heading('Archivio documenti','',button('upload-other','Aggiungi un altro documento'));
   if(!data)return head+error();
-  return head+(data.documents.length?'<div class="list document-list">'+data.documents.map(d=>{const used=data.activities.some(a=>a.document_id===d.id&&a.status==='completed');return '<article class="row"><span class="doc-icon">'+icon('file')+'</span><div class="row-main"><h2>'+esc(d.original_filename)+'</h2><p>'+date(d.ready_at)+' · '+(used?'Utilizzato in una richiesta completata':'Condiviso')+'</p></div>'+button('document','Scarica documento',`data-document="${d.id}"`,'button secondary')+'</article>';}).join('')+'</div>':'<p class="empty">Nessun documento caricato.</p>');
+  return head+(data.documents.length?'<div class="list document-list">'+data.documents.map(d=>{const used=data.activities.some(a=>a.document_id===d.id&&a.status==='completed');return '<article class="row"><span class="doc-icon">'+icon('file')+'</span><div class="row-main"><h2>'+esc(d.original_filename)+'</h2><p>'+date(d.ready_at)+' · '+(used?'Utilizzato in una richiesta completata':'Condiviso')+'</p></div>'+button('document','Scarica documento',`data-document="${esc(d.id)}"`,'button secondary')+'</article>';}).join('')+'</div>':'<p class="empty">Nessun documento caricato.</p>');
  }
  const header=heading('Attività','',connection+link(href(r,'documenti'),'Archivio documenti','text-link',false));
  if(!data)return header+error();

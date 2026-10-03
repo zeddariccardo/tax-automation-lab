@@ -13,7 +13,7 @@ export function createVerificationUI({auth,service,route,fiscals,payments,openPa
   await controller.refresh();if(!current(o))return true;
   const d=controller.getState().data;
   const record=kind==='pension_payment'?d?.pensionPayments?.find(p=>p.id===id):paymentRecords(d?.draft).find(p=>p.id===id);
-  if(!record)return true;
+  if(!record||record.confirmation?.evidenceStatus==='needs_review')return true;
   opened={...o,kind,id,revision:(record.verifications||[]).length};job=null;
   openPanel('Verifica del versamento','<p>Conferma dopo aver controllato il versamento. La dichiarazione originale del titolare resta nello storico.</p><form id="fact-verification-form"><div class="field"><label for="fact-verification-reason">Riferimento della verifica</label><input id="fact-verification-reason" name="reason" required minlength="3" maxlength="1000"></div><p class="error" role="alert" tabindex="-1"></p><button class="button" type="submit">Conferma verifica dello Studio</button></form>');
   return true;

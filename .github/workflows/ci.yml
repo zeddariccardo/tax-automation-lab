@@ -17,7 +17,7 @@ name: Verifica
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/s07-saas-integration]
   pull_request:
   workflow_dispatch:
 
@@ -51,9 +51,22 @@ jobs:
           node-version: '22'
       - name: Installa Playwright
         run: |
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
           npx playwright install --with-deps chromium
       - name: Golden e characterization che richiedono Chromium
         run: npm run test:browser
       - name: Verifica a 320, 360, 390, 430, 768, 980 e 981 px
         run: npm run test:e2e
+
+  saas:
+    name: SaaS unit and artifact security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node --test "tools/forfettario-saas/*.test.mjs"

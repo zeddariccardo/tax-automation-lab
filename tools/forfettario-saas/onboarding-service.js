@@ -42,6 +42,7 @@ export function createOnboardingService({auth,fetchImpl}) {
    if(!selected||selected.context_type+':'+selected.context_id!==preview.context)throw fail('context');
    return command('tal_accept_link',{...parseInvite(code),p_expected_revision:preview.revision,p_idempotency_key:key},true);
   },
+  endInvite:(link,action,key,code=null)=>command('tal_end_link_invite',{p_link_id:link.id,p_expected_revision:link.revision,p_idempotency_key:key,p_action:action,p_token:code?parseInvite(code).p_token:null},true),
   revokeLink:(link,key)=>command('tal_revoke_link',{p_link_id:link.id,p_expected_revision:link.revision,p_idempotency_key:key},true),
   async resolveActivity(year,code){
    return auth.withIdentitySession(async s=>{

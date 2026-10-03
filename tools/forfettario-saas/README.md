@@ -881,3 +881,14 @@ Header HTTP reali e negazione dei percorsi development verificati sull'artefatto
 Le prove native hosted AAL1/AAL2, offboarding, quota, cleanup e restore sono nel
 runbook backend `test-support/forfettario-s18b/README.md`. SMTP pubblico e produzione
 rimangono da configurare; nessun deployment del sito e nessun lavoro S19.
+
+
+## S18-C — security closure, development verified
+
+Shared HTML/attribute escaping now covers server/hash-derived identifiers, years, counters, dialog titles and import/document forms. Authenticated invitation controls add sender cancellation and recipient rejection; no additional onboarding or signup bypass. The server remains the authority for lifecycle, recipient and current grants. Matching S18-C migrations are installed and verified in development.
+
+The frontend lockfile is now tracked and CI uses npm ci. The production artifact continues to contain only the runtime module graph and required assets; tests, hosted harnesses, local configuration and diagnostics remain excluded. No public deployment occurred.
+
+Local evidence: SaaS 212/212, full frontend 770/770, static 310/310, responsive 42/42; live-DOM XSS and invite cancel/reject keyboard tests at 1440/1024/390/375 PASS. Hosted S18-C: 10/10 operational groups, seven real synthetic logins; S18-B regression 14/14 and post-migration checkpoint 9/9 PASS. See the private backend S18-C README for the complete closure matrix and explicit pre-pilot production gates.
+
+The approved ambiguous historical receipt retains both original payments. Its server-derived `confirmation.evidenceStatus = needs_review` takes precedence over reliability labels: “Evidenza da verificare · associazioni in conflitto”. No professional-verification CTA is offered; the server also rejects new uses/verifications. Amounts, dates and historical audit are unchanged. No automatic reconciliation or conflict-resolution workflow.

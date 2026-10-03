@@ -1,5 +1,9 @@
 import config from './runtime-config.js';
+import binding from './environment-binding.js';
+import {validateEnvironment} from './environment-config.js';
 import { createAuthContextService } from './auth-context-service.js';
+let runtimeConfig=null;
+try { runtimeConfig=validateEnvironment(config,binding); } catch { /* fail closed, no requests */ }
 
 // Email confirmation is completed by Supabase. Never adopt a session from a URL.
 // Remove callback credentials immediately and ask for a normal verified login.
@@ -11,7 +15,7 @@ const blockedStorage = { getItem() { throw new Error('storage'); }, setItem() { 
 let sessionStoragePort, localStoragePort;
 try { localStoragePort = window.localStorage; sessionStoragePort = window.sessionStorage; } catch { /* controlled error in service */ }
 export const auth = createAuthContextService({
-  config,
+  config:runtimeConfig,
   fetchImpl: window.fetch.bind(window),
   storage: localStoragePort || blockedStorage,
   preferenceStorage: sessionStoragePort || blockedStorage,

@@ -1,0 +1,8 @@
+config.local.js
+*.local.json
+*.local.toml
+.env
+.env.*
+dist/
+artifacts/
+*.log

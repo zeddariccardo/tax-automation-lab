@@ -319,6 +319,7 @@ document.addEventListener('submit',event=>{if(event.target.id==='pension-form'){
 const moneyErrors={amount:'Inserisci un importo positivo con al massimo due decimali, entro il residuo.',date:'Controlla la data.',invalid:'Controlla numero, cliente, data e importo.',forbidden:'Il tuo accesso è cambiato. Non puoi completare questa operazione.',expired:'Accedi di nuovo per continuare.',conflict:'I dati sono cambiati. Controlla la situazione aggiornata e riprova.',idempotency:'Questa operazione non corrisponde al tentativo precedente. Chiudi e controlla le entrate.',uncertain:'Conferma non ricevuta. Riprova senza modificare i dati: il tentativo non crea duplicati.',stale:'La sessione è cambiata. Riprova per verificare lo stesso tentativo.'};
 let currentInvoice;
 async function action(name, element) {
+  if(name==='auth-mfa-enroll'){await auth.enrollMfa();document.querySelector('#mfa-code')?.focus();return;}
   if(await importUI.action(name,element))return;
   if(await onboardingUI.act(name,element))return;
   if(name==='hero-motion'){
@@ -403,6 +404,7 @@ document.addEventListener('input', event => {
 });
 document.addEventListener('submit', async event => {
   event.preventDefault();
+  if(event.target.id==='mfa-form'){const code=event.target.elements.code.value;event.target.elements.code.value='';await auth.verifyMfa(code);return;}
   if(await importUI.submit(event.target))return;
   if(await onboardingUI.submit(event.target))return;
   if (event.target.id === 'login-form' || event.target.id === 'signup-form') {

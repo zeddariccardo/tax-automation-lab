@@ -4,7 +4,7 @@ export function validateConfig(value) {
     const url = new URL(value.supabaseUrl);
     if (!/^https:\/\/[a-z]{20}\.supabase\.co$/.test(url.origin) || url.username || url.password || url.port || !['', '/'].includes(url.pathname) || url.search || url.hash) return null;
     if (!/^sb_publishable_[A-Za-z0-9_-]{20,}$/.test(value.publishableKey)) return null;
-    return { supabaseUrl: url.origin, publishableKey: value.publishableKey };
+    return { supabaseUrl: url.origin, publishableKey: value.publishableKey, ...(value.studioMfa===true?{studioMfa:true}:{}) };
   } catch { return null; }
 }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -15,7 +15,7 @@ const messages = {
   unavailable: 'Non riusciamo a verificare il tuo accesso. Riprova tra poco.',
   limited: 'Troppi tentativi. Attendi qualche minuto e riprova.',
   storage: 'Consenti il salvataggio locale della sessione per accedere.',
-  configuration: 'Configurazione di sviluppo assente. Avvia la preview con serve-dev.mjs dopo aver configurato config.local.js.',
+  configuration: 'Configurazione dell’ambiente non valida. Contatta il supporto.',
 };
 const problem = (code, transient = false) => Object.assign(new Error(code), { code, transient });
 const same = (a, b) => !!a && !!b && a.context_type === b.context_type && a.context_id === b.context_id;
@@ -26,6 +26,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
   const contextKey = sessionKey + ':choice';
   const listeners = new Set();
   let epoch = 0, checking = null;
+  let mfaPending=null, mfaBusy=false;
   let state = { phase: config ? 'loading' : 'config-error', user: null, contexts: [], selected: null, message: config ? '' : messages.configuration };
   const snapshot = () => structuredClone(state);
   const emit = next => { state = next; for (const listener of listeners) listener(snapshot()); };
@@ -40,6 +41,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
     } catch (error) { throw problem(error.code === 'expired' || error instanceof SyntaxError ? 'expired' : 'storage'); }
   }
   function clear() {
+    mfaPending=null;
     storage.removeItem(sessionKey);
     preferenceStorage.removeItem(contextKey);
   }
@@ -61,6 +63,7 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
     if (!response.ok) {
       await response.body?.cancel();
       if (path === '/auth/v1/signup' && response.status !== 429) throw problem('signup');
+      if(path.includes('/factors/')&&[400,422].includes(response.status))throw problem('mfa-code');
       throw problem(response.status === 429 ? 'limited' : credentials && [400,401,422].includes(response.status) ? 'credentials' : [400,401,403].includes(response.status) ? 'expired' : 'unavailable', response.status === 429 || response.status >= 500);
     }
     if (response.status === 204 || path.startsWith('/auth/v1/logout')) return null;
@@ -100,6 +103,18 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
     }
     // A saved choice is only a preference; it is never an authorization source.
     const selected = chooser ? null : contexts.find(c => same(c, preferred)) || (contexts.length === 1 && !desired ? contexts[0] : null);
+    if(config.studioMfa && selected?.context_type==='studio'){
+      const security=await request('/rest/v1/rpc/tal_my_studio_security',{token:s.access_token,body:{}});
+      assertCurrent(version);
+      if(!Array.isArray(security))throw problem('unavailable');
+      let aal='aal1';try{aal=JSON.parse(atob(s.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).aal;}catch{}
+      if(security.some(row=>row.studioId===selected.context_id&&row.mfaRequired)&&aal!=='aal2'){
+        mfaPending={selected,userId:user.id,factor:(user.factors||[]).find(f=>f.factor_type==='totp'&&f.status==='verified')?.id||null};
+        emit({phase:'mfa',user:{id:user.id,email:user.email||''},contexts,selected:null,message:'',mfa:{enrolled:!!mfaPending.factor}});
+        return;
+      }
+    }
+    mfaPending=null;
     try {
       if (selected) preferenceStorage.setItem(contextKey, JSON.stringify({ userId: user.id, ...selected }));
       else preferenceStorage.removeItem(contextKey);
@@ -125,6 +140,32 @@ export function createAuthContextService({ config: input, fetchImpl, storage, pr
   const api = {
     sessionKey, contextKey,
     getState: snapshot,
+    async enrollMfa(){
+      if(state.phase!=='mfa'||!mfaPending||mfaPending.factor||mfaBusy)return;
+      const version=epoch;mfaBusy=true;
+      try{
+        const s=await session(version);
+        const result=await request('/auth/v1/factors',{token:s.access_token,body:{factor_type:'totp',friendly_name:'TAL Studio'}});
+        assertCurrent(version);
+        if(!uuid.test(result.id)||typeof result.totp?.secret!=='string')throw problem('unavailable');
+        mfaPending.factor=result.id;
+        // Enrollment secret is shown once in the current view, never persisted/logged.
+        emit({...state,mfa:{enrolled:true,secret:result.totp.secret},message:''});
+      }catch(e){if(version===epoch)emit({...state,message:messages[e.code]||'Non è stato possibile attivare la verifica. Riprova.'});}finally{mfaBusy=false;}
+    },
+    async verifyMfa(code){
+      if(state.phase!=='mfa'||!mfaPending?.factor||!/^\d{6}$/.test(code)||mfaBusy)return;
+      const version=epoch,pending=mfaPending;mfaBusy=true;
+      try{
+        await lock(sessionKey,async()=>{
+          assertCurrent(version);const s=saved();if(!s)throw problem('expired');
+          const challenge=await request('/auth/v1/factors/'+pending.factor+'/challenge',{token:s.access_token,body:{}});
+          const data=await request('/auth/v1/factors/'+pending.factor+'/verify',{token:s.access_token,body:{challenge_id:challenge.id,code}});
+          assertCurrent(version);persist(data,pending.userId);
+        });
+        await discover(version,pending.selected);
+      }catch(e){if(version===epoch){if(e.code==='expired')await failed(e,version);else emit({...state,message:e.code==='mfa-code'?'Codice non valido. Riprova.':'Verifica non disponibile. Riprova.'});}}finally{mfaBusy=false;}
+    },
     // Bootstrap has no selected workspace yet. The caller receives only the current identity session.
     async withIdentitySession(work) {
       if (!['ready','choosing','empty'].includes(state.phase) || !state.user) throw problem('forbidden');

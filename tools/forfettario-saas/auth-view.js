@@ -3,6 +3,11 @@ export function authEntry({ access, loginEmail, brand, icon, esc, button, signup
   let content;
   const exit = '<button class="text-link auth-exit" type="button" data-action="auth-logout">Esci</button>';
   if (setup) content = setup + exit;
+  else if(access.phase==='mfa')content='<h2 id="auth-title" tabindex="-1">Verifica in due passaggi</h2>'+
+    (access.mfa?.enrolled?'<p>Inserisci il codice della tua app di autenticazione.</p>'+
+      (access.mfa.secret?'<div class="field"><label for="mfa-secret">Chiave da aggiungere alla tua app</label><input id="mfa-secret" readonly autocomplete="off" value="'+esc(access.mfa.secret)+'"></div>':'')+
+      '<form id="mfa-form"><div class="field"><label for="mfa-code">Codice a 6 cifre</label><input id="mfa-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required aria-describedby="mfa-error"></div><p id="mfa-error" role="alert">'+esc(access.message)+'</p><button class="button" type="submit">Verifica</button></form>':
+      '<p>Per accedere allo Studio, collega un’app di autenticazione.</p>'+button('auth-mfa-enroll','Configura la verifica')+'<p role="alert">'+esc(access.message)+'</p>')+exit;
   else if (access.phase === 'check-email') content = '<h2 id="auth-title">Verifica email</h2><p>'+esc(access.message)+'</p>'+button('auth-login-mode','Torna ad Accedi');
   else if (access.phase === 'loading') content = '<h2 id="auth-title" tabindex="-1">Accesso in corso</h2><p role="status" aria-live="polite">Verifica dell’account…</p>';
   else if (access.phase === 'config-error') content = '<h2 id="auth-title">Preview da configurare</h2><p>'+esc(access.message)+'</p>';

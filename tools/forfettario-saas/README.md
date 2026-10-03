@@ -837,3 +837,47 @@ dal pannello browser aperto/annullato. Screenshot solo nella TEMP di sistema.
 Suite frontend generale 769/770: resta riproducibile un overflow della guida
 del vecchio Forfettario a 1024px, passo 6, su file/test/asset invariati.
 Questo controllo non viene dichiarato PASS né corretto nello sprint security.
+
+## S18-B — ambiente, artefatto dedicato e MFA Studio
+
+La preview resta development. `environment-config.js` verifica il binding fra
+ambiente, progetto Supabase e origine SaaS. Una futura configurazione production
+richiede origine HTTPS dedicata, progetto approvato separatamente e inventario
+delle risorse development da escludere. Nessun default sceglie la production.
+
+`build-saas.mjs` costruisce una directory nuova contenente soltanto moduli runtime,
+font/vendor necessari, configurazione pubblica verificata e manifest degli header.
+Non pubblicare la radice del repository. Test, PowerShell, README, config locali,
+fixture e diagnostiche restano esclusi. Il file locale è protetto anche dalla
+`.gitignore` versionata della cartella. Nessun servizio/admin secret è ammesso nel
+manifest; `config.example.js` resta senza valori reali.
+
+Il manifest emette CSP via header con endpoint esatti del progetto, `frame-ancestors
+'none'`, `X-Frame-Options: DENY`, no-store, nosniff, no-referrer e Permissions-Policy.
+`serve-artifact.mjs` prova gli stessi header su loopback e serve esclusivamente
+i file dell'artefatto. Il futuro hosting dovrà rispettare `_headers` o tradurre
+fedelmente il manifest: DNS, hosting production e pubblicazione non sono eseguiti.
+
+```powershell
+node tools/forfettario-saas/build-saas.mjs <manifest-operatore.json> <directory-nuova>
+node tools/forfettario-saas/serve-artifact.mjs <directory-artefatto>
+node --test tools/forfettario-saas/operational*.test.mjs
+```
+
+Il manifest operatore contiene `config`, `binding` e `forbiddenResources` (non
+vuoto). `binding.approvedSupabaseUrl` deve essere il progetto production approvato;
+`binding.publicSiteOrigin` deve differire da `config.saasOrigin`. Esempi fittizi
+completi sono nei test, non una configurazione production utilizzabile.
+
+Per Studio con MFA richiesta dal server, l'accesso propone enrollment/challenge
+TOTP Supabase. Nessun OTP custom, logout spurio o bypass della RLS. Il secret TOTP
+temporaneo non entra nel browser storage; il codice si può incollare. Il profilo
+personale del contribuente non richiede MFA Studio. Revoca/Account disabilitato
+restano controllati dal server anche se il JWT non è scaduto.
+
+Verifiche S18-B: SaaS **206/206**, frontend generale **770/770**, statici **310/310**,
+responsive **42/42**; MFA a 1440/1024/390/375 con tastiera/focus e zero overflow.
+Header HTTP reali e negazione dei percorsi development verificati sull'artefatto.
+Le prove native hosted AAL1/AAL2, offboarding, quota, cleanup e restore sono nel
+runbook backend `test-support/forfettario-s18b/README.md`. SMTP pubblico e produzione
+rimangono da configurare; nessun deployment del sito e nessun lavoro S19.
